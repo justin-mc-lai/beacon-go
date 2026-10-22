@@ -1,0 +1,23 @@
+== seed: fresh store in /home/hatch/workspace/beacon-go/bench/seed-store (source: /home/hatch/workspace/repos/beacon) ==
+migrate v1: 21646.9 ms, packages imported={'imported': 128, 'already_present': 0, 'skipped': 0}
+feature=beacon-precheck-stage-and-bundle-freshness packages=128 single_artifact_run=run_v1mig_15362b5a1da19e678dcf4a6d (/home/hatch/workspace/repos/beacon/docs/beacon/archive/v1.6.8/features/beacon-goal-longrun-default-v168/truth.md, 3495 bytes)
+== AC-051 cold start: /home/hatch/workspace/beacon-go/bin/beacon --version (n=50, no warmup) ==
+== AC-052 spine show (n=50) ==
+== AC-053 truth show (truth-map resolve equivalent; n=50) ==
+== AC-054 gate status + gate evaluate (n=50 / n=30) ==
+== AC-055 spine artifacts, single-artifact run (n=50) ==
+== AC-057 goal tick, recording executor, fresh run per sample (n=30) ==
+== v1 AC-051: python -m beacon --version (n=30) ==
+== v1 equivalent query: status show-status (n=30) ==
+== v1 truth-map resolve (the original AC-053 surface; n=30) ==
+AC-051 CLI cold start (beacon --version) | median: 4.04 p95: 5.03 n: 50 pass: True
+AC-052 spine show (one feature, 128-package store) | median: 8.53 p95: 10.16 n: 50 pass: True
+AC-053 truth-map resolve equivalent: truth show (one package) | median: 7.91 p95: 8.77 n: 50 pass: True
+AC-054 Gate calculation: gate evaluate qa (compute + persist verdic | median: 81.46 p95: 95.79 n: 30 pass: False
+AC-055 Single-file evidence hash verification (spine artifacts, 1-a | median: 6.61 p95: 8.78 n: 50 pass: True
+AC-056 DB migration v1->v2 (migrate v1, full source repo import) | median: 21646.86 p95: 21646.86 n: 1 pass: True
+AC-057 Orchestrator iteration scheduling (goal tick, recording exec | median: 102.38 p95: 111.29 n: 30 pass: False
+AC-058 beacon.db volume (seeded 128-package store) | median: None p95: None n: 1 pass: True
+results written to /home/hatch/workspace/beacon-go/bench/results.json
+done.
+exit=0

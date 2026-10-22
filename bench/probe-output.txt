@@ -1,0 +1,18 @@
+=== RUN   TestProbeWriteCosts
+open_write_existing          n=30 median=   1.39ms p95=   2.94ms min=   1.11ms max=   7.96ms
+open_readonly_existing       n=30 median=   0.28ms p95=   0.37ms min=   0.25ms max=   0.47ms
+journal_mode=wal synchronous=2 (2=FULL,1=NORMAL,0=OFF)
+check_writable_select        n=100 median=   0.01ms p95=   0.01ms min=   0.01ms max=   0.03ms
+ddl_ensure_all_stmts         n=30 median=   0.12ms p95=   0.15ms min=   0.12ms max=   0.22ms
+verify_schema_contract       n=30 median=   0.23ms p95=   0.31ms min=   0.22ms max=   0.54ms
+append_event_autocommit      n=30 median=  31.28ms p95=  49.10ms min=  19.71ms max=  84.78ms
+raw_single_insert            n=30 median=  23.02ms p95=  34.70ms min=  18.51ms max=  37.81ms
+tx_1_insert                  n=30 median=  22.40ms p95=  29.47ms min=  19.48ms max=  33.77ms
+tx_4_inserts                 n=30 median=  23.83ms p95=  45.20ms min=  18.51ms max=  70.36ms
+NORMAL_append_event          n=30 median=   0.07ms p95=   1.01ms min=   0.04ms max=  29.71ms
+NORMAL_tx_4_inserts          n=30 median=   0.10ms p95=   0.46ms min=   0.07ms max=   1.21ms
+artifacts_read_path_inproc   n=30 median=   0.13ms p95=   0.42ms min=   0.12ms max=  15.30ms
+probe done
+--- PASS: TestProbeWriteCosts (3.50s)
+PASS
+ok  	beacon-go/internal/store	3.511s
