@@ -104,11 +104,21 @@ Edit the package truth (and its tests/tasks/evidence as needed), then close this
 	// or the edit began outside the change flow (drift).
 	pkg := e.packageFiles(ctx)
 	openFP := core.PackageFingerprint([]byte(pkg.Truth.Text), []byte(pkg.Tests.Text))
+	// M7 (R2a): opening a change marks the tests/tasks materials
+	// stale — they describe the pre-change truth until the
+	// refreeze refreshes them. This runs AFTER openFP is taken:
+	// the fingerprint-at-open must describe the package as the
+	// change found it, not as the marking left it.
+	staleMarked, err := e.markPackageMaterialsStale(ctx)
+	if err != nil {
+		return TruthPackageView{}, err
+	}
 	if err := e.appendFeatureEvent(ctx.Feature.ID, EventTruthChangeRequested, map[string]any{
 		"change_id": changeID, "summary": summary, "by": by,
 		"change_doc":          filepath.ToSlash(changeRel),
 		"package_fingerprint": openFP, "fingerprint_alg": core.FingerprintAlg,
 		"base_truth_sha256": baseTruthSHA, "base_package_fingerprint": basePackageFP,
+		"materials_marked_stale": staleMarked,
 	}); err != nil {
 		return TruthPackageView{}, err
 	}

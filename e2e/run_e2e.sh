@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Beacon Go (v2.0.0-go.8) — end-to-end full-chain script.
+# Beacon Go (v2.0.0-go.9) — end-to-end full-chain script.
 #
 # Chain (one step must not be skipped; no manual back-filling anywhere):
 #   1. git-init a temp project + `projects register`
@@ -65,8 +65,8 @@ main() {
   echo "started: $(date '+%F %T %Z')"
   echo "beacon:  $BEACON"
   "$BEACON" --version
-  "$BEACON" --version | grep -q "v2.0.0-go.8" || {
-    echo "FAIL: this script targets Beacon CLI v2.0.0-go.8"
+  "$BEACON" --version | grep -q "v2.0.0-go.9" || {
+    echo "FAIL: this script targets Beacon CLI v2.0.0-go.9"
     return 1
   }
 

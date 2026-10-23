@@ -25,7 +25,7 @@ type gateTestEnv struct {
 	ctx store.FeatureContext
 }
 
-const frozenTruthDoc = "---\nslug: feat-a\nstatus: frozen\n---\n# Truth\n\n- **AC-001**：the one requirement\n"
+const frozenTruthDoc = "---\nslug: feat-a\nversion: v1.6.19\nstatus: frozen\nlanguage: en\nparser_contract: beacon-feature-package-v2\ncanonical_refs:\n  truth: truth.md\n  tests: tests.md\n  tasks: tasks.md\n  evidence: evidence.md\n---\n# Truth\n\n- **AC-001**：the one requirement\n"
 
 const frozenTestsDoc = "---\nslug: feat-a\n---\n| AC ID | TC ID | Layer | Command | Assertion |\n|-------|-------|-------|---------|-----------|\n| AC-001 | TC-001 | unit | `go test ./...` | passes |\n"
 
@@ -43,7 +43,7 @@ func newGateEnv(t *testing.T, truthDoc string) gateTestEnv {
 	write("truth.md", truthDoc)
 	write("tests.md", frozenTestsDoc)
 	write("tasks.md", "---\nslug: feat-a\n---\n- [ ] the work\n")
-	write("evidence.md", "# Evidence\n\n(no artifacts referenced yet)\n")
+	write("evidence.md", "# Evidence\n\n| Surface | Authority | Artifact |\n|---|---|---|\n| qa | qa_verdict | qa-report.md |\n\n(no artifacts referenced yet)\n")
 	ctx, err := env.st.ResolveFeature(env.root, "feat-a", "")
 	if err != nil {
 		t.Fatal(err)

@@ -60,6 +60,46 @@ func (e *Engine) packageFiles(ctx store.FeatureContext) gate.PackageFiles {
 	return pkg
 }
 
+// integrityReportLive runs the integrity check WITHOUT persisting
+// (the fact gathering + mode default + CheckIntegrity call that
+// EvaluateIntegrity persists, and the version release check /
+// truth-map face read live). Returns the report, the gathered
+// package and the effective mode.
+func (e *Engine) integrityReportLive(ctx store.FeatureContext, mode string) (gate.IntegrityReport, gate.PackageFiles, string, error) {
+	pkg := e.packageFiles(ctx)
+	if mode == "" {
+		mode = gate.IntegrityModeBlock
+		scalars, _, ok := gate.ParseFrontmatter(pkg.Truth.Text)
+		if (ok && scalars["status"] == "frozen") || ctx.Feature.Status == "frozen" {
+			mode = gate.IntegrityModeAuditOnly
+		}
+	}
+	root := ctx.Project.RootPath
+	var artifacts []gate.ArtifactFact
+	runs, err := e.store.Runs().ListByFeature(ctx.Feature.ID)
+	if err != nil {
+		return gate.IntegrityReport{}, pkg, mode, err
+	}
+	for _, run := range runs {
+		arts, err := e.store.Artifacts().ListByRun(run.ID)
+		if err != nil {
+			return gate.IntegrityReport{}, pkg, mode, err
+		}
+		for _, a := range arts {
+			artifacts = append(artifacts, gate.ArtifactFact{AbsPath: a.AbsPath})
+		}
+	}
+	rep := gate.CheckIntegrity(gate.IntegrityInput{
+		Pkg: pkg, Artifacts: artifacts,
+		ResolveRef: func(ref string) string { return resolvePkgPath(root, ref) },
+		FileExists: func(abs string) bool {
+			_, err := os.Stat(abs)
+			return err == nil
+		},
+	}, mode)
+	return rep, pkg, mode, nil
+}
+
 // EvaluateIntegrity runs the Truth Integrity Gate (AC-101) and
 // persists the verdict under gate_type=truth_integrity. mode is
 // "block", "audit_only", or "" for the AC-101 default: an
@@ -74,37 +114,10 @@ func (e *Engine) EvaluateIntegrity(ctx store.FeatureContext, evaluator, mode str
 		return IntegrityView{}, core.NewError(core.ReasonGateTypeUnknown, "gate.EvaluateIntegrity",
 			"unknown integrity mode "+mode+" (block | audit_only)")
 	}
-	pkg := e.packageFiles(ctx)
-	if mode == "" {
-		mode = gate.IntegrityModeBlock
-		scalars, _, ok := gate.ParseFrontmatter(pkg.Truth.Text)
-		if (ok && scalars["status"] == "frozen") || ctx.Feature.Status == "frozen" {
-			mode = gate.IntegrityModeAuditOnly
-		}
-	}
-	root := ctx.Project.RootPath
-	var artifacts []gate.ArtifactFact
-	runs, err := e.store.Runs().ListByFeature(ctx.Feature.ID)
+	rep, _, mode, err := e.integrityReportLive(ctx, mode)
 	if err != nil {
 		return IntegrityView{}, err
 	}
-	for _, run := range runs {
-		arts, err := e.store.Artifacts().ListByRun(run.ID)
-		if err != nil {
-			return IntegrityView{}, err
-		}
-		for _, a := range arts {
-			artifacts = append(artifacts, gate.ArtifactFact{AbsPath: a.AbsPath})
-		}
-	}
-	rep := gate.CheckIntegrity(gate.IntegrityInput{
-		Pkg: pkg, Artifacts: artifacts,
-		ResolveRef: func(ref string) string { return resolvePkgPath(root, ref) },
-		FileExists: func(abs string) bool {
-			_, err := os.Stat(abs)
-			return err == nil
-		},
-	}, mode)
 	ev := gate.Evaluation{
 		GateType: gate.GateTruthIntegrity, Verdict: rep.Verdict,
 		ReasonCodes: rep.ReasonCodes, Evaluator: evaluator,

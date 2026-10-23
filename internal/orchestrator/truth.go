@@ -99,6 +99,11 @@ type TruthPackageView struct {
 	BaselineRecorded bool   `json:"baseline_recorded,omitempty"`
 	BaselineAlready  bool   `json:"baseline_already_recorded,omitempty"`
 	BaselineNote     string `json:"baseline_note,omitempty"`
+	// R2d (M14): set by truth reopen — the revision chain this
+	// reopen just advanced.
+	PreviousRevisionID string `json:"previous_revision_id,omitempty"`
+	NewRevisionID      string `json:"new_revision_id,omitempty"`
+	ReopenReason       string `json:"reopen_reason,omitempty"`
 }
 
 var slugRe = regexp.MustCompile(`^[a-z0-9]+(?:[-_][a-z0-9]+)*$`)
@@ -351,6 +356,10 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string) (TruthPacka
 // status line to frozen (the one sanctioned body write), move the
 // package status + lifecycle, and append the trail event.
 func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload map[string]any) (TruthPackageView, error) {
+	// M7 (R2a): a landed freeze/refreeze refreshes the materials —
+	// stale marks clear BEFORE any fingerprint is recorded, so
+	// the frozen record describes the cleared (current) state.
+	e.clearPackageMaterialsStale(ctx)
 	root := ctx.Project.RootPath
 	abs := resolvePkgPath(root, ctx.Feature.TruthPath)
 	raw, err := os.ReadFile(abs)

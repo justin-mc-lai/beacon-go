@@ -34,6 +34,12 @@ func newTruthCmd() *cobra.Command {
 		newTruthChangeCmd(), newTruthBaselineCmd(), newTruthShowCmd(), newTruthListCmd(),
 		newTruthAskCmd(), newTruthAnswerCmd(), newTruthQuestionsCmd(),
 		newTruthIntentCmd(), newTruthConfirmCmd(), newTruthDriftCmd(), newTruthRebaseCmd(),
+		// R2b (M16): the truth-map standalone face.
+		newTruthMapCmd(),
+		// R2d (M3/M4/M13/M14): intent decomposition, kernel
+		// brainstorm questions, code2truth intake, revision reopen.
+		newTruthDecomposeCmd(), newTruthBrainstormCmd(),
+		newTruthCode2TruthCmd(), newTruthReopenCmd(),
 	)
 	return c
 }

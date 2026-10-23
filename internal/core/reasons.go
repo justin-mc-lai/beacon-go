@@ -411,6 +411,195 @@ const (
 	ReasonTopologyScopeUnreadable = "topology_scope_unreadable" // NEW (S3): see family comment
 )
 
+// ---- Freeze quality R2a family (Python v1.6 parity audit H1-H4 /
+// M5-M7) ----
+//
+// Spellings are verbatim from the Python sources they port:
+// ac_vague_disjunction is truth_review_gate.REASON_VAGUE,
+// truth_scaffold_not_filled its REASON_SCAFFOLD, truth_fsm_invalid
+// is truth_fsm.REASON_TRUTH_FSM_INVALID, materials_status_stale is
+// evaluate_release_truth_materials_gate's headline code,
+// feature_package_validation_failed is truth_integrity's validation
+// code, the TRUTH_DETERMINISM_* pair are truth_integrity's TIG-DC
+// codes (uppercase in the source), and the domain-FSM codes are
+// domain_fsm.py's REASON_* constants. requirement_clarity_open is
+// requirement_clarity.py's blocked-payload code.
+// unapproved_scope_reduction is planner_review_runtime's
+// _deferral_ledger capability name (the ledger row carries no
+// reason_code field in Python; the capability string is its stable
+// identifier). TWO codes are new in this slice and marked as such:
+// scope_mode_invalid (Python only ever DERIVES scope_mode, so it
+// never needed a code for a hand-written bad value; the Go intent
+// command accepts an explicit override and must fail closed on it)
+// — the deferral ledger's own code reuses the Python capability
+// name instead of inventing a second spelling.
+
+const (
+	ReasonACVagueDisjunction        = "ac_vague_disjunction"
+	ReasonTruthScaffoldNotFilled    = "truth_scaffold_not_filled"
+	ReasonTruthFSMInvalid           = "truth_fsm_invalid"
+	ReasonMaterialsStale            = "materials_status_stale"
+	ReasonIntegrityPackageValid     = "feature_package_validation_failed"
+	ReasonDeterminismPlaceholder    = "TRUTH_DETERMINISM_PLACEHOLDER"
+	ReasonDeterminismHollowTemplate = "TRUTH_DETERMINISM_HOLLOW_TEMPLATE"
+	ReasonRequirementClarityOpen    = "requirement_clarity_open"
+	ReasonDeferralUnapproved        = "unapproved_scope_reduction"
+	ReasonScopeModeInvalid          = "scope_mode_invalid" // NEW (R2a): see family comment
+	// Domain FSM authority (domain_fsm.py REASON_* verbatim).
+	ReasonDomainModelMissing      = "domain_model_missing"
+	ReasonEntityPrecedenceMissing = "entity_precedence_missing"
+	ReasonDomainFSMMissing        = "domain_fsm_missing"
+	ReasonDomainFSMIncomplete     = "domain_fsm_incomplete"
+	ReasonIllegalTransitionSlot   = "illegal_transition_slot_missing"
+	ReasonOrphanACWithoutFSMPath  = "orphan_ac_without_fsm_path"
+	ReasonDomainFSMSchemaInvalid  = "domain_fsm_schema_invalid"
+	// Integrity extension scan kinds (truth_integrity.py
+	// scan_integrity_extension_lines: the finding kind IS the code
+	// in the Python payloads).
+	ReasonIntegrityPlaceholderAC    = "placeholder_ac_language"
+	ReasonIntegrityIllegalClosure   = "illegal_closure_path"
+	ReasonIntegritySoftTestAssert   = "soft_test_assertion"
+	ReasonIntegrityAlignmentMissing = "alignment_surface_missing"
+	ReasonIntegrityUserIntentMiss   = "user_intent_missing"
+)
+
+// ---- Orchestration & release R2b family (Python v1.6 parity
+// audit H5/H6/H7/M8/M9/M15/M16) ----
+//
+// Spellings are verbatim from the Python sources they port:
+// planner_review_* are loop_goal_state.record_review_decision's
+// routing codes (the drift-route code is BUILT by that function as
+// planner_review_route_<route with '-' -> '_'>); health_blocked /
+// operator_gate_open / evidence_wait / focus_wait are
+// goal_quota.quota_should_run's four wait-state codes (its
+// quota_exhausted already lives in the budget family above);
+// already_resolved / gate_unresolved are goal_gates.py's gate-card
+// codes; spend_idempotent_replay is goal_budget.commit_spend's
+// replay code; release_profile_invalid is prod_ops_v168
+// .select_release_profile's refusal, release_check_failed is
+// release.py's lifecycle-trace code for a failed version check,
+// and project_metadata_contract_blocked /
+// requirement_package_contract_blocked are release.py check's two
+// early-block codes; feature_package_not_resolved and
+// machine_json_source_hash_stale are truth_map.verify_truth_map's
+// diagnostic codes (the Go truth-map face reuses them for its
+// resolver/fingerprint-staleness diagnostics — see the r2b
+// report for the mapping). THREE codes are new in this slice and
+// marked as such: release_check_hard_block /
+// release_check_downgraded_warning (the task-level distinction the
+// version check must surface per item; Python's check only had
+// pass/warn/fail labels) and review_spec_drift_detected (Python's
+// drift findings bind to its prototype/runtime-projection
+// machinery, which has no Go counterpart; the Go review face
+// judges package drift vs the freeze record instead).
+
+const (
+	ReasonPlannerReviewPacketIncompl   = "planner_review_packet_incomplete"
+	ReasonPlannerReviewBlockingFinding = "planner_review_blocking_finding"
+	ReasonPlannerReviewUserDecisionReq = "planner_review_user_decision_required"
+	ReasonPlannerReviewHumanGateP1     = "planner_review_human_gate_p1"
+	ReasonPlannerReviewRouteUnhandled  = "planner_review_route_unhandled"
+	ReasonHealthBlocked                = "health_blocked"
+	ReasonOperatorGateOpen             = "operator_gate_open"
+	ReasonEvidenceWait                 = "evidence_wait"
+	ReasonFocusWait                    = "focus_wait"
+	ReasonGateAlreadyResolved          = "already_resolved"
+	ReasonGateUnresolved               = "gate_unresolved"
+	ReasonSpendIdempotentReplay        = "spend_idempotent_replay"
+	ReasonReleaseProfileInvalid        = "release_profile_invalid"
+	ReasonReleaseCheckFailed           = "release_check_failed"
+	ReasonProjectMetadataBlocked       = "project_metadata_contract_blocked"
+	ReasonRequirementContractBlocked   = "requirement_package_contract_blocked"
+	ReasonTruthMapNotResolved          = "feature_package_not_resolved"
+	ReasonTruthMapStale                = "machine_json_source_hash_stale"
+	ReasonReleaseCheckHardBlock        = "release_check_hard_block"         // NEW (R2b): see family comment
+	ReasonReleaseCheckDowngraded       = "release_check_downgraded_warning" // NEW (R2b): see family comment
+	ReasonReviewSpecDrift              = "review_spec_drift_detected"       // NEW (R2b): see family comment
+)
+
+// ---- Exec & host R2c family (Python v1.6 parity audit
+// H8/H9/H10/M10/M11/M12) ----
+//
+// Spellings are verbatim from the Python sources they port:
+// qa9_command_missing_auto_case and auto_test_layer_failed are
+// auto_test.py's per-TC codes; the hook_* / invalid_* /
+// manual_confirmation_required / hidden_auto_run_not_allowed /
+// post_release_followup_failed set is project_hooks.py's
+// admission + run vocabulary (its diagnostic codes double as
+// reason codes); archive_governance_not_supported is
+// commands/archive.py's blocked payload code; invalid_project_mode
+// is commands/init.py's refusal code. Codes marked NEW have no
+// Python spelling because Python never needed one (its auto-test
+// ran through a shell, its skill install never conflict-checked,
+// its state lived in files so it never exported/imported).
+
+const (
+	ReasonAutoTestCommandMissing  = "qa9_command_missing_auto_case"
+	ReasonAutoTestLayerFailed     = "auto_test_layer_failed"
+	ReasonAutoTestTestsDocMissing = "autotest_tests_document_missing"   // NEW (R2c)
+	ReasonAutoTestNoExecutable    = "autotest_no_executable_tests"      // NEW (R2c)
+	ReasonAutoTestUnparseable     = "autotest_command_unparseable"      // NEW (R2c): shell-free argv split failed
+	ReasonAutoTestShellSyntax     = "autotest_shell_syntax_unsupported" // NEW (R2c): shell operators refused, never silently misrun
+	ReasonAutoTestFailed          = "autotest_failed"                   // NEW (R2c): aggregate headline when any TC fails/blocks
+	ReasonAutoTestDeclaredBlocked = "tc_declared_blocked"               // NEW (R2c): tests.md's own BLOCKED: escape, reported not executed
+	ReasonSkillInstallConflict    = "skill_install_conflict"            // NEW (R2c)
+	ReasonSkillInstallHostUnknown = "skill_install_host_unknown"        // NEW (R2c)
+	ReasonStateSnapshotMissing    = "state_snapshot_missing"            // NEW (R2c)
+	ReasonStateSnapshotInvalid    = "state_snapshot_invalid"            // NEW (R2c)
+	ReasonArchiveStatusInvalid    = "archive_status_invalid"            // NEW (R2c): Python normalizes silently; the Go face refuses a bad status instead of guessing
+	ReasonArchiveFeatureNotFound  = "archive_feature_not_found"         // NEW (R2c)
+	ReasonArchiveNotSupported     = "archive_governance_not_supported"
+	ReasonProjectModeInvalid      = "invalid_project_mode"
+	ReasonHookAdmissionBlocked    = "hook_admission_blocked"
+	ReasonHookDryRunOnly          = "hook_dry_run_only"
+	ReasonHookManualConfirm       = "manual_confirmation_required"
+	ReasonHookHiddenAutoRun       = "hidden_auto_run_not_allowed"
+	ReasonHookFollowupFailed      = "post_release_followup_failed"
+	ReasonHookFileMissing         = "hook_file_missing"
+	ReasonHookCommandFailed       = "hook_command_failed" // NEW (R2c): Python never executed command_template; the Go face does (via harness) and needs the code
+)
+
+// ---- Intelligence R2d family (Python v1.6 parity audit
+// M1/M2/M3/M4/M13/M14) ----
+//
+// Spellings are verbatim from the Python sources they port:
+// boundary_forbidden_phrase / route_probe_missing /
+// route_probe_mismatch are agent_eval_grader.py's verdict codes;
+// agent_eval_live_runner_not_admitted / agent_eval_admission_missing
+// / prompt_fixture_missing / catalog_harness_missing /
+// live_skill_matrix_mismatch are agent_eval_kit.py's admission and
+// catalog vocabulary. Codes marked NEW have no Python spelling:
+// Python's scorecard simply reports status blocked below the 70
+// composite threshold (agent_eval_kit.REGRESSION_COMPOSITE_THRESHOLD)
+// and never wires that verdict into executor profile selection —
+// the Go face does, and needs names for the dispositions.
+
+const (
+	ReasonBoundaryForbiddenPhrase   = "boundary_forbidden_phrase"
+	ReasonRouteProbeMissing         = "route_probe_missing"
+	ReasonRouteProbeMismatch        = "route_probe_mismatch"
+	ReasonAgentEvalRunnerNotAdmit   = "agent_eval_live_runner_not_admitted"
+	ReasonAgentEvalAdmissionMissing = "agent_eval_admission_missing"
+	ReasonPromptFixtureMissing      = "prompt_fixture_missing"
+	ReasonCatalogHarnessMissing     = "catalog_harness_missing"
+	ReasonLiveSkillMatrixMismatch   = "live_skill_matrix_mismatch"
+	ReasonAgentEvalBelowThreshold   = "agent_eval_below_threshold" // NEW (R2d): profile selection refuses an agent whose latest scorecard is blocked (<70 composite, Python threshold)
+	ReasonAgentEvalNoRecord         = "agent_eval_no_record"       // NEW (R2d): warning disposition — no eval record exists for the profile; selection proceeds
+	ReasonBrainstormModeInvalid     = "brainstorm_mode_invalid"    // NEW (R2d): Python raises ValueError("unsupported brainstorm mode"); the Go face names it
+	ReasonDecomposeFrozen           = "decompose_frozen_package"   // NEW (R2d): decomposition materializes files; a frozen body is never rewritten by it
+	ReasonDecomposeNoIntents        = "decompose_no_intents"       // NEW (R2d): the utterance produced no clause of substance
+	ReasonCode2TruthTargetMissing   = "code2truth_target_missing"  // NEW (R2d): the intake target directory does not exist
+	ReasonTruthReopenNotFrozen      = "truth_reopen_not_frozen"    // NEW (R2d): reopen opens a new revision of a frozen/active package; a draft is simply edited
+)
+
+// PlannerReviewRouteCode builds record_review_decision's drift
+// routing code for one drift route (beacon-gen-truth /
+// beacon-gen-change / beacon-gen-refreeze): the source spells it
+// planner_review_route_<route> with dashes folded to underscores.
+func PlannerReviewRouteCode(route string) string {
+	return "planner_review_route_" + strings.ReplaceAll(route, "-", "_")
+}
+
 // ReasonMonorepoServiceDirty is the v1.6.7 dynamic scope code for a
 // dirty writable monorepo service scope: monorepo_service_dirty:<key>.
 func ReasonMonorepoServiceDirty(serviceKey string) string {
@@ -423,7 +612,7 @@ func IsKnownReasonCode(code string) bool {
 	if _, ok := ReasonCatalog[code]; ok {
 		return true
 	}
-	for _, prefix := range []string{"stage_exit_", "goal_implement_", "main_", "freeze_", "release_", "program_", "hotfix_", "multi_version_", "main_axis_", "gate_", "truth_integrity_", "design_binding_", "truth_change_", "truth_canonical_", "canonical_", "empty_", "revision_", "stale_", "qa_", "executor_", "ralph_", "worktree_", "planner_", "acp_", "skill_", "standard_flow_", "truth_baseline_", "workspace_admission_", "unscoped_", "git_diff_", "topology_gate_", "topology_scope_", "gitscope_", "satellite_", "multi_git_", "monorepo_"} {
+	for _, prefix := range []string{"stage_exit_", "goal_implement_", "main_", "freeze_", "release_", "program_", "hotfix_", "multi_version_", "main_axis_", "gate_", "truth_integrity_", "design_binding_", "truth_change_", "truth_canonical_", "truth_", "canonical_", "empty_", "revision_", "stale_", "qa_", "executor_", "ralph_", "worktree_", "planner_", "acp_", "skill_", "standard_flow_", "truth_baseline_", "workspace_admission_", "unscoped_", "git_diff_", "topology_gate_", "topology_scope_", "gitscope_", "satellite_", "multi_git_", "monorepo_", "ac_vague_", "materials_", "feature_package_", "requirement_clarity_", "unapproved_", "scope_mode_", "domain_", "entity_", "illegal_", "orphan_", "placeholder_", "alignment_", "user_intent_", "TRUTH_DETERMINISM_", "health_", "operator_gate_", "evidence_wait", "focus_wait", "gate_unresolved", "already_resolved", "release_", "feature_package_", "machine_json_", "review_", "autotest_", "qa9_", "auto_test_", "tc_declared_", "skill_install_", "state_snapshot_", "archive_", "hook_", "invalid_project_mode", "agent_eval_", "boundary_", "route_probe_", "prompt_fixture_", "catalog_", "live_skill_", "brainstorm_", "decompose_", "code2truth_", "qa_strategy_"} {
 		if strings.HasPrefix(code, prefix) {
 			return true
 		}

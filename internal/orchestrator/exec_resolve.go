@@ -136,6 +136,18 @@ func (e *Engine) ResolveExecutorFor(runID, selector string, inv *ExecutorConfig)
 					"profile "+name+" selected but its command "+prof.Argv[0]+" is not available and no --exec-cmd override was given")
 			}
 		}
+		// R2d (M1): agent-eval admission at selection time — a
+		// profile whose latest scorecard is blocked (composite
+		// below the Python 70 threshold, or a boundary violation
+		// in its latest graded transcript) is refused here, the
+		// one place the kernel knows which agent is about to
+		// work. No record on file only warns (see
+		// core.AgentAdmissionFromRecord); it never blocks.
+		if fctx, ferr := e.featureContext(featureIDOf(e, runID)); ferr == nil {
+			if aerr := e.CheckProfileAdmission(fctx.Project.RootPath, name, "goal.ResolveExecutorFor"); aerr != nil {
+				return nil, aerr
+			}
+		}
 		return NewProfileExecutor(e, prof, cfg.TimeoutSec), nil
 	default:
 		return nil, core.NewError(core.ReasonExecutorProfileUnknown, "goal.ResolveExecutorFor",
@@ -171,6 +183,12 @@ func (e *Engine) ExecuteProfileIteration(ctx context.Context, runID, profileName
 		argv = cfg.Argv
 	}
 	prof = prof.WithCommand(argv)
+	// R2d (M1): the same agent-eval admission as ResolveExecutorFor.
+	if fctx, ferr := e.featureContext(featureIDOf(e, runID)); ferr == nil {
+		if aerr := e.CheckProfileAdmission(fctx.Project.RootPath, profileName, "goal.ExecuteProfileIteration"); aerr != nil {
+			return StageOutcome{}, harness.Profile{}, aerr
+		}
+	}
 	ex := NewProfileExecutor(e, prof, cfg.TimeoutSec)
 	outcome, err := ex.ExecuteStage(ctx, RunView{RunID: runID, FeatureID: featureIDOf(e, runID)}, StageImplement)
 	return outcome, prof, err

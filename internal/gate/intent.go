@@ -33,7 +33,11 @@ type OpenQuestion struct {
 	Recommendation string `json:"recommendation,omitempty"`
 	Status         string `json:"status"`
 	Answer         string `json:"answer,omitempty"`
-	Line           int    `json:"line,omitempty"`
+	// Source marks who raised the question (R2d, audit M4):
+	// "human" for hand-asked rows, "kernel:brainstorm-*" for
+	// rows the kernel generated. Empty parses as human.
+	Source string `json:"source,omitempty"`
+	Line   int    `json:"line,omitempty"`
 }
 
 // IntentCoverageRow traces one AC to the intent/evidence it serves.
@@ -217,6 +221,7 @@ func ParseOpenQuestions(truth string) []OpenQuestion {
 			Recommendation: col(headers, r, "recommendation"),
 			Status:         questionStatus(col(headers, r, "status")),
 			Answer:         col(headers, r, "answer"),
+			Source:         col(headers, r, "source"),
 			Line:           i + 1,
 		}
 		if q.ID == "" && q.Question == "" {
@@ -245,9 +250,22 @@ func ParseIntentCoverage(truth string) []IntentCoverageRow {
 	return out
 }
 
-// ParseFSM reads the `## Domain FSM` table.
+// fsmSectionText returns the body of the package's FSM section
+// under any of its dialect headings: the Go skeleton's original
+// `## Domain FSM`, the v1.6.19 gold dialect's `## FSM 五元组`,
+// or a domain state-machine heading.
+func fsmSectionText(truth string) (string, bool) {
+	for _, name := range []string{"domain fsm", "fsm 五元组", "业务状态机", "领域状态机", "domain state machine", "状态机"} {
+		if sec, ok := sectionText(truth, name); ok {
+			return sec, true
+		}
+	}
+	return "", false
+}
+
+// ParseFSM reads the FSM five-tuple table.
 func ParseFSM(truth string) []FSMRow {
-	sec, _ := sectionText(truth, "domain fsm")
+	sec, _ := fsmSectionText(truth)
 	headers, rows := tableOf(sec)
 	out := []FSMRow{}
 	for i, r := range rows {
@@ -260,8 +278,99 @@ func ParseFSM(truth string) []FSMRow {
 	return out
 }
 
-var fsmHangRe = regexp.MustCompile(`(?i)hang|挂起|挂死`)
-var fsmIllegalRe = regexp.MustCompile(`(?i)illegal|invalid|非法`)
+// ---- Check E: vague disjunction (truth_review_gate.check_e_vague) ----
+
+// vaguePatterns are check_e_vague's pattern list, copied verbatim
+// (truth_review_gate.py lines 660-675): a deterministic AC cannot
+// carry a branch word — the implementer would have to guess.
+var vaguePatterns = []struct {
+	re    *regexp.Regexp
+	label string
+}{
+	{regexp.MustCompile(`或者`), "或者"},
+	{regexp.MustCompile(`至少`), "至少"},
+	{regexp.MustCompile(`不少于`), "不少于"},
+	{regexp.MustCompile(`等[，。、]|等等`), "等"},
+	{regexp.MustCompile(`(?:^|[^a-zA-Z0-9_])或(?:[^a-zA-Z0-9_]|$)`), "或"},
+	{regexp.MustCompile(`若干`), "若干"},
+	{regexp.MustCompile(`视情况`), "视情况"},
+	{regexp.MustCompile(`(?i)\bat\s+least\b`), "at least"},
+	{regexp.MustCompile(`(?i)\bat\s+most\b`), "at most"},
+	{regexp.MustCompile(`(?i)\betc\.?\b`), "etc"},
+	{regexp.MustCompile(`(?i)\band\s+so\s+on\b`), "and so on"},
+	{regexp.MustCompile(`(?i)\bor\b`), "or"},
+}
+
+var backtickSpanRe = regexp.MustCompile("`[^`]*`")
+
+// checkEVague ports check_e_vague: strip code ticks first so code
+// identifiers never false-fire, then match the branch words.
+func checkEVague(truth string, add func(kind, code, detail string)) {
+	for _, ac := range ExtractACDescriptions(truth) {
+		plain := backtickSpanRe.ReplaceAllString(ac.Description, "")
+		for _, p := range vaguePatterns {
+			if p.re.MatchString(plain) {
+				text := strings.TrimSpace(plain)
+				if r := []rune(text); len(r) > 80 {
+					text = string(r[:80])
+				}
+				add("ac_vague_disjunction", core.ReasonACVagueDisjunction,
+					ac.ID+" 含模糊词 '"+p.label+"': "+text)
+				break
+			}
+		}
+	}
+}
+
+// ---- Check D additions (truth_review_gate.check_d_fill_depth) ----
+
+var journeyHeadingRe = regexp.MustCompile(`(?im)^##\s+(用户旅程|user journey|journey)(?:\s|$)`)
+
+// metaFSMStates is check_d_fill_depth's _META_FSM_STATES: a
+// business package whose FSM models only the package lifecycle
+// (draft/frozen/...) is impersonating a domain FSM.
+var metaFSMStates = map[string]bool{
+	"draft": true, "in_review": true, "frozen": true,
+	"humanize_pending": true, "refreeze_review": true, "in-review": true,
+}
+
+func checkDFillDepth(pkg PackageFiles, scalars map[string]string, add func(kind, code, detail string)) {
+	body := pkg.Truth.Text
+	// Scaffold snapshot markers (_SCAFFOLD_MARKERS handling).
+	if strings.Contains(body, "scaffold: v1.6.10-gold-aligned") ||
+		(strings.Contains(body, "v1.6.10-gold-aligned") && strings.Contains(body, "scaffold:")) {
+		add("scaffold_snapshot", core.ReasonTruthScaffoldNotFilled,
+			"User Intent Snapshot still marks scaffold: v1.6.10-gold-aligned — replace with filled lake content")
+	}
+	// L0 generic placeholder wording.
+	if l0PlaceholderRe.MatchString(body) {
+		add("scaffold_l0_placeholder", core.ReasonTruthScaffoldNotFilled,
+			"L0 still uses generic scaffold wording — rewrite 人话 for this lake")
+	}
+	if !businessDomain(scalars, body) {
+		return
+	}
+	if !journeyHeadingRe.MatchString(body) {
+		add("journey_missing", core.ReasonTruthScaffoldNotFilled,
+			"business domain lake missing ## 用户旅程 / ## User Journey section")
+	}
+	proj := ParseTruthFSM(body)
+	if len(proj.States) > 0 {
+		onlyMeta := true
+		for _, st := range proj.States {
+			if !metaFSMStates[strings.ToLower(strings.TrimSpace(st))] {
+				onlyMeta = false
+				break
+			}
+		}
+		if onlyMeta {
+			add("scaffold_meta_fsm", core.ReasonTruthScaffoldNotFilled,
+				"FSM only models package lifecycle (draft/in_review/frozen) — fill real domain states before freeze")
+		}
+	}
+}
+
+var l0PlaceholderRe = regexp.MustCompile("本湖让用户能完成\\s*`[^`]+`\\s*的核心结果")
 
 // CheckIntentGate is the pure intent judgement over one package.
 func CheckIntentGate(pkg PackageFiles) []Finding {
@@ -330,24 +439,30 @@ func CheckIntentGate(pkg PackageFiles) []Finding {
 		}
 	}
 
-	if strings.EqualFold(strings.TrimSpace(scalars["domain_required"]), "true") {
-		sec, _ := sectionText(pkg.Truth.Text, "domain fsm")
-		rows := ParseFSM(pkg.Truth.Text)
-		if len(rows) == 0 {
+	// Check B (R2a, audit H2): the domain FSM is validated as a
+	// GRAPH by the one validator review and freeze share
+	// (truth_fsm.validate_truth_fsm, gate/fsm.go) — the pre-R2a
+	// keyword sniffing (a row exists, the words hang/illegal
+	// appear) let a wrong graph freeze.
+	if truthyValue(scalars["domain_required"]) {
+		proj := ParseTruthFSM(pkg.Truth.Text)
+		if !proj.FiveTuplePresent {
 			add("intent_fsm_missing", core.ReasonIntentFSMMissing,
-				"domain_required is true but no Domain FSM table is present")
+				"domain_required is true but no FSM five-tuple (State|Event|Guard|To|Action) table is present")
 		} else {
-			for _, r := range rows {
-				if isPlaceholder(r.State) || isPlaceholder(r.Event) || isPlaceholder(r.Guard) ||
-					isPlaceholder(r.To) || isPlaceholder(r.Action) {
+			for _, t := range proj.Transitions {
+				if isPlaceholder(t.State) || isPlaceholder(t.Event) || isPlaceholder(t.Guard) ||
+					isPlaceholder(t.To) || isPlaceholder(t.Action) {
 					add("intent_fsm_incomplete", core.ReasonIntentFSMIncomplete,
 						"Domain FSM row is missing State/Event/Guard/To/Action")
 					break
 				}
 			}
-			if !fsmHangRe.MatchString(sec) || !fsmIllegalRe.MatchString(sec) {
-				add("intent_fsm_incomplete", core.ReasonIntentFSMIncomplete,
-					"Domain FSM must name at least one hang state and one illegal transition")
+			ffindings, _ := ValidateTruthFSM(proj)
+			for _, ff := range ffindings {
+				if ff.Severity == "error" {
+					add(ff.Kind, core.ReasonTruthFSMInvalid, ff.Text)
+				}
 			}
 		}
 	}
@@ -363,11 +478,52 @@ func CheckIntentGate(pkg PackageFiles) []Finding {
 			"## 人话 still carries the skeleton placeholder; write the one-sentence human summary")
 	}
 
+	// Check D fill depth (R2a, audit H4): scaffold snapshot
+	// markers, the L0 generic placeholder, and — for business
+	// domains — the two hard checks (a user journey must exist;
+	// a lifecycle-only FSM is an impersonation, not a domain FSM).
+	checkDFillDepth(pkg, scalars, add)
+
+	// Check E (R2a, audit H1): vague branch words in AC text.
+	checkEVague(pkg.Truth.Text, add)
+
+	// Scope mode is a controlled vocabulary (R2a, audit M6): a
+	// hand-written value outside it silently disables the
+	// full_parity machinery in Python; here it fails closed.
+	if !isPlaceholder(snap.ScopeMode) && !ValidScopeMode(snap.ScopeMode) {
+		add("scope_mode_invalid", core.ReasonScopeModeInvalid,
+			"scope_mode '"+snap.ScopeMode+"' is not in the controlled vocabulary ("+
+				strings.Join(ScopeModeVocabulary, " | ")+"); record intent again with a valid or derived mode")
+	}
+
 	if strings.EqualFold(strings.TrimSpace(snap.ScopeMode), "full_parity") {
 		sec, ok := sectionText(pkg.Truth.Text, "parity matrix")
 		if !ok || len(strings.TrimSpace(sec)) == 0 {
 			add("intent_parity_missing", core.ReasonIntentParityMissing,
 				"scope_mode is full_parity but no Parity Matrix is present")
+		}
+		// Deferral ledger (R2a, audit M5): under a full-parity
+		// promise, deferral wording in the utterance or the ACs
+		// must be dispositioned in the package's Deferral Ledger
+		// with a named user approval — a silent scope cut has no
+		// record and no intercept point otherwise
+		// (planner_review_runtime._deferral_ledger).
+		blob := strings.ToLower(snap.Utterance)
+		for _, ac := range ExtractACDescriptions(pkg.Truth.Text) {
+			blob += "\n" + strings.ToLower(ac.Description)
+		}
+		if containsAnySignal(blob, deferralSignals) {
+			approved := false
+			for _, e := range ParseDeferralLedger(pkg.Truth.Text) {
+				if e.Approved() {
+					approved = true
+					break
+				}
+			}
+			if !approved {
+				add("unapproved_scope_reduction", core.ReasonDeferralUnapproved,
+					"full_parity scope carries deferral wording (mvp/defer/later/延期/裁剪/partial) but no user-approved entry exists in the ## Deferral Ledger; record the deferred item, its reason and the approver, or remove the reduction")
+			}
 		}
 	}
 	return out

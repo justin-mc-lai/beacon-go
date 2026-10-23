@@ -184,6 +184,9 @@ func (e *Engine) evalRelease(ctx store.FeatureContext, evaluator string) (gate.E
 	f.Design = fact(gate.GateDesign)
 	f.Implement = fact(gate.GateImplement)
 	f.QA = fact(gate.GateQA)
+	// M7 (R2a): materials freshness — a surface still marked
+	// stale after a truth change blocks the release verdict.
+	f.MaterialsStale = e.staleMaterialSurfaces(ctx)
 	// Design applicability + human confirmation both live on the
 	// newest goal run; the release_confirmed event is the trail-side
 	// record of the same confirmation (P2a口径).

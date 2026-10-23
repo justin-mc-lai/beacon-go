@@ -42,6 +42,11 @@ func newGateCmd() *cobra.Command {
 // resolveGateFeature resolves the feature context for a gate command.
 func resolveGateFeature(st *store.Store, project, slug, version string) (store.FeatureContext, error) {
 	root := store.ResolveRootPath(project)
+	// R2c (H10): a repo carrying its own state snapshot is
+	// auto-recognized instead of refused as unregistered. On a
+	// read-only store the import simply fails and the normal
+	// not-found path below reports as before.
+	autoRecognizeProject(st, root)
 	ctx, err := st.ResolveFeature(root, slug, version)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

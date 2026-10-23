@@ -74,7 +74,7 @@ Every AC must trace to the intent or evidence it serves.
 
 | AC ID | Intent Source | Evidence |
 |-------|---------------|----------|
-| AC-001 | (fill: 用户原话/目标/约束) | (fill: 证据路径或 conversation:) |
+| AC-001 | (fill: 用户原话/目标/约束) | (fill: 证据路径、conversation:) |
 
 ## Acceptance Criteria
 
@@ -82,10 +82,14 @@ Every AC must trace to the intent or evidence it serves.
 |-------|-----------|
 | AC-001 | 作者写下第一条可验证的完成标准（可被 tests.md 的 TC-001 直接验证） |
 
-## Domain FSM
+## FSM 五元组
 
-Only required when frontmatter domain_required: true. Name at least one
-hang state (挂起/hang) and one illegal transition (非法/illegal).
+Only required when frontmatter domain_required: true. Fill the
+five-tuple, declare terminal states (终态： ...), and add an
+Illegal Transitions section below listing forbidden moves
+(- illegal: from -> to). The graph is machine-validated at
+freeze: a missing target, a missing event, or a missing illegal
+section blocks.
 
 | State | Event | Guard | To | Action |
 |-------|-------|-------|----|--------|

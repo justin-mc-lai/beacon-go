@@ -52,6 +52,13 @@ type ReviewerLane struct {
 	Detail    string   `json:"detail,omitempty"`
 	Summary   string   `json:"summary,omitempty"`
 	RawStdout string   `json:"-"`
+	// R2b (H5): the optional routing fields of the verdict line —
+	// a lane may grade its block (severity P0..P3), recommend a
+	// route, and demand a user decision. They feed the review
+	// packet that record_review_decision routes on.
+	Severity             string `json:"severity,omitempty"`
+	RecommendedRoute     string `json:"recommended_route,omitempty"`
+	UserDecisionRequired bool   `json:"user_decision_required,omitempty"`
 }
 
 // PlannerReviewView is the AC-102-shaped review result.
@@ -68,18 +75,39 @@ type PlannerReviewView struct {
 	RuntimeEvidenceOnly bool           `json:"runtime_evidence_only"` // always true (AC-102)
 	GateResultID        string         `json:"gate_result_id,omitempty"`
 	ArtifactID          string         `json:"artifact_id,omitempty"`
+	// R2b (H5): the routed decision — the packet's graded facts and
+	// where record_review_decision sent the run.
+	HighestSeverity      string `json:"highest_severity,omitempty"`
+	RecommendedRoute     string `json:"recommended_route,omitempty"`
+	UserDecisionRequired bool   `json:"user_decision_required,omitempty"`
+	RouteStage           string `json:"route_stage,omitempty"`
+	RouteReasonCode      string `json:"route_reason_code,omitempty"`
 }
 
-// reviewerVerdict is the JSON contract a reviewer prints.
+// reviewerVerdict is the JSON contract a reviewer prints. The
+// verdict/reasons pair is the original AC-102 contract; severity,
+// recommended_route and user_decision_required are the optional
+// R2b routing fields (a verdict line without them still parses —
+// an ungraded block grades P0 at packet assembly, fail-closed).
 type reviewerVerdict struct {
-	Verdict string   `json:"verdict"`
-	Reasons []string `json:"reasons"`
+	Verdict              string   `json:"verdict"`
+	Reasons              []string `json:"reasons"`
+	Severity             string   `json:"severity,omitempty"`
+	RecommendedRoute     string   `json:"recommended_route,omitempty"`
+	UserDecisionRequired bool     `json:"user_decision_required,omitempty"`
 }
 
 // parseReviewerVerdict extracts the verdict: the LAST stdout line
 // that parses as a JSON object with a verdict field wins (reviewers
 // may narrate before answering). A block without reasons is invalid.
 func parseReviewerVerdict(stdout string) (verdict string, reasons []string, ok bool) {
+	v, parsed := parseReviewerVerdictFull(stdout)
+	return v.Verdict, v.Reasons, parsed
+}
+
+// parseReviewerVerdictFull is parseReviewerVerdict with the full
+// verdict line (routing fields included).
+func parseReviewerVerdictFull(stdout string) (reviewerVerdict, bool) {
 	lines := strings.Split(stdout, "\n")
 	for i := len(lines) - 1; i >= 0; i-- {
 		line := strings.TrimSpace(lines[i])
@@ -92,7 +120,7 @@ func parseReviewerVerdict(stdout string) (verdict string, reasons []string, ok b
 		}
 		switch v.Verdict {
 		case LanePass:
-			return LanePass, v.Reasons, true
+			return v, true
 		case LaneBlock:
 			var nonempty []string
 			for _, r := range v.Reasons {
@@ -101,12 +129,15 @@ func parseReviewerVerdict(stdout string) (verdict string, reasons []string, ok b
 				}
 			}
 			if len(nonempty) == 0 {
-				return LaneInvalid, nil, true // answered, but an empty veto is not a veto
+				v.Verdict = LaneInvalid // answered, but an empty veto is not a veto
+				v.Reasons = nil
+				return v, true
 			}
-			return LaneBlock, nonempty, true
+			v.Reasons = nonempty
+			return v, true
 		}
 	}
-	return LaneInvalid, nil, false
+	return reviewerVerdict{Verdict: LaneInvalid}, false
 }
 
 // reviewInputText assembles what the reviewers are shown: the run's
@@ -198,6 +229,7 @@ func (e *Engine) RunPlannerReview(ctx context.Context, runID string, specs Plann
 		RuntimeEvidenceOnly: true, Verdict: "blocked",
 	}
 	var findings []string
+	var packetFindings []core.ReviewFinding
 	valid, blocks, invalid := 0, 0, 0
 	for i, spec := range specs {
 		lane := e.runReviewerLane(ctx, run, workdir, ctxPath, inputText, spec, i+1, timeoutSec)
@@ -208,8 +240,18 @@ func (e *Engine) RunPlannerReview(ctx context.Context, runID string, specs Plann
 		case LaneBlock:
 			valid++
 			blocks++
+			// An ungraded veto grades P0 at packet assembly
+			// (fail-closed: the lane stopped the work but did not
+			// say how badly — the routing treats it as blocking).
+			sev := strings.ToUpper(strings.TrimSpace(lane.Severity))
+			if sev == "" {
+				sev = "P0"
+			}
 			for _, r := range lane.Reasons {
 				findings = append(findings, lane.Reviewer+": "+r)
+				packetFindings = append(packetFindings, core.ReviewFinding{
+					Severity: sev, Message: r, Source: lane.Reviewer,
+				})
 			}
 		default:
 			invalid++
@@ -268,6 +310,25 @@ func (e *Engine) RunPlannerReview(ctx context.Context, runID string, specs Plann
 		"reviewers": len(specs), "invalid": invalid, "execution_mode": view.ExecutionMode,
 		"runtime_evidence_only": true, "gate_result_id": rec.ID, "target": target,
 	})
+	// H5 (R2b): the conclusion is ROUTED back into the loop state
+	// (record_review_decision) — a graded block can stop implement,
+	// a drift route sends the run to the truth change flow, a
+	// user-decision demand parks it for a human. The packet's route
+	// is the one the strongest blocking lane recommended (ties:
+	// first declared); the synthesis marker is "at least one lane
+	// produced a valid verdict line" — with zero valid lanes the
+	// packet is empty and the routing fail-closes to
+	// error_recovery, exactly like the source's incomplete test.
+	packet := reviewPacketOf(view, packetFindings, rec.ID)
+	if rec2, rerr := e.recordReviewDecisionOn(run, m, packet, "planner_review"); rerr == nil {
+		view.HighestSeverity = rec2.HighestSeverity
+		view.RecommendedRoute = rec2.RecommendedRoute
+		view.UserDecisionRequired = rec2.UserDecisionRequired
+		view.RouteStage = rec2.NextStage
+		view.RouteReasonCode = rec2.ReasonCode
+	} else {
+		return PlannerReviewView{}, rerr
+	}
 	if err := e.saveRun(run, m); err != nil {
 		return PlannerReviewView{}, err
 	}
@@ -316,12 +377,15 @@ func (e *Engine) runReviewerLane(ctx context.Context, run store.Run, workdir, ct
 		lane.Verdict = LaneInvalid
 		lane.Detail = core.ReasonExecutorExitNonZero
 	default:
-		verdict, reasons, parsed := parseReviewerVerdict(res.StdoutText)
-		lane.Verdict = verdict
-		lane.Reasons = reasons
+		full, parsed := parseReviewerVerdictFull(res.StdoutText)
+		lane.Verdict = full.Verdict
+		lane.Reasons = full.Reasons
+		lane.Severity = full.Severity
+		lane.RecommendedRoute = full.RecommendedRoute
+		lane.UserDecisionRequired = full.UserDecisionRequired
 		if !parsed {
 			lane.Detail = "no parseable verdict JSON line on stdout"
-		} else if verdict == LaneInvalid {
+		} else if full.Verdict == LaneInvalid {
 			lane.Detail = "block verdict carried no reasons (an empty veto is invalid, not a pass and not a block)"
 		}
 	}
@@ -333,4 +397,59 @@ func specName(spec ReviewerSpec, def string) string {
 		return spec.Name
 	}
 	return def
+}
+
+// reviewPacketOf assembles the record_review_decision packet from
+// the aggregated lanes. Route choice is deterministic: the
+// strongest blocking lane's declared route wins (ungraded blocks
+// grade P0, as at finding assembly); when no blocking lane declares
+// a route, the first route any valid lane declared is used. The
+// synthesis marker is "at least one lane answered with a valid
+// verdict line" — zero valid lanes leaves an empty packet, which
+// the routing fail-closes as incomplete.
+func reviewPacketOf(view PlannerReviewView, findings []core.ReviewFinding, reviewID string) core.ReviewPacket {
+	rank := map[string]int{"P0": 0, "P1": 1, "P2": 2, "P3": 3}
+	route := ""
+	bestRank := 99
+	declaredHighest := ""
+	udr := false
+	valid := 0
+	var firstRoute string
+	for _, lane := range view.ReviewerLanes {
+		if lane.Verdict == LaneInvalid {
+			continue
+		}
+		valid++
+		if lane.UserDecisionRequired {
+			udr = true
+		}
+		if lane.RecommendedRoute != "" && firstRoute == "" {
+			firstRoute = lane.RecommendedRoute
+		}
+		sev := strings.ToUpper(strings.TrimSpace(lane.Severity))
+		if r, ok := rank[sev]; ok && (declaredHighest == "" || r < rank[declaredHighest]) {
+			declaredHighest = sev
+		}
+		if lane.Verdict != LaneBlock {
+			continue
+		}
+		eff := sev
+		if eff == "" {
+			eff = "P0"
+		}
+		if lane.RecommendedRoute != "" && rank[eff] < bestRank {
+			bestRank = rank[eff]
+			route = lane.RecommendedRoute
+		}
+	}
+	if route == "" {
+		route = firstRoute
+	}
+	count := len(findings)
+	return core.ReviewPacket{
+		ReviewID: reviewID, ArtifactRef: view.ArtifactID,
+		RecommendedRoute: route, UserDecisionRequired: udr,
+		Findings: findings, DeclaredHighest: declaredHighest,
+		DeclaredFindingCount: &count, SynthesisMarker: valid > 0,
+	}
 }

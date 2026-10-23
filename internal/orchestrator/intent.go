@@ -139,12 +139,16 @@ func rebuildOpenQuestions(rows []gate.OpenQuestion) string {
 	var b strings.Builder
 	b.WriteString("One question at a time; a package cannot be signed while a row is open.\n")
 	b.WriteString("Use beacon truth ask / beacon truth answer to drive this ledger.\n\n")
-	b.WriteString("| Q ID | Question | Recommendation | Status | Answer |\n")
-	b.WriteString("|------|----------|----------------|--------|--------|\n")
+	b.WriteString("| Q ID | Question | Recommendation | Status | Answer | Source |\n")
+	b.WriteString("|------|----------|----------------|--------|--------|--------|\n")
 	for _, r := range rows {
-		fmt.Fprintf(&b, "| %s | %s | %s | %s | %s |\n",
+		src := r.Source
+		if src == "" {
+			src = "human"
+		}
+		fmt.Fprintf(&b, "| %s | %s | %s | %s | %s | %s |\n",
 			cellEscape(r.ID), cellEscape(r.Question), cellEscape(r.Recommendation),
-			cellEscape(r.Status), cellEscape(r.Answer))
+			cellEscape(r.Status), cellEscape(r.Answer), cellEscape(src))
 	}
 	return b.String()
 }
@@ -174,6 +178,18 @@ func nextQuestionID(rows []gate.OpenQuestion) string {
 
 // UpdateIntent records the user-intent snapshot fields.
 func (e *Engine) UpdateIntent(ctx store.FeatureContext, snap gate.IntentSnapshot, by string) (IntentView, error) {
+	// Scope mode (R2a, audit M6) is a controlled, derived value in
+	// Python — never free text. An explicit value outside the
+	// vocabulary fails closed; an empty one is derived from the
+	// utterance (planner + decomposition signal axes).
+	snap.ScopeMode = gate.NormalizeScopeMode(snap.ScopeMode)
+	if snap.ScopeMode == "" {
+		snap.ScopeMode = gate.DeriveScopeMode(snap.Utterance)
+	} else if !gate.ValidScopeMode(snap.ScopeMode) {
+		return IntentView{}, core.NewError(core.ReasonScopeModeInvalid, "truth.Intent",
+			"scope_mode '"+snap.ScopeMode+"' is not in the controlled vocabulary ("+
+				strings.Join(gate.ScopeModeVocabulary, " | ")+"); leave it empty to derive from the utterance")
+	}
 	text, err := readTruthText(ctx)
 	if err != nil {
 		return IntentView{}, err

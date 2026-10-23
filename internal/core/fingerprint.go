@@ -32,10 +32,15 @@ import (
 // fingerprint so future algorithm changes stay detectable.
 const FingerprintAlg = "pkgfp-v1"
 
-// NormalizeTruthForFingerprint returns the truth bytes with the
-// frontmatter status line's value replaced by a fixed marker. Only
-// the leading frontmatter block (--- ... ---) is touched; a
-// document without frontmatter is returned unchanged.
+// NormalizeTruthForFingerprint returns the document bytes with
+// the frontmatter bookkeeping lines' values replaced by a fixed
+// marker: `status:` (the freeze flip itself) and, since R2a,
+// `materials_status:` (the kernel's own stale/current marking,
+// M7). Both are kernel bookkeeping, not requirement content —
+// letting them move the fingerprint would make the kernel's own
+// metadata writes masquerade as body drift. Only the leading
+// frontmatter block (--- ... ---) is touched; a document without
+// frontmatter is returned unchanged.
 func NormalizeTruthForFingerprint(raw []byte) []byte {
 	text := string(raw)
 	if !strings.HasPrefix(text, "---\n") && !strings.HasPrefix(text, "---\r\n") {
@@ -54,27 +59,29 @@ func NormalizeTruthForFingerprint(raw []byte) []byte {
 	}
 	for i := 1; i < end; i++ {
 		trimmed := strings.TrimRight(lines[i], "\r")
-		if strings.HasPrefix(trimmed, "status:") {
-			suffix := ""
-			if strings.HasSuffix(lines[i], "\r") {
-				suffix = "\r"
+		for _, key := range []string{"status:", "materials_status:"} {
+			if strings.HasPrefix(trimmed, key) {
+				suffix := ""
+				if strings.HasSuffix(lines[i], "\r") {
+					suffix = "\r"
+				}
+				lines[i] = key + " *" + suffix
 			}
-			lines[i] = "status: *" + suffix
 		}
 	}
 	return []byte(strings.Join(lines, "\n"))
 }
 
-// PackageFingerprint hashes a package body: the status-normalized
-// truth bytes plus the tests bytes, domain-separated by the
-// algorithm tag.
+// PackageFingerprint hashes a package body: the bookkeeping-
+// normalized truth bytes plus the bookkeeping-normalized tests
+// bytes, domain-separated by the algorithm tag.
 func PackageFingerprint(truthRaw, testsRaw []byte) string {
 	h := sha256.New()
 	h.Write([]byte(FingerprintAlg))
 	h.Write([]byte{0})
 	h.Write(NormalizeTruthForFingerprint(truthRaw))
 	h.Write([]byte{0})
-	h.Write(testsRaw)
+	h.Write(NormalizeTruthForFingerprint(testsRaw))
 	return hex.EncodeToString(h.Sum(nil))
 }
 
@@ -89,7 +96,7 @@ func PackageFingerprint(truthRaw, testsRaw []byte) string {
 const SurfaceFingerprintAlg = "pkgsurface-v1"
 
 // PackageSurfaceFingerprint hashes all four requirement surfaces
-// of a package (status-normalized truth + tests + tasks +
+// of a package (bookkeeping-normalized truth + tests + tasks +
 // evidence), domain-separated by the algorithm tag.
 func PackageSurfaceFingerprint(truthRaw, testsRaw, tasksRaw, evidenceRaw []byte) string {
 	h := sha256.New()
@@ -97,11 +104,11 @@ func PackageSurfaceFingerprint(truthRaw, testsRaw, tasksRaw, evidenceRaw []byte)
 	h.Write([]byte{0})
 	h.Write(NormalizeTruthForFingerprint(truthRaw))
 	h.Write([]byte{0})
-	h.Write(testsRaw)
+	h.Write(NormalizeTruthForFingerprint(testsRaw))
 	h.Write([]byte{0})
-	h.Write(tasksRaw)
+	h.Write(NormalizeTruthForFingerprint(tasksRaw))
 	h.Write([]byte{0})
-	h.Write(evidenceRaw)
+	h.Write(NormalizeTruthForFingerprint(evidenceRaw))
 	return hex.EncodeToString(h.Sum(nil))
 }
 

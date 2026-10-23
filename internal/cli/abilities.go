@@ -83,7 +83,10 @@ func newQACmd() *cobra.Command {
 			"gate, and scoring never edits the skill — a human edits, then re-scores.",
 	}
 	c.AddCommand(newGateStatusCmd(), newGateEvaluateFixedCmd("qa"), newGoalPlannerReviewCmd(),
-		newQAScoreCmd(), newQAScoreHistoryCmd())
+		newQAScoreCmd(), newQAScoreHistoryCmd(), newQAAutoTestCmd(),
+		// R2d (M2/M1): qa9 strategy generation + the agent-eval
+		// line (a separate engine from the skill score above).
+		newQAStrategyCmd(), newQAAgentScoreCmd(), newQAAgentEvalCmd())
 	return c
 }
 
@@ -103,7 +106,7 @@ func newReleaseCmd() *cobra.Command {
 			"a passing qa gate. Human confirmation is an invariant, not a flag\n" +
 			"that can be bypassed from either entry.",
 	}
-	c.AddCommand(newGateEvaluateFixedCmd("release"), newGoalCompleteCmd())
+	c.AddCommand(newGateEvaluateFixedCmd("release"), newGoalCompleteCmd(), newReleaseCheckCmd())
 	return c
 }
 

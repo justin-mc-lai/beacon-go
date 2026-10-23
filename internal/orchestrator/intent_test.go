@@ -101,9 +101,10 @@ func TestIntentFSMRequiredWhenDomain(t *testing.T) {
 		"| idle | start | ok | running | begin |\n" +
 		"| running | error | retry<3 | running | retry |\n" +
 		"| running | hang | no heartbeat | hung | mark hang |\n" +
-		"| hung | stop | human | idle | illegal inbound blocked |\n"
+		"| hung | stop | human | idle | illegal inbound blocked |\n" +
+		"\n### Illegal Transitions\n\n- illegal: idle -> hung\n"
 	raw = readFile(t, truthPath)
-	raw = replaceSection(raw, "## Domain FSM", fsm)
+	raw = replaceSection(raw, "## FSM 五元组", fsm)
 	if err := os.WriteFile(truthPath, []byte(raw), 0o644); err != nil {
 		t.Fatal(err)
 	}

@@ -268,6 +268,31 @@ func (e *Engine) DriverRunOnce(ctx context.Context, runID string) (DriverView, e
 		})
 		return driverViewOf(run, m, slug), killSwitchError("goal.DriverRunOnce", path)
 	}
+	// Quota gate (R2b, H6 — goal_quota.quota_should_run): before
+	// the budget is even consulted, the five-segment decision runs.
+	// A wait state (health / operator gate / evidence / focus) is a
+	// SKIP: no turn, no budget, no slot — and not a stall either,
+	// so the heartbeat refreshes. An exhausted slot quota halts
+	// the driver with quota_exhausted (the source's halt packet).
+	if qd := e.quotaDecisionFor(run, m); qd.Decision == core.QuotaDecisionSkip {
+		m.LastHeartbeatAt = nowISO()
+		m.Driver.State = DriverRequeue
+		m.Driver.UpdatedAt = nowISO()
+		if err := e.store.WithTx(func(tx *store.Tx) error {
+			_ = e.appendEventOn(tx, run, "driver_quota_skip", map[string]any{
+				"driver_id": m.Driver.DriverID, "reason_code": qd.ReasonCode,
+				"quota_state": qd.State, "spent_slots": qd.SpentSlots, "allowed_slots": qd.AllowedSlots,
+			})
+			return e.saveRunOn(tx, run, m)
+		}); err != nil {
+			return DriverView{}, err
+		}
+		dv := driverViewOf(run, m, slug)
+		dv.ReasonCode = qd.ReasonCode
+		return dv, nil
+	} else if qd.Decision == core.QuotaDecisionExhausted {
+		return e.haltDriverQuota(run, m, slug, qd)
+	}
 	// Budget gate before spending a turn.
 	if exhausted, reason := budgetExhausted(m.Budget); exhausted {
 		return e.haltDriverBudget(run, m, slug, reason)
@@ -306,6 +331,7 @@ func (e *Engine) DriverRunOnce(ctx context.Context, runID string) (DriverView, e
 		return DriverView{}, err
 	}
 	started := time.Now()
+	wasBlocked := m.Blocked
 	var v RunView
 	if m.Blocked {
 		v, err = e.Continue(ctx, runID)
@@ -333,7 +359,26 @@ func (e *Engine) DriverRunOnce(ctx context.Context, runID string) (DriverView, e
 	m.Budget.UsedRounds++
 	m.Budget.UsedDurationSec += elapsed
 	m.LastHeartbeatAt = nowISO()
-	m.Driver.NextPrompt = nextPromptDigest(v)
+	// The next-turn digest is a handoff text: the turn budget caps
+	// it at 16 lines / 1800 chars (R2b, M9 — enforce_handoff_budget;
+	// applied and reported, never silently cut).
+	handoff := core.EnforceHandoffBudget(nextPromptDigest(v))
+	m.Driver.NextPrompt = handoff.Text
+	// Quota spend (H6): the turn ran and its writeback (the tick's
+	// own snapshot save) has landed, so one slot is spent —
+	// record_spend's validated-writeback rule.
+	_, _ = recordQuotaSpend(m, 1, true)
+	// Spend ledger (M9): the same turn is charged to the goal's
+	// spend ledger under its turn digest — delivery turns spend as
+	// delivery_completion, continue-after-block turns as repair.
+	// A program_drive_budget_exhausted refusal halts the driver
+	// after this turn's bookkeeping lands.
+	spendSource := "delivery_completion"
+	if wasBlocked {
+		spendSource = "repair"
+	}
+	_, spendReason := e.recordSpendOn(run, m, spendSource,
+		fmt.Sprintf("%s:turn:%d", run.ID, m.Driver.TurnN), true, "", false)
 	// The whole turn-end unit — turn_end event, the optional
 	// awaiting-human event, the run save and the closing checkpoint
 	// (checkpoint row + goal_checkpoint event + run save) — commits
@@ -344,7 +389,8 @@ func (e *Engine) DriverRunOnce(ctx context.Context, runID string) (DriverView, e
 		_ = e.appendEventOn(tx, run, "driver_turn_end", map[string]any{
 			"driver_id": m.Driver.DriverID, "turn_n": m.Driver.TurnN,
 			"stage": v.CurrentStage, "loop_stage": v.LoopStage, "blocked": v.Blocked,
-			"summary": fmt.Sprintf("turn=%d stage=%s blocked=%v", m.Driver.TurnN, v.CurrentStage, v.Blocked),
+			"handoff_truncated": handoff.Truncated,
+			"summary":           fmt.Sprintf("turn=%d stage=%s blocked=%v", m.Driver.TurnN, v.CurrentStage, v.Blocked),
 		})
 		switch {
 		case v.LoopStage == string(core.LoopReleaseGate):
@@ -387,7 +433,38 @@ func (e *Engine) DriverRunOnce(ctx context.Context, runID string) (DriverView, e
 	if exhausted, reason := budgetExhausted(m.Budget); exhausted && !m.Driver.terminal() {
 		return e.haltDriverBudget(run, m, slug, reason)
 	}
+	// The spend ledger's own ceiling (M9): a turn the ledger
+	// refused for exhaustion halts the driver on the ledger's code.
+	if spendReason == core.ReasonProgramBudgetExhausted && !m.Driver.terminal() {
+		return e.haltDriverBudget(run, m, slug, spendReason)
+	}
 	return driverViewOf(run, m, slug), nil
+}
+
+// haltDriverQuota stops the driver on slot-quota exhaustion
+// (quota_should_run's quota_exhausted outcome; halt_on_exhaust's
+// halt_budget state with resume_action=none — the driver record
+// carries the spent/allowed pair on the event).
+func (e *Engine) haltDriverQuota(run store.Run, m *runMeta, slug string, qd core.QuotaDecision) (DriverView, error) {
+	if m.Driver != nil {
+		m.Driver.State = DriverHaltBudget
+		m.Driver.HaltReason = core.ReasonQuotaExhausted
+		m.Driver.LeaseExpiresAt = ""
+		m.Driver.UpdatedAt = nowISO()
+	}
+	if err := e.store.WithTx(func(tx *store.Tx) error {
+		_ = e.appendEventOn(tx, run, "quota_exhausted", map[string]any{
+			"reason_code": core.ReasonQuotaExhausted,
+			"spent_slots": qd.SpentSlots, "allowed_slots": qd.AllowedSlots,
+			"resume_action": "none",
+		})
+		return e.saveRunOn(tx, run, m)
+	}); err != nil {
+		return DriverView{}, err
+	}
+	dv := driverViewOf(run, m, slug)
+	dv.ReasonCode = core.ReasonQuotaExhausted
+	return dv, nil
 }
 
 func (e *Engine) haltDriverBudget(run store.Run, m *runMeta, slug, reason string) (DriverView, error) {

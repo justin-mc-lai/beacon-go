@@ -54,6 +54,10 @@ type ArtifactFact struct {
 
 // Finding is one integrity fracture, itemised (AC-101: hard block +
 // repair_route; the Go surface adds one stable reason code per kind).
+// Severity is "" (blocking) or "warn" (reported, never blocks) —
+// the Python TIG's one warn class is the determinism hollow-template
+// scan (truth_integrity.py: blocking_findings excludes
+// TRUTH_DETERMINISM_HOLLOW_TEMPLATE findings).
 type Finding struct {
 	Kind        string `json:"kind"`
 	ReasonCode  string `json:"reason_code"`
@@ -61,6 +65,7 @@ type Finding struct {
 	Line        int    `json:"line,omitempty"`
 	Detail      string `json:"detail"`
 	RepairRoute string `json:"repair_route"`
+	Severity    string `json:"severity,omitempty"`
 }
 
 // IntegrityReport is the integrity evaluation outcome. Verdict is
@@ -88,7 +93,9 @@ var (
 	acDefBoldRe  = regexp.MustCompile(`\*\*AC-(\d{3})\*\*`)
 	acDefTableRe = regexp.MustCompile(`(?m)^\|\s*AC-(\d{3})\s*\|`)
 	acRefRe      = regexp.MustCompile(`AC-\d{3}`)
-	deferralRe   = regexp.MustCompile(`(?i)\|\s*pending\s*\||user_decision:\s*pending`)
+	// truth_integrity._DEFERRAL_PENDING_RE (the 状态 pending
+	// alternative joined in R2a; the other two predate it).
+	deferralRe = regexp.MustCompile(`(?i)\|\s*pending\s*\||user_decision:\s*pending|状态\s*pending`)
 )
 
 // ParseFrontmatter reads the minimal YAML frontmatter of a markdown
@@ -467,7 +474,44 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 			Detail: "tasks.md frontmatter slug " + orMissing(tasksSlug) + " != package slug " + in.Pkg.Slug})
 	}
 
+	// 8-12. The R2a Python-parity groups (audit H3), appended in
+	// the Python TIG's aggregation order: clarity scan of the four
+	// files, the domain FSM authority, the extension scan, the
+	// determinism scan, and feature-package validation.
+	for _, f := range files {
+		if f.pf.Present {
+			findings = append(findings, scanClarityFile(f.pf)...)
+		}
+	}
+	if in.Pkg.Truth.Present {
+		if required, df := EvaluateDomainFSM(in.Pkg.Truth.Text, in.Pkg.Tests.Text); required {
+			for _, d := range df {
+				findings = append(findings, Finding{
+					Kind: d.Kind, ReasonCode: d.ReasonCode,
+					File: in.Pkg.Truth.Path, Detail: d.Text, RepairRoute: DefaultRepairRoute,
+				})
+			}
+		}
+	}
+	findings = append(findings, scanExtensionFiles(in.Pkg)...)
+	for _, f := range files {
+		if f.pf.Present {
+			findings = append(findings, scanDeterminismFile(f.pf)...)
+		}
+	}
+	findings = append(findings, ValidateFeaturePackage(in.Pkg)...)
+
 	rep := IntegrityReport{Mode: mode, Findings: findings, Verdict: VerdictPass}
+	// Warn-severity findings (the determinism hollow templates)
+	// are reported but never block — the Python TIG excludes them
+	// from its blocking set by name.
+	blocking := false
+	for _, f := range findings {
+		if f.Severity != "warn" {
+			blocking = true
+			break
+		}
+	}
 	if len(findings) > 0 {
 		seen := map[string]bool{}
 		push := func(code string) {
@@ -476,11 +520,13 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 				rep.ReasonCodes = append(rep.ReasonCodes, code)
 			}
 		}
-		if mode == IntegrityModeAuditOnly {
-			rep.Verdict = VerdictAudit
-			push(core.ReasonIntegrityAuditOnly)
-		} else {
-			rep.Verdict = VerdictBlocked
+		if blocking {
+			if mode == IntegrityModeAuditOnly {
+				rep.Verdict = VerdictAudit
+				push(core.ReasonIntegrityAuditOnly)
+			} else {
+				rep.Verdict = VerdictBlocked
+			}
 		}
 		for _, f := range findings {
 			push(f.ReasonCode)

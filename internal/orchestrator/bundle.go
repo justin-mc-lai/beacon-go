@@ -131,7 +131,11 @@ func packagePresent(pkg gate.PackageFiles) bool {
 	return pkg.Truth.Present || pkg.Tests.Present || pkg.Tasks.Present || pkg.Evidence.Present
 }
 
-// bundleTruthMap verifies registration + layout consistency.
+// bundleTruthMap verifies registration + layout consistency. The
+// layout judgement itself is the shared truthMapLayoutProblems
+// (R2b/M16): the standalone `beacon truth map verify` face and
+// this bundle item read the same function, so the two can never
+// disagree.
 func (e *Engine) bundleTruthMap(run store.Run, slug string) BundleItem {
 	item := BundleItem{Check: BundleTruthMap, Source: "derived"}
 	fc, ok, err := e.featureContextOf(run.FeatureID)
@@ -141,38 +145,12 @@ func (e *Engine) bundleTruthMap(run store.Run, slug string) BundleItem {
 		item.Detail = "feature is not registered in spine/projects; no truth-map can be derived"
 		return item
 	}
-	pkg := e.packageFiles(fc)
-	if !packagePresent(pkg) {
+	_, present, problems := e.truthMapLayoutProblems(fc)
+	if !present {
 		item.OK, item.Applicable = true, false
 		item.Detail = "no on-disk package (seeded registration): truth-map not applicable — S1 no_document caliber; " +
 			"no standalone truth-map artifact exists in the kernel, this verdict is derived from registration + layout when a package exists"
 		return item
-	}
-	var problems []string
-	for _, f := range []struct {
-		name string
-		pf   gate.PackageFile
-	}{
-		{"truth", pkg.Truth}, {"tests", pkg.Tests}, {"tasks", pkg.Tasks}, {"evidence", pkg.Evidence},
-	} {
-		if !f.pf.Present {
-			problems = append(problems, "registered "+f.name+" member missing on disk: "+f.pf.Path)
-		}
-	}
-	if pkg.Truth.Present {
-		scalars, refs, parsed := gate.ParseFrontmatter(pkg.Truth.Text)
-		if !parsed {
-			problems = append(problems, "truth.md frontmatter unparseable; layout cannot be verified")
-		} else {
-			if scalars["slug"] != "" && scalars["slug"] != fc.Feature.Slug {
-				problems = append(problems, "truth.md slug "+scalars["slug"]+" != registered slug "+fc.Feature.Slug)
-			}
-			for name, ref := range refs {
-				if _, err := os.Stat(resolvePkgPath(fc.Project.RootPath, ref)); err != nil {
-					problems = append(problems, "canonical_refs."+name+" points at missing file "+ref)
-				}
-			}
-		}
 	}
 	item.Applicable = true
 	if len(problems) > 0 {

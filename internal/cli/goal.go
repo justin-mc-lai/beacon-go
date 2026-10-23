@@ -64,6 +64,10 @@ func newGoalCmd() *cobra.Command {
 		// subgroup — no new top-level command.
 		newGoalFlowCmd(),
 		newGoalTopologyCmd(),
+		// R2b: quota (H6), orchestration records (M8 — decide /
+		// gate / fork / error-recovery) and the spend ledger (M9).
+		newGoalQuotaCmd(), newGoalDecideCmd(), newGoalGateCmd(), newGoalForkCmd(),
+		newGoalErrorRecoveryCmd(), newGoalSpendCmd(),
 	)
 	return c
 }
@@ -323,6 +327,23 @@ func newGoalCompleteCmd() *cobra.Command {
 			if v.RunID != "" {
 				if perr := printGoalView(cmd, v, asJSON); perr != nil {
 					return perr
+				}
+			}
+			if err == nil {
+				// R2c (M12): completion triggers the project's
+				// post_release hooks. Outcomes ride the run's
+				// event trail; a hook outcome never un-completes
+				// the run, and manual_confirmed hooks are only
+				// ever reported as awaiting confirmation here.
+				if summary, herr := eng.RunPostReleaseHooks(runID); herr == nil && len(summary.Hooks) > 0 {
+					for _, h := range summary.Hooks {
+						line := fmt.Sprintf("hook %s: %s (%s)", h.HookID, h.Status, h.Action)
+						if asJSON {
+							fmt.Fprintln(cmd.ErrOrStderr(), line)
+						} else {
+							fmt.Fprintln(cmd.OutOrStdout(), line)
+						}
+					}
 				}
 			}
 			return err

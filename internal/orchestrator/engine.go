@@ -150,6 +150,11 @@ type RunView struct {
 	MainAxis     *MainAxis         `json:"main_axis,omitempty"`
 	// S3 (AC-173): the topology fact recorded at run creation.
 	Topology *TopologyFact `json:"topology,omitempty"`
+	// R2b (H5/M8): the latest routed review decision and the
+	// human-stop metrics, surfaced so a blocked-by-review run says
+	// why on every status read.
+	Review     *ReviewDecisionRecord  `json:"review_decision,omitempty"`
+	HumanStops *core.HumanStopMetrics `json:"human_stop_metrics,omitempty"`
 }
 
 // ---- internal load/save helpers ----
@@ -261,6 +266,7 @@ func viewOf(run store.Run, m *runMeta, slug string) RunView {
 		Program: m.Program, Hotfix: m.Hotfix,
 		MultiVersion: m.MultiVersion, MainAxis: m.MainAxis,
 		Topology: m.Topology,
+		Review:   m.ReviewDecision, HumanStops: m.HumanStops,
 	}
 	if m.Implement != nil {
 		v.Implement = m.Implement.view()

@@ -4,7 +4,11 @@
 // verdict and the same reason codes (re-evaluation is deterministic).
 package gate
 
-import "beacon-go/internal/core"
+import (
+	"strings"
+
+	"beacon-go/internal/core"
+)
 
 // ---- truth_freeze ----
 
@@ -218,6 +222,11 @@ type ReleaseFacts struct {
 	DesignApplicable bool
 	HumanConfirmed   bool
 	HumanConfirmedBy string
+	// MaterialsStale names the package surfaces (truth/tests/
+	// tasks) whose frontmatter reads materials_status: stale
+	// (R2a, audit M7 — the stale half of Python's
+	// evaluate_release_truth_materials_gate, fail-closed).
+	MaterialsStale []string
 }
 
 func releasePrereq(name string, g GateFact) CheckItem {
@@ -240,6 +249,13 @@ func EvaluateRelease(f ReleaseFacts, evaluator string) Evaluation {
 		checks = append(checks, naItem("gate_design_passed", "no run of this feature requires design"))
 	}
 	checks = append(checks, releasePrereq("implement", f.Implement), releasePrereq("qa", f.QA))
+	if len(f.MaterialsStale) > 0 {
+		checks = append(checks, failItem("truth_materials_fresh", core.ReasonMaterialsStale,
+			"package materials marked stale after a truth change ("+
+				strings.Join(f.MaterialsStale, ", ")+"); refreeze to refresh them before release"))
+	} else {
+		checks = append(checks, okItem("truth_materials_fresh", "no package material is marked stale"))
+	}
 	if f.HumanConfirmed {
 		detail := "human release confirmation on record"
 		if f.HumanConfirmedBy != "" {

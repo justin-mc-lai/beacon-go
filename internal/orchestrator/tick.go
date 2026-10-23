@@ -88,6 +88,18 @@ func (e *Engine) Tick(ctx context.Context, runID string) (RunView, error) {
 		v.ReasonCode = core.ReasonLoopGoalAlreadyDone
 		return v, nil
 	}
+	// Review hold (H5): a run routed to error_recovery / drift_routing
+	// by an unresolved review decision does not execute stages. The
+	// hold clears only when a later review decision routes onward
+	// (recordReviewDecisionOn flips Resolved), so this guard keys on
+	// the record, not on the stage alone — a repair-loop
+	// error_recovery without a review hold keeps its retry semantics.
+	if m.ReviewDecision != nil && !m.ReviewDecision.Resolved &&
+		(m.LoopStage == string(core.LoopErrorRecovery) || m.LoopStage == string(core.LoopDriftRouting)) {
+		v := viewOf(run, m, slug)
+		v.ReasonCode = m.ReviewDecision.ReasonCode
+		return v, nil
+	}
 	key := e.tickKey(run, m)
 	if m.LastTickKey != "" && m.LastTickKey == key {
 		v := viewOf(run, m, slug)
@@ -266,6 +278,14 @@ func (e *Engine) Continue(ctx context.Context, runID string) (RunView, error) {
 	run, m, slug, err := e.loadRun(runID)
 	if err != nil {
 		return RunView{}, err
+	}
+	// A review-routed block (H5) is not cleared by continue: the run
+	// waits for its resolution path (a user decision + re-review, or
+	// the truth change flow for a drift route).
+	if m.ReviewDecision != nil && !m.ReviewDecision.Resolved && IsReviewBlockReason(m.LastBlockReason) {
+		v := viewOf(run, m, slug)
+		v.ReasonCode = m.ReviewDecision.ReasonCode
+		return v, nil
 	}
 	if m.Blocked {
 		if m.BlockedStreak >= 3 {

@@ -146,7 +146,15 @@ func TestEvaluationDeterminism(t *testing.T) {
 
 const goodTruth = `---
 slug: demo
+version: v1.6.19
 status: frozen
+language: en
+parser_contract: beacon-feature-package-v2
+canonical_refs:
+  truth: features/demo/truth.md
+  tests: features/demo/tests.md
+  tasks: features/demo/tasks.md
+  evidence: features/demo/evidence.md
 ---
 # Truth
 
@@ -171,7 +179,7 @@ func baseIntegrityInput() IntegrityInput {
 			Tests: PackageFile{Path: "features/demo/tests.md", Present: true, Text: goodTests},
 			Tasks: PackageFile{Path: "features/demo/tasks.md", Present: true, Text: "---\nslug: demo\n---\n- [ ] work\n"},
 			Evidence: PackageFile{Path: "features/demo/evidence.md", Present: true,
-				Text: "# Evidence\n\n| Surface | Artifact |\n|---|---|\n| qa | artifacts/qa-report.md |\n"},
+				Text: "# Evidence\n\n| Surface | Authority | Artifact |\n|---|---|---|\n| qa | qa_verdict | artifacts/qa-report.md |\n"},
 		},
 		Artifacts:  []ArtifactFact{{AbsPath: "/proj/artifacts/qa-report.md"}},
 		ResolveRef: func(ref string) string { return "/proj/" + ref },

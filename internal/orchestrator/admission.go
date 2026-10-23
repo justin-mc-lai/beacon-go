@@ -55,6 +55,9 @@
 //     BranchContext (AC-171) is required and its live gate
 //     (AC-172) must pass: topology_gate_missing /
 //     topology_gate_blocked. Non-git projects are not_applicable.
+//  9. review_decision   — R2b (H5): an unresolved routed review
+//     decision (P0 / user-decision / drift) refuses implement with
+//     the routing's own code, until a later review routes onward.
 package orchestrator
 
 import (
@@ -217,6 +220,19 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 		ok(topo)
 	} else {
 		fail(topo)
+	}
+
+	// 9. review decision clear (R2b, H5): an unresolved routed
+	// review block (record_review_decision's error_recovery /
+	// drift_routing outcome) refuses implement with the routing's
+	// own reason code — a P0 the reviewers found must stop the
+	// writing hand, not just sit in a report.
+	if rd := m.ReviewDecision; rd != nil && !rd.Resolved {
+		fail(AdmissionItem{Check: "review_decision", Applicable: true,
+			ReasonCode: rd.ReasonCode,
+			Detail:     "unresolved review decision (" + rd.NextStage + ") from " + rd.Source + "; resolve it before implementing"})
+	} else {
+		ok(AdmissionItem{Check: "review_decision", OK: true, Applicable: true, Detail: "no unresolved review decision"})
 	}
 
 	if len(res.ReasonCodes) > 0 {

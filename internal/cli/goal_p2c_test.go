@@ -42,8 +42,10 @@ func TestGoalP2CChain(t *testing.T) {
 	}
 	// S3 (declared change): admission grew the AC-173 topology_gate
 	// item — 7 -> 8 items (not_applicable on this non-git fixture).
-	if items, _ := adm["items"].([]any); len(items) != 8 {
-		t.Errorf("admission items = %d, want 8", len(items))
+	// R2b (H5): admission grew the review_decision item — 8 -> 9
+	// items (not_applicable when no review routing is unresolved).
+	if items, _ := adm["items"].([]any); len(items) != 9 {
+		t.Errorf("admission items = %d, want 9", len(items))
 	}
 
 	// implement plan with an explicit ralph ask.

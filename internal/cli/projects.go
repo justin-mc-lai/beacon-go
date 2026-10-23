@@ -51,7 +51,8 @@ func newProjectsCmd() *cobra.Command {
 		Use:   "projects",
 		Short: "Machine-level multi-project registry (AC-021)",
 	}
-	c.AddCommand(newProjectsRegisterCmd(), newProjectsListCmd(), newProjectsShowCmd())
+	c.AddCommand(newProjectsRegisterCmd(), newProjectsListCmd(), newProjectsShowCmd(),
+		newProjectsInitCmd(), newProjectsExportStateCmd(), newProjectsImportStateCmd())
 	return c
 }
 
@@ -194,15 +195,41 @@ func newProjectsShowCmd() *cobra.Command {
 			}
 			root := store.ResolveRootPath(project)
 			if !exists {
-				return fail(ReasonProjectNotRegistered, "projects show", "no runtime DB yet, project not registered: "+root)
+				// R2c (H10): no DB on this machine yet does not
+				// mean unknown project — the repo may carry its
+				// state snapshot. Import on a writable pass, then
+				// re-open read-only before refusing.
+				if wst, werr := openWriteStore(); werr == nil {
+					autoRecognizeProject(wst, root)
+					wst.Close()
+				}
+				st, exists, err = openReadStore()
+				if err != nil {
+					return err
+				}
+				if !exists {
+					return fail(ReasonProjectNotRegistered, "projects show", "no runtime DB yet, project not registered: "+root)
+				}
 			}
 			defer st.Close()
 			p, err := st.Projects().GetByRootPath(root)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
-					return fail(ReasonProjectNotRegistered, "projects show", "project not registered: "+root)
+					// R2c (H10): the repo may carry its own state
+					// snapshot — recognize it via a writable pass
+					// instead of refusing outright.
+					if wst, werr := openWriteStore(); werr == nil {
+						autoRecognizeProject(wst, root)
+						wst.Close()
+						p, err = st.Projects().GetByRootPath(root)
+					}
 				}
-				return err
+				if err != nil {
+					if errors.Is(err, sql.ErrNoRows) {
+						return fail(ReasonProjectNotRegistered, "projects show", "project not registered: "+root)
+					}
+					return err
+				}
 			}
 			view, err := buildProjectView(st, p)
 			if err != nil {

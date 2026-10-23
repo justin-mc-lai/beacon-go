@@ -125,6 +125,11 @@ func (e *Engine) RecordInterrupt(runID, substep string) (RunView, error) {
 	if substep != "" {
 		m.LastSubstep = substep
 	}
+	// M8 (R2b): record_host_interrupt also feeds the human-stop
+	// metrics (one more stop, attributed to host_turn_interrupted) —
+	// the metrics, not just the bare count, are what build_resume
+	// reports.
+	ensureHumanStops(m).BumpStopReason(core.ReasonHostTurnInterrupted)
 	if err := e.store.WithTx(func(tx *store.Tx) error {
 		if err := e.appendEventOn(tx, run, "host_interrupt", map[string]any{
 			"reason_code": core.ReasonHostTurnInterrupted, "substep": substep,
@@ -151,6 +156,9 @@ type ResumeView struct {
 	ResumeAction                string          `json:"resume_action"`
 	SameSessionContinueRequired bool            `json:"same_session_continue_required"`
 	PendingSteering             *SteeringRecord `json:"pending_steering,omitempty"`
+	// HumanStops is the run's human-stop accounting (M8, R2b —
+	// build_resume includes human_stop_metrics in its output).
+	HumanStops *core.HumanStopMetrics `json:"human_stop_metrics,omitempty"`
 }
 
 // decideResume is the pure half of Resume (loop_goal_state
@@ -165,7 +173,7 @@ type ResumeView struct {
 // the very same decision read-only.
 func decideResume(runID string, m *runMeta) ResumeView {
 	rv := ResumeView{RunID: runID, Status: "ok", LoopStage: m.LoopStage, CurrentStage: m.currentStage(),
-		PendingSteering: m.pendingSteering()}
+		PendingSteering: m.pendingSteering(), HumanStops: m.HumanStops}
 	switch {
 	case m.LoopStage == string(core.LoopDone):
 		rv.ReasonCode = core.ReasonLoopGoalAlreadyDone
@@ -216,7 +224,10 @@ func (e *Engine) Resume(runID, utterance string) (ResumeView, error) {
 	// Short continue utterances (AC-035) and explicit resumes both
 	// map to load_next_skill; a long utterance is advisory only.
 	_ = utterance
-	if m.Blocked && m.BlockedStreak < 3 {
+	// A review-routed block (H5) is NOT a soft block: it clears only
+	// when a later review decision routes onward, never by resume.
+	reviewHeld := m.ReviewDecision != nil && !m.ReviewDecision.Resolved && IsReviewBlockReason(m.LastBlockReason)
+	if m.Blocked && m.BlockedStreak < 3 && !reviewHeld {
 		m.Blocked = false
 		m.LastTickKey = ""
 		_ = e.saveRun(run, m)

@@ -14,8 +14,10 @@ func TestSkillsListAndShow(t *testing.T) {
 	}
 	doc := parseDoc(t, out)
 	list, ok := doc["skills"].([]any)
-	if !ok || len(list) != 6 {
-		t.Fatalf("skills list = %v, want 6", doc)
+	// R2c (H9): the set grew 6 -> 7 when plan joined (Scheme A 1+6);
+	// the count follows the surface, the assertion is not relaxed.
+	if !ok || len(list) != 7 {
+		t.Fatalf("skills list = %v, want 7", doc)
 	}
 	out, err = runCLI(t, "skills", "show", "truth")
 	if err != nil {

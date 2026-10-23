@@ -177,6 +177,20 @@ type runMeta struct {
 	// A fact, never a creation-time block: the implement admission
 	// and the bundle consume the gate (topology_record.go).
 	Topology *TopologyFact `json:"topology,omitempty"`
+	// R2b orchestration records (H5/M8/H6/M9): the loop_goal_state
+	// record family, the quota kernel's run state and the spend
+	// ledger. Same rule as everything above: runs.metadata_json is
+	// the only snapshot; the Python originals kept these inside the
+	// loop state file's outputs dict.
+	ReviewDecision     *ReviewDecisionRecord  `json:"review_decision,omitempty"`
+	IntentForks        []core.IntentFork      `json:"intent_forks,omitempty"`
+	Decisions          []core.UserDecision    `json:"decision_cache,omitempty"`
+	HumanStops         *core.HumanStopMetrics `json:"human_stop_metrics,omitempty"`
+	LatestUtterance    string                 `json:"latest_utterance,omitempty"`
+	Quota              *QuotaRunState         `json:"quota,omitempty"`
+	Spend              *core.SpendLedger      `json:"spend_ledger,omitempty"`
+	AutoDecide         *bool                  `json:"auto_decide,omitempty"`
+	HumanGateOverrides []string               `json:"human_gate_overrides,omitempty"`
 }
 
 // pendingSteering returns the newest unacknowledged steering record,

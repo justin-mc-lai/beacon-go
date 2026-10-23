@@ -34,6 +34,15 @@ func resolveSearchRoot(cmd *cobra.Command, st *store.Store, projectFlag string, 
 		root := store.ResolveRootPath(projectFlag)
 		if _, err := st.Projects().GetByRootPath(root); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
+				// R2c (H10): recognize a repo-carried state
+				// snapshot instead of refusing the project.
+				if wst, werr := openWriteStore(); werr == nil {
+					autoRecognizeProject(wst, root)
+					wst.Close()
+					if _, rerr := st.Projects().GetByRootPath(root); rerr == nil {
+						return root, nil
+					}
+				}
 				return "", fail(ReasonProjectNotRegistered, "spine", "project not registered: "+root)
 			}
 			return "", err

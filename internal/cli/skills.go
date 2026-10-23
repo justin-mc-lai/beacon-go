@@ -1,6 +1,8 @@
-// Skills surface: the six embedded public skills, listable and
-// readable without a model call. This restores the v1 kept `skill`
-// support surface (charter: slim, not dropped).
+// Skills surface: the seven embedded public skills (Scheme A 1+6:
+// goal facade + plan/truth/design/implement/qa/release), listable
+// and readable without a model call, and installable into a host
+// skill directory (skills_install.go). This restores the v1 kept
+// `skill` support surface (charter: slim, not dropped).
 package cli
 
 import (
@@ -15,9 +17,9 @@ import (
 func newSkillsCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "skills",
-		Short: "List or show the six embedded public skills",
+		Short: "List, show or install the embedded public skills (1+6 Scheme A set)",
 	}
-	c.AddCommand(newSkillsListCmd(), newSkillsShowCmd())
+	c.AddCommand(newSkillsListCmd(), newSkillsShowCmd(), newSkillsReferencesCmd(), newSkillsInstallCmd())
 	return c
 }
 

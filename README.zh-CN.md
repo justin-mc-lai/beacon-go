@@ -10,7 +10,9 @@ Beacon Go 是 Beacon 内核的 Go 语言重构版。它保留 Python 版 Beacon 
 自己排阶段、在硬门禁下逐步推进、断了能续跑，并且永远不能绕过独立
 检查者和人工确认自称完成。
 
-当前版本：**v2.0.0-go.8** · 243 个行为级测试 · 端到端全链跑通。
+当前版本：**v2.0.0-go.9** · 327 个行为级测试 · 端到端全链跑通。
+go.9 补齐了对 Python v1.6.19 对等审计查出的 26 条高/中缺口
+（报告见 `docs/parity-audit-python-v16.md`）。
 
 ## 为什么重构
 
@@ -62,7 +64,7 @@ Go 版按一份书面口径执行（[`docs/scope-charter.md`](docs/scope-charter
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.8
+./bin/beacon --version          # Beacon CLI v2.0.0-go.9
 ```
 
 日常五条命令：
@@ -113,7 +115,7 @@ beacon skills show truth
 
 ## 验证情况
 
-- `go test ./...`——252 个行为级测试全过（Linux/macOS）。
+- `go test ./...`——327 个行为级测试全过。
 - [`e2e/run_e2e.sh`](e2e/run_e2e.sh)——真二进制全链剧本（注册 →
   建包 → 冻结 → 提交基线 → 真执行器干活 → 司机推进 → 四门评估 →
   挂检查者 → 完工），13 步，退出码 0。

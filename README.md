@@ -13,8 +13,9 @@ engine**: long-running coding work that plans itself into stages, advances
 step by step under hard gates, survives interruptions, and never marks
 itself done without independent verification and a human-confirmed release.
 
-Current release: **v2.0.0-go.8** · 252 behavior tests · full end-to-end
-chain green.
+Current release: **v2.0.0-go.9** · 327 behavior tests · full end-to-end
+chain green. v2.0.0-go.9 closes the 26 high/medium gaps found by the
+Python v1.6.19 parity audit (`docs/parity-audit-python-v16.md`).
 
 ## Why a rewrite
 
@@ -73,7 +74,7 @@ Requires Go 1.27+.
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.8
+./bin/beacon --version          # Beacon CLI v2.0.0-go.9
 ```
 
 Five commands cover most of a day:
@@ -127,7 +128,7 @@ it stays in the Markdown packages under
 
 ## Verification
 
-- `go test ./...` — 243 behavior-level tests.
+- `go test ./...` — 327 behavior-level tests.
 - [`e2e/run_e2e.sh`](e2e/run_e2e.sh) — a scripted full chain
   (register → create → freeze → commit baseline → run with a real
   subprocess executor → driver → gates → verify → complete) against the

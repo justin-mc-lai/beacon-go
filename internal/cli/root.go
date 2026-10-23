@@ -47,9 +47,18 @@ import (
 // docs/stdflow-s1/s2/s3-implementation.md);
 // v2.0.0-go.8 adds the ask-before-sign chain (truth ask/answer/intent/
 // confirm), requirement-level drift, the parallel-change base guard,
-// embedded public skills, and the macOS/Linux path canonicalization fix.
+// embedded public skills, and the macOS/Linux path canonicalization fix;
+// v2.0.0-go.9 closes the 26 high/medium gaps from the Python v1.6.19
+// parity audit (docs/parity-audit-python-v16.md): freeze quality
+// (vague-term block, FSM graph validation, five integrity dimension
+// groups, fill depth, deferral ledger, scope modes, stale materials),
+// orchestration closure (review write-back, quota, version-level
+// release checks, budget contract), execution & host (autotest,
+// skills install, repo-carried state, archive/init/hooks), and the
+// intelligence faces (agent eval, qa strategy, intent decomposition,
+// brainstorm, code2truth, reopen). See docs/r2a..r2d reports.
 // Development builds between exits carried a dev suffix.
-const Version = "2.0.0-go.8"
+const Version = "2.0.0-go.9"
 
 // NewRootCmd builds the beacon root command with the six first-class
 // abilities as real command groups (P4a convergence): goal (the loop
@@ -107,6 +116,6 @@ func NewRootCmd() *cobra.Command {
 	// P2a: the goal command group (the loop ability's formal entry).
 	// P3a: the gate command group (formal evaluation write-back).
 	// P3b: migrate v1 (AC-077..079) + doctor rebuild (AC-011).
-	root.AddCommand(newSpineCmd(), newProjectsCmd(), newGoalCmd(), newGateCmd(), newMigrateCmd(), newDoctorCmd(), newSkillsCmd())
+	root.AddCommand(newSpineCmd(), newProjectsCmd(), newGoalCmd(), newGateCmd(), newMigrateCmd(), newDoctorCmd(), newSkillsCmd(), newReviewCmd(), newArchiveCmd(), newHooksCmd())
 	return root
 }

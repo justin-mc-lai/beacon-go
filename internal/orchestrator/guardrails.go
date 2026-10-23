@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"beacon-go/internal/core"
+	"beacon-go/internal/store"
 )
 
 // ConfigureBudget sets the run's budget limits (rounds + duration
@@ -53,6 +54,106 @@ func (e *Engine) ConfigureBudget(runID string, maxRounds, maxDurationSec int) (R
 		return RunView{}, err
 	}
 	return viewOf(run, m, slug), nil
+}
+
+// ---- Spend ledger + handoff budget (R2b, M9: goal_budget.py) ----
+
+// spendLimitOf resolves the spend ledger's quota limit from the
+// run's own ceilings: the budget's round cap first, then the
+// driver's turn cap. Zero means no ceiling is configured anywhere
+// — the budget family's "0 = unlimited" caliber — and the spend
+// gate stays out of the way (the source's ledger takes an explicit
+// limit; a Go run without one has nothing to charge against).
+func spendLimitOf(m *runMeta) int {
+	if m.Budget != nil && m.Budget.MaxRounds > 0 {
+		return m.Budget.MaxRounds
+	}
+	if m.Driver != nil && m.Driver.MaxTurns > 0 {
+		return m.Driver.MaxTurns
+	}
+	return 0
+}
+
+// unboundedSpendProbe stands in for the quota limit when guards
+// are evaluated on a run with no configured ceiling: the source's
+// budget packet always carries an explicit limit (and treats 0 as
+// exhausted from the start — core keeps that edge), while a Go run
+// without any ceiling has nothing to exhaust. The probe value is
+// evaluation-only; the persisted ledger keeps its real limit.
+const unboundedSpendProbe = 1 << 30
+
+// recordSpendOn charges one spend to the run's ledger (in-memory;
+// the caller persists). It applies spend_eligible's full guard
+// order and commit_spend. Returns the refusal reason ("" when the
+// spend landed or no spend gate applies). With force=false (the
+// driver's internal charge) a run with no configured ceiling has
+// no spend gate at all; with force=true (the public RecordSpend
+// door) the whitelist / writeback / idempotency guards always
+// apply, with the exhaustion leg evaluated against the probe.
+func (e *Engine) recordSpendOn(run store.Run, m *runMeta, source, indexDigest string, writebackValidated bool, writebackRef string, force bool) (alreadySpent bool, reason string) {
+	limit := spendLimitOf(m)
+	if limit <= 0 && !force {
+		return false, ""
+	}
+	if m.Spend == nil {
+		l := core.NewSpendLedger(run.ID, limit)
+		m.Spend = &l
+	}
+	probe := *m.Spend
+	if probe.QuotaLimit <= 0 {
+		probe.QuotaLimit = unboundedSpendProbe
+	}
+	if ok, code := core.SpendEligible(probe, source, writebackValidated, indexDigest); !ok {
+		return false, code
+	}
+	l, already, _ := core.CommitSpend(*m.Spend, source, indexDigest, writebackRef)
+	*m.Spend = l
+	return already, ""
+}
+
+// RecordSpend is the public spend door: one guarded charge against
+// the run's spend ledger, persisted with its trail event. Refusals
+// come back as typed errors carrying the source's reason codes
+// (quiet_skip_no_spend / spend_without_writeback /
+// spend_idempotency_conflict / spend_source_not_allowed /
+// program_drive_budget_exhausted).
+func (e *Engine) RecordSpend(runID, source, indexDigest string, writebackValidated bool, writebackRef string) (core.SpendLedger, error) {
+	if indexDigest == "" {
+		return core.SpendLedger{}, core.NewError("spend_index_digest_required", "goal.RecordSpend",
+			"an index digest is required: it is the idempotency key of the spend")
+	}
+	run, m, _, err := e.loadRun(runID)
+	if err != nil {
+		return core.SpendLedger{}, err
+	}
+	already, reason := e.recordSpendOn(run, m, source, indexDigest, writebackValidated, writebackRef, true)
+	if reason != "" {
+		return core.SpendLedger{}, core.NewError(reason, "goal.RecordSpend",
+			"spend refused for run "+runID+" (source="+source+")")
+	}
+	_ = already // replay-safe by construction (eligibility refuses a second charge)
+	if err := e.store.WithTx(func(tx *store.Tx) error {
+		if err := e.appendEventOn(tx, run, "spend_recorded", map[string]any{
+			"source": source, "index_digest": indexDigest, "writeback_ref": writebackRef,
+		}); err != nil {
+			return err
+		}
+		return e.saveRunOn(tx, run, m)
+	}); err != nil {
+		return core.SpendLedger{}, err
+	}
+	if m.Spend == nil {
+		return core.NewSpendLedger(run.ID, spendLimitOf(m)), nil
+	}
+	return *m.Spend, nil
+}
+
+// EnforceHandoffBudget caps a handoff text at the turn budget's
+// 16 lines / 1800 chars (goal_budget.enforce_handoff_budget):
+// truncation is applied and reported, never silent, never a
+// refusal. The driver applies it to every next-turn digest.
+func EnforceHandoffBudget(text string) core.HandoffBudgetResult {
+	return core.EnforceHandoffBudget(text)
 }
 
 // ---- Steering ----

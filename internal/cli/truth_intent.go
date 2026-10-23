@@ -187,7 +187,7 @@ func newTruthIntentCmd() *cobra.Command {
 	c.Flags().StringVar(&goal, "goal", "", "what outcome this serves")
 	c.Flags().StringVar(&nonGoals, "non-goals", "", "what is explicitly out of scope")
 	c.Flags().StringVar(&constraints, "constraints", "", "hard constraints / boundaries")
-	c.Flags().StringVar(&scopeMode, "scope-mode", "focused", "focused | full_parity | mvp | explore")
+	c.Flags().StringVar(&scopeMode, "scope-mode", "", "scope mode: full_parity | mvp | patch | brownfield_takeover | research | lake | ocean | focused (empty = derive from the utterance)")
 	c.Flags().StringVar(&by, "by", "cli", "who records the intent")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("feature")
