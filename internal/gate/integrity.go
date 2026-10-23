@@ -275,6 +275,11 @@ var fakeDeliveryPatterns = []struct {
 
 var docsOnlyRe = regexp.MustCompile(`(?i)docs[- ]only([- ]completion)?|只写文档|文档完成`)
 
+// docsOnlyCommandRe matches commands that only read/print files. The
+// v1 truth-review check C_exec refused these as the sole "test" for a
+// business AC: proving a string exists is not proving the behavior.
+var docsOnlyCommandRe = regexp.MustCompile(`(?i)^\s*(rg|grep|cat|head|tail|ls|find|echo|test\s+-[fd])\b`)
+
 func scanFakeDelivery(file string, text string) []Finding {
 	var out []Finding
 	for i, line := range strings.Split(text, "\n") {
@@ -395,6 +400,10 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 				add(Finding{Kind: "soft_tc", ReasonCode: core.ReasonIntegritySoftTC,
 					File: in.Pkg.Tests.Path, Line: row.Line,
 					Detail: row.TC + " for " + row.AC + " is a soft TC (no Command + Assertion, no BLOCKED: escape)"})
+			} else if docsOnlyCommandRe.MatchString(strings.Trim(strings.TrimSpace(row.Command), "`")) {
+				add(Finding{Kind: "docs_only_tc", ReasonCode: core.ReasonIntegrityDocsOnlyTC,
+					File: in.Pkg.Tests.Path, Line: row.Line,
+					Detail: row.TC + " for " + row.AC + " only searches/prints files; a business AC needs an execution-layer TC"})
 			}
 		}
 		ids := make([]string, 0, len(defined))

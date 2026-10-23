@@ -63,6 +63,11 @@ func (d *ProjectDao) Register(p Project) (Project, error) {
 	if p.ID == "" {
 		p.ID = newID("proj_")
 	}
+	// Canonicalize at the write boundary: every read path resolves
+	// the root (ResolveRootPath), so storing an unresolved path would
+	// make the row unfindable whenever the two spellings differ
+	// (macOS /var -> /private/var symlink is the common case).
+	p.RootPath = ResolveRootPath(p.RootPath)
 	p.RegisteredAt = orNow(p.RegisteredAt)
 	_, err := d.q.Exec(`INSERT INTO projects(id, root_path, name, registered_at) VALUES(?,?,?,?)`,
 		p.ID, p.RootPath, p.Name, p.RegisteredAt)
@@ -81,7 +86,7 @@ func scanProject(row interface{ Scan(...any) error }) (Project, error) {
 // GetByRootPath looks a project up by its unique root path.
 func (d *ProjectDao) GetByRootPath(rootPath string) (Project, error) {
 	return scanProject(d.q.QueryRow(
-		`SELECT id, root_path, name, registered_at FROM projects WHERE root_path = ?`, rootPath))
+		`SELECT id, root_path, name, registered_at FROM projects WHERE root_path = ?`, ResolveRootPath(rootPath)))
 }
 
 // GetByID looks a project up by id.

@@ -32,6 +32,7 @@ parser_contract: beacon-feature-package-v2
 truth_source_model: feature_package_authoritative
 package_maturity: draft
 materials_status: draft
+intent_confirmed: false
 canonical_refs:
   truth: %s/truth.md
   tests: %s/tests.md
@@ -52,13 +53,50 @@ lake_or_ocean: 湖
 language: zh
 source: user_intent
 utterance: ""
+goal: ""
+non_goals: ""
+constraints: ""
+scope_mode: focused
 `+"```"+`
+
+## Open Questions
+
+One question at a time; a package cannot be signed while a row is open.
+Use beacon truth ask / beacon truth answer to drive this ledger.
+
+| Q ID | Question | Recommendation | Status | Answer |
+|------|----------|----------------|--------|--------|
+| Q1 | 用一句话说清：谁、什么问题、什么算完成？ | 先写目标与非目标，再写一条可验证的完成标准 | open | |
+
+## Intent Coverage
+
+Every AC must trace to the intent or evidence it serves.
+
+| AC ID | Intent Source | Evidence |
+|-------|---------------|----------|
+| AC-001 | (fill: 用户原话/目标/约束) | (fill: 证据路径或 conversation:) |
 
 ## Acceptance Criteria
 
 | AC ID | Criterion |
 |-------|-----------|
 | AC-001 | 作者写下第一条可验证的完成标准（可被 tests.md 的 TC-001 直接验证） |
+
+## Domain FSM
+
+Only required when frontmatter domain_required: true. Name at least one
+hang state (挂起/hang) and one illegal transition (非法/illegal).
+
+| State | Event | Guard | To | Action |
+|-------|-------|-------|----|--------|
+
+## Parity Matrix
+
+Only required when scope_mode: full_parity. List the source capability,
+whether Beacon covers it, and the evidence.
+
+| Capability | Covered | Evidence |
+|------------|---------|----------|
 `, slug, version, pkgRel, pkgRel, pkgRel, pkgRel, slug)
 	tests := fmt.Sprintf(`---
 slug: %s

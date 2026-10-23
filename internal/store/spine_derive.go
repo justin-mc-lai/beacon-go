@@ -34,7 +34,27 @@ func ResolveRootPath(p string) string {
 	if resolved, err := filepath.EvalSymlinks(abs); err == nil {
 		return resolved
 	}
-	return filepath.Clean(abs)
+	// The leaf may not exist yet (a package/project directory is
+	// often registered before it is created). Resolve the longest
+	// existing ancestor and rejoin the remaining components, so the
+	// same path always canonicalizes to the same string whether or
+	// not the directory exists — Python's Path.resolve(strict=False)
+	// behavior.
+	dir, tail := abs, []string{}
+	for {
+		if resolved, err := filepath.EvalSymlinks(dir); err == nil {
+			for i := len(tail) - 1; i >= 0; i-- {
+				resolved = filepath.Join(resolved, tail[i])
+			}
+			return filepath.Clean(resolved)
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return filepath.Clean(abs)
+		}
+		tail = append(tail, filepath.Base(dir))
+		dir = parent
+	}
 }
 
 // ProjectKey reproduces v1 runtime_projection._project_key exactly:

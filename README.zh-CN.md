@@ -10,7 +10,7 @@ Beacon Go 是 Beacon 内核的 Go 语言重构版。它保留 Python 版 Beacon 
 自己排阶段、在硬门禁下逐步推进、断了能续跑，并且永远不能绕过独立
 检查者和人工确认自称完成。
 
-当前版本：**v2.0.0-go.7** · 243 个行为级测试 · 端到端全链跑通。
+当前版本：**v2.0.0-go.8** · 243 个行为级测试 · 端到端全链跑通。
 
 ## 为什么重构
 
@@ -62,7 +62,7 @@ Go 版按一份书面口径执行（[`docs/scope-charter.md`](docs/scope-charter
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.7
+./bin/beacon --version          # Beacon CLI v2.0.0-go.8
 ```
 
 日常五条命令：
@@ -76,13 +76,44 @@ beacon goal driver run-loop --run-id <任务id>       # 推到发布门口
 beacon spine show --project . --feature my-feature  # 看唯一账本视图
 ```
 
+### 先问清楚，再签字
+
+需求包结构完整不等于想清楚了。意图门要求：记录用户原话、关掉开放问题账本、
+每条 AC 都能追溯到意图来源，然后显式签字：
+
+```sh
+beacon truth ask      --feature my-feature --question "这个功能给谁用？" --recommend "..."
+beacon truth answer   --feature my-feature --id Q1 --answer "..."
+beacon truth intent   --feature my-feature --utterance "用户原话" --goal "..." \
+                      --non-goals "..." --constraints "..."
+beacon truth confirm  --feature my-feature        # 还有开放问题就拒绝
+beacon truth freeze   --feature my-feature        # 完整性 + 一致性 + 意图
+```
+
+需求变更后，按 AC 级别自检：
+
+```sh
+beacon truth change   --feature my-feature --summary "放宽 AC-001"
+# 编辑需求包，然后：
+beacon truth refreeze --feature my-feature
+beacon truth drift    --feature my-feature        # 指出哪条 AC 动了
+beacon truth rebase   --feature my-feature --change <id> --accept-current
+```
+
+六个公共 skill 已随二进制打包：
+
+```sh
+beacon skills list
+beacon skills show truth
+```
+
 运行状态只存一个全局 SQLite 数据库（`~/.beacon/beacon.db`，WAL
 模式）。需求真相永不进库，只住在
 `docs/beacon/<版本>/features/<slug>/` 下的 Markdown 包里。
 
 ## 验证情况
 
-- `go test ./...`——243 个行为级测试全过。
+- `go test ./...`——252 个行为级测试全过（Linux/macOS）。
 - [`e2e/run_e2e.sh`](e2e/run_e2e.sh)——真二进制全链剧本（注册 →
   建包 → 冻结 → 提交基线 → 真执行器干活 → 司机推进 → 四门评估 →
   挂检查者 → 完工），13 步，退出码 0。

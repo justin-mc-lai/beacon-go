@@ -13,7 +13,7 @@ engine**: long-running coding work that plans itself into stages, advances
 step by step under hard gates, survives interruptions, and never marks
 itself done without independent verification and a human-confirmed release.
 
-Current release: **v2.0.0-go.7** · 243 behavior tests · full end-to-end
+Current release: **v2.0.0-go.8** · 252 behavior tests · full end-to-end
 chain green.
 
 ## Why a rewrite
@@ -73,7 +73,7 @@ Requires Go 1.27+.
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.7
+./bin/beacon --version          # Beacon CLI v2.0.0-go.8
 ```
 
 Five commands cover most of a day:
@@ -85,6 +85,39 @@ beacon truth freeze --project . --feature my-feature
 beacon goal run "add two-factor auth to the login page" --project . --feature my-feature
 beacon goal driver run-loop --run-id <run-id>       # push it to the release gate
 beacon spine show --project . --feature my-feature  # read the one ledger view
+```
+
+### Ask before sign
+
+A package cannot be frozen just because it is structurally complete. The
+intent gate requires the author to record what the user actually asked for,
+close the open-question ledger, trace every AC to an intent source, and sign
+the result:
+
+```sh
+beacon truth ask      --feature my-feature --question "Who is this for?" --recommend "..."
+beacon truth answer   --feature my-feature --id Q1 --answer "..."
+beacon truth intent   --feature my-feature --utterance "user words" --goal "..." \
+                      --non-goals "..." --constraints "..."
+beacon truth confirm  --feature my-feature        # refuses while anything is open
+beacon truth freeze   --feature my-feature        # completeness + integrity + intent
+```
+
+After a change, the package self-checks at requirement level:
+
+```sh
+beacon truth change   --feature my-feature --summary "widen AC-001"
+# edit the package, then:
+beacon truth refreeze --feature my-feature
+beacon truth drift    --feature my-feature        # names the ACs that moved
+beacon truth rebase   --feature my-feature --change <id> --accept-current
+```
+
+The six public skills ship inside the binary:
+
+```sh
+beacon skills list
+beacon skills show truth
 ```
 
 Runtime state lives in a single global SQLite database
@@ -115,6 +148,8 @@ it stays in the Markdown packages under
   handshake). Real session iteration awaits a real ACP agent binary.
 - **Vendor executors** (codex / claude CLIs) are wired as command
   profiles; end-to-end verification awaits authenticated binaries.
+- **Skill references** beyond the six embedded `SKILL.md` files stay
+  host-side; the binary ships the public surface only.
 - Four acceptance items are deferred to external conditions — see the
   matrix and `docs/p6-implementation.md` §6 for the full gap list.
 

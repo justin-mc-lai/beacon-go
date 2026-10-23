@@ -55,12 +55,29 @@ func (e *Engine) RequestTruthChange(ctx store.FeatureContext, summary, by string
 	changeID := "chg_" + hex.EncodeToString(rnd[:])
 	pkgDir := filepath.Dir(ctx.Feature.TruthPath)
 	changeRel := filepath.Join(pkgDir, "changes", changeID+".md")
+	// R1: record the frozen body the change was authored against.
+	// A later refreeze compares this base with the then-current
+	// freeze record; a mismatch means a parallel change landed and
+	// the author must rebase explicitly (never silent overwrite).
+	recs, _ := e.trailRecords(ctx.Feature.ID)
+	baseTruthSHA := ""
+	basePackageFP := ""
+	if recs.freeze != nil {
+		baseTruthSHA = recs.freeze.TruthSHA256After
+		basePackageFP = recs.freeze.Fingerprint
+	}
+	if baseTruthSHA == "" {
+		rawTruth, _ := os.ReadFile(resolvePkgPath(ctx.Project.RootPath, ctx.Feature.TruthPath))
+		baseTruthSHA = sha256HexOf(rawTruth)
+	}
 	doc := fmt.Sprintf(`---
 change_id: %s
 slug: %s
 status: pending
 created_by: %s
 created_at: %s
+base_truth_sha256: %s
+base_package_fingerprint: %s
 ---
 
 # Change Request: %s
@@ -70,7 +87,7 @@ created_at: %s
 ## Route
 
 Edit the package truth (and its tests/tasks/evidence as needed), then close this change with `+"`beacon truth refreeze`"+`. The change stays pending — and the truth_freeze gate stays blocked — until the refreeze lands.
-`, changeID, view.Slug, by, nowISO(), summary, summary)
+`, changeID, view.Slug, by, nowISO(), baseTruthSHA, basePackageFP, summary, summary)
 	absChange := resolvePkgPath(ctx.Project.RootPath, changeRel)
 	if err := os.MkdirAll(filepath.Dir(absChange), 0o755); err != nil {
 		return TruthPackageView{}, err
@@ -91,6 +108,7 @@ Edit the package truth (and its tests/tasks/evidence as needed), then close this
 		"change_id": changeID, "summary": summary, "by": by,
 		"change_doc":          filepath.ToSlash(changeRel),
 		"package_fingerprint": openFP, "fingerprint_alg": core.FingerprintAlg,
+		"base_truth_sha256": baseTruthSHA, "base_package_fingerprint": basePackageFP,
 	}); err != nil {
 		return TruthPackageView{}, err
 	}
@@ -122,6 +140,11 @@ func (e *Engine) RefreezeTruthPackage(ctx store.FeatureContext, by string) (Trut
 		return view, core.NewError(ReasonTruthNoChangePending, "truth.Refreeze",
 			"package "+view.Slug+" has no pending change to refreeze")
 	}
+	// R1: a change authored against an older frozen body (because a
+	// parallel change landed first) must be rebased explicitly.
+	if err := e.checkChangeBase(ctx); err != nil {
+		return view, err
+	}
 	// AC-137: the refreeze transaction checks (content moved,
 	// revision id agrees, freeze->change fingerprint chain
 	// intact) run before the freeze precheck — a drifted or
@@ -143,6 +166,34 @@ func (e *Engine) RefreezeTruthPackage(ctx store.FeatureContext, by string) (Trut
 	return e.applyFreeze(ctx, EventTruthRefrozen, map[string]any{
 		"by": by, "change_ids": changeIDs,
 	})
+}
+
+// checkChangeBase is the R1 parallel-change guard: every pending
+// change names the frozen body it was authored against; if the latest
+// freeze record moved past that base, another change landed and this
+// refreeze would silently overwrite it. Fail closed with a rebase
+// instruction instead.
+func (e *Engine) checkChangeBase(ctx store.FeatureContext) error {
+	recs, err := e.trailRecords(ctx.Feature.ID)
+	if err != nil {
+		return err
+	}
+	if recs.freeze == nil || recs.freeze.TruthSHA256After == "" {
+		return nil // pre-R1 history: nothing to prove against
+	}
+	for _, ch := range recs.pendingChanges {
+		if ch.BaseTruthSHA256 == "" {
+			continue
+		}
+		if ch.BaseTruthSHA256 != recs.freeze.TruthSHA256After {
+			return core.NewError(core.ReasonTruthBaseDiverged, "truth.Refreeze",
+				"change "+ch.ChangeID+" was opened on frozen body "+short(ch.BaseTruthSHA256)+
+					" but the latest freeze is "+short(recs.freeze.TruthSHA256After)+
+					"; another change landed first. Merge it, then run `beacon truth rebase --change "+
+					ch.ChangeID+" --accept-current` before refreezing")
+		}
+	}
+	return nil
 }
 
 // refreezeTxGuard enforces the AC-137 refreeze transaction checks

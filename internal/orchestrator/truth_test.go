@@ -63,6 +63,7 @@ func (env truthEnv) create(t *testing.T, slug string) TruthPackageView {
 	if err != nil {
 		t.Fatalf("CreateTruthPackage(%s): %v", slug, err)
 	}
+	completeIntentForTest(t, env.eng, env.ctx(t, slug))
 	return v
 }
 

@@ -32,6 +32,8 @@ func newTruthCmd() *cobra.Command {
 	c.AddCommand(
 		newTruthCreateCmd(), newTruthFreezeCmd(false), newTruthFreezeCmd(true),
 		newTruthChangeCmd(), newTruthBaselineCmd(), newTruthShowCmd(), newTruthListCmd(),
+		newTruthAskCmd(), newTruthAnswerCmd(), newTruthQuestionsCmd(),
+		newTruthIntentCmd(), newTruthConfirmCmd(), newTruthDriftCmd(), newTruthRebaseCmd(),
 	)
 	return c
 }

@@ -3,6 +3,7 @@ package core
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"regexp"
 	"strings"
 )
 
@@ -102,4 +103,70 @@ func PackageSurfaceFingerprint(truthRaw, testsRaw, tasksRaw, evidenceRaw []byte)
 	h.Write([]byte{0})
 	h.Write(evidenceRaw)
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+// RequirementFingerprintAlg tags the per-AC fingerprint map recorded
+// at freeze (R1): requirement truth must be self-checking at the
+// requirement level, not only at the package level, so a later drift
+// report can name WHICH acceptance criterion moved.
+const RequirementFingerprintAlg = "reqfp-v1"
+
+var acStartRe = regexp.MustCompile(`\*\*AC-(\d{3})\*\*|^\|\s*AC-(\d{3})\s*\|`)
+
+// RequirementFingerprints returns one stable hash per AC defined in a
+// truth document. A bold definition block runs from its line to the
+// next AC definition or the next `## ` heading; a table row is one
+// line. Multiple occurrences of the same AC are concatenated, so a
+// change in any occurrence moves that AC's fingerprint. The map is
+// empty when the document defines no ACs.
+func RequirementFingerprints(truthRaw []byte) map[string]string {
+	text := string(NormalizeTruthForFingerprint(truthRaw))
+	lines := strings.Split(text, "\n")
+	blocks := map[string][]string{}
+	var cur string
+	var buf []string
+	flush := func() {
+		if cur == "" {
+			return
+		}
+		blocks[cur] = append(blocks[cur], strings.Join(buf, "\n"))
+		buf = nil
+	}
+	for _, line := range lines {
+		if strings.HasPrefix(line, "## ") {
+			flush()
+			cur = ""
+			continue
+		}
+		if m := acStartRe.FindStringSubmatch(line); m != nil {
+			flush()
+			id := m[1]
+			if id == "" {
+				id = m[2]
+			}
+			cur = "AC-" + id
+			buf = []string{strings.TrimRight(line, " \t\r")}
+			// A table row is complete on its own line.
+			if strings.HasPrefix(strings.TrimSpace(line), "|") {
+				flush()
+				cur = ""
+			}
+			continue
+		}
+		if cur != "" {
+			buf = append(buf, strings.TrimRight(line, " \t\r"))
+		}
+	}
+	flush()
+	out := make(map[string]string, len(blocks))
+	for id, parts := range blocks {
+		h := sha256.New()
+		h.Write([]byte(RequirementFingerprintAlg))
+		h.Write([]byte{0})
+		h.Write([]byte(id))
+		h.Write([]byte{0})
+		h.Write([]byte(strings.Join(parts, "\n")))
+		out[id] = hex.EncodeToString(h.Sum(nil))
+	}
+	return out
 }

@@ -268,3 +268,25 @@ func TestIntegrityFakeDeliveryAndDeferral(t *testing.T) {
 		t.Fatalf("pending deferral must be caught, got %+v", rep.Findings)
 	}
 }
+
+func TestIntegrityRejectsDocsOnlyTC(t *testing.T) {
+	in := baseIntegrityInput()
+	in.Pkg.Tests.Text = "---\nslug: demo\n---\n" +
+		"| AC ID | TC ID | Layer | Command | Assertion |\n" +
+		"|-------|-------|-------|---------|-----------|\n" +
+		"| AC-001 | TC-001 | docs | `rg -n \"AC-001\" truth.md` | string_exists |\n" +
+		"| AC-002 | TC-002 | docs | `grep -n \"AC-002\" truth.md` | string_exists |\n"
+	rep := CheckIntegrity(in, IntegrityModeBlock)
+	if rep.Verdict != VerdictBlocked {
+		t.Fatalf("docs-only TC must block, got %+v", rep)
+	}
+	found := false
+	for _, f := range rep.Findings {
+		if f.Kind == "docs_only_tc" && f.ReasonCode == core.ReasonIntegrityDocsOnlyTC {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("missing docs_only_tc finding: %+v", rep.Findings)
+	}
+}

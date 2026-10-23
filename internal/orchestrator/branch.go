@@ -175,9 +175,11 @@ func (e *Engine) requireCanonicalBranch(root, op string) (BranchInfo, error) {
 // ---- trail records (one scan, three readers) ----
 
 type freezeRecord struct {
-	Fingerprint        string // package_fingerprint (truth+tests, P4c)
-	SurfaceFingerprint string // surface_fingerprint (four surfaces, S1)
-	RevisionID         string
+	Fingerprint             string // package_fingerprint (truth+tests, P4c)
+	SurfaceFingerprint      string // surface_fingerprint (four surfaces, S1)
+	RevisionID              string
+	TruthSHA256After        string            // frozen body hash (R1 drift base)
+	RequirementFingerprints map[string]string // per-AC hashes (R1 drift)
 }
 
 type baselineRecord struct {
@@ -188,6 +190,7 @@ type baselineRecord struct {
 type changeOpenRecord struct {
 	ChangeID          string
 	FingerprintAtOpen string // package_fingerprint when the change was opened ("" = pre-S1 change)
+	BaseTruthSHA256   string // frozen body hash the change was authored against (R1)
 }
 
 type trailRecords struct {
@@ -202,6 +205,20 @@ type trailRecords struct {
 // longer the frozen body), the latest freeze record (AC-137's
 // proof base) and the pending changes with their open-state
 // fingerprints.
+func stringMap(v any) map[string]string {
+	m, ok := v.(map[string]any)
+	if !ok {
+		return nil
+	}
+	out := make(map[string]string, len(m))
+	for k, val := range m {
+		if s, ok := val.(string); ok {
+			out[k] = s
+		}
+	}
+	return out
+}
+
 func (e *Engine) trailRecords(featureID string) (trailRecords, error) {
 	events, err := e.store.ListEvents(featureID)
 	if err != nil {
@@ -226,18 +243,33 @@ func (e *Engine) trailRecords(featureID string) (trailRecords, error) {
 		case EventTruthChangeRequested, "change_requested", "gen_change":
 			recs.pendingChanges = append(recs.pendingChanges, changeOpenRecord{
 				ChangeID: str("change_id"), FingerprintAtOpen: str("package_fingerprint"),
+				BaseTruthSHA256: str("base_truth_sha256"),
 			})
 		case EventTruthFrozen, EventTruthRefrozen, "refreeze", "gen_refreeze":
 			recs.pendingChanges = nil
 			recs.freeze = &freezeRecord{
-				Fingerprint:        str("package_fingerprint"),
-				SurfaceFingerprint: str("surface_fingerprint"),
-				RevisionID:         str("revision_id"),
+				Fingerprint:             str("package_fingerprint"),
+				SurfaceFingerprint:      str("surface_fingerprint"),
+				RevisionID:              str("revision_id"),
+				TruthSHA256After:        str("truth_sha256_after"),
+				RequirementFingerprints: stringMap(p["requirement_fingerprints"]),
 			}
 			if c := str("baseline_commit"); c != "" {
 				recs.baseline = &baselineRecord{Commit: c, TruthSHA256: str("truth_sha256_after")}
 			} else {
 				recs.baseline = nil
+			}
+		case EventTruthChangeRebased:
+			for i := range recs.pendingChanges {
+				if recs.pendingChanges[i].ChangeID != str("change_id") {
+					continue
+				}
+				if fp := str("package_fingerprint"); fp != "" {
+					recs.pendingChanges[i].FingerprintAtOpen = fp
+				}
+				if bs := str("base_truth_sha256"); bs != "" {
+					recs.pendingChanges[i].BaseTruthSHA256 = bs
+				}
 			}
 		case EventTruthBaselineRecorded:
 			recs.baseline = &baselineRecord{Commit: str("baseline_commit"), TruthSHA256: str("truth_sha256")}

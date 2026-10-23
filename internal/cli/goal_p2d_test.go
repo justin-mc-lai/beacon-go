@@ -47,7 +47,7 @@ func seedP2DProject(t *testing.T) string {
 // drift after a program change.
 func TestGoalP2DChain(t *testing.T) {
 	out, err := runCLI(t, "--version")
-	if err != nil || !strings.Contains(out, "v2.0.0-go.7") {
+	if err != nil || !strings.Contains(out, "v"+Version) {
 		t.Fatalf("version = %q err=%v", out, err)
 	}
 	root := seedP2DProject(t)

@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Beacon Go (v2.0.0-go.7) — P6 end-to-end full-chain script.
+# Beacon Go (v2.0.0-go.8) — end-to-end full-chain script.
 #
 # Chain (one step must not be skipped; no manual back-filling anywhere):
 #   1. git-init a temp project + `projects register`
 #   2. `truth create` a feature package (slug: e2e-login-2fa)
 #   3. fill the four-piece package with minimal real content
+#  3b. `truth ask` -> `truth intent` -> `truth answer` -> `truth confirm`
+#      (R1 ask-before-sign: the intent gate refuses an unsigned package)
 #   4. `truth freeze`
 #  4b. commit the frozen package on main + `truth baseline`
 #      (S1, AC-139: a frozen body becomes a consumable baseline
@@ -63,8 +65,8 @@ main() {
   echo "started: $(date '+%F %T %Z')"
   echo "beacon:  $BEACON"
   "$BEACON" --version
-  "$BEACON" --version | grep -q "v2.0.0-go.7" || {
-    echo "FAIL: this script targets Beacon CLI v2.0.0-go.7"
+  "$BEACON" --version | grep -q "v2.0.0-go.8" || {
+    echo "FAIL: this script targets Beacon CLI v2.0.0-go.8"
     return 1
   }
 
@@ -160,6 +162,31 @@ PYEOF
   grep -q "TestLogin2FAReplay" "$PKG_DIR/tests.md"
   grep -q "replay rejection" "$PKG_DIR/tasks.md"
   echo "four-piece content verified on disk"
+
+  # ==================================================================
+  STEP="3b ask + sign intent"
+  echo; echo "===== STEP 3b: $STEP ====="
+  OUT="$("$BEACON" truth ask --project "$PROJ" --feature "$SLUG" \
+    --question "动态码错误、过期、重放分别返回给用户什么？" \
+    --recommend "统一返回登录失败，不泄露具体原因；重放按失败计数" --json)"
+  echo "$OUT"
+  OUT="$("$BEACON" truth intent --project "$PROJ" --feature "$SLUG" \
+    --utterance "给登录加 TOTP 二次验证，动态码错误或重放时拒绝登录" \
+    --goal "账号密码泄露后仍不能直接登录" \
+    --non-goals "不做短信验证码；不改注册流程" \
+    --constraints "离线可验证；不引入外部服务" --scope-mode focused --json)"
+  echo "$OUT"
+  OUT="$("$BEACON" truth answer --project "$PROJ" --feature "$SLUG" --id Q1 \
+    --answer "所有失败统一返回登录失败，并计入失败次数" --json)"
+  echo "$OUT"
+  OUT="$("$BEACON" truth answer --project "$PROJ" --feature "$SLUG" --id Q2 \
+    --answer "统一登录失败，不区分过期/错误/重放" --json)"
+  echo "$OUT"
+  OUT="$("$BEACON" truth confirm --project "$PROJ" --feature "$SLUG" --by e2e-author --json)"
+  echo "$OUT"
+  grep -q "^intent_confirmed: true" "$PKG_DIR/truth.md" || {
+    echo "FAIL: intent_confirmed is not true after confirm"; return 1; }
+  echo "intent signed: snapshot + closed questions + per-AC coverage verified"
 
   # ==================================================================
   STEP="4 truth freeze"

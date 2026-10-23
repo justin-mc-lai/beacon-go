@@ -34,6 +34,31 @@ func truthCreate(t *testing.T, root, slug string) map[string]any {
 	if err != nil {
 		t.Fatalf("truth create %s: %v (%s)", slug, err, out)
 	}
+	// Fill the one-sentence human summary (the intent gate refuses
+	// the skeleton placeholder), then drive the real ask-before-sign
+	// flow so lifecycle tests keep testing their own subject.
+	truthPath := filepath.Join(root, "docs", "beacon", "v2.0.0", "features", slug, "truth.md")
+	if raw, err := os.ReadFile(truthPath); err == nil {
+		raw = []byte(strings.Replace(string(raw),
+			"（一句话说清这个需求解决什么问题、给谁用、做到什么算完。冻结前由作者补齐。）",
+			"测试需求：目标、用户与完成标准。", 1))
+		if err := os.WriteFile(truthPath, raw, 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if out, err := runCLI(t, "truth", "intent", "--project", root, "--feature", slug,
+		"--utterance", "test utterance", "--goal", "test goal",
+		"--non-goals", "test non-goals", "--constraints", "test constraints", "--json"); err != nil {
+		t.Fatalf("truth intent %s: %v (%s)", slug, err, out)
+	}
+	if out, err := runCLI(t, "truth", "answer", "--project", root, "--feature", slug,
+		"--id", "Q1", "--answer", "test answer", "--json"); err != nil {
+		t.Fatalf("truth answer %s: %v (%s)", slug, err, out)
+	}
+	if out, err := runCLI(t, "truth", "confirm", "--project", root, "--feature", slug, "--json"); err != nil {
+		t.Fatalf("truth confirm %s: %v (%s)", slug, err, out)
+	}
 	return parseDoc(t, out)
 }
 

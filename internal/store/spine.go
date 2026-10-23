@@ -270,7 +270,7 @@ func (s *Store) ListFeatureContexts(projectRoot string) ([]FeatureContext, error
 	var args []any
 	if projectRoot != "" {
 		query += " WHERE p.root_path = ?"
-		args = append(args, projectRoot)
+		args = append(args, ResolveRootPath(projectRoot))
 	}
 	query += " ORDER BY v.is_current DESC, p.registered_at, p.id, f.slug"
 	rows, err := s.db.Query(query, args...)

@@ -56,6 +56,11 @@ const (
 	EventTruthChangeRequested  = "truth_change_requested"
 	EventTruthRefrozen         = "truth_refrozen"
 	EventTruthFreezeReconciled = "truth_freeze_reconciled"
+	EventTruthIntentUpdated    = "truth_intent_updated"
+	EventTruthQuestionAsked    = "truth_question_asked"
+	EventTruthQuestionAnswered = "truth_question_answered"
+	EventTruthIntentConfirmed  = "truth_intent_confirmed"
+	EventTruthChangeRebased    = "truth_change_rebased"
 )
 
 // TruthPackageView is the truth ability's read/write surface for one
@@ -323,6 +328,21 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string) (TruthPacka
 		view.Findings = iv.Findings
 		return view, false, nil
 	}
+	// R1 intent gate (ask before sign): intent snapshot, open
+	// questions, per-AC coverage, FSM and parity. Structural and
+	// deterministic; the interaction lives in truth ask/answer.
+	if findings := gate.CheckIntentGate(pkg); len(findings) > 0 {
+		view.Blocked = true
+		view.Findings = findings
+		seen := map[string]bool{}
+		for _, f := range findings {
+			if f.ReasonCode != "" && !seen[f.ReasonCode] {
+				seen[f.ReasonCode] = true
+				view.BlockReasons = append(view.BlockReasons, f.ReasonCode)
+			}
+		}
+		return view, false, nil
+	}
 	return view, true, nil
 }
 
@@ -350,6 +370,11 @@ func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload
 	testsRaw, _ := os.ReadFile(resolvePkgPath(root, ctx.Feature.TestsPath))
 	payload["package_fingerprint"] = core.PackageFingerprint(raw, testsRaw)
 	payload["fingerprint_alg"] = core.FingerprintAlg
+	// R1: requirement-level hashes are the drift baseline. The
+	// package fingerprint says "something moved"; this map says
+	// WHICH acceptance criterion moved.
+	payload["requirement_fingerprints"] = core.RequirementFingerprints(raw)
+	payload["requirement_fingerprint_alg"] = core.RequirementFingerprintAlg
 	// S1 (AC-137): the four-surface fingerprint (the refreeze
 	// transaction's proof base — at least one requirement surface
 	// must change) and the document's declared revision id (the

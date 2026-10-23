@@ -256,12 +256,37 @@ const (
 	ReasonIntegrityTestsUnknownAC    = "truth_integrity_tests_unknown_ac"
 	ReasonIntegrityACWithoutTC       = "truth_integrity_ac_without_tc"
 	ReasonIntegritySoftTC            = "truth_integrity_soft_tc"
+	ReasonIntegrityDocsOnlyTC        = "truth_integrity_docs_only_tc"
 	ReasonIntegrityDeferralPending   = "truth_integrity_deferral_pending"
 	ReasonIntegrityFakeDelivery      = "truth_integrity_fake_delivery"
 	ReasonIntegrityEvidenceUnreg     = "truth_integrity_evidence_artifact_unregistered"
 	ReasonIntegrityEvidenceMissing   = "truth_integrity_evidence_artifact_missing"
 	ReasonIntegritySlugMismatch      = "truth_integrity_slug_mismatch"
 	ReasonIntegrityAuditOnly         = "truth_integrity_audit_only"
+)
+
+// ---- Intent gate family (R1: ask before sign) ----
+//
+// The freeze gate's intent half: a package cannot be signed until the
+// author has recorded the user's intent, closed every open question,
+// traced every AC to an intent source, declared maturity, and written
+// the domain FSM/parity materials the package's own frontmatter
+// requires. These checks are structural and deterministic; the
+// interaction (one question at a time) is the truth ask/answer flow.
+const (
+	ReasonIntentNotConfirmed     = "truth_intent_not_confirmed"
+	ReasonIntentSnapshotIncomple = "truth_intent_snapshot_incomplete"
+	ReasonIntentQuestionOpen     = "truth_intent_question_open"
+	ReasonIntentCoverageMissing  = "truth_intent_coverage_missing"
+	ReasonIntentCoverageUnknown  = "truth_intent_coverage_unknown_ac"
+	ReasonIntentCoverageUntraced = "truth_intent_coverage_untraced"
+	ReasonIntentFSMMissing       = "truth_intent_fsm_missing"
+	ReasonIntentFSMIncomplete    = "truth_intent_fsm_incomplete"
+	ReasonIntentPackageScaffold  = "truth_intent_package_scaffold"
+	ReasonIntentParityMissing    = "truth_intent_parity_missing"
+	ReasonTruthBaseDiverged      = "truth_base_diverged"
+	ReasonTruthRebaseNotAllowed  = "truth_rebase_not_allowed"
+	ReasonTruthDriftNeverFrozen  = "truth_drift_never_frozen"
 )
 
 // ---- Real-integration family (P3c: subprocess / profile / ralph /
