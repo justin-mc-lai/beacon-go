@@ -2,7 +2,7 @@
 
 > 日期：2026-10-22 ｜ 范围：冻结 truth `beacon-v2-rust-kernel-redesign` 有效 AC 共 171 条（AC-001..173，缺 145/146，其为 TC 编号）
 > 分类口径：tested＝有行为级测试或可复跑 benchmark 实际断言该 AC 行为（给出测试函数名或 bench 归档）；implemented＝代码已实现该行为但无专门测试；deferred-external＝实现依赖外部目标（写清前置条件）；dropped-by-charter＝口径稿拍板不迁（写拍板依据）。
-> 终表统计：tested 81 ｜ implemented 64 ｜ deferred-external 17 ｜ dropped-by-charter 9 ｜ 合计 171（与逐行加总一致，自查通过）
+> 终表统计：tested 82 ｜ implemented 64 ｜ deferred-external 16 ｜ dropped-by-charter 9 ｜ 合计 171（与逐行加总一致，自查通过）
 > 说明：本表由 ac-matrix-part1.md / ac-matrix-part2.md 两分片合并，合并时仅对 AC-051..058（P6 benchmark 已实测）与 AC-090（P6 出口判据）按实测结果更新分类与备注，其余逐行原样保留；标「待复核」者为分类时拿不准、按保守档落位的条目。2026-10-22 两组标准全补（S1/S2/S3，发 v2.0.0-go.7）后，AC-136..142 与 AC-171..173 共 10 行按实测改为 tested 并逐行写明测试名，其余行未动。
 
 | AC | 摘要 | 分类 | 证据/备注 |
@@ -97,7 +97,7 @@
 | AC-088 | P4 阶段出口 | implemented | docs/p4a-implementation.md、p4b-implementation.md、p4c-implementation.md 与 v2.0.0-go.3 出口（六能力收敛、统一评分、P4c 终局）；阶段出口为流程里程碑，无单测断言出口本身 |
 | AC-089 | P5 阶段出口以 D-V2-001 accepted defer 跳过、不建 proto/gRPC、不阻塞 P6 | dropped-by-charter | 拍板依据：冻结 deferral D-V2-001 accepted（truth 阶段表 P5 行与 AC-024）+ phase0-inventory P5 proto 跳过结论；Go 侧无 proto/gRPC 硬依赖。此条依据是冻结 deferral 而非口径稿 drop 16 清单，待复核 |
 | AC-090 | P6 成熟度出口：默认 v2 加 benchmark 门禁达标 | implemented | P6 出口工作已执行（benchmark 已建并归档、AC 全矩阵即本文件、外部验证逐项实测前置），但出口判据未全绿：benchmark 8 项中 3 项 FAIL（AC-054/055/057）、E2E 全链路停步第 10 步（QA 产物登记面缺失，见 P6 报告）；故不标 tested，如实记为部分达成 |
-| AC-091 | CI 必须真跑构建/测试双平台矩阵、不得仅 README 声明 | deferred-external | 2026-10-25 复测：`.github/workflows/ci.yml` 已存在（ubuntu-latest + macos-latest 矩阵跑 go mod verify / build / vet / test / gofmt，另有 windows-advisory 非门禁 job；`git log --oneline -1 -- .github/workflows/ci.yml` = `2ec1cf4 feat(v2.0.0-go.8): ask-before-sign intent gate + requirement drift + R0 fixes`，原「无任何 CI 配置」备注过期）；前置条件由此变为「一次真实 CI run 的通过记录」，待复核 |
+| AC-091 | CI 必须真跑构建/测试双平台矩阵、不得仅 README 声明 | tested | 已真跑：GitHub Actions run `40172116739`（https://github.com/justin-mc-lai/beacon-go/actions/runs/40172116739 ，head `7bf5a018`，run conclusion `success`）。jobs：`test (ubuntu-latest)` success（go mod verify / build / vet / test / gofmt 全绿）、`test (macos-latest)` success（gofmt 按设计只在 ubuntu 跑，此处 skipped）、`windows-advisory` failure（`continue-on-error` 的 advisory job，挂在 `go build ./...`，不计入门禁）。配置见 `.github/workflows/ci.yml`（`2ec1cf4` 引入）；本机 `gh run view 40172116739` 复验与上述一致 |
 | AC-092 | migration 前自动备份 runtime-ledger 与既有 DB | deferred-external | internal/migration 与 internal/cli/migrate.go 无备份代码（只有 dry-run、已存 v2 数据拒绝导入两道防护）；前置为迁移流程补自动备份步骤，待复核 |
 | AC-093 | 双写期单一写者、双向同时写必须测试失败 | tested | TestTrackWriteDomain（internal/store/store_test.go）：异轨写打开以 dual_track_writer_conflict fail-closed、只读打开可读；另 store.go SetMaxOpenConns(1) 单写者 |
 | AC-094 | harness 面/跨轨隔离回归失败须走诊断面、禁止静默 cross-track fallback | implemented | 落点 internal/orchestrator/exec_resolve.go：执行器未配置明确报 executor_not_configured、绝不回退占位（TestSubprocessExecutorMissingAndUnconfigured，internal/orchestrator/p3c_test.go）；doctor 侧无 cross-track 专项诊断（doctor 只有 rebuild），待复核 |

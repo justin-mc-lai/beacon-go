@@ -135,7 +135,7 @@ it stays in the Markdown packages under
   real binary; currently 15 steps, exit 0.
 - [`docs/ac-matrix.md`](docs/ac-matrix.md) — the frozen v2 acceptance
   criteria (171 ACs) with a final status per line:
-  81 tested, 64 implemented, 17 deferred to external conditions,
+  82 tested, 64 implemented, 16 deferred to external conditions,
   9 dropped by charter decision.
 - [`bench/`](bench/) — the performance gate. Read paths run 50–200×
   faster than the Python version; the write paths were reworked to batch
