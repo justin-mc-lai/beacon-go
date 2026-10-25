@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"beacon-go/internal/core"
 	"beacon-go/internal/gate"
 	"beacon-go/internal/orchestrator"
 )
@@ -253,7 +254,10 @@ func newTruthDriftCmd() *cobra.Command {
 				return err
 			}
 			if asJSON {
-				return printJSON(cmd, v)
+				if err := printJSON(cmd, v); err != nil {
+					return err
+				}
+				return driftExit(v)
 			}
 			out := cmd.OutOrStdout()
 			fmt.Fprintf(out, "package: %s\nclean:   %v\n", v.Slug, v.Clean)
@@ -273,7 +277,7 @@ func newTruthDriftCmd() *cobra.Command {
 			if v.BaseDiverged {
 				fmt.Fprintf(out, "base diverged: %s\n", v.BaseDetail)
 			}
-			return nil
+			return driftExit(v)
 		},
 	}
 	c.Flags().StringVar(&project, "project", ".", "project root path")
@@ -282,6 +286,20 @@ func newTruthDriftCmd() *cobra.Command {
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("feature")
 	return c
+}
+
+// driftExit turns real drift into a non-zero exit so a CI step can gate on
+// it. Nothing to compare against is not drift: a never-frozen package and a
+// draft still collecting answers stay a clean exit — those belong to the
+// freeze gate, and failing here would make every in-progress package red.
+func driftExit(v orchestrator.DriftView) error {
+	actionable := v.BodyDrift || len(v.RequirementDrift) > 0 || v.BaseDiverged
+	if !actionable {
+		return nil
+	}
+	return core.NewError(core.ReasonTruthDriftDetected, "truth drift",
+		fmt.Sprintf("%s: body_drift=%v changed=%d open_questions=%d base_diverged=%v (details above)",
+			v.Slug, v.BodyDrift, len(v.RequirementDrift), v.OpenQuestions, v.BaseDiverged))
 }
 
 func newTruthRebaseCmd() *cobra.Command {

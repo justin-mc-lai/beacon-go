@@ -287,6 +287,7 @@ const (
 	ReasonTruthBaseDiverged      = "truth_base_diverged"
 	ReasonTruthRebaseNotAllowed  = "truth_rebase_not_allowed"
 	ReasonTruthDriftNeverFrozen  = "truth_drift_never_frozen"
+	ReasonTruthDriftDetected     = "truth_drift_detected"
 )
 
 // ---- Real-integration family (P3c: subprocess / profile / ralph /

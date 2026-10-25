@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -583,5 +584,45 @@ func TestPostReleaseHookTriggerAndBuiltinInstall(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(home, ".agents", "skills", "beacon-goal", "SKILL.md")); err != nil {
 		t.Errorf("agents skill install: %v", err)
+	}
+}
+
+// Takeover of a project that already carries onboarding state (Python v1
+// runtime wrote runtime_capability_lines) must merge, not rebuild: losing
+// those keys silently corrupts a project we are adopting.
+func TestInitProjectMergesOnboardingState(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "beacon.db")
+	st, err := store.Open(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer st.Close()
+	eng := NewEngine(st)
+	root := filepath.Join(t.TempDir(), "adopted")
+	priorPath := filepath.Join(root, ".beacon", "state", "project-onboarding.json")
+	if err := os.MkdirAll(filepath.Dir(priorPath), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	prior := `{"schema_version":"1.0","docs_version":"v0.1","runtime_version":"v1.6.17","runtime_capability_lines":["v1.2.1","v1.3.0"]}`
+	if err := os.WriteFile(priorPath, []byte(prior), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// No Version: init inherits/falls back instead of failing.
+	if _, err := eng.InitProject(root, InitOptions{Version: "v0.5.0", RuntimeVersion: "2.0.0-go.9"}); err != nil {
+		t.Fatalf("init on adopted project: %v", err)
+	}
+	raw, err := os.ReadFile(priorPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got map[string]any
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatal(err)
+	}
+	if lines, _ := got["runtime_capability_lines"].([]any); len(lines) != 2 {
+		t.Fatalf("runtime_capability_lines lost: %v", got)
+	}
+	if got["docs_version"] != "v0.5.0" || got["runtime_version"] != "2.0.0-go.9" {
+		t.Fatalf("onboarding not refreshed: %v", got)
 	}
 }

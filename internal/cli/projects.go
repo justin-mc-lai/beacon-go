@@ -57,7 +57,7 @@ func newProjectsCmd() *cobra.Command {
 }
 
 func newProjectsRegisterCmd() *cobra.Command {
-	var path, name, version, docsRoot string
+	var path, project, name, version, docsRoot string
 	var asJSON bool
 	c := &cobra.Command{
 		Use:   "register",
@@ -69,6 +69,11 @@ func newProjectsRegisterCmd() *cobra.Command {
 				return err
 			}
 			defer st.Close()
+			// --project is the name every truth/gate command uses; keep
+			// --path for the older callers and take whichever was set.
+			if project != "" && project != path {
+				path = project
+			}
 			root := store.ResolveRootPath(path)
 			p, err := st.Projects().GetByRootPath(root)
 			if errors.Is(err, sql.ErrNoRows) {
@@ -103,6 +108,7 @@ func newProjectsRegisterCmd() *cobra.Command {
 		},
 	}
 	c.Flags().StringVar(&path, "path", ".", "project root path")
+	c.Flags().StringVar(&project, "project", "", "alias of --path (project root path)")
 	c.Flags().StringVar(&name, "name", "", "project display name (default: directory base name)")
 	c.Flags().StringVar(&version, "version", "", "also record this docs version and mark it current")
 	c.Flags().StringVar(&docsRoot, "docs-root", "", "docs root for --version (default docs/beacon/<version>)")

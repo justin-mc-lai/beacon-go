@@ -96,8 +96,10 @@ func TestTruthAskConfirmDriftCLI(t *testing.T) {
 		t.Fatal(err)
 	}
 	out, err = runCLI(t, "truth", "drift", "--project", root, "--feature", slug, "--json")
-	if err != nil {
-		t.Fatalf("drift: %v", err)
+	// Drift is a CI gate: an unclean package must exit non-zero while the
+	// JSON view still comes out on stdout.
+	if err == nil {
+		t.Fatal("drift on a drifted package must return an error (non-zero exit)")
 	}
 	doc = parseDoc(t, out)
 	if doc["clean"] != false || doc["body_drift"] != true {

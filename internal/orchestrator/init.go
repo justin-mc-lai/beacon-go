@@ -64,7 +64,86 @@ type InitReport struct {
 	DryRun         bool         `json:"dry_run"`
 	Status         string       `json:"status"`
 	Actions        []InitAction `json:"actions"`
+	Notes          []string     `json:"notes,omitempty"`
 	ReportPath     string       `json:"report_path,omitempty"`
+}
+
+// DefaultDocsVersion is the docs version init assembles when the caller
+// names none and the project has none recorded or on disk.
+const DefaultDocsVersion = "v0.1"
+
+// detectDocsVersion returns the newest docs/beacon/<version> directory the
+// project already carries, else DefaultDocsVersion. Keeping init off the
+// failure path matters for unattended bootstrap: a fresh project should
+// simply start at v0.1 instead of demanding --version.
+func detectDocsVersion(root string) string {
+	entries, err := os.ReadDir(filepath.Join(root, "docs", "beacon"))
+	if err != nil {
+		return DefaultDocsVersion
+	}
+	newest := ""
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		name := e.Name()
+		if len(name) < 2 || name[0] != 'v' || name[1] < '0' || name[1] > '9' {
+			continue
+		}
+		if newest == "" || versionLess(newest, name) {
+			newest = name
+		}
+	}
+	if newest == "" {
+		return DefaultDocsVersion
+	}
+	return newest
+}
+
+// versionLess compares vMAJOR.MINOR[.PATCH] numerically; anything it cannot
+// parse falls back to string order so it never panics on odd directory names.
+func versionLess(a, b string) bool {
+	pa, oka := parseVersionNums(a)
+	pb, okb := parseVersionNums(b)
+	if !oka || !okb {
+		return a < b
+	}
+	for i := 0; i < len(pa) || i < len(pb); i++ {
+		var x, y int
+		if i < len(pa) {
+			x = pa[i]
+		}
+		if i < len(pb) {
+			y = pb[i]
+		}
+		if x != y {
+			return x < y
+		}
+	}
+	return false
+}
+
+func parseVersionNums(v string) ([]int, bool) {
+	body := strings.TrimPrefix(v, "v")
+	if body == "" {
+		return nil, false
+	}
+	parts := strings.Split(body, ".")
+	nums := make([]int, 0, len(parts))
+	for _, p := range parts {
+		n := 0
+		if p == "" {
+			return nil, false
+		}
+		for _, r := range p {
+			if r < '0' || r > '9' {
+				return nil, false
+			}
+			n = n*10 + int(r-'0')
+		}
+		nums = append(nums, n)
+	}
+	return nums, true
 }
 
 type initFile struct {
@@ -111,28 +190,25 @@ func (e *Engine) InitProject(projectRoot string, opts InitOptions) (InitReport, 
 		// unreachable in practice; keep the zero value out of the files
 		return InitReport{}, core.NewError(ReasonProjectNotRegistered, "projects.Init", "project resolution failed: "+root)
 	}
-	if apply {
-		if version != "" {
-			if err := e.ensureVersionRecorded(proj, version); err != nil {
-				return InitReport{}, err
-			}
-		} else {
-			cur, cerr := e.store.Projects().CurrentVersion(proj.ID)
-			if cerr != nil || cur.Version == "" {
-				return InitReport{}, core.NewError(ReasonTruthVersionMissing,
-					"projects.Init", "no docs version given and none recorded for "+root+" (pass --version)")
-			}
-			version = cur.Version
-		}
-	} else if version == "" {
+	var notes []string
+	if version == "" {
 		if proj.ID != "" {
 			if cur, cerr := e.store.Projects().CurrentVersion(proj.ID); cerr == nil {
 				version = cur.Version
 			}
 		}
+		// No flag and no record: inherit the newest version already on
+		// disk, else fall back to the default. Blocking here forced a
+		// flag on every fresh project and made init unusable unattended.
 		if version == "" {
-			return InitReport{}, core.NewError(ReasonTruthVersionMissing,
-				"projects.Init", "no docs version given and none recorded for "+root+" (pass --version)")
+			version = detectDocsVersion(root)
+			notes = append(notes, "docs version not given; defaulted to "+version+
+				" (pass --version to choose)")
+		}
+	}
+	if apply {
+		if err := e.ensureVersionRecorded(proj, version); err != nil {
+			return InitReport{}, err
 		}
 	}
 
@@ -173,7 +249,7 @@ func (e *Engine) InitProject(projectRoot string, opts InitOptions) (InitReport, 
 	report := InitReport{
 		SchemaVersion: "1.0", Command: "projects init", ProjectRoot: root,
 		DocsVersion: version, RuntimeVersion: rtVersion, ProjectMode: mode,
-		DryRun: opts.DryRun, Status: "completed",
+		DryRun: opts.DryRun, Status: "completed", Notes: notes,
 	}
 	if registered {
 		report.Actions = append(report.Actions, InitAction{Scope: "store", Action: "registered", Path: root})
@@ -215,19 +291,35 @@ func (e *Engine) InitProject(projectRoot string, opts InitOptions) (InitReport, 
 		onboarding["takeover_baseline_status"] = "draft"
 		onboarding["next_recommended_stage"] = "architecture-current-state"
 	}
+	obPath := filepath.Join(root, ".beacon", "state", "project-onboarding.json")
+	// Merge over any onboarding state the project already carries: a
+	// takeover must not drop keys the previous runtime wrote (Python's
+	// runtime_capability_lines and friends), only refresh ours.
+	obAction := "created"
+	if prior, rerr := os.ReadFile(obPath); rerr == nil {
+		merged := map[string]any{}
+		if json.Unmarshal(prior, &merged) == nil {
+			for k, v := range onboarding {
+				merged[k] = v
+			}
+			onboarding = merged
+			obAction = "updated"
+		}
+	}
 	if apply {
 		raw, merr := json.MarshalIndent(onboarding, "", "  ")
 		if merr != nil {
 			return InitReport{}, merr
 		}
-		obPath := filepath.Join(root, ".beacon", "state", "project-onboarding.json")
 		if err := os.WriteFile(obPath, append(raw, '\n'), 0o644); err != nil {
 			return InitReport{}, err
 		}
 	}
-	report.Actions = append(report.Actions, InitAction{Scope: "state",
-		Action: map[bool]string{true: "created", false: "planned"}[apply],
-		Path:   ".beacon/state/project-onboarding.json"})
+	if !apply {
+		obAction = "planned"
+	}
+	report.Actions = append(report.Actions, InitAction{Scope: "state", Action: obAction,
+		Path: ".beacon/state/project-onboarding.json"})
 	if apply {
 		raw, merr := json.MarshalIndent(report, "", "  ")
 		if merr != nil {
