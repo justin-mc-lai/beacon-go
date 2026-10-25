@@ -132,7 +132,7 @@ it stays in the Markdown packages under
 - [`e2e/run_e2e.sh`](e2e/run_e2e.sh) — a scripted full chain
   (register → create → freeze → commit baseline → run with a real
   subprocess executor → driver → gates → verify → complete) against the
-  real binary; currently 13 steps, exit 0.
+  real binary; currently 15 steps, exit 0.
 - [`docs/ac-matrix.md`](docs/ac-matrix.md) — the frozen v2 acceptance
   criteria (171 ACs) with a final status per line:
   81 tested, 64 implemented, 17 deferred to external conditions,
@@ -151,8 +151,10 @@ it stays in the Markdown packages under
   profiles; end-to-end verification awaits authenticated binaries.
 - **Skill references** beyond the six embedded `SKILL.md` files stay
   host-side; the binary ships the public surface only.
-- Four acceptance items are deferred to external conditions — see the
-  matrix and `docs/p6-implementation.md` §6 for the full gap list.
+- Four external-verification items are deferred to external conditions
+  (`docs/p6-implementation.md` §4); at AC level 17 rows carry the
+  `deferred-external` class. Per-item preconditions, probes, and owners
+  are in [`docs/deferred-external.md`](docs/deferred-external.md).
 
 ## Documentation
 

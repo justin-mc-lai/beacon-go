@@ -118,7 +118,7 @@ beacon skills show truth
 - `go test ./...`——327 个行为级测试全过。
 - [`e2e/run_e2e.sh`](e2e/run_e2e.sh)——真二进制全链剧本（注册 →
   建包 → 冻结 → 提交基线 → 真执行器干活 → 司机推进 → 四门评估 →
-  挂检查者 → 完工），13 步，退出码 0。
+  挂检查者 → 完工），15 步，退出码 0。
 - [`docs/ac-matrix.md`](docs/ac-matrix.md)——冻结 v2 的 171 条验收
   标准逐条终局：有测试 81、已实现 64、待外部条件 17、按拍板不迁 9。
 - [`bench/`](bench/)——性能门禁。读路径比 Python 版快 50–200 倍；
@@ -132,8 +132,9 @@ beacon skills show truth
   迭代等有真 ACP 程序时再验。
 - **厂商执行器**（codex / claude 命令行）已按档案模板接好端到端
   形状，真机验证等已登录的真程序。
-- 四个验收项待外部条件，完整清单见矩阵与 `docs/p6-implementation.md`
-  第 6 节。
+- 四个外部验证项待外部条件（`docs/p6-implementation.md` 第 4 节）；
+  AC 层面为 17 条 `deferred-external`。逐条前置条件、复跑命令与责任
+  角色见 [`docs/deferred-external.md`](docs/deferred-external.md)。
 
 ## 文档
 
