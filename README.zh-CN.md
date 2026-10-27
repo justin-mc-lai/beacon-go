@@ -148,3 +148,13 @@ beacon skills show truth
 Python 仓（`justin-mc-lai/beacon`）是冻结 v2 设计的原始出处，保持
 不动；本仓是该设计的 Go 实现，日常使用以本仓为准。老项目用
 `beacon migrate v1` 搬过来。
+
+## 协议
+
+[MIT](LICENSE) © 2026 Kunqi Lai
+
+## 维护者
+
+**Kunqi Lai** (<goodlive.lkq1128@gmail.com>)
+- GitHub: [@justin-mc-lai](https://github.com/justin-mc-lai)
+

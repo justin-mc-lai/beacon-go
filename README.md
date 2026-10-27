@@ -171,3 +171,13 @@ The Python repository (`justin-mc-lai/beacon`) remains the untouched
 source of record for the frozen v2 design; this repository implements
 that design in Go and supersedes the Python runtime for day-to-day use.
 `beacon migrate v1` moves existing projects over.
+
+## License
+
+[MIT](LICENSE) © 2026 Kunqi Lai
+
+## Maintainer
+
+**Kunqi Lai** (<goodlive.lkq1128@gmail.com>)
+- GitHub: [@justin-mc-lai](https://github.com/justin-mc-lai)
+
