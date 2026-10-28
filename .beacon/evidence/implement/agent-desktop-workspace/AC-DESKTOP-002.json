@@ -1,0 +1,12 @@
+{
+  "ac": "AC-DESKTOP-002",
+  "status": "passed",
+  "description": "Live workspace backend scanning features list and full Truth/Tests/Evidence markdown content",
+  "evidence_type": "go_test_execution",
+  "target": "beacon-go/internal/ui",
+  "test_cases": [
+    "TestWorkspaceFeaturesAPI"
+  ],
+  "exit_code": 0,
+  "verified_at": "2026-10-28T09:25:00Z"
+}

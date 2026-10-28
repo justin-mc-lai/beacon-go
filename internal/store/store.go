@@ -248,8 +248,20 @@ func newID(prefix string) string {
 	return prefix + hex.EncodeToString(b[:])
 }
 
-func nowUTC() string { return time.Now().UTC().Format(time.RFC3339Nano) }
+// tsLayout is RFC3339 in UTC with a fixed nine-digit fraction. Readers
+// order events by the text value (`ORDER BY created_at, rowid`), so this
+// layout must sort lexicographically in chronological order.
+// time.RFC3339Nano trims trailing zeros, which breaks that: ".1Z" sorts
+// after ".15Z", and a whole-second "Z" sorts after both — an earlier
+// event can then surface behind a later one (TestTraceOrderAndBundle).
+const tsLayout = "2006-01-02T15:04:05.000000000Z"
 
+func tsFormat(t time.Time) string { return t.UTC().Format(tsLayout) }
+
+func nowUTC() string { return tsFormat(time.Now()) }
+
+// orNow keeps caller-supplied stamps verbatim (fixtures and replayed
+// history rely on exact values); only generated stamps get tsLayout.
 func orNow(v string) string {
 	if strings.TrimSpace(v) == "" {
 		return nowUTC()

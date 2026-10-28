@@ -1,0 +1,12 @@
+{
+  "ac": "AC-DESKTOP-003",
+  "status": "passed",
+  "description": "Wails desktop app scaffolding and cmd/beacon-desktop binary compilation",
+  "evidence_type": "go_test_execution",
+  "target": "beacon-go/cmd/beacon-desktop",
+  "test_cases": [
+    "TestWailsConfigValid"
+  ],
+  "exit_code": 0,
+  "verified_at": "2026-10-28T09:25:00Z"
+}

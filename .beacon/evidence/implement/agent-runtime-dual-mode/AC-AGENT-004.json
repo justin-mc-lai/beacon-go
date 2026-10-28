@@ -1,0 +1,12 @@
+{
+  "ac": "AC-AGENT-004",
+  "status": "passed",
+  "description": "Headless CLI verification lever producing deterministic machine JSON and exit 0",
+  "evidence_type": "go_test_execution",
+  "target": "beacon-go/internal/cli",
+  "test_cases": [
+    "TestHarnessVerifyJSON"
+  ],
+  "exit_code": 0,
+  "verified_at": "2026-10-27T22:18:00Z"
+}

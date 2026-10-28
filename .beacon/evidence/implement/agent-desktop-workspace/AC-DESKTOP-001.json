@@ -1,0 +1,12 @@
+{
+  "ac": "AC-DESKTOP-001",
+  "status": "passed",
+  "description": "Three-column OpenMuse + DS-Bot Workspace (Rooms + Step Plan + Context Inspector)",
+  "evidence_type": "go_test_execution",
+  "target": "beacon-go/internal/ui",
+  "test_cases": [
+    "TestConsoleThreeColumnLayout"
+  ],
+  "exit_code": 0,
+  "verified_at": "2026-10-28T09:25:00Z"
+}

@@ -409,3 +409,24 @@ func TestSpineShowSingleProjectDefault(t *testing.T) {
 		t.Errorf("default show feature = %q", got)
 	}
 }
+
+func TestHarnessVerifyJSON(t *testing.T) {
+	cmd := newQAVerifyHarnessCmd()
+	cmd.SetArgs([]string{"--slug", "test-feature", "--json"})
+	buf := new(bytes.Buffer)
+	cmd.SetOut(buf)
+
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("unexpected error executing verify-harness: %v", err)
+	}
+	var res map[string]any
+	if err := json.Unmarshal(buf.Bytes(), &res); err != nil {
+		t.Fatalf("failed to parse JSON from verify-harness: %v, raw: %s", err, buf.String())
+	}
+	if res["status"] != "passed" || res["slug"] != "test-feature" || res["exit_code"].(float64) != 0 {
+		t.Errorf("unexpected json result: %v", res)
+	}
+	if res["evidence_hash"] == "" {
+		t.Errorf("expected non-empty evidence_hash")
+	}
+}

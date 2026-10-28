@@ -182,3 +182,42 @@ func TestEvidenceChainVerify(t *testing.T) {
 		}
 	}
 }
+
+func TestFSMTransitionEvidenceGuard(t *testing.T) {
+	// 1. Missing evidence to Qa
+	err := ValidateEvidenceTransition(StageImplement, StageQa, nil)
+	if err == nil {
+		t.Fatalf("expected error when evidence is nil")
+	}
+	if typed, ok := err.(*Error); !ok || typed.ReasonCode != ReasonEvidenceMissing {
+		t.Fatalf("expected ReasonEvidenceMissing, got: %v", err)
+	}
+
+	// 2. Failed verification
+	failedEv := &EvidencePayload{
+		AC:           "AC-001",
+		Status:       "failed",
+		ExitCode:     1,
+		EvidenceHash: "abc",
+	}
+	err = ValidateEvidenceTransition(StageImplement, StageQa, failedEv)
+	if err == nil {
+		t.Fatalf("expected error when verification failed")
+	}
+	if typed, ok := err.(*Error); !ok || typed.ReasonCode != ReasonEvidenceVerificationFailed {
+		t.Fatalf("expected ReasonEvidenceVerificationFailed, got: %v", err)
+	}
+
+	// 3. Passed verification with valid hash
+	passedEv := &EvidencePayload{
+		AC:           "AC-001",
+		Status:       "passed",
+		ExitCode:     0,
+		EvidenceHash: "sha256-verified-evidence-hash",
+		TestCases:    []string{"TestLogin"},
+	}
+	err = ValidateEvidenceTransition(StageImplement, StageQa, passedEv)
+	if err != nil {
+		t.Fatalf("expected valid evidence to pass transition, got: %v", err)
+	}
+}

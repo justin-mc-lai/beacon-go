@@ -1,0 +1,13 @@
+{
+  "ac": "AC-AGENT-006",
+  "status": "passed",
+  "description": "FSM State Machine strictly blocks transition to QA/Release without valid machine evidence",
+  "evidence_type": "go_test_execution",
+  "target": "beacon-go/internal/core",
+  "test_cases": [
+    "TestFSMTransitionEvidenceGuard",
+    "TestMultiAgentPipelineRolesAndGate"
+  ],
+  "exit_code": 0,
+  "verified_at": "2026-10-27T22:17:00Z"
+}

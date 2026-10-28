@@ -1,0 +1,13 @@
+{
+  "ac": "AC-AGENT-001",
+  "status": "passed",
+  "description": "BYOK Multi-provider LLM Client and Config Gateway",
+  "evidence_type": "go_test_execution",
+  "target": "beacon-go/internal/llm",
+  "test_cases": [
+    "TestLLMClientFactory",
+    "TestResolveAPIKey"
+  ],
+  "exit_code": 0,
+  "verified_at": "2026-10-27T21:31:00Z"
+}

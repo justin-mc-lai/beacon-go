@@ -1,0 +1,19 @@
+{
+  "name": "beacon-desktop",
+  "outputfilename": "beacon-desktop",
+  "frontend:install": "echo no-install",
+  "frontend:build": "echo no-build",
+  "frontend:dev:watcher": "echo no-watcher",
+  "version": "2.0.0",
+  "author": {
+    "name": "Beacon Team",
+    "email": "dev@beacon.run"
+  },
+  "info": {
+    "companyName": "Beacon",
+    "productName": "Beacon Agent Workspace",
+    "productVersion": "2.0.0",
+    "copyright": "Copyright 2026",
+    "comments": "Beacon Go Multi-Agent Desktop Workspace"
+  }
+}

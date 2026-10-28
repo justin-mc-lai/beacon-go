@@ -1,0 +1,13 @@
+{
+  "ac": "AC-AGENT-005",
+  "status": "passed",
+  "description": "Embedded Zero-Dependency Web Console and SSE Server (Dual-Mode UI)",
+  "evidence_type": "go_test_execution",
+  "target": "beacon-go/internal/ui",
+  "test_cases": [
+    "TestEmbeddedUIServer",
+    "TestUICmdFlags"
+  ],
+  "exit_code": 0,
+  "verified_at": "2026-10-27T21:31:00Z"
+}

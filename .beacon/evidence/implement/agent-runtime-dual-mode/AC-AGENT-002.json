@@ -1,0 +1,12 @@
+{
+  "ac": "AC-AGENT-002",
+  "status": "passed",
+  "description": "Chief of Staff indirect intent alignment and boundary brief before dispatch",
+  "evidence_type": "go_test_execution",
+  "target": "beacon-go/internal/orchestrator",
+  "test_cases": [
+    "TestChiefOfStaffIndirectPrompt"
+  ],
+  "exit_code": 0,
+  "verified_at": "2026-10-27T22:17:00Z"
+}

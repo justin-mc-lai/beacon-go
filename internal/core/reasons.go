@@ -503,6 +503,8 @@ const (
 	ReasonHealthBlocked                = "health_blocked"
 	ReasonOperatorGateOpen             = "operator_gate_open"
 	ReasonEvidenceWait                 = "evidence_wait"
+	ReasonEvidenceVerificationFailed   = "evidence_verification_failed"
+	ReasonEvidenceMissing              = "evidence_missing"
 	ReasonFocusWait                    = "focus_wait"
 	ReasonGateAlreadyResolved          = "already_resolved"
 	ReasonGateUnresolved               = "gate_unresolved"

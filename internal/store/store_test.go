@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 	"testing"
+	"time"
 
 	"beacon-go/internal/core"
 )
@@ -432,4 +433,83 @@ func TestVerifySchemaContractDrift(t *testing.T) {
 		t.Fatal("dropped table must be reported as drift")
 	}
 	_ = path
+}
+
+// Timestamps are compared as text by every reader (`ORDER BY created_at,
+// rowid`), so the stored layout must be fixed width. time.RFC3339Nano
+// trims trailing zeros: ".123Z" sorts after ".1234Z" and a whole-second
+// "Z" sorts after both, which reorders an event trail.
+func TestTimestampsSortChronologically(t *testing.T) {
+	base := time.Date(2026, 10, 26, 9, 30, 0, 0, time.UTC)
+	early := time.Date(2026, 10, 26, 9, 30, 0, 123000000, time.UTC) // .123
+	late := time.Date(2026, 10, 26, 9, 30, 0, 123400000, time.UTC)  // .1234
+
+	got := []string{tsFormat(base), tsFormat(early), tsFormat(late)}
+	want := []string{
+		"2026-10-26T09:30:00.000000000Z",
+		"2026-10-26T09:30:00.123000000Z",
+		"2026-10-26T09:30:00.123400000Z",
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("stamp[%d] = %q want %q", i, got[i], want[i])
+		}
+	}
+	for i := 1; i < len(got); i++ {
+		if got[i] <= got[i-1] {
+			t.Fatalf("text order must match time order: %q then %q", got[i-1], got[i])
+		}
+	}
+
+	// Stored events keep the same layout end to end.
+	s, _ := openTestStore(t)
+	_, _, f := seedFeature(t, s)
+	var prev string
+	for i := 0; i < 8; i++ {
+		e, err := s.AppendEvent(LifecycleEvent{FeatureID: f.ID, EventType: "stage_executed"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := time.Parse(tsLayout, e.CreatedAt); err != nil {
+			t.Fatalf("stored created_at %q is not tsLayout: %v", e.CreatedAt, err)
+		}
+		if prev != "" && e.CreatedAt < prev {
+			t.Fatalf("event timestamps went backwards: %q then %q", prev, e.CreatedAt)
+		}
+		prev = e.CreatedAt
+	}
+}
+
+// v1 ledger rows carry a fixed six-digit fraction with +00:00; v2 (after
+// tsLayout) carries nine digits with Z. Both are fixed width, so text
+// order stays time order when the two are mixed: the separator byte only
+// decides between two spellings of the same instant, which is a tie and
+// therefore allowed. This is the assumption AC-077 import relies on.
+func TestMixedTimestampShapesKeepTimeOrder(t *testing.T) {
+	texts := []string{
+		"2026-03-29T11:48:00.123456+00:00", // v1 row
+		"2026-03-29T11:48:00.123456000Z",   // v2 row, same instant
+		"2026-03-29T11:48:00.123456789Z",   // v2 row, 789ns later
+		"2026-03-29T11:48:00.648178+00:00", // v1 row
+		"2026-03-29T11:48:01+00:00",        // v1 row, whole second
+	}
+	type row struct {
+		text string
+		at   time.Time
+	}
+	rows := make([]row, 0, len(texts))
+	for _, s := range texts {
+		at, err := time.Parse(time.RFC3339Nano, s)
+		if err != nil {
+			t.Fatalf("parse %q: %v", s, err)
+		}
+		rows = append(rows, row{s, at})
+	}
+	sort.Slice(rows, func(i, j int) bool { return rows[i].text < rows[j].text })
+	for i := 1; i < len(rows); i++ {
+		if rows[i].at.Before(rows[i-1].at) {
+			t.Fatalf("text order broke time order: %q (%s) before %q (%s)",
+				rows[i-1].text, rows[i-1].at, rows[i].text, rows[i].at)
+		}
+	}
 }

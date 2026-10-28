@@ -366,20 +366,21 @@ func (e *Engine) TruthDrift(ctx store.FeatureContext) (DriftView, error) {
 	if err != nil {
 		return DriftView{}, err
 	}
+	vp, err := e.TruthPackage(ctx)
+	if err != nil {
+		return DriftView{}, err
+	}
 	v := DriftView{
 		Slug: ctx.Feature.Slug, Version: ctx.Version.Version,
-		Status:           ctx.Feature.Status,
+		Status: vp.Status, Frozen: vp.Frozen,
 		CurrentTruthHash: sha256HexOf([]byte(text)),
 		RequirementDrift: map[string]string{},
 	}
-	if pkg := e.packageFiles(ctx); true {
-		for _, q := range gate.ParseOpenQuestions(text) {
-			if !strings.EqualFold(q.Status, "answered") && !strings.EqualFold(q.Status, "dropped") &&
-				!strings.EqualFold(q.Status, "closed") && !strings.EqualFold(q.Status, "resolved") {
-				v.OpenQuestions++
-			}
+	for _, q := range gate.ParseOpenQuestions(text) {
+		if !strings.EqualFold(q.Status, "answered") && !strings.EqualFold(q.Status, "dropped") &&
+			!strings.EqualFold(q.Status, "closed") && !strings.EqualFold(q.Status, "resolved") {
+			v.OpenQuestions++
 		}
-		_ = pkg
 	}
 	if recs.freeze == nil {
 		v.Note = "never_frozen"
