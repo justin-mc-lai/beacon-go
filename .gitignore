@@ -2,5 +2,8 @@ bin/
 *.db
 bench/seed-store/
 bin/
-beacon
-beacon-desktop
+# Anchor build artifacts to the repo root: an unanchored `beacon` also
+# matched docs/beacon/, which made frozen truth packages uncommittable
+# (and therefore never a consumable baseline).
+/beacon
+/beacon-desktop
