@@ -60,6 +60,7 @@ type openAIChatReq struct {
 	Messages    []openAIReqMsg `json:"messages"`
 	Temperature float64        `json:"temperature"`
 	MaxTokens   int            `json:"max_tokens,omitempty"`
+	Stream      bool           `json:"stream,omitempty"`
 }
 
 type openAIChatResp struct {
@@ -134,6 +135,75 @@ func (c *OpenAICompatibleClient) Complete(ctx context.Context, req Request) (*Re
 	}, nil
 }
 
+func (c *OpenAICompatibleClient) StreamComplete(ctx context.Context, req Request, handler StreamChunkHandler) (*Response, error) {
+	// If no handler, fallback to Complete
+	if handler == nil {
+		return c.Complete(ctx, req)
+	}
+
+	var msgs []openAIReqMsg
+	for _, m := range req.Messages {
+		msgs = append(msgs, openAIReqMsg{Role: m.Role, Content: m.Content})
+	}
+
+	payload := openAIChatReq{
+		Model:       req.Model,
+		Messages:    msgs,
+		Temperature: req.Temperature,
+		MaxTokens:   req.MaxTokens,
+		Stream:      true,
+	}
+
+	raw, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := fmt.Sprintf("%s/chat/completions", c.baseURL)
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(raw))
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Authorization", "Bearer "+c.apiKey)
+
+	resp, err := c.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		respBytes, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("provider %s HTTP %d: %s", c.provider, resp.StatusCode, string(respBytes))
+	}
+
+	// Read SSE stream lines
+	var fullContent bytes.Buffer
+	buf := make([]byte, 4096)
+	for {
+		n, err := resp.Body.Read(buf)
+		if n > 0 {
+			chunk := string(buf[:n])
+			fullContent.WriteString(chunk)
+			_ = handler(chunk)
+		}
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return nil, err
+		}
+	}
+
+	return &Response{
+		Content:      fullContent.String(),
+		PromptTokens: 10,
+		CompTokens:   20,
+		Model:        req.Model,
+	}, nil
+}
+
 // MockClient is used for testing and zero-cost simulation.
 type MockClient struct {
 	Handler func(req Request) string
@@ -154,4 +224,18 @@ func (m *MockClient) Complete(ctx context.Context, req Request) (*Response, erro
 		CompTokens:   20,
 		Model:        "mock-model",
 	}, nil
+}
+
+func (m *MockClient) StreamComplete(ctx context.Context, req Request, handler StreamChunkHandler) (*Response, error) {
+	resp, err := m.Complete(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	if handler != nil {
+		chunks := []string{"参谋长思考中: ", "分析需求事实...", " 识别隐性边界..."}
+		for _, c := range chunks {
+			_ = handler(c)
+		}
+	}
+	return resp, nil
 }

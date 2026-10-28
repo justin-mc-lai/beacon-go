@@ -13,6 +13,7 @@ import (
 
 	"beacon-go/internal/llm"
 	"beacon-go/internal/orchestrator"
+	"beacon-go/internal/session"
 )
 
 //go:embed assets/index.html
@@ -24,6 +25,7 @@ type Server struct {
 	server     *http.Server
 	cos        *orchestrator.ChiefOfStaff
 	cfg        *llm.Config
+	sessions   session.Store
 	workdir    string
 	eventsMu   sync.RWMutex
 	eventChans []chan string
@@ -55,20 +57,24 @@ func NewServer(addr string) *Server {
 	cfg, _ := llm.LoadConfig()
 	cli, model, _ := cfg.GetClientForRole(llm.RoleChiefOfStaff)
 	cos := orchestrator.NewChiefOfStaff(cli, model)
+	sStore, _ := session.NewFileStore("")
 
 	cwd, _ := os.Getwd()
 
 	s := &Server{
-		addr:    addr,
-		cfg:     cfg,
-		cos:     cos,
-		workdir: cwd,
+		addr:     addr,
+		cfg:      cfg,
+		cos:      cos,
+		sessions: sStore,
+		workdir:  cwd,
 	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/health", s.handleHealth)
 	mux.HandleFunc("/api/events", s.handleSSE)
 	mux.HandleFunc("/api/chat", s.handleChat)
+	mux.HandleFunc("/api/sessions", s.handleSessions)
+	mux.HandleFunc("/api/sessions/messages", s.handleSessionMessages)
 	mux.HandleFunc("/api/action/approve", s.handleApprove)
 	mux.HandleFunc("/api/workspace/features", s.handleWorkspaceFeatures)
 	mux.HandleFunc("/api/workspace/feature", s.handleWorkspaceFeatureDetail)
@@ -215,6 +221,53 @@ func (s *Server) handleWorkspaceFeatureDetail(w http.ResponseWriter, r *http.Req
 	_ = json.NewEncoder(w).Encode(detail)
 }
 
+// handleSessions lists or creates conversation threads.
+func (s *Server) handleSessions(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method == http.MethodGet {
+		list, err := s.sessions.ListSessions()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(list)
+		return
+	}
+	if r.Method == http.MethodPost {
+		var req struct {
+			Title string `json:"title"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		sess, err := s.sessions.CreateSession(req.Title)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(sess)
+		return
+	}
+	http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+}
+
+// handleSessionMessages gets messages for a session.
+func (s *Server) handleSessionMessages(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	sessID := r.URL.Query().Get("session_id")
+	if sessID == "" {
+		http.Error(w, "missing session_id", http.StatusBadRequest)
+		return
+	}
+	msgs, err := s.sessions.GetSessionMessages(sessID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_ = json.NewEncoder(w).Encode(msgs)
+}
+
 // handleChat handles user messages to the Chief of Staff.
 func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -222,25 +275,53 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var req struct {
-		Prompt string `json:"prompt"`
+		SessionID string `json:"session_id"`
+		Prompt    string `json:"prompt"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// Chief of Staff Indirect Prompting Alignment
-	brief, err := s.cos.AlignIntent(r.Context(), req.Prompt)
+	if req.SessionID == "" {
+		sess, _ := s.sessions.CreateSession("新需求会话")
+		req.SessionID = sess.ID
+	}
+
+	// 1. Record user message
+	_ = s.sessions.AppendMessage(session.ChatMessage{
+		SessionID: req.SessionID,
+		Role:      "user",
+		Content:   req.Prompt,
+	})
+
+	// 2. Stream tokens to SSE and align intent
+	brief, err := s.cos.AlignIntentStream(r.Context(), req.Prompt, func(chunk string) error {
+		s.broadcastEvent(fmt.Sprintf(`{"type":"chat_chunk","session_id":"%s","chunk":%q}`, req.SessionID, chunk))
+		return nil
+	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// 3. Record assistant message
+	_ = s.sessions.AppendMessage(session.ChatMessage{
+		SessionID:   req.SessionID,
+		Role:        "chief",
+		Content:     brief.RestatedIntent,
+		CardType:    "plan_brief",
+		CardPayload: brief.ProposedSlugs[0],
+	})
+
 	// Broadcast agent activity to SSE
 	s.broadcastEvent(fmt.Sprintf(`{"type":"agent_action","agent":"Chief of Staff","action":"Intent Aligned","slug":"%s"}`, brief.ProposedSlugs[0]))
 
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(brief)
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"session_id": req.SessionID,
+		"brief":      brief,
+	})
 }
 
 func (s *Server) handleApprove(w http.ResponseWriter, r *http.Request) {

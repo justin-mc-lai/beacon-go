@@ -9,11 +9,13 @@ import (
 
 	"beacon-go/internal/llm"
 	"beacon-go/internal/orchestrator"
+	"beacon-go/internal/session"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
+	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 //go:embed frontend/index.html
@@ -21,26 +23,84 @@ var assets embed.FS
 
 // App represents the Wails desktop backend service.
 type App struct {
-	ctx     context.Context
-	cfg     *llm.Config
-	cos     *orchestrator.ChiefOfStaff
-	workdir string
+	ctx      context.Context
+	cfg      *llm.Config
+	cos      *orchestrator.ChiefOfStaff
+	sessions session.Store
+	workdir  string
 }
 
 func NewApp() *App {
 	cfg, _ := llm.LoadConfig()
 	cli, model, _ := cfg.GetClientForRole(llm.RoleChiefOfStaff)
 	cos := orchestrator.NewChiefOfStaff(cli, model)
+	sStore, _ := session.NewFileStore("")
 	cwd, _ := os.Getwd()
 	return &App{
-		cfg:     cfg,
-		cos:     cos,
-		workdir: cwd,
+		cfg:      cfg,
+		cos:      cos,
+		sessions: sStore,
+		workdir:  cwd,
 	}
 }
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+}
+
+// GetSessions lists all saved session threads.
+func (a *App) GetSessions() ([]session.Session, error) {
+	return a.sessions.ListSessions()
+}
+
+// CreateSession initializes a new session thread.
+func (a *App) CreateSession(title string) (*session.Session, error) {
+	return a.sessions.CreateSession(title)
+}
+
+// GetSessionMessages returns the conversation turns for a session.
+func (a *App) GetSessionMessages(sessionID string) ([]session.ChatMessage, error) {
+	return a.sessions.GetSessionMessages(sessionID)
+}
+
+// AppendMessage saves a message into the session.
+func (a *App) AppendMessage(msg session.ChatMessage) error {
+	return a.sessions.AppendMessage(msg)
+}
+
+// AlignIntentStream streams intent alignment tokens and emits Wails events.
+func (a *App) AlignIntentStream(sessionID, prompt string) (*orchestrator.Briefing, error) {
+	// 1. Record user message
+	_ = a.sessions.AppendMessage(session.ChatMessage{
+		SessionID: sessionID,
+		Role:      "user",
+		Content:   prompt,
+	})
+
+	// 2. Stream tokens via Chief of Staff
+	brief, err := a.cos.AlignIntentStream(a.ctx, prompt, func(chunk string) error {
+		if a.ctx != nil {
+			wailsRuntime.EventsEmit(a.ctx, "chat:stream:chunk", map[string]string{
+				"session_id": sessionID,
+				"chunk":      chunk,
+			})
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// 3. Record assistant message with plan card payload
+	_ = a.sessions.AppendMessage(session.ChatMessage{
+		SessionID:   sessionID,
+		Role:        "chief",
+		Content:     brief.RestatedIntent,
+		CardType:    "plan_brief",
+		CardPayload: brief.ProposedSlugs[0],
+	})
+
+	return brief, nil
 }
 
 // GetSettings retrieves the current BYOK and Multi-Agent role config.

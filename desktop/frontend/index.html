@@ -316,36 +316,173 @@
       applyLang(currentLang === 'zh' ? 'en' : 'zh');
     }
 
+    let currentSessionId = "";
+
+    // Load initial Sessions and setup listeners
+    window.addEventListener('DOMContentLoaded', async () => {
+      await refreshSessions();
+      setupStreamListener();
+    });
+
+    async function refreshSessions() {
+      try {
+        let sessions = [];
+        if (window.go && window.go.main && window.go.main.App) {
+          sessions = await window.go.main.App.GetSessions();
+        } else {
+          const res = await fetch('/api/sessions');
+          if (res.ok) sessions = await res.json();
+        }
+
+        const listEl = document.getElementById('sessionList');
+        listEl.innerHTML = '';
+
+        if (!sessions || sessions.length === 0) {
+          // Auto create initial session
+          await startNewSession();
+          return;
+        }
+
+        sessions.forEach((s, idx) => {
+          const item = document.createElement('div');
+          item.className = 'session-item' + (s.id === currentSessionId || (idx === 0 && !currentSessionId) ? ' active' : '');
+          item.onclick = () => selectSession(s.id);
+          item.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:600;">${s.title}</span>
+              <span style="font-size:0.7rem; color:${s.status === 'active' ? '#10b981' : '#64748b'};">[${s.status}]</span>
+            </div>
+            <span class="session-item-time">${new Date(s.updated_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+          `;
+          listEl.appendChild(item);
+          if (idx === 0 && !currentSessionId) {
+            currentSessionId = s.id;
+          }
+        });
+
+        if (currentSessionId) {
+          await loadSessionMessages(currentSessionId);
+        }
+      } catch (e) {
+        console.error("Failed to load sessions:", e);
+      }
+    }
+
+    async function selectSession(sessionId) {
+      currentSessionId = sessionId;
+      const items = document.querySelectorAll('.session-item');
+      items.forEach(el => el.classList.remove('active'));
+      await refreshSessions();
+    }
+
+    async function startNewSession() {
+      const title = currentLang === 'zh' ? '新需求任务' : 'New Task Thread';
+      try {
+        let newSess = null;
+        if (window.go && window.go.main && window.go.main.App) {
+          newSess = await window.go.main.App.CreateSession(title);
+        } else {
+          const res = await fetch('/api/sessions', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({title: title})
+          });
+          newSess = await res.json();
+        }
+        currentSessionId = newSess.id;
+        document.getElementById('cardsFlow').innerHTML = '';
+        document.getElementById('promptInput').value = '';
+        await refreshSessions();
+      } catch (e) {
+        alert("Failed to create session: " + e.message);
+      }
+    }
+
+    async function loadSessionMessages(sessionId) {
+      const flow = document.getElementById('cardsFlow');
+      flow.innerHTML = '';
+      try {
+        let msgs = [];
+        if (window.go && window.go.main && window.go.main.App) {
+          msgs = await window.go.main.App.GetSessionMessages(sessionId);
+        } else {
+          const res = await fetch('/api/sessions/messages?session_id=' + encodeURIComponent(sessionId));
+          if (res.ok) msgs = await res.json();
+        }
+
+        if (!msgs || msgs.length === 0) return;
+
+        msgs.forEach(msg => {
+          if (msg.role === 'user') {
+            appendUserBubble(msg.content);
+          } else if (msg.card_type === 'plan_brief') {
+            renderPlanCard({
+              restated_intent: msg.content,
+              proposed_slugs: [msg.card_payload || "aligned-plan"],
+              identified_risks: ["严格测试回归保障", "保证原有状态机转移"],
+              boundaries: ["沙盒隔离操作", "Exit 0 验资放行"]
+            });
+          }
+        });
+      } catch (e) {
+        console.warn("load messages error:", e);
+      }
+    }
+
+    function appendUserBubble(text) {
+      const flow = document.getElementById('cardsFlow');
+      const bubble = document.createElement('div');
+      bubble.style.cssText = "align-self: flex-end; background: #e0e7ff; color: #1e1b4b; padding: 10px 14px; border-radius: 12px; font-size: 0.92rem; max-width: 80%; margin-bottom: 8px;";
+      bubble.textContent = text;
+      flow.appendChild(bubble);
+      document.getElementById('streamViewport').scrollTo({ top: flow.scrollHeight, behavior: 'smooth' });
+    }
+
+    function setupStreamListener() {
+      if (window.runtime && window.runtime.EventsOn) {
+        window.runtime.EventsOn("chat:stream:chunk", data => {
+          appendStreamingChunk(data.chunk);
+        });
+      } else {
+        // Fallback Web SSE
+        try {
+          const sse = new EventSource('/api/events');
+          sse.onmessage = e => {
+            const data = JSON.parse(e.data);
+            if (data.type === 'chat_chunk') {
+              appendStreamingChunk(data.chunk);
+            }
+          };
+        } catch (e) {}
+      }
+    }
+
+    let activeStreamContainer = null;
+    function appendStreamingChunk(chunk) {
+      const flow = document.getElementById('cardsFlow');
+      if (!activeStreamContainer) {
+        activeStreamContainer = document.createElement('div');
+        activeStreamContainer.className = 'gen-card';
+        activeStreamContainer.innerHTML = `
+          <div class="gen-card-header">
+            <span class="card-tag">⚡ 参谋长正在推理与边界对齐 (Live Typing)</span>
+          </div>
+          <div id="liveStreamText" style="font-size:0.9rem; line-height:1.6; color:#334155; white-space: pre-wrap;"></div>
+        `;
+        flow.appendChild(activeStreamContainer);
+      }
+      const textEl = document.getElementById('liveStreamText');
+      if (textEl) {
+        textEl.textContent += chunk;
+        document.getElementById('streamViewport').scrollTo({ top: flow.scrollHeight, behavior: 'smooth' });
+      }
+    }
+
     function handleKeyDown(e) {
       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         runPlan();
       }
-    }
-
-    function startNewSession() {
-      document.getElementById('cardsFlow').innerHTML = '';
-      document.getElementById('promptInput').value = '';
-      const list = document.getElementById('sessionList');
-      const item = document.createElement('div');
-      item.className = 'session-item active';
-      item.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span>新会话任务</span>
-          <span style="font-size:0.7rem; color:#10b981;">[Active]</span>
-        </div>
-        <span class="session-item-time">刚刚 · 待分析</span>
-      `;
-      Array.from(list.children).forEach(c => c.classList.remove('active'));
-      list.prepend(item);
-    }
-
-    function switchSession(idx) {
-      const items = document.querySelectorAll('.session-item');
-      items.forEach((it, i) => {
-        if (i === idx) it.classList.add('active');
-        else it.classList.remove('active');
-      });
     }
 
     // Settings load & save
@@ -429,18 +566,41 @@
       const val = textarea.value.trim();
       if (!val) return;
 
-      const flow = document.getElementById('cardsFlow');
-      flow.innerHTML = `
-        <div class="gen-card" style="text-align:center; padding: 2rem; color: #64748b;">
-          <div style="font-size: 1.2rem; margin-bottom: 8px;">⚡</div>
-          <div>${currentLang === 'zh' ? '参谋长正在分析需求事实与隐性边界...' : 'Chief of Staff is analyzing requirements & boundaries...'}</div>
-        </div>
-      `;
+      appendUserBubble(val);
+      textarea.value = '';
+
+      if (!currentSessionId) {
+        await startNewSession();
+      }
+
+      activeStreamContainer = null;
 
       try {
         let brief = null;
         if (window.go && window.go.main && window.go.main.App) {
-          brief = await window.go.main.App.AlignIntent(val);
+          brief = await window.go.main.App.AlignIntentStream(currentSessionId, val);
+        } else {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: currentSessionId, prompt: val })
+          });
+          const data = await res.json();
+          brief = data.brief;
+        }
+
+        if (activeStreamContainer) {
+          activeStreamContainer.remove();
+          activeStreamContainer = null;
+        }
+
+        renderPlanCard(brief);
+        await refreshSessions();
+      } catch (e) {
+        const flow = document.getElementById('cardsFlow');
+        flow.innerHTML += `<div class="gen-card" style="color:red;">Error: ${e.message}</div>`;
+      }
+    }
         } else {
           const res = await fetch('/api/chat', {
             method: 'POST',

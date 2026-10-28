@@ -54,9 +54,13 @@ type Response struct {
 	Model        string `json:"model"`
 }
 
+// StreamChunkHandler is invoked as incremental tokens arrive.
+type StreamChunkHandler func(chunk string) error
+
 // Client defines the interface for calling any LLM provider.
 type Client interface {
 	Complete(ctx context.Context, req Request) (*Response, error)
+	StreamComplete(ctx context.Context, req Request, handler StreamChunkHandler) (*Response, error)
 	Provider() Provider
 }
 

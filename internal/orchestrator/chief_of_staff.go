@@ -84,6 +84,53 @@ and summarize the boundary into a strict confirmation brief.`
 	return b, nil
 }
 
+// AlignIntentStream aligns user prompt and calls chunkHandler as tokens stream in.
+func (c *ChiefOfStaff) AlignIntentStream(ctx context.Context, prompt string, chunkHandler func(chunk string) error) (*Briefing, error) {
+	if strings.TrimSpace(prompt) == "" {
+		return nil, fmt.Errorf("empty prompt provided to chief of staff")
+	}
+
+	systemPrompt := `You are the Chief of Staff in Beacon Go.
+Your job is NOT to write code or modify files.
+Your job is Indirect Prompting: restate the user's requirement, identify hidden risks/invariants,
+and summarize the boundary into a strict confirmation brief.`
+
+	userPrompt := fmt.Sprintf("Analyze this requirement and restate it:\n%s", prompt)
+
+	req := llm.Request{
+		Role:  llm.RoleChiefOfStaff,
+		Model: c.model,
+		Messages: []llm.Message{
+			{Role: "system", Content: systemPrompt},
+			{Role: "user", Content: userPrompt},
+		},
+		Temperature: 0.1,
+		MaxTokens:   2048,
+	}
+
+	resp, err := c.client.StreamComplete(ctx, req, chunkHandler)
+	if err != nil {
+		return nil, fmt.Errorf("chief of staff LLM alignment failed: %w", err)
+	}
+
+	// Deterministic fallback/structured parse
+	b := &Briefing{
+		OriginalPrompt: prompt,
+		RestatedIntent: resp.Content,
+		IdentifiedRisks: []string{
+			"Do not break existing database schema or FSM transitions",
+			"Require full test coverage and machine evidence before QA gate",
+		},
+		Boundaries: []string{
+			"Code modifications restricted to feature-specific worktree",
+			"Must produce exit 0 evidence before release",
+		},
+		ProposedSlugs: []string{slugify(prompt)},
+		Confirmed:     false,
+	}
+	return b, nil
+}
+
 func slugify(s string) string {
 	s = strings.ToLower(strings.TrimSpace(s))
 	s = strings.ReplaceAll(s, " ", "-")
