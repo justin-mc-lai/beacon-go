@@ -1,14 +1,26 @@
 # Evidence Index: agent-desktop-workspace
 
-> **Feature Slug**: `agent-desktop-workspace`  
-> **Version**: `v2.0.0`
+## Evidence Index
 
----
+| Surface | Authority | Canonical Artifact | Status | Route |
+|---------|-----------|--------------------|--------|-------|
+| truth | requirement_truth | truth.md | frozen | truth |
+| tests | test_truth | tests.md | frozen | qa |
 
-## 证据链索 (Evidence Trail)
+## Verification Log
 
-| 阶段 | 交付工件 | 生成时间 | 机器校验哈希 |
-|---|---|---|---|
-| **Freeze Truth** | `truth.md`, `tests.md`, `tasks.md` | 2026-10-28T09:24:00Z | `e83a912...` (Frozen) |
-| **Implement** | `.beacon/evidence/implement/agent-desktop-workspace/` | Pending | Pending |
-| **QA Verification** | `.beacon/evidence/qa/agent-desktop-workspace/` | Pending | Pending |
+Every row was executed by the whole Go test suite; the command is the exact
+`-run` selector. No row is a hand-written hash.
+
+| AC | Test | Result |
+|----|------|--------|
+| AC-001 | `TestShellScriptParses` | PASS |
+| AC-002 | `TestUnregisteredProjectIsEmptyNotInvented` | PASS |
+| AC-003 | `TestWailsConfigValid` | PASS |
+
+Whole-suite state: the full test suite passes, go vet is clean,
+gofmt reports nothing.
+
+## 2026-10-29 复核
+
+冻结后复核：证据表引用的测试均在当前仓库存在并通过；材料状态随冻结归位 current。

@@ -22,6 +22,13 @@ import (
 // code, and this package claims no vendor integration it cannot
 // demonstrate.
 //
+// Context handoff: {context} is spliced INTO the prompt text, not
+// passed as a flag. The earlier templates used `--context-file`,
+// which neither `codex exec` nor `claude -p` actually accepts — the
+// shape was verified only against a stand-in command, never against
+// the real binaries, so it never ran in production. Both CLIs accept
+// exactly one prompt argument, so the context path rides along in it.
+//
 // Template placeholders: {context} (stage-context file path),
 // {prompt} (iteration prompt), {workdir}, {iteration}, {stage}.
 // Substitution is plain string replacement over the template's argv
@@ -41,14 +48,18 @@ type Profile struct {
 func BuiltinProfiles() []Profile {
 	return []Profile{
 		{
-			Name:        "codex-style",
-			Description: "Codex-style agent CLI: non-interactive exec with the stage-context file passed by path",
-			Argv:        []string{"codex", "exec", "--context-file", "{context}", "{prompt}"},
+			Name: "codex-style",
+			Description: "Codex CLI: non-interactive exec takes ONE prompt argument; the " +
+				"stage-context path travels inside the prompt text because codex has " +
+				"no --context-file flag (verified against `codex exec --help`)",
+			Argv: []string{"codex", "exec", "{prompt}\n\nStage context file (read it first): {context}"},
 		},
 		{
-			Name:        "claude-style",
-			Description: "Claude-style agent CLI: print mode with the stage-context file passed by path",
-			Argv:        []string{"claude", "-p", "--context-file", "{context}", "{prompt}"},
+			Name: "claude-style",
+			Description: "Claude Code CLI: print mode takes ONE prompt argument; the " +
+				"stage-context path travels inside the prompt text because claude has " +
+				"no --context-file flag (verified against `claude -p --help`)",
+			Argv: []string{"claude", "-p", "{prompt}\n\nStage context file (read it first): {context}"},
 		},
 	}
 }

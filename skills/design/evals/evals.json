@@ -1,0 +1,60 @@
+{
+  "schema": "skill-evals.v1",
+  "skill": "beacon-design",
+  "cases": [
+    {
+      "id": "design-00-gate",
+      "prompt": "加一个退款进度页。",
+      "expectations": [
+        "Marks design required",
+        "Blocks implement until the binding exists"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "No binding, no implement"
+        },
+        {
+          "kind": "contains",
+          "text": "ds-check"
+        }
+      ]
+    },
+    {
+      "id": "design-01-no-prototype",
+      "prompt": "顺手把原型也画了吧。",
+      "expectations": [
+        "Refuses to generate the prototype in the kernel",
+        "Routes prototype generation to the host agent"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "Never draw"
+        },
+        {
+          "kind": "contains",
+          "text": "prototype"
+        }
+      ]
+    },
+    {
+      "id": "design-02-no-ui",
+      "prompt": "加一个对账定时任务。",
+      "expectations": [
+        "Does not insert a design stage for backend-only work",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "does not require design"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    }
+  ]
+}

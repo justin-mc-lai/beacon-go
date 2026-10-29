@@ -13,7 +13,7 @@ engine**: long-running coding work that plans itself into stages, advances
 step by step under hard gates, survives interruptions, and never marks
 itself done without independent verification and a human-confirmed release.
 
-Current release: **v2.0.0-go.9** · 327 behavior tests · full end-to-end
+Current release: **v2.0.0-go.9** · 407 behavior tests · full end-to-end
 chain green. v2.0.0-go.9 closes the 26 high/medium gaps found by the
 Python v1.6.19 parity audit (`docs/parity-audit-python-v16.md`).
 
@@ -74,7 +74,7 @@ Requires Go 1.27+.
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.9
+./bin/beacon --version          # Beacon CLI v2.0.0-go.10
 ```
 
 Five commands cover most of a day:
@@ -87,6 +87,28 @@ beacon goal run "add two-factor auth to the login page" --project . --feature my
 beacon goal driver run-loop --run-id <run-id>       # push it to the release gate
 beacon spine show --project . --feature my-feature  # read the one ledger view
 ```
+
+### Desktop workspace
+
+The workspace ships as one native window (Wails). There is no browser
+mode: one surface, one implementation, no second rendering path to keep
+in sync. The window embeds a single HTML shell and binds one shared API
+(`internal/agentapi`).
+
+```sh
+go build -o bin/beacon-desktop ./desktop   # native app
+./bin/beacon ui                            # open the window
+```
+
+The workspace reads requirement packages from the ledger and creates
+real goal runs. It never claims a stage finished: with no executor
+registered the run stays parked at `plan`, and the release button
+returns the gate's real verdict and reason codes instead of a
+success message.
+
+The window uses the same ledger as the CLI. The Go track keeps its own
+database so it can never collide with the Python v1 schema: the default is
+`~/.beacon/beacon-go.db`, overridable with `BEACON_STORE_PATH`.
 
 ### Ask before sign
 
@@ -119,23 +141,36 @@ The six public skills ship inside the binary:
 ```sh
 beacon skills list
 beacon skills show truth
+beacon skills hosts                 # which host dirs exist, what is installed
+beacon skills install --host workbuddy
 ```
 
+`skills install` writes `beacon-<id>/SKILL.md` plus its `references/`, `examples/`
+and `evals/` into the host's skill directory (workbuddy, claude, codex, agents,
+cursor, windsurf, trae). With no `--host` it auto-detects the first existing host
+directory and fails closed when none exists.
+
+Each package carries three worked examples and a `skill-evals.v1` eval set. The
+eval `checks` are machine-verifiable (`contains` / `references_contains` /
+`min_examples`), and `beacon qa score` runs them as part of the structural
+dimension — a skill that claims a rule it does not state scores zero on that item.
+Behavioural grading (did a model follow it) still needs a human grade.
+
 Runtime state lives in a single global SQLite database
-(`~/.beacon/beacon.db`, WAL). Requirement truth never enters the database —
+(`~/.beacon/beacon-go.db`, WAL). Requirement truth never enters the database —
 it stays in the Markdown packages under
 `docs/beacon/<version>/features/<slug>/`.
 
 ## Verification
 
-- `go test ./...` — 327 behavior-level tests.
+- `go test ./...` — 407 behavior-level tests.
 - [`e2e/run_e2e.sh`](e2e/run_e2e.sh) — a scripted full chain
   (register → create → freeze → commit baseline → run with a real
   subprocess executor → driver → gates → verify → complete) against the
   real binary; currently 15 steps, exit 0.
 - [`docs/ac-matrix.md`](docs/ac-matrix.md) — the frozen v2 acceptance
   criteria (171 ACs) with a final status per line:
-  82 tested, 64 implemented, 16 deferred to external conditions,
+  88 tested, 62 implemented, 12 deferred to external conditions,
   9 dropped by charter decision.
 - [`bench/`](bench/) — the performance gate. Read paths run 50–200×
   faster than the Python version; the write paths were reworked to batch
@@ -145,16 +180,16 @@ it stays in the Markdown packages under
 
 ## Known limits (stated, not hidden)
 
-- **ACP** support is probe-level only (initialize + session/new
-  handshake). Real session iteration awaits a real ACP agent binary.
+- **ACP** support drives a real `initialize → session/new → session/prompt`
+  iteration against a scripted agent in tests; a real vendor ACP target is
+  still external evidence.
 - **Vendor executors** (codex / claude CLIs) are wired as command
   profiles; end-to-end verification awaits authenticated binaries.
 - **Skill references** beyond the six embedded `SKILL.md` files stay
   host-side; the binary ships the public surface only.
-- Four external-verification items are deferred to external conditions
-  (`docs/p6-implementation.md` §4); at AC level 17 rows carry the
-  `deferred-external` class. Per-item preconditions, probes, and owners
-  are in [`docs/deferred-external.md`](docs/deferred-external.md).
+- External verification that needs a vendor binary or a decision stays
+  deferred; at AC level the remaining rows are listed with preconditions,
+  probes and owners in [`docs/deferred-external.md`](docs/deferred-external.md).
 
 ## Documentation
 

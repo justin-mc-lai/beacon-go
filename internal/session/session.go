@@ -1,12 +1,16 @@
 package session
 
 import (
-	"encoding/json"
+	"crypto/rand"
+	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
-	"sync"
+	"strings"
 	"time"
+
+	_ "modernc.org/sqlite"
 )
 
 // Session represents an active or archived planning conversation thread.
@@ -24,12 +28,12 @@ type ChatMessage struct {
 	SessionID   string    `json:"session_id"`
 	Role        string    `json:"role"` // user, chief, architect, coder, qa
 	Content     string    `json:"content"`
-	CardType    string    `json:"card_type,omitempty"` // plan_brief, goal_gate
+	CardType    string    `json:"card_type,omitempty"` // plan_brief, goal_run, release_verdict
 	CardPayload string    `json:"card_payload,omitempty"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-// Store defines persistence methods for Sessions and Messages.
+// Store defines persistence for Sessions and Messages.
 type Store interface {
 	ListSessions() ([]Session, error)
 	CreateSession(title string) (*Session, error)
@@ -37,144 +41,195 @@ type Store interface {
 	AppendMessage(msg ChatMessage) error
 }
 
-// FileStore implements Store using persistent JSON files in ~/.beacon/sessions/.
-type FileStore struct {
-	mu      sync.RWMutex
-	baseDir string
+// SQLiteStore keeps conversation history in one SQLite file with WAL
+// and transactional writes. It replaces the earlier JSON-file store:
+// a half-written JSON file could silently lose a whole thread, and
+// list/append were not atomic against each other.
+type SQLiteStore struct {
+	db   *sql.DB
+	Path string
 }
 
-// NewFileStore initializes the session store under the given directory or ~/.beacon/sessions.
-func NewFileStore(dir string) (*FileStore, error) {
-	if dir == "" {
-		home, err := os.UserHomeDir()
+const sessionSchema = `
+CREATE TABLE IF NOT EXISTS sessions (
+	id         TEXT PRIMARY KEY,
+	title      TEXT NOT NULL,
+	status     TEXT NOT NULL DEFAULT 'active',
+	created_at TEXT NOT NULL,
+	updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS messages (
+	id           TEXT PRIMARY KEY,
+	session_id   TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+	role         TEXT NOT NULL,
+	content      TEXT NOT NULL,
+	card_type    TEXT NOT NULL DEFAULT '',
+	card_payload TEXT NOT NULL DEFAULT '',
+	created_at   TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id, created_at);
+`
+
+// DefaultPath resolves the conversation store: $BEACON_SESSIONS_PATH,
+// otherwise ~/.beacon/sessions.db. It is deliberately separate from the
+// kernel ledger: conversation history is UI state, not runtime
+// authority over runs or gates (charter rule 7 / AC-016).
+func DefaultPath() (string, error) {
+	if p := os.Getenv("BEACON_SESSIONS_PATH"); p != "" {
+		return p, nil
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(home, ".beacon", "sessions.db"), nil
+}
+
+// NewStore opens (creating if needed) the conversation store at path.
+// An empty path resolves through DefaultPath.
+func NewStore(path string) (*SQLiteStore, error) {
+	if path == "" {
+		p, err := DefaultPath()
 		if err != nil {
 			return nil, err
 		}
-		dir = filepath.Join(home, ".beacon", "sessions")
+		path = p
 	}
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return nil, err
+	if dir := filepath.Dir(path); dir != "" && dir != "." {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return nil, err
+		}
 	}
-	return &FileStore{baseDir: dir}, nil
-}
-
-type sessionData struct {
-	Session  Session       `json:"session"`
-	Messages []ChatMessage `json:"messages"`
-}
-
-func (s *FileStore) ListSessions() ([]Session, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	entries, err := os.ReadDir(s.baseDir)
+	dsn := fmt.Sprintf("file:%s?_pragma=journal_mode(WAL)&_pragma=synchronous(NORMAL)&_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)", path)
+	db, err := sql.Open("sqlite", dsn)
 	if err != nil {
 		return nil, err
 	}
-
-	var list []Session
-	for _, entry := range entries {
-		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
-			data, err := os.ReadFile(filepath.Join(s.baseDir, entry.Name()))
-			if err == nil {
-				var sd sessionData
-				if err := json.Unmarshal(data, &sd); err == nil && sd.Session.ID != "" {
-					list = append(list, sd.Session)
-				}
-			}
-		}
+	db.SetMaxOpenConns(1)
+	if _, err := db.Exec(sessionSchema); err != nil {
+		_ = db.Close()
+		return nil, fmt.Errorf("session schema: %w", err)
 	}
-
-	// Sort descending by UpdatedAt
-	for i := 0; i < len(list); i++ {
-		for j := i + 1; j < len(list); j++ {
-			if list[i].UpdatedAt.Before(list[j].UpdatedAt) {
-				list[i], list[j] = list[j], list[i]
-			}
-		}
-	}
-
-	return list, nil
+	return &SQLiteStore{db: db, Path: path}, nil
 }
 
-func (s *FileStore) CreateSession(title string) (*Session, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+// Close releases the database handle.
+func (s *SQLiteStore) Close() error { return s.db.Close() }
 
-	id := fmt.Sprintf("sess-%d", time.Now().UnixNano())
+// ListSessions returns threads newest-updated first.
+func (s *SQLiteStore) ListSessions() ([]Session, error) {
+	rows, err := s.db.Query(`SELECT id, title, status, created_at, updated_at
+		FROM sessions ORDER BY updated_at DESC, id DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	list := []Session{}
+	for rows.Next() {
+		var (
+			sess             Session
+			created, updated string
+		)
+		if err := rows.Scan(&sess.ID, &sess.Title, &sess.Status, &created, &updated); err != nil {
+			return nil, err
+		}
+		sess.CreatedAt = parseTime(created)
+		sess.UpdatedAt = parseTime(updated)
+		list = append(list, sess)
+	}
+	return list, rows.Err()
+}
+
+// CreateSession inserts one thread and returns it.
+func (s *SQLiteStore) CreateSession(title string) (*Session, error) {
+	title = strings.TrimSpace(title)
+	if title == "" {
+		title = "New session"
+	}
 	now := time.Now().UTC()
-	sess := Session{
-		ID:        id,
+	sess := &Session{
+		ID:        "sess-" + newID(),
 		Title:     title,
 		CreatedAt: now,
 		UpdatedAt: now,
 		Status:    "active",
 	}
-
-	sd := sessionData{
-		Session:  sess,
-		Messages: []ChatMessage{},
+	if _, err := s.db.Exec(`INSERT INTO sessions (id, title, status, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?)`,
+		sess.ID, sess.Title, sess.Status, formatTime(now), formatTime(now)); err != nil {
+		return nil, err
 	}
+	return sess, nil
+}
 
-	raw, err := json.MarshalIndent(sd, "", "  ")
+// GetSessionMessages returns one thread's turns in insertion order.
+func (s *SQLiteStore) GetSessionMessages(sessionID string) ([]ChatMessage, error) {
+	rows, err := s.db.Query(`SELECT id, session_id, role, content, card_type, card_payload, created_at
+		FROM messages WHERE session_id = ? ORDER BY created_at, rowid`, sessionID)
 	if err != nil {
 		return nil, err
 	}
-
-	targetPath := filepath.Join(s.baseDir, fmt.Sprintf("%s.json", id))
-	if err := os.WriteFile(targetPath, raw, 0644); err != nil {
-		return nil, err
+	defer rows.Close()
+	out := []ChatMessage{}
+	for rows.Next() {
+		var (
+			m       ChatMessage
+			created string
+		)
+		if err := rows.Scan(&m.ID, &m.SessionID, &m.Role, &m.Content, &m.CardType, &m.CardPayload, &created); err != nil {
+			return nil, err
+		}
+		m.CreatedAt = parseTime(created)
+		out = append(out, m)
 	}
-
-	return &sess, nil
+	return out, rows.Err()
 }
 
-func (s *FileStore) GetSessionMessages(sessionID string) ([]ChatMessage, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	targetPath := filepath.Join(s.baseDir, fmt.Sprintf("%s.json", sessionID))
-	data, err := os.ReadFile(targetPath)
-	if err != nil {
-		return nil, err
+// AppendMessage writes one turn and bumps the thread's updated_at in the
+// same transaction, so a listed session can never lag its messages.
+func (s *SQLiteStore) AppendMessage(msg ChatMessage) error {
+	if msg.SessionID == "" {
+		return fmt.Errorf("session: append requires a session id")
 	}
-
-	var sd sessionData
-	if err := json.Unmarshal(data, &sd); err != nil {
-		return nil, err
-	}
-	return sd.Messages, nil
-}
-
-func (s *FileStore) AppendMessage(msg ChatMessage) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	if msg.ID == "" {
-		msg.ID = fmt.Sprintf("msg-%d", time.Now().UnixNano())
+		msg.ID = "msg-" + newID()
 	}
+	now := time.Now().UTC()
 	if msg.CreatedAt.IsZero() {
-		msg.CreatedAt = time.Now().UTC()
+		msg.CreatedAt = now
 	}
-
-	targetPath := filepath.Join(s.baseDir, fmt.Sprintf("%s.json", msg.SessionID))
-	data, err := os.ReadFile(targetPath)
+	tx, err := s.db.Begin()
 	if err != nil {
 		return err
 	}
-
-	var sd sessionData
-	if err := json.Unmarshal(data, &sd); err != nil {
+	defer func() { _ = tx.Rollback() }()
+	if _, err := tx.Exec(`INSERT INTO messages (id, session_id, role, content, card_type, card_payload, created_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		msg.ID, msg.SessionID, msg.Role, msg.Content, msg.CardType, msg.CardPayload,
+		formatTime(msg.CreatedAt)); err != nil {
 		return err
 	}
+	if _, err := tx.Exec(`UPDATE sessions SET updated_at = ? WHERE id = ?`,
+		formatTime(now), msg.SessionID); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
 
-	sd.Messages = append(sd.Messages, msg)
-	sd.Session.UpdatedAt = msg.CreatedAt
+func formatTime(t time.Time) string { return t.UTC().Format(time.RFC3339Nano) }
 
-	raw, err := json.MarshalIndent(sd, "", "  ")
+func parseTime(s string) time.Time {
+	t, err := time.Parse(time.RFC3339Nano, s)
 	if err != nil {
-		return err
+		return time.Time{}
 	}
+	return t
+}
 
-	return os.WriteFile(targetPath, raw, 0644)
+func newID() string {
+	var b [8]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		return fmt.Sprintf("%d", time.Now().UnixNano())
+	}
+	return hex.EncodeToString(b[:])
 }

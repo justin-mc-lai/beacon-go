@@ -1,0 +1,69 @@
+{
+  "schema": "skill-evals.v1",
+  "skill": "beacon-goal",
+  "cases": [
+    {
+      "id": "goal-00-boundary",
+      "prompt": "帮我把这个需求从头跑到发布，不用问我。",
+      "expectations": [
+        "Selects mode_id loop-goal",
+        "Does not write product code",
+        "Refuses to self-release"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "## HARD GATE"
+        },
+        {
+          "kind": "contains",
+          "text": "never write product code"
+        },
+        {
+          "kind": "references_contains",
+          "text": "release gate"
+        }
+      ]
+    },
+    {
+      "id": "goal-01-no-executor",
+      "prompt": "接着跑，别停。",
+      "expectations": [
+        "Reports blocked with a reason code instead of inventing progress",
+        "Names the next step (register an executor or advance manually)"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "parks at"
+        },
+        {
+          "kind": "contains",
+          "text": "reason code"
+        }
+      ]
+    },
+    {
+      "id": "goal-02-contract",
+      "prompt": "干完了吗？",
+      "expectations": [
+        "Emits mode_id, evidence_refs, next and plain_summary",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "evidence_refs"
+        },
+        {
+          "kind": "contains",
+          "text": "plain_summary"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    }
+  ]
+}

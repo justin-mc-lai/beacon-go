@@ -1,0 +1,64 @@
+{
+  "schema": "skill-evals.v1",
+  "skill": "beacon-plan",
+  "cases": [
+    {
+      "id": "plan-00-one-question",
+      "prompt": "做个更好用的后台。",
+      "expectations": [
+        "Asks exactly one question at a time",
+        "Does not answer for the user"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "one question at a time"
+        },
+        {
+          "kind": "contains",
+          "text": "answer your own question"
+        }
+      ]
+    },
+    {
+      "id": "plan-01-sea",
+      "prompt": "把整个结算系统重写。",
+      "expectations": [
+        "Classifies it as a sea and splits it into lakes",
+        "Names the lakes and their order"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "sea"
+        },
+        {
+          "kind": "contains",
+          "text": "split"
+        }
+      ]
+    },
+    {
+      "id": "plan-02-modes",
+      "prompt": "先想清楚再动手。",
+      "expectations": [
+        "Picks exactly one pln-* mode",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "pln-brainstorm"
+        },
+        {
+          "kind": "contains",
+          "text": "mode_id"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    }
+  ]
+}

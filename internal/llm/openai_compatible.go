@@ -1,6 +1,7 @@
 package llm
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -8,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -178,28 +180,94 @@ func (c *OpenAICompatibleClient) StreamComplete(ctx context.Context, req Request
 		return nil, fmt.Errorf("provider %s HTTP %d: %s", c.provider, resp.StatusCode, string(respBytes))
 	}
 
-	// Read SSE stream lines
-	var fullContent bytes.Buffer
-	buf := make([]byte, 4096)
-	for {
-		n, err := resp.Body.Read(buf)
-		if n > 0 {
-			chunk := string(buf[:n])
-			fullContent.WriteString(chunk)
-			_ = handler(chunk)
+	// SSE: one `data:` line per delta. Forward the DELTA text, not the
+	// raw read buffer — a single TCP read can carry several events, and a
+	// raw buffer makes the host's typing animation jump in blocks. A
+	// non-SSE body (some gateways ignore stream=true) is parsed as one
+	// complete answer.
+	var fullContent strings.Builder
+	scanner := bufio.NewScanner(resp.Body)
+	scanner.Buffer(make([]byte, 0, 64*1024), 4*1024*1024)
+	sawSSE := false
+	respUsage := struct {
+		PromptTokens     int `json:"prompt_tokens"`
+		CompletionTokens int `json:"completion_tokens"`
+	}{}
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, ":") {
+			continue
 		}
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
+		if !strings.HasPrefix(line, "data:") {
+			if !sawSSE {
+				// Non-SSE answer: re-read is impossible, so treat the
+				// remaining body as one JSON document.
+				rest := line
+				for scanner.Scan() {
+					rest += "\n" + scanner.Text()
+				}
+				var chatResp openAIChatResp
+				if err := json.Unmarshal([]byte(rest), &chatResp); err != nil {
+					return nil, err
+				}
+				if chatResp.Error != nil && chatResp.Error.Message != "" {
+					return nil, errors.New(chatResp.Error.Message)
+				}
+				if len(chatResp.Choices) == 0 {
+					return nil, errors.New("empty choices returned from provider")
+				}
+				content := chatResp.Choices[0].Message.Content
+				if err := handler(content); err != nil {
+					return nil, err
+				}
+				return &Response{
+					Content: content, PromptTokens: chatResp.Usage.PromptTokens,
+					CompTokens: chatResp.Usage.CompletionTokens, Model: req.Model,
+				}, nil
 			}
-			return nil, err
+			continue
 		}
+		sawSSE = true
+		payload := strings.TrimSpace(strings.TrimPrefix(line, "data:"))
+		if payload == "[DONE]" {
+			break
+		}
+		var event struct {
+			Choices []struct {
+				Delta struct {
+					Content string `json:"content"`
+				} `json:"delta"`
+			} `json:"choices"`
+			Usage *struct {
+				PromptTokens     int `json:"prompt_tokens"`
+				CompletionTokens int `json:"completion_tokens"`
+			} `json:"usage"`
+		}
+		if err := json.Unmarshal([]byte(payload), &event); err != nil {
+			continue // keepalive / vendor noise: not a content event
+		}
+		if event.Usage != nil {
+			respUsage.PromptTokens = event.Usage.PromptTokens
+			respUsage.CompletionTokens = event.Usage.CompletionTokens
+		}
+		for _, ch := range event.Choices {
+			if ch.Delta.Content == "" {
+				continue
+			}
+			fullContent.WriteString(ch.Delta.Content)
+			if err := handler(ch.Delta.Content); err != nil {
+				return nil, err
+			}
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
 	}
 
 	return &Response{
 		Content:      fullContent.String(),
-		PromptTokens: 10,
-		CompTokens:   20,
+		PromptTokens: respUsage.PromptTokens,
+		CompTokens:   respUsage.CompletionTokens,
 		Model:        req.Model,
 	}, nil
 }

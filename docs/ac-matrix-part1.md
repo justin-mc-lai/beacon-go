@@ -1,3 +1,5 @@
+> 历史分片：自 2026-10-29 起状态权威为 `docs/ac-matrix.md`；本文件可能与最新状态不同。
+
 # Beacon Go 重构 · AC 全矩阵（前半：AC-001..AC-088）
 
 > 日期：2026-10-22 ｜ 范围：冻结 truth `beacon-v2-rust-kernel-redesign/truth.md` 中 AC-001..AC-088（该区间编号无缺号，共 88 条）
@@ -14,7 +16,7 @@
 | AC-005 | 全局 DB 不得存储可编辑的需求正文，只存元数据与指针 | tested | TestNoTruthBodyColumns（internal/store/store_test.go）逐表逐列断言无 truth_body、body、content 类列 |
 | AC-006 | v1 JSON 投影在 v2 为非权威，Spine 读 DB 优先 | tested | TestSpineShowGateArtifacts（internal/cli/cli_test.go）毒文件段：写入与 DB 矛盾的 .beacon/gate-report.json 后 gate 输出仍为 DB 值且读命令不写回 |
 | AC-007 | 实现必须遵守存储三层分离（L1 MD、L2 全局 SQLite、L3 Blob） | implemented | internal/store 全局 DB、orchestrator/truth.go 的 MD 包、artifact_refs 的 Blob 指针三层分工成立；无整体断言的单测 |
-| AC-008 | 禁止 per-project beacon.db 作为运行态权威 | implemented | store.DefaultPath 只解析全局 ~/.beacon/beacon.db 或 BEACON_STORE_PATH，无 per-project 打开路径；无专门测试 |
+| AC-008 | 禁止 per-project beacon.db 作为运行态权威 | tested | store.DefaultPath 只解析全局 ~/.beacon/beacon-go.db 或 BEACON_STORE_PATH，无 per-project 打开路径；TestDefaultPathIsGoTrackLedger 断言默认文件名与 v1 的 beacon.db 分离 |
 | AC-009 | 禁止 loop-runs.db 作为 v2 权威，v1 ledger 须导入全局库后只读归档 | deferred-external | 前置条件：真实 loop-runs.db 出现以探明 schema；当前 migration/scan.go 仅探测存在性并报告未导入（p3b 报告），运行权威只认全局库 |
 | AC-010 | Blob 变更时 artifact_refs 更新 content_hash，hash 不符标 stale | tested | TestArtifactDaoAndStale（internal/store/store_test.go）与 TestArtifactViewHashMismatch（internal/store/spine_test.go）断言 hash 不符即 stale 与 hash_mismatch |
 | AC-011 | doctor projection rebuild 能重建全局库索引且前后 lifecycle 与 gate 字段一致 | tested | TestDoctorApply（internal/migration/migration_test.go）断言 rebuild 前后 Spine 快照 lifecycle 与 gate 一致，TestDoctorReportOnly 断言只报不写 |
@@ -67,7 +69,7 @@
 | AC-058 | beacon.db 体积软上限 500MB，超阈值 WARN 日志加 metric | deferred-external | 待复核：未找到体积监控或 WARN 实现，P6 benchmark 门禁未建（p4c 报告列为 P6 待办） |
 | AC-059 | v2 harness surface 只暴露六个一等能力 | implemented | internal/harness/harness.go 的 Abilities 恰六项，cli/root.go 据此建六组顶层命令；无专门计数测试 |
 | AC-060 | 双轨运行时选择必须显式，禁止环境默认偷偷切轨 | implemented | 待复核：Go 轨为独立二进制与独立版本串（2.0.0-go.3）、不偷切 v1；但二进制名仍为 beacon、无 runtime 旗标，phase0 将命名口径列为待拍板 |
-| AC-061 | BEACON_STORE_PATH 测试隔离，生产默认 ~/.beacon/beacon.db | tested | internal/store/store_test.go 的 openTestStore 断言 env 路径解析，全部 store 测试经此隔离（如 TestOpenIdempotentAndWAL） |
+| AC-061 | BEACON_STORE_PATH 测试隔离，生产默认 ~/.beacon/beacon-go.db | tested | internal/store/store_test.go 的 openTestStore 断言 env 路径解析（TestDefaultPathIsGoTrackLedger 额外断言默认文件名），全部 store 测试经此隔离 |
 | AC-062 | v2 路径内把 v1 Python 后端当执行后端的请求须 fail-closed 回 cross_track_fallback_forbidden | implemented | 待复核：纯 Go 实现无 Python 后端可回退（构造性成立），但未找到该 reason_code 常量、守卫代码或测试 |
 | AC-063 | harness list 只返回六个一等能力及其 contract metadata | implemented | 待复核：无 harness list 命令；数据源为 internal/harness/harness.go 的 Abilities 与六个顶层命令组（等价面），未找到专门测试 |
 | AC-064 | spine、projects、workflow、truth-map、implement、qa、release、run 子命令可解析且 help snapshot 稳定 | implemented | 待复核：spine、projects、goal、truth、implement、qa、release 经大量 CLI 测试实际执行解析，但无 help snapshot 测试，且无 workflow 与 truth-map 同名命令 |

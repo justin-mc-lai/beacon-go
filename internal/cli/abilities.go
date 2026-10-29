@@ -17,7 +17,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -168,33 +167,69 @@ func newGateEvaluateFixedCmd(gateType string) *cobra.Command {
 	return c
 }
 
-// newQAVerifyHarnessCmd exposes the machine-oriented verification lever (AC-AGENT-004).
+// newQAVerifyHarnessCmd exposes the machine-oriented verification lever
+// (AC-AGENT-004). It answers from the ledger and the bytes on disk — QA
+// artifacts recorded, qa stage executed, every blob hash still matching —
+// and exits non-zero when anything is missing or stale. It never writes a
+// gate result: formal verdicts belong to `gate evaluate qa`.
 func newQAVerifyHarnessCmd() *cobra.Command {
 	var jsonOutput bool
-	var slug string
+	var project, slug, version, evaluator string
 	cmd := &cobra.Command{
 		Use:   "verify-harness",
 		Short: "Machine verification lever for agents (Build the Lever)",
+		Long: "Verify one feature's QA evidence without writing a gate result.\n" +
+			"Passing needs recorded QA artifacts, a qa stage execution on record, and\n" +
+			"every artifact blob still matching its recorded SHA-256. Anything else\n" +
+			"exits non-zero with the failing checks named.",
+		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			out := cmd.OutOrStdout()
-			if jsonOutput {
-				res := map[string]any{
-					"status":        "passed",
-					"slug":          slug,
-					"exit_code":     0,
-					"verified":      true,
-					"evidence_hash": "sha256-machine-verified-evidence-hash",
-					"harness":       "beacon-go/qa",
-				}
-				raw, _ := json.Marshal(res)
-				_, _ = fmt.Fprintln(out, string(raw))
-				return nil
+			st, err := openWriteStore()
+			if err != nil {
+				return err
 			}
-			_, _ = fmt.Fprintf(out, "✅ Verification passed for slug %s (exit 0)\n", slug)
+			defer st.Close()
+			fctx, err := resolveGateFeature(st, project, slug, version)
+			if err != nil {
+				return err
+			}
+			eng := orchestrator.NewEngine(st)
+			res, err := eng.VerifyHarness(fctx, evaluator)
+			if err != nil {
+				return err
+			}
+			if jsonOutput {
+				if perr := printJSON(cmd, res); perr != nil {
+					return perr
+				}
+			} else {
+				out := cmd.OutOrStdout()
+				fmt.Fprintf(out, "harness verify: %s → %s (exit %d)\n", res.Slug, res.Status, res.ExitCode)
+				fmt.Fprintf(out, "  evidence: %d artifact(s) hash=%s\n", res.EvidenceCount, res.EvidenceHash)
+				for _, f := range res.Checks {
+					if f.Applicable && !f.OK {
+						fmt.Fprintf(out, "  BLOCK [%s] %s\n", f.ReasonCode, f.Detail)
+					}
+				}
+				for _, s := range res.Stale {
+					fmt.Fprintf(out, "  stale: %s\n", s)
+				}
+			}
+			if !res.Verified {
+				code := core.ReasonStageExitQAEvidenceMiss
+				if len(res.ReasonCodes) > 0 {
+					code = res.ReasonCodes[0]
+				}
+				return fail(code, "qa verify-harness", "verification blocked for feature "+res.Slug)
+			}
 			return nil
 		},
 	}
 	cmd.Flags().BoolVar(&jsonOutput, "json", true, "Output structured JSON for machine agents")
-	cmd.Flags().StringVar(&slug, "slug", "", "Target feature slug to verify")
+	cmd.Flags().StringVar(&project, "project", ".", "project root path")
+	cmd.Flags().StringVar(&slug, "slug", "", "Target feature slug to verify (required)")
+	cmd.Flags().StringVar(&version, "version", "", "docs version filter")
+	cmd.Flags().StringVar(&evaluator, "evaluator", "harness", "evaluator identity recorded in the answer")
+	_ = cmd.MarkFlagRequired("slug")
 	return cmd
 }

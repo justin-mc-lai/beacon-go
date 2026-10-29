@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"beacon-go/internal/core"
 	"beacon-go/internal/store"
@@ -25,6 +26,7 @@ const (
 	DerivedReason = "migration_v1_derived"
 
 	ReasonHasV2Data       = "v1_migration_project_has_v2_data"
+	ReasonBackupFailed    = "migration_backup_failed"
 	ReasonProjectNotFound = "v1_project_root_not_found"
 )
 
@@ -59,6 +61,7 @@ type Report struct {
 	Uncertain   []string                  `json:"uncertain,omitempty"`
 	Ledgers     []LedgerSource            `json:"ledger_sources"`
 	GateReports []ProjectGateReport       `json:"project_gate_reports,omitempty"`
+	BackupPath  string                    `json:"backup_path,omitempty"`
 }
 
 // Options controls one ImportV1 run.
@@ -98,6 +101,16 @@ func ImportV1(st *store.Store, root string, opts Options) (*Report, error) {
 	}
 	resolved := store.ResolveRootPath(root)
 	rep := newReport(resolved, opts)
+	// AC-092: a one-way import writes into the live ledger, so snapshot
+	// it first. A failed or interrupted import must never leave the
+	// operator without the pre-import state. Dry runs write nothing.
+	if !opts.DryRun {
+		dest := fmt.Sprintf("%s.pre-migrate-%s", st.Path, time.Now().UTC().Format("20060102T150405.000000000Z"))
+		if err := st.BackupTo(dest); err != nil {
+			return rep, core.NewError(ReasonBackupFailed, "migrate.Backup", err.Error())
+		}
+		rep.BackupPath = dest
+	}
 	rep.Ledgers = scan.Ledgers
 	rep.GateReports = scan.GateReports
 

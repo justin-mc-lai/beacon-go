@@ -1,6 +1,6 @@
 // Package store is the Go counterpart of the frozen v2 design's
 // beacon-store crate: the machine-level global SQLite database
-// ~/.beacon/beacon.db (WAL) plus blob pointers (AC-007..016, AC-067..083).
+// ~/.beacon/beacon-go.db (WAL) plus blob pointers (AC-007..016, AC-067..083).
 //
 // P0 scope: Open + migration skeleton (user_version), the nine-table DDL,
 // six DAOs, append-only lifecycle events, the per-track write domain
@@ -49,7 +49,7 @@ var Tables = []string{
 }
 
 // DefaultPath resolves the global DB path: $BEACON_STORE_PATH when set,
-// otherwise ~/.beacon/beacon.db. Per-project beacon.db files are explicitly
+// otherwise ~/.beacon/beacon-go.db. Per-project beacon.db files are explicitly
 // forbidden as runtime authority (AC-008).
 func DefaultPath() (string, error) {
 	if p := os.Getenv(EnvStorePath); p != "" {
@@ -59,7 +59,7 @@ func DefaultPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(home, ".beacon", "beacon.db"), nil
+	return filepath.Join(home, ".beacon", "beacon-go.db"), nil
 }
 
 // OpenOptions controls Open. Track binds the write domain (AC-158);
@@ -221,6 +221,31 @@ func (s *Store) checkWritable() error {
 
 // Close closes the underlying DB.
 func (s *Store) Close() error { return s.db.Close() }
+
+// BackupTo writes a consistent snapshot of the database to dest
+// (AC-092). VACUUM INTO gives a self-contained file that includes the
+// WAL content, so a crash during a later write cannot lose the pre-write
+// state. It refuses to overwrite: every backup is a new file.
+func (s *Store) BackupTo(dest string) error {
+	if s.ReadOnly {
+		return core.NewError(ReasonStoreReadOnly, "store.BackupTo", "cannot back up through a read-only handle")
+	}
+	if s.Path == ":memory:" {
+		return core.NewError(ReasonStoreReadOnly, "store.BackupTo", "in-memory store has no file to back up")
+	}
+	if _, err := os.Stat(dest); err == nil {
+		return fmt.Errorf("backup target already exists: %s", dest)
+	}
+	if dir := filepath.Dir(dest); dir != "" && dir != "." {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return err
+		}
+	}
+	if _, err := s.db.Exec(`VACUUM INTO ?`, dest); err != nil {
+		return fmt.Errorf("backup to %s: %w", dest, err)
+	}
+	return nil
+}
 
 // DB exposes the raw handle for tests and diagnostics.
 func (s *Store) DB() *sql.DB { return s.db }

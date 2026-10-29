@@ -248,3 +248,38 @@ func TestDriverStopHalts(t *testing.T) {
 		t.Errorf("run-once after stop ticked: %+v calls %d -> %d", dv, calls, env.rec.CallCount())
 	}
 }
+
+// AC-105: an interrupt (cancelled context) stops the loop between turns
+// with host_interrupted and leaves the run resumable — it is not failed,
+// not completed, and no release is confirmed.
+func TestDriverRunLoopStopsOnInterrupt(t *testing.T) {
+	env := newTestEnv(t, "active")
+	env.seedTruthFrozen(t)
+	run := env.createRun(t)
+	if _, err := env.eng.DriverStart(run.RunID, DriverStartOptions{MaxTurns: 10}); err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	// Cancel before the first turn: the next loop iteration must stop.
+	cancel()
+	loop, err := env.eng.DriverRunLoop(ctx, run.RunID, 10, nil)
+	if err != nil {
+		t.Fatalf("interrupted loop must return a view, not an error: %v", err)
+	}
+	if loop.ReasonCode != core.ReasonHostInterrupted {
+		t.Errorf("reason = %q want %q", loop.ReasonCode, core.ReasonHostInterrupted)
+	}
+	if loop.Rounds != 0 {
+		t.Errorf("rounds = %d want 0 after a pre-turn interrupt", loop.Rounds)
+	}
+	if loop.AutoRelease {
+		t.Error("interrupt must never release")
+	}
+	st, err := env.eng.Status(run.RunID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if st.Status == "completed" {
+		t.Errorf("interrupted run must stay resumable, got status %q", st.Status)
+	}
+}

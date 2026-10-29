@@ -1,42 +1,78 @@
-# Feature Truth: agent-desktop-workspace
-
-> **Feature Slug**: `agent-desktop-workspace`  
-> **Version**: `v2.0.0`  
-> **Status**: `FROZEN` (2026-10-28)  
-> **Authority**: Resolver-selected Markdown Truth Package
-
+---
+slug: agent-desktop-workspace
+version: v2.0.0
+status: frozen
+language: zh
+domain_required: false
+ux_required: false
+parser_contract: beacon-feature-package-v2
+truth_source_model: feature_package_authoritative
+package_maturity: filled
+materials_status: current
+intent_confirmed: true
+canonical_refs:
+  truth: docs/beacon/v2.0.0/features/agent-desktop-workspace/truth.md
+  tests: docs/beacon/v2.0.0/features/agent-desktop-workspace/tests.md
+  tasks: docs/beacon/v2.0.0/features/agent-desktop-workspace/tasks.md
+  evidence: docs/beacon/v2.0.0/features/agent-desktop-workspace/evidence.md
 ---
 
-## 人话 (Plain Language L0)
+# Requirement Truth: agent-desktop-workspace
 
-为 Beacon Go 打造真正闭环的智能体协同桌面工作台（兼具 Web 与 Wails 跨平台桌面端能力）。
-彻底告别单列聊天框，借鉴 CopilotKit OpenMuse 与 Fei2411/DS-Bot 的顶尖交互设计：
-采用专业的三栏布局（左侧作战群与组织总览、中间参谋长协作/动态步骤进度树/人工审批卡片、右侧 Truth.md/代码Diff/机器验资证据面板）。
-数据流全面打通底层真实 Go 后端，实时展示当前仓库受管的 Feature 清单、Truth 内容以及 FSM 有限状态机执行步骤，并提供 Wails 桌面端脚手架，实现独立桌面应用交付。
+## 人话
 
----
+给本机开发者：一个原生桌面工作台，左栏是作战室，中栏是交互与步骤计划，右栏是需求真相与证据；数据全部来自真实账本，没登记就显示为空而不是编造。界面只有一种形态（Wails），不再有浏览器副本。
 
-## 核心承诺与验收标准 (Acceptance Criteria L1)
+## User Intent Snapshot
 
-### AC-DESKTOP-001: 三栏交互工作台（OpenMuse + DS-Bot 交互形态）
-* **Given**: 用户启动 Beacon UI 或桌面端。
-* **When**: 渲染工作台主界面。
-* **Then**: 
-  1. **左侧栏（Navigation & Rooms）**：展示组织角色总览（Chief of Staff / Architect / Coder / QA Verifier）以及作战室清单（如 `#默认作战室`、`#功能研发`）；
-  2. **中间栏（Main Interaction & Step Plan）**：展示与参谋长、Worker 智能体的协同对话，嵌入 OpenMuse 风格的动态步骤计划树（`Intent -> Truth -> Worktree -> Verify -> Gate`）及人工审批卡片；
-  3. **右侧栏（Workspace Context & Truth Viewer）**：提供多 Tab 切换，实时展示已选 Feature 的 `truth.md`、当前 Git 代码 Diff 以及 QA 机器验资证据（`evidence.json`）。
+```yaml
+lake_or_ocean: 湖
+language: zh
+source: user_intent
+utterance: "要一个桌面工作台，能看到真实 feature、truth 和执行步骤"
+goal: "桌面单壳渲染三栏，数据来自账本与磁盘事实，操作能真正创建 run 并返回门禁裁决"
+non_goals: "不做浏览器副本；不臆造未登记的 feature；不做第二套后端"
+constraints: "单一渲染路径；未登记项目显示空；发布按钮必须返回真实裁决"
+scope_mode: focused
+```
 
-### AC-DESKTOP-002: 真实后端数据流绑定 (Live Features & Markdown Content)
-* **Given**: 前端请求 `/api/workspace/features` 与 `/api/workspace/feature?slug=<slug>`。
-* **When**: 后端接收请求。
-* **Then**: 
-  1. 自动扫描当前工作区 `docs/beacon/<ver>/features/`，返回真实的 Feature 列表与其 FSM 状态；
-  2. 支持按 Slug 提取完整的 `truth.md`、`tests.md`、`evidence.md` 内容与机器签名摘要并渲染于右侧面板。
+## Open Questions
 
-### AC-DESKTOP-003: Wails 桌面应用工程化集成 (Desktop App Scaffold)
-* **Given**: 项目引入 Wails 桌面化规范。
-* **When**: 检查桌面端构建骨架。
-* **Then**: 
-  1. 提供 `wails.json` 桌面应用配置定义；
-  2. 在 `cmd/beacon-desktop` 或独立桌面入口提供与系统原生 Webview 绑定的初始化入口；
-  3. 将 Go 后端的能力（Features 获取、Chat 对齐、Gate 审批）作为结构化绑定接口暴露，支持编译为原生应用。
+One question at a time; a package cannot be signed while a row is open.
+Use beacon truth ask / beacon truth answer to drive this ledger.
+
+| Q ID | Question | Recommendation | Status | Answer | Source |
+|------|----------|----------------|--------|--------|--------|
+| Q1 | 用一句话说清：谁、什么问题、什么算完成？ | 先写目标与非目标，再写一条可验证的完成标准 | answered | 给本机开发者：桌面端展示真实需求包与门禁状态并能创建 run；完成=三栏可见、数据来自账本、操作有真实返回值 | human |
+
+## Intent Coverage
+
+Every AC must trace to the intent or evidence it serves.
+
+| AC ID | Intent Source | Evidence |
+|-------|---------------|----------|
+| AC-001 | 目标「桌面三栏」 | `TestShellScriptParses` |
+| AC-002 | 目标「真实账本数据流」 | `TestUnregisteredProjectIsEmptyNotInvented` |
+| AC-003 | 目标「Wails 工程化」 | `TestWailsConfigValid` |
+
+## Acceptance Criteria
+
+| AC ID | Criterion |
+|-------|-----------|
+| AC-001 | 单壳渲染三栏工作台：作战室/组织、交互与步骤计划、需求真相与证据面板 |
+| AC-002 | 数据来自账本：feature 列表与详情由 store 解析；未登记项目返回空集并标记 registered=false，不臆造内容 |
+| AC-003 | Wails 工程可复现：wails.json 完整，`desktop` 入口可构建，后端能力以结构化绑定暴露 |
+
+## FSM 五元组
+
+Not required: domain_required is false.
+
+| State | Event | Guard | To | Action |
+|-------|-------|-------|----|--------|
+
+## Parity Matrix
+
+Not required: scope_mode is focused.
+
+| Capability | Covered | Evidence |
+|------------|---------|----------|

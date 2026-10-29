@@ -1,7 +1,7 @@
 ---
 slug: p0-executor-desktop
 version: v2.0.0
-materials_status: draft
+materials_status: current
 ---
 
 # Tests: p0-executor-desktop

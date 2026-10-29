@@ -64,6 +64,9 @@ func printMigrationReport(cmd *cobra.Command, rep *migration.Report) {
 		mode = "dry-run (nothing written)"
 	}
 	fmt.Fprintf(out, "migrate v1: %s [%s]\n", rep.ProjectRoot, mode)
+	if rep.BackupPath != "" {
+		fmt.Fprintf(out, "  backup: %s\n", rep.BackupPath)
+	}
 	for _, cat := range migration.Categories {
 		n := rep.Counts[cat]
 		fmt.Fprintf(out, "  %-18s imported=%d already_present=%d skipped=%d\n",

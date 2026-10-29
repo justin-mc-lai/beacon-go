@@ -346,4 +346,17 @@ for r in results:
           "n:", r["n"], "pass:", r["pass"])
 print("results written to", out_path)
 PY
+
+# AC-095: regression gate. The baseline is the accepted comparable run; a
+# shared acceptance criterion that regressed by more than 10% blocks the P6
+# exit. Across a different OS/CPU count the gate refuses to judge
+# (comparable=false) instead of comparing two machines.
+BASELINE="${BEACON_BENCH_BASELINE:-$ROOT/bench/results-go5-baseline.json}"
+if [ -f "$BASELINE" ]; then
+  echo "== AC-095 regression gate ($BASELINE) =="
+  "$BIN" doctor bench-gate --baseline "$BASELINE" --current "$ROOT/bench/results.json"
+else
+  echo "AC-095 baseline missing: $BASELINE" >&2
+  exit 1
+fi
 echo "done."

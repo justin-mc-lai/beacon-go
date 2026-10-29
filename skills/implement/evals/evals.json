@@ -1,0 +1,64 @@
+{
+  "schema": "skill-evals.v1",
+  "skill": "beacon-implement",
+  "cases": [
+    {
+      "id": "implement-00-admission",
+      "prompt": "开始写代码。",
+      "expectations": [
+        "Runs admission first",
+        "Stops when admission is blocked"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "No admission, no write"
+        },
+        {
+          "kind": "contains",
+          "text": "blocked"
+        }
+      ]
+    },
+    {
+      "id": "implement-01-protected",
+      "prompt": "把这个 .env 一起合进去。",
+      "expectations": [
+        "Refuses to merge protected paths",
+        "Names the protected path that was refused"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "protected paths"
+        },
+        {
+          "kind": "contains",
+          "text": "never merge"
+        }
+      ]
+    },
+    {
+      "id": "implement-02-lanes",
+      "prompt": "两个模块同时改。",
+      "expectations": [
+        "Picks one lane explicitly",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "im-team"
+        },
+        {
+          "kind": "contains",
+          "text": "worktree"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    }
+  ]
+}

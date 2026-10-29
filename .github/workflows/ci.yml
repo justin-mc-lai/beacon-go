@@ -25,6 +25,12 @@ jobs:
       - name: gofmt
         if: matrix.os == 'ubuntu-latest'
         run: test -z "$(gofmt -l .)"
+      - name: AC-025 file-size guard
+        if: matrix.os == 'ubuntu-latest'
+        run: bash scripts/check_file_size.sh
+      - name: AC-095 benchmark regression gate (recorded artifacts)
+        if: matrix.os == 'ubuntu-latest'
+        run: go run ./cmd/beacon doctor bench-gate --baseline bench/results-go5-baseline.json --current bench/results-merged-full.json
 
   windows-advisory:
     # Windows is advisory until the worktree/path suite is verified on a

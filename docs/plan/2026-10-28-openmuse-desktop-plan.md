@@ -1,5 +1,9 @@
 # Beacon Agent 极简浅色桌面工作台设计方案 (OpenMuse 风格)
 
+> 实施后记（2026-10-28）：前端一度收敛为 `internal/webui/index.html`。
+> 2026-10-28 晚的「只保留桌面端」决定（`change-desktop-only.md`）随后删除了该中间层，
+> 唯一来源回到 `desktop/frontend/index.html`；本文路径仅作历史记录。
+
 > **模式**: `pln-review` / `pln-program`  
 > **设计基调**: **纯白/浅灰高亮极简风 (OpenMuse Light)** + **桌面原生应用 (Desktop Native)** + **内敛复杂度的生成式卡片**  
 > **核心哲学**: **“把复杂的 FSM 状态机、多 Agent 握手、Truth/Tests 规约为两张极简卡片：Plan 规划方案卡 ➔ Goal 确认与执行卡”**

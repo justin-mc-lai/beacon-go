@@ -563,10 +563,17 @@ func runPostReleaseInstallFollowup(homeOverride string) map[string]any {
 	}
 	out := map[string]any{"hook_id": PostReleaseInstallHookID}
 	blocked := false
-	for host, dir := range map[string]string{
-		"claude": filepath.Join(home, ".claude", "skills"),
-		"agents": filepath.Join(home, ".agents", "skills"),
-	} {
+	// Host roots come from the one table in the skills package; this
+	// hook aligns the two long-standing roots only (claude + agents),
+	// so a post-release run does not start writing into new hosts
+	// without an explicit decision.
+	for _, host := range []string{"claude", "agents"} {
+		dir, derr := skills.HostDir(host, home)
+		if derr != nil {
+			out[host] = map[string]any{"status": "blocked", "error": derr.Error()}
+			blocked = true
+			continue
+		}
 		res, err := skills.Install(dir, true)
 		if err != nil {
 			out[host] = map[string]any{"status": "blocked", "error": err.Error()}

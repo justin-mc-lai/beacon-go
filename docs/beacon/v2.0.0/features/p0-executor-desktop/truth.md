@@ -7,8 +7,8 @@ domain_required: false
 ux_required: false
 parser_contract: beacon-feature-package-v2
 truth_source_model: feature_package_authoritative
-package_maturity: draft
-materials_status: draft
+package_maturity: filled
+materials_status: current
 intent_confirmed: true
 canonical_refs:
   truth: docs/beacon/v2.0.0/features/p0-executor-desktop/truth.md

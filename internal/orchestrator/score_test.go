@@ -66,6 +66,29 @@ func writeSkill(t *testing.T, dir, name, doc string, withRef bool) string {
 	if err := os.WriteFile(p, []byte(doc), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	// Current package standard: three worked examples plus eval cases
+	// with machine checks. A "good skill" fixture must carry them,
+	// otherwise the structural score is not comparable.
+	exDir := filepath.Join(pkg, "examples")
+	if err := os.MkdirAll(exDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, n := range []string{"one.md", "two.md", "three.md"} {
+		if err := os.WriteFile(filepath.Join(exDir, n), []byte("# example\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	evDir := filepath.Join(pkg, "evals")
+	if err := os.MkdirAll(evDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	evals := `{"schema":"skill-evals.v1","skill":"` + name + `","cases":[
+{"id":"c1","prompt":"p1","expectations":["a","b"],"checks":[{"kind":"contains","text":"## HARD GATE"}]},
+{"id":"c2","prompt":"p2","expectations":["a","b"],"checks":[{"kind":"contains","text":"Never self-certify"}]},
+{"id":"c3","prompt":"p3","expectations":["a","b"],"checks":[{"kind":"min_examples","min":3}]}]}`
+	if err := os.WriteFile(filepath.Join(evDir, "evals.json"), []byte(evals), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	return p
 }
 

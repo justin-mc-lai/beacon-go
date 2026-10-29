@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -90,5 +91,72 @@ func TestResolveAPIKey(t *testing.T) {
 	got := cfg.ResolveAPIKey(ProviderOpenAI)
 	if got != "secret-val-123" {
 		t.Fatalf("expected resolved env var 'secret-val-123', got %q", got)
+	}
+}
+
+// AC-STREAM-002: StreamComplete forwards every incremental chunk to the
+// handler (at least three increments for a multi-chunk answer) and the
+// full content is the concatenation of what the provider sent.
+func TestStreamCompleteChunks(t *testing.T) {
+	body := strings.Join([]string{
+		"data: {\"choices\":[{\"delta\":{\"content\":\"退\"}}]}",
+		"data: {\"choices\":[{\"delta\":{\"content\":\"款\"}}]}",
+		"data: {\"choices\":[{\"delta\":{\"content\":\"方案\"}}]}",
+		"data: [DONE]",
+		"",
+	}, "\n")
+	doer := &mockTransport{roundTrip: func(r *http.Request) (*http.Response, error) {
+		if r.Header.Get("Accept") == "" {
+			// no-op: the client does not require Accept
+		}
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Header:     http.Header{"Content-Type": []string{"text/event-stream"}},
+			Body:       io.NopCloser(strings.NewReader(body)),
+		}, nil
+	}}
+	c := NewOpenAICompatibleClient(ProviderDeepSeek, "https://example.invalid/v1", "k")
+	c.SetDoer(doer)
+
+	var chunks []string
+	resp, err := c.StreamComplete(context.Background(), Request{
+		Model:    "deepseek-chat",
+		Messages: []Message{{Role: "user", Content: "你好"}},
+	}, func(chunk string) error {
+		chunks = append(chunks, chunk)
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(chunks) < 3 {
+		t.Fatalf("chunks = %d want at least 3 incremental deliveries", len(chunks))
+	}
+	joined := strings.Join(chunks, "")
+	if !strings.Contains(joined, "退") || !strings.Contains(joined, "方案") {
+		t.Fatalf("streamed chunks lost content: %q", joined)
+	}
+	if resp == nil || !strings.Contains(resp.Content, "方案") {
+		t.Fatalf("final response content = %+v", resp)
+	}
+}
+
+// A provider that answers with no handler must fall back to Complete and
+// still return content — streaming is an option, not a new requirement.
+func TestStreamCompleteNilHandlerFallsBack(t *testing.T) {
+	doer := &mockTransport{roundTrip: func(r *http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(bytes.NewBufferString(`{"choices":[{"message":{"content":"ok"}}]}`)),
+		}, nil
+	}}
+	c := NewOpenAICompatibleClient(ProviderOpenAI, "https://example.invalid/v1", "k")
+	c.SetDoer(doer)
+	resp, err := c.StreamComplete(context.Background(), Request{Model: "gpt", Messages: []Message{{Role: "user", Content: "hi"}}}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.Content != "ok" {
+		t.Fatalf("fallback content = %q", resp.Content)
 	}
 }

@@ -1,0 +1,64 @@
+{
+  "schema": "skill-evals.v1",
+  "skill": "beacon-truth",
+  "cases": [
+    {
+      "id": "truth-00-freeze",
+      "prompt": "这个需求可以冻了。",
+      "expectations": [
+        "Refuses to freeze with an open question",
+        "Records the intent before signing"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "Never freeze while"
+        },
+        {
+          "kind": "contains",
+          "text": "truth change"
+        }
+      ]
+    },
+    {
+      "id": "truth-01-change",
+      "prompt": "冻完之后要改 AC-003。",
+      "expectations": [
+        "Uses truth change then refreeze",
+        "Does not edit the frozen body directly"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "refreeze"
+        },
+        {
+          "kind": "contains",
+          "text": "Never edit a frozen body"
+        }
+      ]
+    },
+    {
+      "id": "truth-02-contract",
+      "prompt": "冻好了吗？",
+      "expectations": [
+        "Reports the package path and fingerprint",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "package_path"
+        },
+        {
+          "kind": "contains",
+          "text": "plain_summary"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    }
+  ]
+}

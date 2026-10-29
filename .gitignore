@@ -1,9 +1,13 @@
 bin/
 *.db
 bench/seed-store/
-bin/
 # Anchor build artifacts to the repo root: an unanchored `beacon` also
 # matched docs/beacon/, which made frozen truth packages uncommittable
 # (and therefore never a consumable baseline).
 /beacon
 /beacon-desktop
+
+# local agent state (not shipped)
+.omc/
+.workbuddy-ai/
+logs/

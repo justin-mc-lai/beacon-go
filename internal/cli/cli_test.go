@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"crypto/sha256"
+	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"os"
@@ -410,23 +411,84 @@ func TestSpineShowSingleProjectDefault(t *testing.T) {
 	}
 }
 
+// The machine verification lever must answer from the ledger and the
+// bytes on disk: a missing feature, missing QA evidence and stale
+// blobs all fail; only a real, hash-matching evidence set passes.
 func TestHarnessVerifyJSON(t *testing.T) {
-	cmd := newQAVerifyHarnessCmd()
-	cmd.SetArgs([]string{"--slug", "test-feature", "--json"})
-	buf := new(bytes.Buffer)
-	cmd.SetOut(buf)
+	seed := seedOneProject(t)
 
-	if err := cmd.Execute(); err != nil {
-		t.Fatalf("unexpected error executing verify-harness: %v", err)
+	// 1. Unknown feature: never a pass, always a reason code.
+	_, err := runCLI(t, "qa", "verify-harness", "--project", seed.projRoot, "--slug", "test-feature", "--json")
+	if err == nil {
+		t.Fatal("verifying an unknown feature must fail")
 	}
-	var res map[string]any
-	if err := json.Unmarshal(buf.Bytes(), &res); err != nil {
-		t.Fatalf("failed to parse JSON from verify-harness: %v, raw: %s", err, buf.String())
+	if rc, _ := core.ReasonCodeOf(err); rc != ReasonFeatureNotFound {
+		t.Errorf("unknown feature reason = %q (err %v)", rc, err)
 	}
-	if res["status"] != "passed" || res["slug"] != "test-feature" || res["exit_code"].(float64) != 0 {
-		t.Errorf("unexpected json result: %v", res)
+
+	// 2. Known feature with no QA evidence: blocked, exit_code 1, no hash.
+	out, err := runCLI(t, "qa", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
+	if err == nil {
+		t.Fatal("verifying a feature without QA evidence must fail")
 	}
-	if res["evidence_hash"] == "" {
-		t.Errorf("expected non-empty evidence_hash")
+	doc := parseDoc(t, out)
+	if doc["status"] != "blocked" || doc["verified"] != false || doc["exit_code"].(float64) != 1 {
+		t.Errorf("blocked verification = %v", doc)
+	}
+	if doc["evidence_hash"] != nil && doc["evidence_hash"] != "" {
+		t.Errorf("blocked verification must not carry an evidence hash: %v", doc["evidence_hash"])
+	}
+	if rc, _ := core.ReasonCodeOf(err); rc != core.ReasonStageExitQAEvidenceMiss {
+		t.Errorf("blocked reason = %q (err %v)", rc, err)
+	}
+
+	// 3. Real QA evidence + qa stage executed: passes with a real digest.
+	dbPath := seed.dbPath
+	st, err := store.Open(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer st.Close()
+	blob := filepath.Join(t.TempDir(), "qa-report.json")
+	if err := os.WriteFile(blob, []byte(`{"verdict":"pass"}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	digest := sha256.Sum256([]byte(`{"verdict":"pass"}`))
+	if _, err := st.Artifacts().Add(store.ArtifactRef{
+		RunID: seed.run.ID, Kind: "qa_report", AbsPath: blob,
+		ContentHash: hex.EncodeToString(digest[:]), SizeBytes: 17,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := st.AppendEvent(store.LifecycleEvent{
+		FeatureID: seed.feature.ID, RunID: sql.NullString{String: seed.run.ID, Valid: true}, EventType: "stage_executed",
+		Payload: []byte(`{"stage":"qa","outcome":"succeeded"}`),
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	out, err = runCLI(t, "qa", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
+	if err != nil {
+		t.Fatalf("verifying real QA evidence must pass: %v\n%s", err, out)
+	}
+	doc = parseDoc(t, out)
+	if doc["status"] != "passed" || doc["verified"] != true || doc["exit_code"].(float64) != 0 {
+		t.Errorf("passing verification = %v", doc)
+	}
+	hash, _ := doc["evidence_hash"].(string)
+	if len(hash) != 64 {
+		t.Errorf("evidence hash = %q want a real sha256 hex digest", hash)
+	}
+
+	// 4. Editing the blob after registration turns the same answer stale.
+	if err := os.WriteFile(blob, []byte(`{"verdict":"tampered"}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	out, err = runCLI(t, "qa", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
+	if err == nil {
+		t.Fatalf("a tampered evidence blob must fail verification:\n%s", out)
+	}
+	if rc, _ := core.ReasonCodeOf(err); rc != core.ReasonQAArtifactStale {
+		t.Errorf("stale reason = %q (err %v)", rc, err)
 	}
 }

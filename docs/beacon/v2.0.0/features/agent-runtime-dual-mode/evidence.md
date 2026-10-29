@@ -1,15 +1,29 @@
 # Evidence Index: agent-runtime-dual-mode
 
-> **Feature Slug**: `agent-runtime-dual-mode`  
-> **Version**: `v2.0.0`
+## Evidence Index
 
----
+| Surface | Authority | Canonical Artifact | Status | Route |
+|---------|-----------|--------------------|--------|-------|
+| truth | requirement_truth | truth.md | frozen | truth |
+| tests | test_truth | tests.md | frozen | qa |
 
-## 证据链索 (Evidence Trail)
+## Verification Log
 
-| 阶段 | 交付工件 | 生成时间 | 机器校验哈希 |
-|---|---|---|---|
-| **Freeze Truth** | `truth.md`, `tests.md`, `tasks.md` | 2026-10-27T21:28:00Z | `f58c7329...` (Initial Spec Frozen) |
-| **Implement** | `.beacon/evidence/implement/agent-runtime-dual-mode/` | Pending | Pending |
-| **QA Verification** | `.beacon/evidence/qa/agent-runtime-dual-mode/report.json` | Pending | Pending |
-| **Release Verdict** | `.beacon/evidence/release/agent-runtime-dual-mode/verdict.json` | Pending | Pending |
+Every row was executed by the whole Go test suite; the command is the exact
+`-run` selector. No row is a hand-written hash.
+
+| AC | Test | Result |
+|----|------|--------|
+| AC-001 | `TestLLMClientFactory` | PASS |
+| AC-002 | `TestChiefOfStaffIndirectPrompt` | PASS |
+| AC-003 | `TestMultiAgentPipelineRolesAndGate` | PASS |
+| AC-004 | `TestHarnessVerifyJSON` | PASS |
+| AC-005 | `TestSingleSurface` | PASS |
+| AC-006 | `TestFSMTransitionEvidenceGuard` | PASS |
+
+Whole-suite state: the full test suite passes, go vet is clean,
+gofmt reports nothing.
+
+## 2026-10-29 复核
+
+冻结后复核：证据表引用的测试均在当前仓库存在并通过；材料状态随冻结归位 current。

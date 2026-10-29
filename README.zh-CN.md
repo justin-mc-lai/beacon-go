@@ -10,9 +10,10 @@ Beacon Go 是 Beacon 内核的 Go 语言重构版。它保留 Python 版 Beacon 
 自己排阶段、在硬门禁下逐步推进、断了能续跑，并且永远不能绕过独立
 检查者和人工确认自称完成。
 
-当前版本：**v2.0.0-go.9** · 327 个行为级测试 · 端到端全链跑通。
-go.9 补齐了对 Python v1.6.19 对等审计查出的 26 条高/中缺口
-（报告见 `docs/parity-audit-python-v16.md`）。
+当前版本：**v2.0.0-go.10** · 407 个行为级测试 · 端到端全链跑通。
+go.10 收口了 2026-10-29 全仓审查（报告见
+`docs/changes/change-audit-2026-10-29.md`）：验资杠杆改为真校验、
+Go 账本独立成文件、冻结包与代码对齐。
 
 ## 为什么重构
 
@@ -109,13 +110,13 @@ beacon skills list
 beacon skills show truth
 ```
 
-运行状态只存一个全局 SQLite 数据库（`~/.beacon/beacon.db`，WAL
+运行状态只存一个全局 SQLite 数据库（`~/.beacon/beacon-go.db`，WAL
 模式）。需求真相永不进库，只住在
 `docs/beacon/<版本>/features/<slug>/` 下的 Markdown 包里。
 
 ## 验证情况
 
-- `go test ./...`——327 个行为级测试全过。
+- `go test ./...`——407 个行为级测试全过。
 - [`e2e/run_e2e.sh`](e2e/run_e2e.sh)——真二进制全链剧本（注册 →
   建包 → 冻结 → 提交基线 → 真执行器干活 → 司机推进 → 四门评估 →
   挂检查者 → 完工），15 步，退出码 0。

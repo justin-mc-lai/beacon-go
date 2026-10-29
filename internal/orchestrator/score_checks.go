@@ -6,6 +6,7 @@
 package orchestrator
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -140,12 +141,13 @@ func structuralItems(fm map[string]string, fmOK bool, body, raw, pkgDir string) 
 	default:
 		add("frontmatter_identity", 0, 2, true, "name and description both missing")
 	}
-	// name_matches_package.
+	// name_matches_package: the package directory, or its installed
+	// host name beacon-<dir> (Scheme A install convention).
 	base := filepath.Base(pkgDir)
 	switch {
 	case name == "":
 		add("name_matches_package", 0, 1, true, "no frontmatter name to match against the package directory "+base)
-	case name == base:
+	case name == base || name == "beacon-"+base:
 		add("name_matches_package", 1, 1, true, "frontmatter name matches package directory")
 	default:
 		add("name_matches_package", 0, 1, true, "frontmatter name "+name+" != package directory "+base)
@@ -225,7 +227,142 @@ func structuralItems(fm map[string]string, fmOK bool, body, raw, pkgDir string) 
 			add("references_resolve", 0, 2, true, "no referenced path resolves: "+strings.Join(missing, ", "))
 		}
 	}
+	// evals: the package must carry machine-checkable eval cases.
+	// Structural only — it verifies the skill *states* the rules its
+	// cases expect. Whether a model obeys them needs a run and stays
+	// a human grade (the effectiveness dimension).
+	items = append(items, evalsItems(pkgDir, body)...)
 	return items
+}
+
+// ---- evals (structural half) ----
+
+type evalCheck struct {
+	Kind string `json:"kind"` // contains | references_contains | min_examples
+	Text string `json:"text,omitempty"`
+	Min  int    `json:"min,omitempty"`
+}
+
+type evalCase struct {
+	ID           string      `json:"id"`
+	Prompt       string      `json:"prompt"`
+	Expectations []string    `json:"expectations"`
+	Checks       []evalCheck `json:"checks"`
+}
+
+type evalSet struct {
+	Schema string     `json:"schema"`
+	Skill  string     `json:"skill"`
+	Cases  []evalCase `json:"cases"`
+}
+
+// evalsItems scores evals/evals.json: presence, case depth, and
+// whether every machine check passes against the package bytes.
+func evalsItems(pkgDir, body string) []ScoreItem {
+	raw, err := os.ReadFile(filepath.Join(pkgDir, "evals", "evals.json"))
+	if err != nil {
+		return []ScoreItem{{
+			Check: "evals_present", Points: 0, MaxPoints: 3, Applicable: true,
+			Detail: "no evals/evals.json (a skill without eval cases cannot be checked for drift)",
+		}}
+	}
+	var set evalSet
+	if err := json.Unmarshal(raw, &set); err != nil || set.Schema != "skill-evals.v1" {
+		return []ScoreItem{{
+			Check: "evals_present", Points: 0, MaxPoints: 3, Applicable: true,
+			Detail: "evals/evals.json does not parse as skill-evals.v1",
+		}}
+	}
+	items := []ScoreItem{{
+		Check: "evals_present", Points: 3, MaxPoints: 3, Applicable: true,
+		Detail: fmt.Sprintf("evals/evals.json parses (%d cases)", len(set.Cases)),
+	}}
+
+	// Depth: >= 3 cases, each with id, prompt and >= 2 expectations.
+	thin := []string{}
+	for _, c := range set.Cases {
+		if strings.TrimSpace(c.ID) == "" || strings.TrimSpace(c.Prompt) == "" || len(c.Expectations) < 2 {
+			thin = append(thin, c.ID)
+		}
+	}
+	switch {
+	case len(set.Cases) >= 3 && len(thin) == 0:
+		items = append(items, ScoreItem{Check: "evals_cases", Points: 3, MaxPoints: 3, Applicable: true,
+			Detail: fmt.Sprintf("%d cases, each with id/prompt/2+ expectations", len(set.Cases))})
+	case len(set.Cases) > 0:
+		items = append(items, ScoreItem{Check: "evals_cases", Points: 1, MaxPoints: 3, Applicable: true,
+			Detail: fmt.Sprintf("%d cases; thin or incomplete: %s", len(set.Cases), strings.Join(thin, ", "))})
+	default:
+		items = append(items, ScoreItem{Check: "evals_cases", Points: 0, MaxPoints: 3, Applicable: true,
+			Detail: "no cases"})
+	}
+
+	// Machine checks: every assertion must hold against the package.
+	var failed []string
+	total := 0
+	for _, c := range set.Cases {
+		for _, chk := range c.Checks {
+			total++
+			if ok, why := evalCheckPasses(chk, pkgDir, body); !ok {
+				failed = append(failed, c.ID+":"+why)
+			}
+		}
+	}
+	switch {
+	case total == 0:
+		items = append(items, ScoreItem{Check: "evals_checks_pass", Points: 0, MaxPoints: 4, Applicable: true,
+			Detail: "no machine checks declared (expectations alone cannot be scored without a model run)"})
+	case len(failed) == 0:
+		items = append(items, ScoreItem{Check: "evals_checks_pass", Points: 4, MaxPoints: 4, Applicable: true,
+			Detail: fmt.Sprintf("all %d machine checks pass", total)})
+	default:
+		items = append(items, ScoreItem{Check: "evals_checks_pass", Points: 0, MaxPoints: 4, Applicable: true,
+			Detail: "failing checks: " + strings.Join(failed, "; ")})
+	}
+	return items
+}
+
+// evalCheckPasses runs one machine check. It answers a narrow question:
+// does the package state/contain what the case expects?
+func evalCheckPasses(chk evalCheck, pkgDir, body string) (bool, string) {
+	switch chk.Kind {
+	case "contains":
+		if strings.Contains(strings.ToLower(body), strings.ToLower(chk.Text)) {
+			return true, ""
+		}
+		return false, "body lacks " + chk.Text
+	case "references_contains":
+		refs := filepath.Join(pkgDir, "references")
+		found := false
+		_ = filepath.Walk(refs, func(p string, info os.FileInfo, err error) error {
+			if err != nil || info.IsDir() {
+				return nil
+			}
+			if b, rerr := os.ReadFile(p); rerr == nil &&
+				strings.Contains(strings.ToLower(string(b)), strings.ToLower(chk.Text)) {
+				found = true
+			}
+			return nil
+		})
+		if found {
+			return true, ""
+		}
+		return false, "references lack " + chk.Text
+	case "min_examples":
+		n := 0
+		_ = filepath.Walk(filepath.Join(pkgDir, "examples"), func(p string, info os.FileInfo, err error) error {
+			if err == nil && !info.IsDir() {
+				n++
+			}
+			return nil
+		})
+		if n >= chk.Min {
+			return true, ""
+		}
+		return false, fmt.Sprintf("%d examples < %d", n, chk.Min)
+	default:
+		return false, "unknown check kind " + chk.Kind
+	}
 }
 
 var scoreAdvice = map[string]string{
@@ -237,4 +374,7 @@ var scoreAdvice = map[string]string{
 	"hard_gate_declared":     "Declare the non-negotiable rules under a HARD GATE section (the Beacon skill-package standard).",
 	"progressive_disclosure": "Move detail out of SKILL.md into references/ so the entry document stays lean (progressive disclosure).",
 	"references_resolve":     "Fix or remove the references that do not resolve to files inside the package.",
+	"evals_present":          "Add evals/evals.json (schema skill-evals.v1): test prompts with expectations and machine checks.",
+	"evals_cases":            "Give the package at least three eval cases, each with an id, a prompt and two or more expectations.",
+	"evals_checks_pass":      "Fix the machine checks: every case must assert something the package actually states (contains / references_contains / min_examples).",
 }

@@ -38,6 +38,28 @@ func writeCLISkill(t *testing.T) string {
 	if err := os.WriteFile(p, []byte(cliGoodSkill), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	// A well-formed package carries worked examples and eval cases;
+	// without them the structural score is not a full 100 any more.
+	exDir := filepath.Join(pkg, "examples")
+	if err := os.MkdirAll(exDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, n := range []string{"one.md", "two.md", "three.md"} {
+		if err := os.WriteFile(filepath.Join(exDir, n), []byte("# example\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	evDir := filepath.Join(pkg, "evals")
+	if err := os.MkdirAll(evDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	evals := `{"schema":"skill-evals.v1","skill":"cli-skill","cases":[
+{"id":"c1","prompt":"p1","expectations":["a","b"],"checks":[{"kind":"contains","text":"## HARD GATE"}]},
+{"id":"c2","prompt":"p2","expectations":["a","b"],"checks":[{"kind":"contains","text":"Never self-certify"}]},
+{"id":"c3","prompt":"p3","expectations":["a","b"],"checks":[{"kind":"min_examples","min":3}]}]}`
+	if err := os.WriteFile(filepath.Join(evDir, "evals.json"), []byte(evals), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	return p
 }
 

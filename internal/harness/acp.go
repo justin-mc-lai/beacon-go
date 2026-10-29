@@ -28,15 +28,19 @@ import (
 //   - report how far the handshake got: StoppedAt names the step
 //     that failed ("initialize" or "session/new").
 //
-// What is NOT implemented: session/prompt, session lifecycle,
-// reverse requests (fs/terminal/permission), any iteration.
-// AcpBackend therefore does NOT satisfy AC-046 (a real integration
-// iteration) and never claims to: its Iterate refuses with
-// acp_full_backend_not_supported. A real session/prompt iteration
-// needs a real ACP agent binary to verify against; that is a P6
-// external-verification item (see the p4c report). No "supports
-// ACP" claim exists anywhere on this surface — the probe result
-// says probe, the CLI says probe, the view says probe.
+// What the probe does NOT cover: reverse requests
+// (fs/terminal/permission) and session lifecycle beyond the first
+// prompt. The probe result itself remains a probe — FullBackend is
+// always false, and no "supports ACP" claim exists on this surface.
+//
+// session/prompt has a real implementation in acp_session.go:
+// RunACPSession opens a session, sends one prompt and maps the agent's
+// own answer onto the AC-042 result schema. AC-046 asks for an
+// integration iteration against a REAL ACP agent binary, and this
+// repository has no such target, so that evidence is still
+// outstanding: the implementation can only be proven against a real
+// agent, and until one is available the honest state is "implemented,
+// not yet proven against a real target".
 
 // ACPProbeResult is the probe's evidence record.
 type ACPProbeResult struct {
@@ -146,6 +150,10 @@ func ProbeACP(ctx context.Context, argv []string, timeout time.Duration) (ACPPro
 	runCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 	cmd := exec.CommandContext(runCtx, resolved, argv[1:]...)
+	// Bound the wait: a killed target may leave a child holding the
+	// stdout pipe open, which would otherwise block Wait for that
+	// child's whole lifetime.
+	cmd.WaitDelay = 3 * time.Second
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return res, err
@@ -283,11 +291,29 @@ func (b *AcpBackend) Name() string {
 	return "acp:" + b.argv[0]
 }
 
-// Iterate REFUSES: no ACP session iteration exists in this build.
+// Iterate drives one real ACP session against the configured target:
+// initialize, session/new, then a single session/prompt. The agent's
+// own answer becomes the iteration result.
+//
+// A missing target, a refused handshake or an unanswered prompt comes
+// back as an error with a reason code — the backend never fabricates
+// an IterationResult. The prompt is taken from the stage-context file
+// when one was handed over; otherwise it falls back to the stage name.
 func (b *AcpBackend) Iterate(ctx context.Context, req IterationRequest) (IterationResult, error) {
-	return IterationResult{}, core.NewError(core.ReasonACPNotSupported,
-		"harness.AcpBackend.Iterate",
-		"ACP session iteration is not implemented (probe level only: initialize + session/new handshake); a real iteration needs a real ACP agent target — see the p4c report's P6 list")
+	prompt := acpPromptFromContext(req.ContextPath, req.Stage)
+	res, err := RunACPSession(ctx, b.argv, prompt, req.Workdir, b.timeout)
+	if err != nil {
+		return IterationResult{}, err
+	}
+	success := res.StopReason == "" || res.StopReason == "end_turn" || res.StopReason == "stop"
+	return IterationResult{
+		Success:        success,
+		Summary:        res.Content,
+		StopSignal:     res.StopReason,
+		AgentName:      res.AgentName,
+		StdoutText:     res.Content,
+		KeyChangesMade: nil,
+	}, nil
 }
 
 // HealthCheck runs the two-step handshake probe.

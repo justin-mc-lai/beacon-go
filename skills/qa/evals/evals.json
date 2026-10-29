@@ -1,0 +1,60 @@
+{
+  "schema": "skill-evals.v1",
+  "skill": "beacon-qa",
+  "cases": [
+    {
+      "id": "qa-00-register",
+      "prompt": "验收一下。",
+      "expectations": [
+        "Registers the artifact before evaluating",
+        "Names the artifact path and its hash"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "Only registered artifacts count"
+        },
+        {
+          "kind": "contains",
+          "text": "artifacts register"
+        }
+      ]
+    },
+    {
+      "id": "qa-01-block",
+      "prompt": "过了吗？",
+      "expectations": [
+        "Reports a blocked verdict with reason codes",
+        "Does not retry silently until green"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "reason codes"
+        },
+        {
+          "kind": "contains",
+          "text": "verdict"
+        }
+      ]
+    },
+    {
+      "id": "qa-02-score",
+      "prompt": "给这个技能打个分。",
+      "expectations": [
+        "Keeps scores advisory, never a gate verdict",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "Scores never pass or block a gate"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    }
+  ]
+}

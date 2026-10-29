@@ -1,3 +1,5 @@
+> 历史分片：自 2026-10-29 起状态权威为 `docs/ac-matrix.md`；本文件可能与最新状态不同。
+
 # Beacon Go 重构 · AC 全矩阵（后半）AC-089–AC-173
 
 > 日期：2026-10-22 ｜ 范围：冻结 truth `beacon-v2-rust-kernel-redesign/truth.md` 中 AC-089 至 AC-173

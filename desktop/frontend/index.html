@@ -2,12 +2,11 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>Beacon Agent · Desktop Workspace</title>
+  <title>Beacon Agent · Workspace</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
       --bg: #f8fafc;
-      --sidebar: #ffffff;
       --card: #ffffff;
       --border: #e2e8f0;
       --border-subtle: #f1f5f9;
@@ -19,689 +18,782 @@
       --green-bg: #ecfdf5;
       --amber: #f59e0b;
       --amber-bg: #fffbeb;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
       --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
       --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
       --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; -webkit-font-smoothing: antialiased; }
-    
-    /* Desktop Header */
-    header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0.65rem 1.25rem; display: flex; align-items: center; justify-content: space-between; -webkit-app-region: drag; z-index: 20; }
+
+    header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: space-between; -webkit-app-region: drag; z-index: 20; }
     .brand { font-size: 0.95rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--primary); }
     .header-actions { display: flex; align-items: center; gap: 8px; -webkit-app-region: no-drag; }
-    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 4px 10px; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .project-pill { font-size: 0.72rem; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .project-pill.registered { color: #047857; border-color: #a7f3d0; background: var(--green-bg); }
+    .project-pill.unregistered { color: #b45309; border-color: #fde68a; background: var(--amber-bg); }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 4px 10px; font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
     .btn-ghost:hover { background: var(--bg); color: var(--text); border-color: #cbd5e1; }
-    
-    /* Layout: Sidebar + Canvas Main */
-    .app-body { display: flex; flex: 1; height: calc(100vh - 49px); overflow: hidden; }
 
-    /* Left Sidebar: Session & Context Board (DS-Bot & OpenMuse style) */
-    aside.session-sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
-    .sidebar-header { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; }
-    .sidebar-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
-    .btn-new-session { background: #f1f5f9; border: none; border-radius: 6px; padding: 4px 8px; font-size: 0.75rem; font-weight: 600; color: var(--text); cursor: pointer; }
+    .app-body { display: flex; flex: 1; height: calc(100vh - 47px); overflow: hidden; }
+
+    aside.session-sidebar { width: 244px; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+    .sidebar-header { padding: 0.75rem 0.9rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; }
+    .sidebar-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .btn-new-session { background: #f1f5f9; border: none; border-radius: 6px; padding: 4px 8px; font-size: 0.72rem; font-weight: 600; color: var(--text); cursor: pointer; }
     .btn-new-session:hover { background: #e2e8f0; }
-
-    .session-list { flex: 1; overflow-y: auto; padding: 0.75rem 0.5rem; display: flex; flex-direction: column; gap: 4px; }
-    .session-item { padding: 8px 10px; border-radius: 8px; font-size: 0.84rem; color: #334155; cursor: pointer; transition: all 0.15s; display: flex; flex-direction: column; gap: 2px; }
+    .session-list { flex: 1; overflow-y: auto; padding: 0.6rem 0.45rem; display: flex; flex-direction: column; gap: 3px; }
+    .session-item { padding: 7px 9px; border-radius: 8px; font-size: 0.82rem; color: #334155; cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
     .session-item:hover { background: #f8fafc; }
     .session-item.active { background: #eef2ff; color: var(--primary); font-weight: 600; }
-    .session-item-time { font-size: 0.7rem; color: var(--muted); font-weight: normal; }
+    .session-item-time { font-size: 0.68rem; color: var(--muted); font-weight: normal; }
 
-    .sidebar-footer { padding: 0.75rem 1rem; border-top: 1px solid var(--border-subtle); background: #fafafa; display: flex; flex-direction: column; gap: 6px; }
-    .status-pill { display: flex; align-items: center; justify-content: space-between; font-size: 0.74rem; color: var(--muted); }
-    .dot-online { width: 6px; height: 6px; background: var(--green); border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .feature-block { border-top: 1px solid var(--border-subtle); max-height: 40%; display: flex; flex-direction: column; }
+    .feature-list { overflow-y: auto; padding: 0.5rem 0.45rem; display: flex; flex-direction: column; gap: 2px; }
+    .feature-item { padding: 6px 9px; border-radius: 7px; font-size: 0.78rem; color: #334155; cursor: pointer; display: flex; justify-content: space-between; gap: 6px; }
+    .feature-item:hover { background: #f8fafc; }
+    .feature-item.active { background: #f1f5f9; color: var(--text); font-weight: 600; }
+    .feature-state { font-size: 0.66rem; color: var(--muted); flex-shrink: 0; }
+    .empty-hint { padding: 10px 12px; font-size: 0.74rem; color: var(--muted); line-height: 1.5; }
 
-    /* Main Area: Chat & Generative Flow + Sticky Bottom Input */
-    main.workspace-main { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; background: var(--bg); overflow: hidden; }
-    .stream-viewport { flex: 1; overflow-y: auto; padding: 1.5rem 2rem 1.5rem 2rem; display: flex; flex-direction: column; align-items: center; }
-    .workspace-layout { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 1.25rem; }
+    main.workspace-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .stream-viewport { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem 0; }
+    .workspace-layout { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+    .hero { text-align: center; margin: 0.5rem 0 0.25rem; }
+    .hero h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.3rem; }
+    .hero p { font-size: 0.85rem; color: var(--muted); }
+    .cards-flow { display: flex; flex-direction: column; gap: 1rem; width: 100%; padding-bottom: 1rem; }
 
-    /* Welcome Hero */
-    .hero { text-align: center; margin-top: 1rem; margin-bottom: 1.5rem; }
-    .hero h1 { font-size: 1.5rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; margin-bottom: 0.3rem; }
-    .hero p { font-size: 0.88rem; color: var(--muted); }
+    .gen-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem 1.2rem; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+    .gen-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 9px; }
+    .card-tag { font-size: 0.7rem; font-weight: 700; color: var(--primary); background: #eef2ff; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .card-tag.goal { color: #047857; background: var(--green-bg); }
+    .card-tag.error { color: #b91c1c; background: var(--red-bg); }
+    .card-title { font-size: 1rem; font-weight: 700; }
+    .card-body { font-size: 0.88rem; line-height: 1.65; color: #334155; white-space: pre-wrap; }
+    .invariants-box { background: var(--amber-bg); border: 1px solid #fef3c7; border-radius: 8px; padding: 9px 12px; font-size: 0.8rem; color: #92400e; }
+    .invariants-box ul { margin-left: 16px; line-height: 1.55; }
 
-    /* Generative Cards Container */
-    .cards-flow { display: flex; flex-direction: column; gap: 1.25rem; width: 100%; }
+    .stage-row { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; border: 1px solid var(--border); }
+    .stage-name { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .state { font-size: 0.72rem; font-weight: 600; padding: 2px 7px; border-radius: 5px; }
+    .state.done { color: #047857; background: var(--green-bg); }
+    .state.active { color: #b45309; background: var(--amber-bg); }
+    .state.pending { color: var(--muted); background: #f1f5f9; }
+    .state.blocked { color: #b91c1c; background: var(--red-bg); }
 
-    /* Card 1: Plan Analysis */
-    .gen-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px; }
-    .gen-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px; }
-    .card-tag { font-size: 0.75rem; font-weight: 700; color: var(--primary); background: #eef2ff; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
-    .card-title { font-size: 1.05rem; font-weight: 700; color: var(--text); }
-    .invariants-box { background: var(--amber-bg); border: 1px solid #fef3c7; border-radius: 8px; padding: 10px 14px; font-size: 0.84rem; color: #92400e; }
-    
-    /* Card 2: Goal Execution & QA Gate */
-    .goal-card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 14px; padding: 1.25rem; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden; }
-    .goal-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--green); }
-    .step-progress-row { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; border: 1px solid var(--border); }
-    .badge-done { color: var(--green); font-weight: 600; display: flex; align-items: center; gap: 4px; }
-
-    /* Sticky Bottom Input Bar (OpenMuse style) */
-    .bottom-input-container { width: 100%; background: linear-gradient(180deg, rgba(248, 250, 252, 0) 0%, rgba(248, 250, 252, 0.95) 25%, #f8fafc 100%); padding: 0.75rem 2rem 1.25rem 2rem; display: flex; justify-content: center; }
-    .input-wrapper { width: 100%; max-width: 800px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 0.75rem 1rem; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; gap: 8px; transition: border-color 0.2s, box-shadow 0.2s; }
-    .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12); }
-    .input-row { display: flex; align-items: center; gap: 8px; }
-    textarea { width: 100%; border: none; outline: none; resize: none; font-size: 0.92rem; font-family: inherit; color: var(--text); height: 44px; line-height: 1.45; background: transparent; }
-    textarea::placeholder { color: #94a3b8; }
-    .input-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 6px; }
-    .hint { font-size: 0.75rem; color: var(--muted); }
-    .btn-primary { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 6px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
+    .row-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 2px; }
+    .btn-primary { background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 7px 15px; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
     .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 7px 15px; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+    .meta-line { font-size: 0.72rem; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+    .verdict { border-radius: 8px; padding: 9px 12px; font-size: 0.8rem; line-height: 1.55; }
+    .verdict.pass { background: var(--green-bg); border: 1px solid #a7f3d0; color: #065f46; }
+    .verdict.block { background: var(--red-bg); border: 1px solid #fecaca; color: #991b1b; }
+    .verdict ul { margin-left: 16px; }
 
-    /* Settings Modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 50; }
-    .modal { background: var(--card); width: 100%; max-width: 560px; border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; }
-    .modal-header { padding: 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .modal-header h3 { font-size: 1.05rem; font-weight: 700; color: var(--text); }
-    .modal-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; max-height: 70vh; overflow-y: auto; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-label { font-size: 0.82rem; font-weight: 600; color: #334155; }
-    .form-select, .form-input { border: 1px solid var(--border); background: var(--bg); border-radius: 8px; padding: 8px 12px; font-size: 0.88rem; color: var(--text); outline: none; }
+    .bottom-input-container { width: 100%; background: linear-gradient(180deg, rgba(248,250,252,0) 0%, rgba(248,250,252,0.95) 25%, #f8fafc 100%); padding: 0.6rem 1.5rem 1rem; display: flex; justify-content: center; }
+    .input-wrapper { width: 100%; max-width: 780px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 0.7rem 0.9rem; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; gap: 7px; transition: border-color 0.2s, box-shadow 0.2s; }
+    .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+    textarea { width: 100%; border: none; outline: none; resize: none; font-size: 0.9rem; font-family: inherit; color: var(--text); height: 42px; line-height: 1.45; background: transparent; }
+    textarea::placeholder { color: #94a3b8; }
+    .input-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 6px; gap: 10px; }
+    .hint { font-size: 0.72rem; color: var(--muted); }
+
+    aside.inspector-pane { width: 320px; background: var(--card); border-left: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+    .inspector-head { padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--border-subtle); }
+    .inspector-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .inspector-slug { font-size: 0.8rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 3px; color: var(--text); word-break: break-all; }
+    .tab-bar { display: flex; gap: 2px; padding: 0.5rem 0.6rem 0; border-bottom: 1px solid var(--border-subtle); }
+    .tab { font-size: 0.74rem; padding: 5px 9px; border-radius: 6px 6px 0 0; color: var(--muted); cursor: pointer; border: 1px solid transparent; border-bottom: none; }
+    .tab.active { color: var(--text); background: var(--bg); border-color: var(--border); font-weight: 600; }
+    .doc-view { flex: 1; overflow: auto; padding: 0.75rem 0.9rem; font-size: 0.76rem; line-height: 1.6; color: #334155; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .gate-row { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px dashed var(--border-subtle); font-size: 0.75rem; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); display: none; align-items: center; justify-content: center; z-index: 50; }
+    .modal { background: var(--card); width: 100%; max-width: 520px; border-radius: 14px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; }
+    .modal-header { padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { font-size: 1rem; font-weight: 700; }
+    .modal-body { padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 1rem; max-height: 70vh; overflow-y: auto; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 0.78rem; font-weight: 600; color: #334155; }
+    .form-select, .form-input { border: 1px solid var(--border); background: var(--bg); border-radius: 8px; padding: 7px 11px; font-size: 0.84rem; color: var(--text); outline: none; }
     .form-select:focus, .form-input:focus { border-color: var(--primary); }
-    .modal-footer { padding: 1rem 1.25rem; border-top: 1px solid var(--border); background: #f8fafc; display: flex; justify-content: flex-end; gap: 8px; }
+    .modal-footer { padding: 0.9rem 1.2rem; border-top: 1px solid var(--border); background: var(--bg); display: flex; justify-content: flex-end; gap: 8px; }
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
-      <span style="color: var(--primary); font-size: 1.2rem;">⚡</span>
+      <span class="brand-dot"></span>
       <span id="txtAppTitle">Beacon Agent · Workspace</span>
     </div>
     <div class="header-actions">
+      <span class="project-pill" id="projectPill">loading workspace…</span>
       <button class="btn-ghost" onclick="toggleLang()" id="btnLang">English</button>
-      <button class="btn-ghost" onclick="openSettings()" id="btnSettings">⚙️ 设置 / Settings</button>
+      <button class="btn-ghost" onclick="openSettings()" id="btnSettings">设置</button>
     </div>
   </header>
 
   <div class="app-body">
-    <!-- Left Session Sidebar (OpenMuse Threads & DS-Bot Sessions) -->
     <aside class="session-sidebar" id="nav-pane">
       <div class="sidebar-header">
-        <span class="sidebar-title" id="txtSessionTitle">会话看板 (Sessions)</span>
-        <button class="btn-new-session" onclick="startNewSession()">+ 新建</button>
+        <span class="sidebar-title" id="txtSessionTitle">会话</span>
+        <button class="btn-new-session" onclick="startNewSession()" id="btnNewSession">+ 新建</button>
       </div>
+      <div class="session-list" id="sessionList"></div>
 
-      <div class="session-list" id="sessionList">
-        <div class="session-item active" onclick="switchSession(0)">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span>微信退款幂等方案</span>
-            <span style="font-size:0.7rem; color:#10b981;">[Active]</span>
-          </div>
-          <span class="session-item-time">今天 14:10 · 2 个生成卡片</span>
+      <div class="feature-block">
+        <div class="sidebar-header">
+          <span class="sidebar-title" id="txtFeatureTitle">需求包</span>
+          <span class="feature-state" id="featureCount"></span>
         </div>
-        <div class="session-item" onclick="switchSession(1)">
-          <div>用户积分商城重构</div>
-          <span class="session-item-time">昨天 18:32 · 已验收闭环</span>
-        </div>
-      </div>
-
-      <div class="sidebar-footer">
-        <div class="status-pill">
-          <span><span class="dot-online"></span>OpenCodex 本地网关</span>
-          <span style="font-family:monospace;">:10100</span>
-        </div>
-        <div class="status-pill">
-          <span>参谋长对齐模型</span>
-          <span style="font-family:monospace; color:var(--primary);">deepseek</span>
+        <div class="feature-list" id="featureList">
+          <div class="empty-hint" id="featureEmpty">尚未注册需求包</div>
         </div>
       </div>
     </aside>
 
-    <!-- Main Workspace -->
     <main class="workspace-main">
       <div class="stream-viewport" id="streamViewport">
         <div class="workspace-layout">
-          
-          <!-- Hidden Anchors to satisfy layout test assertions -->
-          <div id="step-plan-container" class="step-plan-container" style="display:none;"></div>
-          <div id="inspector-pane" class="inspector-pane" style="display:none;"></div>
-
-          <!-- Hero -->
           <div class="hero">
             <h1 id="txtHeroTitle">把一个想法，稳稳交付为真实代码</h1>
-            <p id="txtHeroSubtitle">基于需求真相与严谨状态机 · 复杂度内敛 · 极简方案对齐与验收</p>
+            <p id="txtHeroSubtitle">需求真相冻结 · 状态机推进 · 机器验资后人工放行</p>
           </div>
-
-          <!-- Generative Cards Flow -->
-          <div class="cards-flow" id="cardsFlow">
-            <!-- Dynamically injected Plan & Goal cards -->
-          </div>
-
+          <div class="cards-flow" id="cardsFlow"></div>
         </div>
       </div>
 
-      <!-- OpenMuse Sticky Bottom Input Pill -->
       <div class="bottom-input-container">
         <div class="input-wrapper">
           <div class="input-row">
-            <textarea id="promptInput" placeholder="描述你想要实现的需求或功能，例如：新增微信支付退款，支持订单原路返还并处理回调幂等..." onkeydown="handleKeyDown(event)"></textarea>
+            <textarea id="promptInput" placeholder="描述你想要实现的需求，例如：新增微信支付退款，支持原路返还并处理回调幂等…" onkeydown="handleKeyDown(event)"></textarea>
           </div>
           <div class="input-footer">
-            <span class="hint" id="txtInputHint">回车换行 · 参谋长将自动分析边界并生成立项方案</span>
-            <button class="btn-primary" onclick="runPlan()" id="btnRunPlan">
-              <span>🚀 方案分析 (Plan)</span>
-            </button>
+            <span class="hint" id="txtInputHint">⌘/Ctrl + Enter 发送 · 参谋长只做需求对齐，不动代码</span>
+            <button class="btn-primary" onclick="runPlan()" id="btnRunPlan">方案分析</button>
           </div>
         </div>
       </div>
     </main>
+
+    <aside class="inspector-pane" id="inspector-pane">
+      <div class="inspector-head">
+        <div class="inspector-title" id="txtInspectorTitle">上下文</div>
+        <div class="inspector-slug" id="inspectorSlug">未选择需求包</div>
+      </div>
+      <div class="tab-bar" id="inspectorTabs" style="display:none;">
+        <div class="tab active" data-tab="truth" onclick="switchTab('truth')">truth.md</div>
+        <div class="tab" data-tab="tests" onclick="switchTab('tests')">tests.md</div>
+        <div class="tab" data-tab="gates" onclick="switchTab('gates')">门禁</div>
+      </div>
+      <div class="doc-view" id="inspectorBody">从左侧选择一个需求包，这里显示它的真实需求正文与门禁结论。</div>
+    </aside>
   </div>
 
-  <!-- Settings Modal (BYOK & Multi-Agent Models) -->
   <div class="modal-overlay" id="settingsModal">
     <div class="modal">
       <div class="modal-header">
-        <h3 id="txtModalTitle">系统与模型设置 (Settings)</h3>
-        <button class="btn-ghost" onclick="closeSettings()" style="padding: 2px 8px;">✕</button>
+        <h3 id="txtModalTitle">系统与模型设置</h3>
+        <button class="btn-ghost" onclick="closeSettings()" style="padding: 2px 8px;">关闭</button>
       </div>
       <div class="modal-body">
-        
-        <!-- Language -->
         <div class="form-group">
-          <label class="form-label" id="txtFormLang">界面语言 (Language)</label>
+          <label class="form-label">界面语言</label>
           <select class="form-select" id="selectLang" onchange="applyLang(this.value)">
-            <option value="zh">简体中文 (Chinese)</option>
-            <option value="en">English (US)</option>
+            <option value="zh">简体中文</option>
+            <option value="en">English</option>
           </select>
         </div>
-
-        <!-- BYOK Provider -->
         <div class="form-group">
-          <label class="form-label">BYOK 模型中转网关 (Provider Endpoint)</label>
-          <input type="text" class="form-input" id="cfgBaseUrl" value="http://127.0.0.1:10100/v1" placeholder="http://127.0.0.1:10100/v1">
-          <span style="font-size:0.75rem; color:#10b981;">● 已配置为 OpenCodex 本地转发网关</span>
+          <label class="form-label">BYOK 网关地址 (OpenAI 兼容)</label>
+          <input type="text" class="form-input" id="cfgBaseUrl" placeholder="http://127.0.0.1:10100/v1">
         </div>
-
-        <!-- Role Models -->
         <div class="form-group">
-          <label class="form-label">参谋长默认模型 (Chief of Staff - Intent Alignment)</label>
-          <select class="form-select" id="modelChief">
-            <option value="deepseek/deepseek-chat" selected>deepseek/deepseek-chat (OpenCodex)</option>
-            <option value="claude-3-7-sonnet">claude-3-7-sonnet (Anthropic)</option>
-            <option value="gpt-4o">gpt-4o (OpenAI)</option>
-          </select>
+          <label class="form-label">参谋长模型</label>
+          <input type="text" class="form-input" id="modelChief" placeholder="deepseek-chat">
         </div>
-
         <div class="form-group">
-          <label class="form-label">需求真相官模型 (Architect - Truth.md & Spec)</label>
-          <select class="form-select" id="modelArchitect">
-            <option value="deepseek/deepseek-chat" selected>deepseek/deepseek-chat (OpenCodex)</option>
-            <option value="deepseek-reasoner">deepseek-reasoner (DeepSeek R1)</option>
-            <option value="o3-mini">o3-mini (OpenAI)</option>
-          </select>
+          <label class="form-label">架构师模型</label>
+          <input type="text" class="form-input" id="modelArchitect" placeholder="deepseek-reasoner">
         </div>
-
         <div class="form-group">
-          <label class="form-label">码农与质检模型 (Coder & QA Verifier)</label>
-          <select class="form-select" id="modelCoder">
-            <option value="deepseek/deepseek-chat" selected>deepseek/deepseek-chat (OpenCodex)</option>
-            <option value="claude-3-5-sonnet">claude-3-5-sonnet (Anthropic)</option>
-          </select>
+          <label class="form-label">编码 / 质检模型</label>
+          <input type="text" class="form-input" id="modelCoder" placeholder="claude-3-5-sonnet">
         </div>
-
       </div>
       <div class="modal-footer">
-        <button class="btn-ghost" onclick="closeSettings()" id="btnCancel">取消</button>
-        <button class="btn-primary" onclick="saveSettings()" id="btnSave">保存设置</button>
+        <button class="btn-outline" onclick="closeSettings()" id="btnCancel">取消</button>
+        <button class="btn-primary" onclick="saveSettings()" id="btnSave">保存</button>
       </div>
     </div>
   </div>
 
   <script>
-    let currentLang = 'zh';
-
     const i18n = {
       zh: {
         appTitle: "Beacon Agent · Workspace",
-        btnLang: "English",
-        btnSettings: "⚙️ 设置 / Settings",
-        sessionTitle: "会话看板 (Sessions)",
+        sessions: "会话", newSession: "新建",
+        features: "需求包",
         heroTitle: "把一个想法，稳稳交付为真实代码",
-        heroSubtitle: "基于需求真相与严谨状态机 · 复杂度内敛 · 极简方案对齐与验收",
-        inputPlaceholder: "描述你想要实现的需求或功能，例如：新增微信支付退款，支持订单原路返还并处理回调幂等...",
-        inputHint: "回车换行 · 参谋长将自动分析边界并生成立项方案",
-        btnRunPlan: "🚀 方案分析 (Plan)",
-        modalTitle: "系统与模型设置 (Settings)",
-        formLang: "界面语言 (Language)",
-        cancel: "取消",
-        save: "保存设置",
-        cardPlanTag: "立项方案分析 (PLAN BRIEF)",
-        btnExecuteGoal: "▶️ 确认方案，执行研发 (Goal)",
-        cardGoalTag: "研发闭环与验收 (GOAL EXECUTION)",
-        btnApproveRelease: "🚀 验收合格，放行发布 (Approve)"
+        heroSubtitle: "需求真相冻结 · 状态机推进 · 机器验资后人工放行",
+        placeholder: "描述你想要实现的需求，例如：新增微信支付退款，支持原路返还并处理回调幂等…",
+        hint: "⌘/Ctrl + Enter 发送 · 参谋长只做需求对齐，不动代码",
+        runPlan: "方案分析",
+        settings: "设置", save: "保存", cancel: "取消",
+        inspector: "上下文", noSelection: "未选择需求包",
+        inspectorEmpty: "从左侧选择一个需求包，这里显示它的真实需求正文与门禁结论。",
+        noFeatures: "尚未注册需求包",
+        planTag: "方案分析", goalTag: "目标运行", errorTag: "失败",
+        execute: "创建目标运行", approve: "评估发布门禁",
+        advance: "推进一步", selectExecutor: "执行器", unavailable: "（不可用）",
+        degraded: "模型未返回结构化字段，风险与边界留空（不编造）",
+        reasoning: "参谋长正在对齐需求…"
       },
       en: {
         appTitle: "Beacon Agent · Workspace",
-        btnLang: "简体中文",
-        btnSettings: "⚙️ Settings",
-        sessionTitle: "Sessions & Threads",
-        heroTitle: "Deliver Ideas Into Verified Code Safely",
-        heroSubtitle: "Truth-First Engineering · Hidden Complexity · Minimal Plan & Goal Verification",
-        inputPlaceholder: "Describe your requirement, e.g., Add WeChat refund support with idempotency verification...",
-        inputHint: "Press Enter to add lines · Chief of Staff analyzes boundaries into a plan",
-        btnRunPlan: "🚀 Plan Analysis",
-        modalTitle: "System & Model Settings",
-        formLang: "Interface Language",
-        cancel: "Cancel",
-        save: "Save Settings",
-        cardPlanTag: "PLAN PROPOSAL BRIEF",
-        btnExecuteGoal: "▶️ Approve Plan & Run Goal",
-        cardGoalTag: "GOAL EXECUTION & QA",
-        btnApproveRelease: "🚀 Release to Production (Approve)"
+        sessions: "Sessions", newSession: "New",
+        features: "Packages",
+        heroTitle: "Deliver an idea as verified code",
+        heroSubtitle: "Frozen truth · staged run · human release after machine evidence",
+        placeholder: "Describe the requirement, e.g. add WeChat refunds with idempotent callbacks…",
+        hint: "Cmd/Ctrl + Enter to send · the Chief of Staff aligns intent only",
+        runPlan: "Analyze",
+        settings: "Settings", save: "Save", cancel: "Cancel",
+        inspector: "Context", noSelection: "No package selected",
+        inspectorEmpty: "Select a package on the left to read its real truth and gate verdicts.",
+        noFeatures: "No packages registered yet",
+        planTag: "Plan brief", goalTag: "Goal run", errorTag: "Failed",
+        execute: "Create goal run", approve: "Evaluate release gate",
+        advance: "Advance one step", selectExecutor: "Executor", unavailable: "(unavailable)",
+        degraded: "The model returned no structured fields; risks and boundaries stay empty (nothing invented).",
+        reasoning: "Chief of Staff is aligning intent…"
       }
     };
+    let currentLang = "zh";
+    let currentSessionId = "";
+    let currentSlug = "";
+    let currentRunId = "";
+    let lastPrompt = "";
+    let activeStream = null;
+    let activeTab = "truth";
+    let inspectorCache = null;
+
+    function t() { return i18n[currentLang]; }
+
+    async function invoke(method, ...args) {
+      if (!(window.go && window.go.main && window.go.main.App)) {
+        throw new Error("desktop bridge unavailable — launch this window with `beacon ui`");
+      }
+      return await window.go.main.App[method](...args);
+    }
 
     function applyLang(lang) {
       currentLang = lang;
-      const dict = i18n[lang];
-      document.getElementById('btnLang').textContent = dict.btnLang;
-      document.getElementById('btnSettings').textContent = dict.btnSettings;
-      document.getElementById('txtSessionTitle').textContent = dict.sessionTitle;
-      document.getElementById('txtHeroTitle').textContent = dict.heroTitle;
-      document.getElementById('txtHeroSubtitle').textContent = dict.heroSubtitle;
-      document.getElementById('promptInput').placeholder = dict.inputPlaceholder;
-      document.getElementById('txtInputHint').textContent = dict.inputHint;
-      document.getElementById('btnRunPlan').innerHTML = `<span>${dict.btnRunPlan}</span>`;
-      document.getElementById('txtModalTitle').textContent = dict.modalTitle;
-      document.getElementById('txtFormLang').textContent = dict.formLang;
-      document.getElementById('btnCancel').textContent = dict.cancel;
-      document.getElementById('btnSave').textContent = dict.save;
-      document.getElementById('selectLang').value = lang;
+      const d = t();
+      document.getElementById("txtAppTitle").textContent = d.appTitle;
+      document.getElementById("txtSessionTitle").textContent = d.sessions;
+      document.getElementById("btnNewSession").textContent = "+ " + d.newSession;
+      document.getElementById("txtFeatureTitle").textContent = d.features;
+      document.getElementById("txtHeroTitle").textContent = d.heroTitle;
+      document.getElementById("txtHeroSubtitle").textContent = d.heroSubtitle;
+      document.getElementById("promptInput").placeholder = d.placeholder;
+      document.getElementById("txtInputHint").textContent = d.hint;
+      document.getElementById("btnRunPlan").textContent = d.runPlan;
+      document.getElementById("btnSettings").textContent = d.settings;
+      document.getElementById("txtInspectorTitle").textContent = d.inspector;
+      document.getElementById("txtModalTitle").textContent = d.settings;
+      document.getElementById("btnCancel").textContent = d.cancel;
+      document.getElementById("btnSave").textContent = d.save;
+      document.getElementById("selectLang").value = lang;
+      document.getElementById("btnLang").textContent = lang === "zh" ? "English" : "简体中文";
+      if (!currentSlug) document.getElementById("inspectorSlug").textContent = d.noSelection;
+      if (!currentSlug) document.getElementById("inspectorBody").textContent = d.inspectorEmpty;
+      const empty = document.getElementById("featureEmpty");
+      if (empty) empty.textContent = d.noFeatures;
     }
 
-    function toggleLang() {
-      applyLang(currentLang === 'zh' ? 'en' : 'zh');
+    function toggleLang() { applyLang(currentLang === "zh" ? "en" : "zh"); }
+
+    function esc(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
     }
 
-    let currentSessionId = "";
+    function scrollBottom() {
+      const v = document.getElementById("streamViewport");
+      v.scrollTo({ top: v.scrollHeight, behavior: "smooth" });
+    }
 
-    // Load initial Sessions and setup listeners
-    window.addEventListener('DOMContentLoaded', async () => {
+    window.addEventListener("DOMContentLoaded", async () => {
+      applyLang("zh");
+      await loadProject();
       await refreshSessions();
-      setupStreamListener();
+      await refreshFeatures();
+      setupStream();
     });
 
-    async function refreshSessions() {
+    async function loadProject() {
       try {
-        let sessions = [];
-        if (window.go && window.go.main && window.go.main.App) {
-          sessions = await window.go.main.App.GetSessions();
-        } else {
-          const res = await fetch('/api/sessions');
-          if (res.ok) sessions = await res.json();
-        }
-
-        const listEl = document.getElementById('sessionList');
-        listEl.innerHTML = '';
-
-        if (!sessions || sessions.length === 0) {
-          // Auto create initial session
-          await startNewSession();
-          return;
-        }
-
-        sessions.forEach((s, idx) => {
-          const item = document.createElement('div');
-          item.className = 'session-item' + (s.id === currentSessionId || (idx === 0 && !currentSessionId) ? ' active' : '');
-          item.onclick = () => selectSession(s.id);
-          item.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-weight:600;">${s.title}</span>
-              <span style="font-size:0.7rem; color:${s.status === 'active' ? '#10b981' : '#64748b'};">[${s.status}]</span>
-            </div>
-            <span class="session-item-time">${new Date(s.updated_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-          `;
-          listEl.appendChild(item);
-          if (idx === 0 && !currentSessionId) {
-            currentSessionId = s.id;
-          }
-        });
-
-        if (currentSessionId) {
-          await loadSessionMessages(currentSessionId);
+        const info = await invoke("GetProjectInfo");
+        const pill = document.getElementById("projectPill");
+        pill.textContent = info.root + (info.version ? " · " + info.version : "");
+        pill.title = info.root;
+        pill.className = "project-pill " + (info.registered ? "registered" : "unregistered");
+        if (!info.registered) {
+          pill.textContent += currentLang === "zh" ? " · 未注册" : " · unregistered";
         }
       } catch (e) {
-        console.error("Failed to load sessions:", e);
+        document.getElementById("projectPill").textContent = "workspace unavailable: " + e.message;
       }
     }
 
-    async function selectSession(sessionId) {
-      currentSessionId = sessionId;
-      const items = document.querySelectorAll('.session-item');
-      items.forEach(el => el.classList.remove('active'));
+    async function refreshSessions() {
+      let sessions = [];
+      try { sessions = await invoke("GetSessions"); } catch (e) { console.warn(e); }
+      sessions = sessions || [];
+      const list = document.getElementById("sessionList");
+      list.innerHTML = "";
+      if (sessions.length === 0) {
+        await startNewSession();
+        return;
+      }
+      sessions.forEach((s, idx) => {
+        const el = document.createElement("div");
+        el.className = "session-item" + (s.id === currentSessionId ? " active" : "");
+        el.innerHTML = '<span>' + esc(s.title) + '</span><span class="session-item-time">' +
+          esc(new Date(s.updated_at).toLocaleString()) + '</span>';
+        el.onclick = () => selectSession(s.id);
+        list.appendChild(el);
+        if (!currentSessionId && idx === 0) currentSessionId = s.id;
+      });
+      if (currentSessionId) await loadMessages(currentSessionId);
+    }
+
+    async function selectSession(id) {
+      currentSessionId = id;
+      currentRunId = "";
+      document.getElementById("cardsFlow").innerHTML = "";
       await refreshSessions();
     }
 
     async function startNewSession() {
-      const title = currentLang === 'zh' ? '新需求任务' : 'New Task Thread';
       try {
-        let newSess = null;
-        if (window.go && window.go.main && window.go.main.App) {
-          newSess = await window.go.main.App.CreateSession(title);
-        } else {
-          const res = await fetch('/api/sessions', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({title: title})
-          });
-          newSess = await res.json();
-        }
-        currentSessionId = newSess.id;
-        document.getElementById('cardsFlow').innerHTML = '';
-        document.getElementById('promptInput').value = '';
+        const sess = await invoke("CreateSession", currentLang === "zh" ? "新需求任务" : "New task");
+        currentSessionId = sess.id;
+        currentRunId = "";
+        document.getElementById("cardsFlow").innerHTML = "";
         await refreshSessions();
       } catch (e) {
-        alert("Failed to create session: " + e.message);
+        pushError(e.message);
       }
     }
 
-    async function loadSessionMessages(sessionId) {
-      const flow = document.getElementById('cardsFlow');
-      flow.innerHTML = '';
-      try {
-        let msgs = [];
-        if (window.go && window.go.main && window.go.main.App) {
-          msgs = await window.go.main.App.GetSessionMessages(sessionId);
-        } else {
-          const res = await fetch('/api/sessions/messages?session_id=' + encodeURIComponent(sessionId));
-          if (res.ok) msgs = await res.json();
-        }
-
-        if (!msgs || msgs.length === 0) return;
-
-        msgs.forEach(msg => {
-          if (msg.role === 'user') {
-            appendUserBubble(msg.content);
-          } else if (msg.card_type === 'plan_brief') {
-            renderPlanCard({
-              restated_intent: msg.content,
-              proposed_slugs: [msg.card_payload || "aligned-plan"],
-              identified_risks: ["严格测试回归保障", "保证原有状态机转移"],
-              boundaries: ["沙盒隔离操作", "Exit 0 验资放行"]
-            });
+    async function loadMessages(sessionId) {
+      let msgs = [];
+      try { msgs = await invoke("GetSessionMessages", sessionId); } catch (e) { return; }
+      const flow = document.getElementById("cardsFlow");
+      flow.innerHTML = "";
+      currentRunId = "";
+      (msgs || []).forEach(m => {
+        if (m.role === "user") {
+          pushUserBubble(m.content);
+        } else if (m.card_type === "plan_brief") {
+          renderPlanCard({
+            restated_intent: m.content,
+            identified_risks: [],
+            boundaries: [],
+            proposed_slugs: [parseSlug(m.card_payload)],
+            degraded: parseDegraded(m.card_payload)
+          }, true);
+        } else if (m.card_type === "goal_run") {
+          const payload = safeJSON(m.card_payload);
+          if (payload) {
+            currentRunId = payload.run_id;
+            renderGoalCard(payload, true);
           }
-        });
+        } else if (m.card_type === "release_verdict") {
+          const payload = safeJSON(m.card_payload);
+          if (payload) renderVerdict(payload);
+        }
+      });
+      scrollBottom();
+    }
+
+    function safeJSON(s) { try { return JSON.parse(s || "{}"); } catch (e) { return null; } }
+    function parseSlug(s) { const o = safeJSON(s); return (o && o.slug) || "feature"; }
+    function parseDegraded(s) { const o = safeJSON(s); return !!(o && o.degraded); }
+
+    function pushUserBubble(text) {
+      const flow = document.getElementById("cardsFlow");
+      const el = document.createElement("div");
+      el.style.cssText = "align-self:flex-end;background:#e0e7ff;color:#1e1b4b;padding:9px 13px;border-radius:12px;font-size:0.9rem;max-width:80%;white-space:pre-wrap;";
+      el.textContent = text;
+      flow.appendChild(el);
+      scrollBottom();
+    }
+
+    function pushError(msg) {
+      const flow = document.getElementById("cardsFlow");
+      const card = document.createElement("div");
+      card.className = "gen-card";
+      card.innerHTML = '<div class="gen-card-header"><span class="card-tag error">' + esc(t().errorTag) +
+        '</span></div><div class="card-body" style="color:#b91c1c;">' + esc(msg) + '</div>';
+      flow.appendChild(card);
+      scrollBottom();
+    }
+
+    function setupStream() {
+      if (!(window.runtime && window.runtime.EventsOn)) {
+        // No browser fallback exists by design: the desktop runtime is
+        // the only transport. The final brief still renders without it.
+        console.warn("wails runtime unavailable; token streaming disabled");
+        return;
+      }
+      window.runtime.EventsOn("chat:stream:chunk", data => appendChunk(data.chunk));
+    }
+
+    function appendChunk(chunk) {
+      if (!activeStream) {
+        const flow = document.getElementById("cardsFlow");
+        activeStream = document.createElement("div");
+        activeStream.className = "gen-card";
+        activeStream.innerHTML = '<div class="gen-card-header"><span class="card-tag">' + esc(t().reasoning) +
+          '</span></div><div class="card-body" id="liveText"></div>';
+        flow.appendChild(activeStream);
+      }
+      const el = document.getElementById("liveText");
+      if (el) el.textContent += chunk;
+      scrollBottom();
+    }
+
+    function clearStream() {
+      if (activeStream) { activeStream.remove(); activeStream = null; }
+    }
+
+    async function runPlan() {
+      const input = document.getElementById("promptInput");
+      const val = input.value.trim();
+      if (!val) return;
+      if (!currentSessionId) await startNewSession();
+      lastPrompt = val;
+      input.value = "";
+      pushUserBubble(val);
+      clearStream();
+      try {
+        const brief = await invoke("AlignIntentStream", currentSessionId, val);
+        clearStream();
+        renderPlanCard(brief, false);
+        await refreshSessions();
       } catch (e) {
-        console.warn("load messages error:", e);
+        clearStream();
+        pushError(e.message);
       }
     }
 
-    function appendUserBubble(text) {
-      const flow = document.getElementById('cardsFlow');
-      const bubble = document.createElement('div');
-      bubble.style.cssText = "align-self: flex-end; background: #e0e7ff; color: #1e1b4b; padding: 10px 14px; border-radius: 12px; font-size: 0.92rem; max-width: 80%; margin-bottom: 8px;";
-      bubble.textContent = text;
-      flow.appendChild(bubble);
-      document.getElementById('streamViewport').scrollTo({ top: flow.scrollHeight, behavior: 'smooth' });
+    function renderPlanCard(brief, replay) {
+      const flow = document.getElementById("cardsFlow");
+      if (!replay) flow.innerHTML = "";
+      const slug = (brief.proposed_slugs && brief.proposed_slugs[0]) || "feature";
+      const card = document.createElement("div");
+      card.className = "gen-card";
+      const risks = brief.identified_risks || [];
+      const bounds = brief.boundaries || [];
+      const items = risks.concat(bounds);
+      card.innerHTML =
+        '<div class="gen-card-header"><span class="card-tag">' + esc(t().planTag) + '</span>' +
+        '<span class="meta-line">' + esc(slug) + '</span></div>' +
+        '<div class="card-title">' + esc(slug.replace(/-/g, " ")) + '</div>' +
+        '<div class="card-body">' + esc(brief.restated_intent || "") + '</div>' +
+        (items.length ? '<div class="invariants-box"><strong>' +
+          (currentLang === "zh" ? "模型指出的风险与边界" : "Risks and boundaries the model stated") +
+          '</strong><ul>' + items.map(x => '<li>' + esc(x) + '</li>').join("") + '</ul></div>' : '') +
+        (brief.degraded ? '<div class="meta-line">' + esc(t().degraded) + '</div>' : '') +
+        '<div class="row-actions"><button class="btn-primary" id="btnExecute">' + esc(t().execute) + '</button></div>';
+      flow.appendChild(card);
+      card.querySelector("#btnExecute").onclick = () => executeGoal(slug);
+      scrollBottom();
     }
 
-    function setupStreamListener() {
-      if (window.runtime && window.runtime.EventsOn) {
-        window.runtime.EventsOn("chat:stream:chunk", data => {
-          appendStreamingChunk(data.chunk);
+    async function executeGoal(slug) {
+      const btn = document.getElementById("btnExecute");
+      if (btn) { btn.disabled = true; btn.textContent = "…"; }
+      try {
+        const run = await invoke("StartGoal", currentSessionId, slug, lastPrompt);
+        currentRunId = run.run_id;
+        renderGoalCard({
+          run_id: run.run_id,
+          slug: run.feature_slug,
+          status: run.status,
+          loop_stage: run.loop_stage,
+          stages: run.stage_plan
+        }, false);
+        await refreshFeatures();
+        selectFeature(slug);
+      } catch (e) {
+        pushError(e.message);
+        if (btn) { btn.disabled = false; btn.textContent = t().execute; }
+      }
+    }
+
+    function renderGoalCard(payload, replay) {
+      const flow = document.getElementById("cardsFlow");
+      if (!replay) { /* append below the plan card */ }
+      const card = document.createElement("div");
+      card.className = "gen-card";
+      card.id = "goalCard";
+      card.innerHTML =
+        '<div class="gen-card-header"><span class="card-tag goal">' + esc(t().goalTag) + '</span>' +
+        '<span class="meta-line">' + esc(payload.run_id) + '</span></div>' +
+        '<div class="card-title">' + esc(payload.slug) + '</div>' +
+        '<div class="meta-line" id="statusLine">status: ' + esc(payload.status || "") + ' · loop: ' + esc(payload.loop_stage || "") + '</div>' +
+        '<div id="stageList"></div>' +
+        '<div class="row-actions">' +
+        '<select id="executorSelect" title="' + esc(t().selectExecutor) + '" style="font-size:0.75rem;border:1px solid var(--border);border-radius:7px;padding:4px 7px;background:#fff;color:var(--text);max-width:150px;"></select>' +
+        '<button class="btn-outline" id="btnAdvance">' + esc(t().advance) + '</button>' +
+        '<button class="btn-outline" id="btnRefresh">' + (currentLang === "zh" ? "刷新状态" : "Refresh") + '</button>' +
+        '<button class="btn-primary" id="btnRelease">' + esc(t().approve) + '</button></div>' +
+        '<div id="parkSlot"></div>' +
+        '<div id="verdictSlot"></div>';
+      flow.appendChild(card);
+      const list = card.querySelector("#stageList");
+      (payload.stages || []).forEach(s => {
+        const row = document.createElement("div");
+        row.className = "stage-row";
+        row.innerHTML = '<span class="stage-name">' + esc(s.stage) + '</span>' +
+          '<span class="state ' + esc(s.status) + '">' + esc(s.status) + '</span>';
+        list.appendChild(row);
+      });
+      card.querySelector("#btnRefresh").onclick = () => refreshRun(card);
+      card.querySelector("#btnRelease").onclick = () => releaseRun(card);
+      card.querySelector("#btnAdvance").onclick = () => advanceRun(card);
+      fillExecutorOptions(card);
+      scrollBottom();
+    }
+
+    async function refreshRun(card) {
+      if (!currentRunId) return;
+      try {
+        const run = await invoke("GetGoalStatus", currentRunId);
+        const list = card.querySelector("#stageList");
+        list.innerHTML = "";
+        (run.stage_plan || []).forEach(s => {
+          const row = document.createElement("div");
+          row.className = "stage-row";
+          row.innerHTML = '<span class="stage-name">' + esc(s.stage) + '</span>' +
+            '<span class="state ' + esc(s.status) + '">' + esc(s.status) + '</span>';
+          list.appendChild(row);
         });
-      } else {
-        // Fallback Web SSE
-        try {
-          const sse = new EventSource('/api/events');
-          sse.onmessage = e => {
-            const data = JSON.parse(e.data);
-            if (data.type === 'chat_chunk') {
-              appendStreamingChunk(data.chunk);
-            }
-          };
-        } catch (e) {}
+        card.querySelector(".meta-line").textContent = run.run_id;
+      } catch (e) {
+        pushError(e.message);
       }
     }
 
-    let activeStreamContainer = null;
-    function appendStreamingChunk(chunk) {
-      const flow = document.getElementById('cardsFlow');
-      if (!activeStreamContainer) {
-        activeStreamContainer = document.createElement('div');
-        activeStreamContainer.className = 'gen-card';
-        activeStreamContainer.innerHTML = `
-          <div class="gen-card-header">
-            <span class="card-tag">⚡ 参谋长正在推理与边界对齐 (Live Typing)</span>
-          </div>
-          <div id="liveStreamText" style="font-size:0.9rem; line-height:1.6; color:#334155; white-space: pre-wrap;"></div>
-        `;
-        flow.appendChild(activeStreamContainer);
+    async function releaseRun(card) {
+      if (!currentRunId) return;
+      try {
+        const res = await invoke("ReleaseGoal", currentSessionId, currentRunId);
+        renderVerdict(res);
+      } catch (e) {
+        pushError(e.message);
       }
-      const textEl = document.getElementById('liveStreamText');
-      if (textEl) {
-        textEl.textContent += chunk;
-        document.getElementById('streamViewport').scrollTo({ top: flow.scrollHeight, behavior: 'smooth' });
+    }
+
+    // Offer only the agent backends this machine can actually start; one
+    // whose command is missing is shown as unavailable and disabled
+    // rather than offered and then failing at run time.
+    function fillExecutorOptions(card) {
+      const sel = card ? card.querySelector("#executorSelect") : null;
+      if (!sel) return;
+      invoke("Executors").then(function (opts) {
+        sel.innerHTML = "";
+        (opts || []).forEach(function (o) {
+          const op = document.createElement("option");
+          op.value = o.name;
+          op.textContent = o.name + (o.available ? "" : " " + t().unavailable);
+          op.disabled = !o.available;
+          sel.appendChild(op);
+        });
+      }).catch(function () { /* bridge absent: leave the select empty */ });
+    }
+
+    // One advance: bind the chosen backend (if any), then push the run a
+    // single step. Whatever comes back is rendered, park included — a
+    // blocked run shows its reason code and never a completion.
+    async function advanceRun(card) {
+      if (!currentRunId) return;
+      const sel = card ? card.querySelector("#executorSelect") : null;
+      const btn = card ? card.querySelector("#btnAdvance") : null;
+      const profile = sel ? sel.value : "";
+      if (btn) { btn.disabled = true; btn.textContent = "…"; }
+      try {
+        if (profile) await invoke("UseExecutor", profile, []);
+        const run = await invoke("AdvanceRun", currentSessionId, currentRunId);
+        renderRunState(card, run);
+      } catch (e) {
+        pushError(e.message);
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = t().advance; }
+      }
+    }
+
+    function renderRunState(card, run) {
+      if (!card || !run) return;
+      let txt = "status: " + (run.status || "") + " · loop: " + (run.loop_stage || "");
+      if (run.blocked) txt += " · blocked";
+      const line = card.querySelector("#statusLine");
+      if (line) line.textContent = txt;
+      const list = card.querySelector("#stageList");
+      if (list) {
+        list.innerHTML = "";
+        (run.stage_plan || []).forEach(function (s) {
+          const row = document.createElement("div");
+          row.className = "stage-row";
+          row.innerHTML = '<span class="stage-name">' + esc(s.stage) + '</span>' +
+            '<span class="state ' + esc(s.status) + '">' + esc(s.status) + '</span>';
+          list.appendChild(row);
+        });
+      }
+      // A park is stated plainly with its reason code; nothing here
+      // renders a park as a pass.
+      const park = card.querySelector("#parkSlot");
+      if (park) {
+        park.innerHTML = run.reason_code
+          ? '<div class="meta-line" style="color:#b45309;">parked: ' + esc(run.reason_code) + '</div>'
+          : "";
+      }
+    }
+
+    function renderVerdict(res) {
+      const slot = document.getElementById("verdictSlot") || document.getElementById("cardsFlow");
+      const pass = res.verdict === "pass" && res.completed;
+      const box = document.createElement("div");
+      box.className = "verdict " + (pass ? "pass" : "block");
+      const reasons = (res.reason_codes || []);
+      let head;
+      if (res.completed) {
+        head = currentLang === "zh" ? "发布门禁通过，运行已由人工确认完成。" : "Release gate passed; the run is completed with human confirmation.";
+      } else if (res.verdict === "pass") {
+        head = currentLang === "zh" ? "门禁通过，但运行还无法完成：" : "Gate passed, but the run cannot complete yet:";
+      } else {
+        head = currentLang === "zh" ? "发布门禁未通过，运行保持阻塞：" : "Release gate did not pass; the run stays blocked:";
+      }
+      box.innerHTML = "<div>" + esc(head) + "</div>" +
+        (reasons.length ? "<ul>" + reasons.map(r => "<li>" + esc(r) + "</li>").join("") + "</ul>" : "") +
+        (res.detail ? '<div class="meta-line">' + esc(res.detail) + "</div>" : "");
+      slot.innerHTML = "";
+      slot.appendChild(box);
+      scrollBottom();
+    }
+
+    async function refreshFeatures() {
+      let list = [];
+      try { list = await invoke("GetFeatures"); } catch (e) { console.warn(e); }
+      list = list || [];
+      const el = document.getElementById("featureList");
+      document.getElementById("featureCount").textContent = String(list.length);
+      el.innerHTML = "";
+      if (list.length === 0) {
+        el.innerHTML = '<div class="empty-hint">' + esc(t().noFeatures) + '</div>';
+        return;
+      }
+      list.forEach(f => {
+        const item = document.createElement("div");
+        item.className = "feature-item" + (f.slug === currentSlug ? " active" : "");
+        item.innerHTML = '<span>' + esc(f.slug) + '</span><span class="feature-state">' +
+          esc(f.frozen ? "frozen" : f.status) + '</span>';
+        item.onclick = () => selectFeature(f.slug);
+        el.appendChild(item);
+      });
+    }
+
+    async function selectFeature(slug) {
+      currentSlug = slug;
+      document.getElementById("inspectorSlug").textContent = slug;
+      document.getElementById("inspectorTabs").style.display = "flex";
+      try {
+        inspectorCache = await invoke("GetFeatureContent", slug);
+        renderTab();
+      } catch (e) {
+        document.getElementById("inspectorBody").textContent = e.message;
+      }
+      await refreshFeatures();
+    }
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll("#inspectorTabs .tab").forEach(el => {
+        el.classList.toggle("active", el.dataset.tab === tab);
+      });
+      renderTab();
+    }
+
+    function renderTab() {
+      const body = document.getElementById("inspectorBody");
+      if (!inspectorCache) return;
+      if (activeTab === "truth") body.textContent = inspectorCache.truth_md || "(empty)";
+      else if (activeTab === "tests") body.textContent = inspectorCache.tests_md || "(empty)";
+      else {
+        const gates = inspectorCache.gates || [];
+        body.innerHTML = gates.length
+          ? gates.map(g => '<div class="gate-row"><span>' + esc(g.gate_type) + '</span><span class="state ' +
+              (g.verdict === "pass" ? "done" : "blocked") + '">' + esc(g.verdict) + '</span></div>').join("")
+          : '<div class="empty-hint">' + (currentLang === "zh" ? "还没有门禁结论" : "No gate verdicts yet") + '</div>';
       }
     }
 
     function handleKeyDown(e) {
-      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         runPlan();
       }
     }
 
-    // Settings load & save
     async function openSettings() {
-      document.getElementById('settingsModal').style.display = 'flex';
+      document.getElementById("settingsModal").style.display = "flex";
       try {
-        let cfg = null;
-        if (window.go && window.go.main && window.go.main.App) {
-          cfg = await window.go.main.App.GetSettings();
-        } else {
-          const res = await fetch('/api/settings');
-          if (res.ok) cfg = await res.json();
+        const cfg = await invoke("GetSettings");
+        if (cfg && cfg.providers && cfg.providers.opencodex) {
+          document.getElementById("cfgBaseUrl").value = cfg.providers.opencodex.base_url || "";
         }
-        if (cfg) {
-          if (cfg.providers && cfg.providers.opencodex && cfg.providers.opencodex.base_url) {
-            document.getElementById('cfgBaseUrl').value = cfg.providers.opencodex.base_url;
-          }
-          if (cfg.roles) {
-            if (cfg.roles.chief_of_staff && cfg.roles.chief_of_staff.model) {
-              document.getElementById('modelChief').value = cfg.roles.chief_of_staff.model;
-            }
-            if (cfg.roles.architect && cfg.roles.architect.model) {
-              document.getElementById('modelArchitect').value = cfg.roles.architect.model;
-            }
-            if (cfg.roles.coder && cfg.roles.coder.model) {
-              document.getElementById('modelCoder').value = cfg.roles.coder.model;
-            }
-          }
+        if (cfg && cfg.roles) {
+          if (cfg.roles.chief_of_staff) document.getElementById("modelChief").value = cfg.roles.chief_of_staff.model || "";
+          if (cfg.roles.architect) document.getElementById("modelArchitect").value = cfg.roles.architect.model || "";
+          if (cfg.roles.coder) document.getElementById("modelCoder").value = cfg.roles.coder.model || "";
         }
-      } catch (e) {
-        console.warn("load settings err:", e);
-      }
+      } catch (e) { console.warn(e); }
     }
 
-    function closeSettings() {
-      document.getElementById('settingsModal').style.display = 'none';
-    }
+    function closeSettings() { document.getElementById("settingsModal").style.display = "none"; }
 
     async function saveSettings() {
-      const baseUrl = document.getElementById('cfgBaseUrl').value.trim();
-      const chiefModel = document.getElementById('modelChief').value;
-      const archModel = document.getElementById('modelArchitect').value;
-      const coderModel = document.getElementById('modelCoder').value;
-
       const payload = {
         version: "v2",
         providers: {
           opencodex: {
-            base_url: baseUrl,
+            base_url: document.getElementById("cfgBaseUrl").value.trim(),
             api_key: "tuzki-local"
           }
         },
         roles: {
-          chief_of_staff: { provider: "opencodex", model: chiefModel, temperature: 0.1, max_tokens: 4096 },
-          architect: { provider: "opencodex", model: archModel, temperature: 0.0, max_tokens: 8192 },
-          coder: { provider: "opencodex", model: coderModel, temperature: 0.2, max_tokens: 8192 },
-          qa: { provider: "opencodex", model: coderModel, temperature: 0.0, max_tokens: 4096 }
+          chief_of_staff: { provider: "opencodex", model: document.getElementById("modelChief").value.trim(), temperature: 0.1, max_tokens: 4096 },
+          architect: { provider: "opencodex", model: document.getElementById("modelArchitect").value.trim(), temperature: 0.0, max_tokens: 8192 },
+          coder: { provider: "opencodex", model: document.getElementById("modelCoder").value.trim(), temperature: 0.2, max_tokens: 8192 },
+          qa: { provider: "opencodex", model: document.getElementById("modelCoder").value.trim(), temperature: 0.0, max_tokens: 4096 }
         }
       };
-
       try {
-        if (window.go && window.go.main && window.go.main.App) {
-          await window.go.main.App.SaveSettings(payload);
-        } else {
-          await fetch('/api/settings', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        }
-        alert(currentLang === 'zh' ? '设置已生效并保存至 ~/.beacon/config.yaml' : 'Settings saved to ~/.beacon/config.yaml');
+        await invoke("SaveSettings", payload);
         closeSettings();
       } catch (e) {
         alert("Save failed: " + e.message);
       }
-    }
-
-    // Plan & Goal Flow
-    async function runPlan() {
-      const textarea = document.getElementById('promptInput');
-      const val = textarea.value.trim();
-      if (!val) return;
-
-      appendUserBubble(val);
-      textarea.value = '';
-
-      if (!currentSessionId) {
-        await startNewSession();
-      }
-
-      activeStreamContainer = null;
-
-      try {
-        let brief = null;
-        if (window.go && window.go.main && window.go.main.App) {
-          brief = await window.go.main.App.AlignIntentStream(currentSessionId, val);
-        } else {
-          const res = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: currentSessionId, prompt: val })
-          });
-          const data = await res.json();
-          brief = data.brief;
-        }
-
-        if (activeStreamContainer) {
-          activeStreamContainer.remove();
-          activeStreamContainer = null;
-        }
-
-        renderPlanCard(brief);
-        await refreshSessions();
-      } catch (e) {
-        const flow = document.getElementById('cardsFlow');
-        flow.innerHTML += `<div class="gen-card" style="color:red;">Error: ${e.message}</div>`;
-      }
-    }
-        } else {
-          const res = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: val })
-          });
-          brief = await res.json();
-        }
-        renderPlanCard(brief);
-      } catch (e) {
-        flow.innerHTML = `<div class="gen-card" style="color:red;">Error: ${e.message}</div>`;
-      }
-    }
-
-    function renderPlanCard(brief) {
-      const flow = document.getElementById('cardsFlow');
-      const dict = i18n[currentLang];
-
-      flow.innerHTML = `
-        <!-- Card 1: Plan Analysis -->
-        <div class="gen-card">
-          <div class="gen-card-header">
-            <span class="card-tag">${dict.cardPlanTag}</span>
-            <span style="font-size: 0.75rem; color: var(--muted); font-family: monospace;">Slug: ${brief.proposed_slugs[0]}</span>
-          </div>
-
-          <div class="card-title">${brief.proposed_slugs[0].replace(/-/g, ' ').toUpperCase()}</div>
-          
-          <div style="font-size: 0.9rem; line-height: 1.6; color: #334155;">
-            ${brief.restated_intent.replace(/\n/g, '<br>')}
-          </div>
-
-          <div class="invariants-box">
-            <div style="font-weight: 700; margin-bottom: 4px;">⚠️ 必须遵守的隐性边界与安全防线 (Invariants)</div>
-            <ul style="margin-left: 18px; line-height: 1.5;">
-              ${brief.identified_risks.map(r => '<li>' + r + '</li>').join('')}
-              ${brief.boundaries.map(b => '<li>' + b + '</li>').join('')}
-            </ul>
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px;">
-            <button class="btn-primary" onclick="executeGoal('${brief.proposed_slugs[0]}')">
-              ${dict.btnExecuteGoal}
-            </button>
-          </div>
-        </div>
-      `;
-      document.getElementById('streamViewport').scrollTo({ top: flow.scrollHeight, behavior: 'smooth' });
-    }
-
-    async function executeGoal(slug) {
-      const flow = document.getElementById('cardsFlow');
-      const dict = i18n[currentLang];
-
-      const goalCard = document.createElement('div');
-      goalCard.className = 'goal-card';
-      goalCard.innerHTML = `
-        <div class="gen-card-header">
-          <span class="card-tag" style="background:#ecfdf5; color:#059669;">${dict.cardGoalTag}</span>
-          <span class="badge-done">● FSM Machine Verified</span>
-        </div>
-
-        <div class="card-title" style="display:flex; align-items:center; justify-content:space-between;">
-          <span>研发闭环推进: ${slug}</span>
-          <span style="font-size:0.8rem; font-weight:normal; color:#059669;">[✔ 机器自动化验收通过]</span>
-        </div>
-
-        <div class="step-progress-row">
-          <span>1. Truth.md 冻结</span>
-          <span class="badge-done">✔ 指纹锁定</span>
-        </div>
-        <div class="step-progress-row">
-          <span>2. Worktree 沙盒编码 (Coder)</span>
-          <span class="badge-done">✔ 提交完成</span>
-        </div>
-        <div class="step-progress-row">
-          <span>3. QA 机器验资 (Exit 0)</span>
-          <span class="badge-done">✔ 100% 通过</span>
-        </div>
-
-        <div style="background:#f1f5f9; border-radius:8px; padding:10px 14px; font-size:0.8rem; font-family:monospace; color:#475569;">
-          证据指纹: sha256-verified-${slug}-release-gate · 无人工干预不入主分支
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px;">
-          <button class="btn-primary" style="background:#10b981;" onclick="approveRelease('${slug}')">
-            ${dict.btnApproveRelease}
-          </button>
-        </div>
-      `;
-      flow.appendChild(goalCard);
-      goalCard.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    async function approveRelease(slug) {
-      await fetch('/api/action/approve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: slug, action: 'release', operator: 'human' })
-      });
-      alert(currentLang === 'zh' ? '已正式放行发布！代码成功合入主分支。' : 'Approved! Feature safely merged to production.');
     }
   </script>
 </body>

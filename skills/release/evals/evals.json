@@ -1,0 +1,64 @@
+{
+  "schema": "skill-evals.v1",
+  "skill": "beacon-release",
+  "cases": [
+    {
+      "id": "release-00-blocked",
+      "prompt": "发了吧。",
+      "expectations": [
+        "Reports blocked with the named reasons",
+        "Does not lower a gate"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "no human nod, no release"
+        },
+        {
+          "kind": "contains",
+          "text": "Never lower a gate"
+        }
+      ]
+    },
+    {
+      "id": "release-01-human",
+      "prompt": "我确认可以发。",
+      "expectations": [
+        "Requires a recorded human confirmation for this run",
+        "Does not infer consent from an earlier approval"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "confirmation"
+        },
+        {
+          "kind": "contains",
+          "text": "recorded"
+        }
+      ]
+    },
+    {
+      "id": "release-02-contract",
+      "prompt": "发完了吗？",
+      "expectations": [
+        "Reports verdict or completion record",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "rel-complete"
+        },
+        {
+          "kind": "contains",
+          "text": "plain_summary"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    }
+  ]
+}

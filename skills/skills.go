@@ -14,6 +14,7 @@ package skills
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"os"
@@ -102,6 +103,90 @@ func References(id string) []RefFile {
 // Python agent_surface layout).
 func InstallDirName(id string) string { return "beacon-" + id }
 
+// EvalCheck is one machine-verifiable assertion about the package
+// bytes. It answers "does the skill actually state the rule this case
+// expects?" — never "did a model behave well". Behavioural grading
+// needs a model run and stays a human judgement.
+type EvalCheck struct {
+	Kind string `json:"kind"` // contains | references_contains | min_examples
+	Text string `json:"text,omitempty"`
+	Min  int    `json:"min,omitempty"`
+}
+
+// EvalCase is one test prompt plus its expectations.
+type EvalCase struct {
+	ID           string      `json:"id"`
+	Prompt       string      `json:"prompt"`
+	Expectations []string    `json:"expectations"`
+	Checks       []EvalCheck `json:"checks"`
+}
+
+// EvalSet is one package's evals/evals.json.
+type EvalSet struct {
+	Schema string     `json:"schema"`
+	Skill  string     `json:"skill"`
+	Cases  []EvalCase `json:"cases"`
+}
+
+// Evals reads one skill's evals/evals.json.
+func Evals(id string) (EvalSet, bool) {
+	raw, err := files.ReadFile(id + "/evals/evals.json")
+	if err != nil {
+		return EvalSet{}, false
+	}
+	var set EvalSet
+	if err := json.Unmarshal(raw, &set); err != nil {
+		return EvalSet{}, false
+	}
+	return set, true
+}
+
+// Examples returns the skill's examples/ files (bodies included).
+func Examples(id string) []RefFile {
+	return walkFiles(id, "examples")
+}
+
+// packageFiles lists every embedded file of one skill package,
+// package-relative and sorted: SKILL.md, references/**, examples/**,
+// evals/**. The installer copies exactly this list, so a host gets the
+// same bytes the binary holds.
+func packageFiles(id string) []string {
+	var out []string
+	_ = fs.WalkDir(files, id, func(path string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return nil
+		}
+		rel, rerr := filepath.Rel(id, path)
+		if rerr != nil {
+			return nil
+		}
+		out = append(out, filepath.ToSlash(rel))
+		return nil
+	})
+	sort.Strings(out)
+	return out
+}
+
+// walkFiles reads one subdirectory of a package.
+func walkFiles(id, sub string) []RefFile {
+	base := id + "/" + sub
+	var out []RefFile
+	_ = fs.WalkDir(files, base, func(path string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return nil
+		}
+		raw, rerr := files.ReadFile(path)
+		if rerr != nil {
+			return nil
+		}
+		rel, _ := filepath.Rel(id, path)
+		out = append(out, RefFile{Path: filepath.ToSlash(rel), Body: string(raw)})
+		return nil
+	})
+	sort.Slice(out, func(i, j int) bool { return out[i].Path < out[j].Path })
+	return out
+}
+
 // ConflictError reports that Install refused to overwrite existing
 // skill directories without force. Nothing was written.
 type ConflictError struct {
@@ -126,19 +211,19 @@ func PlannedFiles(targetDir string) []string {
 	var out []string
 	for _, id := range order {
 		base := filepath.Join(targetDir, InstallDirName(id))
-		out = append(out, filepath.Join(base, "SKILL.md"))
-		for _, ref := range References(id) {
-			out = append(out, filepath.Join(base, filepath.FromSlash(ref.Path)))
+		for _, rel := range packageFiles(id) {
+			out = append(out, filepath.Join(base, filepath.FromSlash(rel)))
 		}
 	}
 	return out
 }
 
 // Install materializes the embedded skill packages into a host
-// skill directory: <target>/beacon-<id>/SKILL.md plus its
-// references/. Existing beacon-<id> directories are a conflict and
-// refuse the WHOLE install unless force is set (no half-written
-// skill set). Unrelated directories in the target are never touched.
+// skill directory: <target>/beacon-<id>/ with SKILL.md, references/,
+// examples/ and evals/. Existing beacon-<id> directories are a
+// conflict and refuse the WHOLE install unless force is set (no
+// half-written skill set). Unrelated directories in the target are
+// never touched.
 func Install(targetDir string, force bool) (InstallResult, error) {
 	if strings.TrimSpace(targetDir) == "" {
 		return InstallResult{}, fmt.Errorf("skills.Install: empty target dir")
@@ -155,30 +240,30 @@ func Install(targetDir string, force bool) (InstallResult, error) {
 	}
 	res := InstallResult{TargetDir: targetDir, Forced: force}
 	for _, id := range order {
-		s, ok := Get(id)
-		if !ok {
+		base := filepath.Join(targetDir, InstallDirName(id))
+		files := packageFiles(id)
+		if len(files) == 0 {
 			return InstallResult{}, fmt.Errorf("skills.Install: embedded skill %s missing", id)
 		}
-		base := filepath.Join(targetDir, InstallDirName(id))
-		if err := os.MkdirAll(base, 0o755); err != nil {
-			return InstallResult{}, err
-		}
-		skillPath := filepath.Join(base, "SKILL.md")
-		if err := os.WriteFile(skillPath, []byte(s.Body), 0o644); err != nil {
-			return InstallResult{}, err
-		}
-		res.Skills = append(res.Skills, id)
-		res.Files = append(res.Files, skillPath)
-		for _, ref := range References(id) {
-			dest := filepath.Join(base, filepath.FromSlash(ref.Path))
+		for _, rel := range files {
+			raw, err := readPackageFile(id, rel)
+			if err != nil {
+				return InstallResult{}, err
+			}
+			dest := filepath.Join(base, filepath.FromSlash(rel))
 			if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
 				return InstallResult{}, err
 			}
-			if err := os.WriteFile(dest, []byte(ref.Body), 0o644); err != nil {
+			if err := os.WriteFile(dest, raw, 0o644); err != nil {
 				return InstallResult{}, err
 			}
 			res.Files = append(res.Files, dest)
 		}
+		res.Skills = append(res.Skills, id)
 	}
 	return res, nil
+}
+
+func readPackageFile(id, rel string) ([]byte, error) {
+	return files.ReadFile(id + "/" + rel)
 }

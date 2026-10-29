@@ -155,9 +155,13 @@ func TestTruthFreezeHappyAndIdempotent(t *testing.T) {
 	if !ok || scalars["status"] != "frozen" {
 		t.Fatalf("frontmatter after freeze = %v", scalars)
 	}
-	// Only the status line may differ from the draft bytes.
-	if want := strings.Replace(draftBytes, "status: draft", "status: frozen", 1); frozenText != want {
-		t.Fatalf("freeze changed more than the status line:\n--- draft ---\n%s\n--- frozen ---\n%s", draftBytes, frozenText)
+	// Freeze may rewrite exactly two frontmatter scalars: the status line
+	// and the materials mark (a frozen package whose materials still read
+	// `draft` is a contradiction — 2026-10-29 fix). Nothing else moves.
+	wantText := strings.Replace(draftBytes, "status: draft", "status: frozen", 1)
+	wantText = strings.Replace(wantText, "materials_status: draft", "materials_status: current", 1)
+	if frozenText != wantText {
+		t.Fatalf("freeze changed more than the status/materials lines:\n--- draft ---\n%s\n--- frozen ---\n%s", draftBytes, frozenText)
 	}
 	if v.LifecycleStage != string(core.StageFreeze) || v.LifecycleStatus != string(core.StatusCompleted) {
 		t.Fatalf("lifecycle = %s/%s, want Freeze/Completed", v.LifecycleStage, v.LifecycleStatus)
@@ -394,5 +398,28 @@ func TestSetFrontmatterStatus(t *testing.T) {
 	}
 	if _, changed4 := setFrontmatterStatus(out, "frozen"); changed4 {
 		t.Fatal("already-frozen must report unchanged")
+	}
+}
+
+// Freezing is the act that declares the materials current: a package that
+// entered freeze with `materials_status: draft` must not leave the gate
+// still reading draft (the frozen-but-draft contradiction found on two
+// packages in the 2026-10-29 audit).
+func TestTruthFreezeSettlesMaterialsToCurrent(t *testing.T) {
+	env := newTruthEnv(t)
+	env.create(t, "feat-materials")
+	ctx := env.ctx(t, "feat-materials")
+	dir := filepath.Join(env.root, "docs", "beacon", "v2.0.0", "features", "feat-materials")
+	if _, err := env.eng.FreezeTruthPackage(ctx, "qa-bot"); err != nil {
+		t.Fatalf("Freeze: %v", err)
+	}
+	for _, name := range []string{"truth.md", "tests.md", "tasks.md"} {
+		scalars, _, ok := gate.ParseFrontmatter(readFile(t, filepath.Join(dir, name)))
+		if !ok {
+			t.Fatalf("%s frontmatter unreadable", name)
+		}
+		if got := strings.ToLower(strings.TrimSpace(scalars["materials_status"])); got != "current" {
+			t.Errorf("%s materials_status = %q want current after freeze", name, got)
+		}
 	}
 }

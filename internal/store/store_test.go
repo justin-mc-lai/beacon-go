@@ -513,3 +513,18 @@ func TestMixedTimestampShapesKeepTimeOrder(t *testing.T) {
 		}
 	}
 }
+
+// AC-008/AC-061: the production default is the Go track's own ledger
+// (beacon-go.db), not the v1 Python database (beacon.db). Opening the v1
+// file by default would mix two schemas in one authority — the exact
+// failure mode the isolated-ledger decision exists to prevent.
+func TestDefaultPathIsGoTrackLedger(t *testing.T) {
+	t.Setenv(EnvStorePath, "")
+	p, err := DefaultPath()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if filepath.Base(p) != "beacon-go.db" {
+		t.Fatalf("DefaultPath = %q want .../beacon-go.db (v1's beacon.db stays untouched)", p)
+	}
+}

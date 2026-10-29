@@ -7,7 +7,7 @@
 - 引擎：`cmd/beacon`，核心包在 `internal/`
 - 需求真相：`docs/beacon/<version>/features/<slug>/`（truth / tests / tasks / evidence）
 - 收敛口径：`docs/scope-charter.md`（12 保留 / 49 合并 / 16 剥离）
-- 版本：`beacon --version`；当前 `v2.0.0-go.9`
+- 版本：`beacon --version`；当前 `v2.0.0-go.10`
 
 ## 可直接读写仓库
 

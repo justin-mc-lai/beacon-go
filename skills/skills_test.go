@@ -56,6 +56,14 @@ func TestInstallMaterializesHostLayout(t *testing.T) {
 		if _, err := os.Stat(filepath.Join(dir, "beacon-"+id, "references", "core.md")); err != nil {
 			t.Errorf("installed references for %s: %v", id, err)
 		}
+		// The host must get the examples and the eval cases too —
+		// they are what anchors behaviour and what `qa score` reads.
+		if _, err := os.Stat(filepath.Join(dir, "beacon-"+id, "evals", "evals.json")); err != nil {
+			t.Errorf("installed evals for %s: %v", id, err)
+		}
+		if n := len(Examples(id)); n < 3 {
+			t.Errorf("skill %s ships %d examples, want >= 3", id, n)
+		}
 	}
 	// Host discovery shape: a flat beacon-plan dir at the top level.
 	if _, err := os.Stat(filepath.Join(dir, "beacon-plan", "SKILL.md")); err != nil {

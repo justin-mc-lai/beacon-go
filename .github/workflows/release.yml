@@ -1,0 +1,80 @@
+name: release
+
+# Distribution closure: the kernel stays one binary per platform; the
+# desktop workspace is an optional companion built for macOS/Linux where
+# the Wails toolchain is available. Every artifact ships with a SHA-256.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  cli:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {goos: darwin, goarch: arm64}
+          - {goos: darwin, goarch: amd64}
+          - {goos: linux, goarch: amd64}
+          - {goos: linux, goarch: arm64}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - run: go test ./... -count=1
+      - name: build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: "0"
+        run: |
+          out="beacon-${{ github.ref_name }}-${{ matrix.goos }}-${{ matrix.goarch }}"
+          go build -trimpath -ldflags="-s -w" -o "$out" ./cmd/beacon
+          sha256sum "$out" > "$out.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: beacon-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: beacon-*
+
+  desktop:
+    # Wails needs a platform webview toolchain; macOS is the supported
+    # delivery target and is built on a macOS runner.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - run: go test ./desktop -count=1
+      - name: build desktop
+        run: |
+          out="beacon-desktop-${GITHUB_REF_NAME}-darwin-arm64"
+          go build -trimpath -ldflags="-s -w" -o "$out" ./desktop
+          shasum -a 256 "$out" > "$out.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: beacon-desktop-darwin-arm64
+          path: beacon-desktop-*
+
+  publish:
+    needs: [cli, desktop]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: checksums
+        run: cd dist && sha256sum * > SHA256SUMS.txt || true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/beacon-*
+            dist/SHA256SUMS.txt

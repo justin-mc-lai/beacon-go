@@ -57,8 +57,13 @@ import (
 // skills install, repo-carried state, archive/init/hooks), and the
 // intelligence faces (agent eval, qa strategy, intent decomposition,
 // brainstorm, code2truth, reopen). See docs/r2a..r2d reports.
+// v2.0.0-go.10 closes the 2026-10-29 audit: the fake verify-harness is
+// now a real ledger+hash check, the default ledger is the Go track's own
+// beacon-go.db, migrations snapshot first, long runs honour SIGINT,
+// streaming forwards real deltas, benchmark and file-size gates exist,
+// and the frozen feature packages are reconciled (docs/changes/change-audit-2026-10-29.md).
 // Development builds between exits carried a dev suffix.
-const Version = "2.0.0-go.9"
+const Version = "2.0.0-go.10"
 
 // NewRootCmd builds the beacon root command with the six first-class
 // abilities as real command groups (P4a convergence): goal (the loop
@@ -72,7 +77,7 @@ func NewRootCmd() *cobra.Command {
 		Long: "Beacon v2 kernel (Go implementation of the frozen v2 design).\n" +
 			"Six first-class abilities: goal | truth | design | implement | qa | release\n" +
 			"(charter decision 5: the loop ability's user entry is `goal`; `loop` is a pointer).\n" +
-			"Runtime state: global ~/.beacon/beacon.db + project blob pointers.",
+			"Runtime state: global ~/.beacon/beacon-go.db + project blob pointers.",
 		Version:       Version,
 		SilenceUsage:  true,
 		SilenceErrors: true,

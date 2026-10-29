@@ -356,17 +356,24 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string) (TruthPacka
 // status line to frozen (the one sanctioned body write), move the
 // package status + lifecycle, and append the trail event.
 func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload map[string]any) (TruthPackageView, error) {
-	// M7 (R2a): a landed freeze/refreeze refreshes the materials —
-	// stale marks clear BEFORE any fingerprint is recorded, so
-	// the frozen record describes the cleared (current) state.
-	e.clearPackageMaterialsStale(ctx)
 	root := ctx.Project.RootPath
 	abs := resolvePkgPath(root, ctx.Feature.TruthPath)
+	// The "before" hash must describe the bytes the author froze, so read
+	// them BEFORE the materials normalization below rewrites a draft mark.
+	rawBefore, err := os.ReadFile(abs)
+	if err != nil {
+		return TruthPackageView{}, err
+	}
+	testsRawBefore, _ := os.ReadFile(resolvePkgPath(root, ctx.Feature.TestsPath))
+	// M7 (R2a): a landed freeze/refreeze refreshes the materials — stale
+	// and draft marks settle to current before the frozen record is
+	// written, so a frozen package never reads `materials_status: draft`.
+	e.clearPackageMaterialsStale(ctx)
 	raw, err := os.ReadFile(abs)
 	if err != nil {
 		return TruthPackageView{}, err
 	}
-	sum := sha256.Sum256(raw)
+	sum := sha256.Sum256(rawBefore)
 	if payload == nil {
 		payload = map[string]any{}
 	}
@@ -376,13 +383,12 @@ func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload
 	// rebuild checks later. Recorded from the pre-flip bytes — the
 	// fingerprint normalizes the status line out, so it describes
 	// the frozen BODY, identical before and after the flip.
-	testsRaw, _ := os.ReadFile(resolvePkgPath(root, ctx.Feature.TestsPath))
-	payload["package_fingerprint"] = core.PackageFingerprint(raw, testsRaw)
+	payload["package_fingerprint"] = core.PackageFingerprint(rawBefore, testsRawBefore)
 	payload["fingerprint_alg"] = core.FingerprintAlg
 	// R1: requirement-level hashes are the drift baseline. The
 	// package fingerprint says "something moved"; this map says
 	// WHICH acceptance criterion moved.
-	payload["requirement_fingerprints"] = core.RequirementFingerprints(raw)
+	payload["requirement_fingerprints"] = core.RequirementFingerprints(rawBefore)
 	payload["requirement_fingerprint_alg"] = core.RequirementFingerprintAlg
 	// S1 (AC-137): the four-surface fingerprint (the refreeze
 	// transaction's proof base — at least one requirement surface

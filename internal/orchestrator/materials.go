@@ -73,16 +73,23 @@ func (e *Engine) markPackageMaterialsStale(ctx store.FeatureContext) ([]string, 
 }
 
 // clearPackageMaterialsStale flips stale marks back to current at
-// freeze/refreeze. Only the stale value is touched — a draft or
-// current mark is the author's own state, not the kernel's.
+// freeze/refreeze, and settles a draft mark to current as well: freezing
+// is the act that declares these materials the frozen set, so a frozen
+// package that still reads `materials_status: draft` is a contradiction
+// (the matrix used to find exactly that on two packages). Any other
+// value is the author's own state and is left alone.
 func (e *Engine) clearPackageMaterialsStale(ctx store.FeatureContext) {
 	pkg := e.packageFiles(ctx)
-	for _, pf := range []gate.PackageFile{pkg.Tests, pkg.Tasks} {
+	for _, pf := range []gate.PackageFile{pkg.Truth, pkg.Tests, pkg.Tasks} {
 		if !pf.Present {
 			continue
 		}
 		scalars, _, ok := gate.ParseFrontmatter(pf.Text)
-		if !ok || !strings.EqualFold(strings.TrimSpace(scalars["materials_status"]), "stale") {
+		if !ok {
+			continue
+		}
+		status := strings.ToLower(strings.TrimSpace(scalars["materials_status"]))
+		if status != "stale" && status != "draft" {
 			continue
 		}
 		abs := resolvePkgPath(ctx.Project.RootPath, pf.Path)

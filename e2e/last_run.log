@@ -1,25 +1,25 @@
 ==================================================================
 Beacon Go P6 E2E — full chain
-started: 2026-10-23 15:58:27 CST
-beacon:  /home/hatch/workspace/beacon-go/e2e/../bin/beacon
-Beacon CLI v2.0.0-go.9
-workspace:        /tmp/beacon-e2e.9oyesaUK
-BEACON_STORE_PATH=/tmp/beacon-e2e.9oyesaUK/beacon.db (isolated temp store)
-project:          /tmp/beacon-e2e.9oyesaUK/proj
+started: 2026-10-29 22:33:37 CST
+beacon:  /Users/apple/Developer/Personal/products/beacon-go/e2e/../bin/beacon
+Beacon CLI v2.0.0-go.10
+workspace:        /tmp/beacon-e2e.Pjw7e32Z
+BEACON_STORE_PATH=/tmp/beacon-e2e.Pjw7e32Z/beacon.db (isolated temp store)
+project:          /tmp/beacon-e2e.Pjw7e32Z/proj
 
 ===== STEP 1: 1 projects register (temp git project) =====
-b0409d3 initial commit (README)
+c4bacc2 initial commit (README)
 {
-  "id": "proj_34a4022de9041b8bb783576b",
-  "project_key": "proj--48d7823fab",
-  "root_path": "/tmp/beacon-e2e.9oyesaUK/proj",
+  "id": "proj_b6bbc3af2d1b6b48742cdc08",
+  "project_key": "proj--3ebb1474ba",
+  "root_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj",
   "name": "proj",
-  "registered_at": "2026-10-23T07:58:27.617354394Z",
+  "registered_at": "2026-10-29T14:33:37.633853000Z",
   "current_version": "v1.0.0",
   "versions": [
     {
-      "id": "ver_02bf2b873abef5f5caa5abd7",
-      "project_id": "proj_34a4022de9041b8bb783576b",
+      "id": "ver_a587c891d30af0a1061e5268",
+      "project_id": "proj_b6bbc3af2d1b6b48742cdc08",
       "version": "v1.0.0",
       "docs_root": "docs/beacon/v1.0.0",
       "is_current": true
@@ -30,8 +30,8 @@ b0409d3 initial commit (README)
 ===== STEP 2: 2 truth create =====
 {
   "slug": "e2e-login-2fa",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
-  "project_root": "/tmp/beacon-e2e.9oyesaUK/proj",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
+  "project_root": "/private/tmp/beacon-e2e.Pjw7e32Z/proj",
   "version": "v1.0.0",
   "status": "draft",
   "frozen": false,
@@ -47,7 +47,7 @@ b0409d3 initial commit (README)
   "current_branch": "main",
   "canonical_branch": "main"
 }
-package dir verified: /tmp/beacon-e2e.9oyesaUK/proj/docs/beacon/v1.0.0/features/e2e-login-2fa (four-piece skeleton present)
+package dir verified: /tmp/beacon-e2e.Pjw7e32Z/proj/docs/beacon/v1.0.0/features/e2e-login-2fa (four-piece skeleton present)
 
 ===== STEP 3: 3 fill four-piece package =====
 filled truth.md / tests.md / tasks.md (evidence.md keeps bare-name index per skeleton boundary)
@@ -292,8 +292,8 @@ intent signed: snapshot + closed questions + per-AC coverage verified
 ===== STEP 4: 4 truth freeze =====
 {
   "slug": "e2e-login-2fa",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
-  "project_root": "/tmp/beacon-e2e.9oyesaUK/proj",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
+  "project_root": "/private/tmp/beacon-e2e.Pjw7e32Z/proj",
   "version": "v1.0.0",
   "status": "frozen",
   "frozen": true,
@@ -317,8 +317,8 @@ baseline_status=uncommitted after freeze verified (AC-139)
 ===== STEP 4b: 4b commit frozen package + truth baseline (S1, AC-139) =====
 {
   "slug": "e2e-login-2fa",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
-  "project_root": "/tmp/beacon-e2e.9oyesaUK/proj",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
+  "project_root": "/private/tmp/beacon-e2e.Pjw7e32Z/proj",
   "version": "v1.0.0",
   "status": "frozen",
   "frozen": true,
@@ -334,7 +334,7 @@ baseline_status=uncommitted after freeze verified (AC-139)
   "current_branch": "main",
   "canonical_branch": "main",
   "baseline_status": "committed",
-  "baseline_commit": "55208074ed0a7b5ac0750f2049df45ac5585a4ce",
+  "baseline_commit": "cf3750a2924ae985ae689c22667cb27a79e846cf",
   "baseline_recorded": true
 }
 baseline committed + recorded verified (AC-139)
@@ -388,10 +388,10 @@ baseline committed + recorded verified (AC-139)
     }
   ],
   "evaluator": "e2e-evaluator",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
-  "gate_result_id": "gate_d568e5575b182fa30f601564",
-  "evaluated_at": "2026-10-23T07:58:28.029348716Z"
+  "gate_result_id": "gate_6cd306e3a67ca3e80e11210e",
+  "evaluated_at": "2026-10-29T14:33:39.480796000Z"
 }
 truth_freeze verdict=pass verified
 
@@ -402,27 +402,27 @@ truth_freeze verdict=pass verified
   "scopes": [
     {
       "scope_id": "primary",
-      "git_root": "/tmp/beacon-e2e.9oyesaUK/proj",
-      "worktree_path": "/tmp/beacon-e2e.9oyesaUK/proj",
+      "git_root": "/tmp/beacon-e2e.Pjw7e32Z/proj",
+      "worktree_path": "/tmp/beacon-e2e.Pjw7e32Z/proj",
       "role": "primary",
       "writable": true,
       "dirty_policy": "fail_closed"
     }
   ],
   "topology_gate_status": "pass",
-  "topology_gate_ref": "bc_0a05ec8db1cc3490",
-  "graph_hash": "0a05ec8db1cc34901038b5e68f1b3284ae1c781e55366008fb175bac55360e49",
+  "topology_gate_ref": "bc_91c8d32273766b8d",
+  "graph_hash": "91c8d32273766b8de41217f6853dcd6213d0a55bfabd8c31f9df0cf267e9f62d",
   "source": "file",
   "confirmed": true,
-  "projected_at": "2026-10-23T07:58:28.074258322Z"
+  "projected_at": "2026-10-29T14:33:39.57058Z"
 }
-topology projected: ref=bc_0a05ec8db1cc3490 gate=pass (AC-171); step 7 admission will consume it (AC-173)
+topology projected: ref=bc_91c8d32273766b8d gate=pass (AC-171); step 7 admission will consume it (AC-173)
 
 ===== STEP 6: 6 goal run (subprocess profile executor, real agent script) =====
-agent script: /tmp/beacon-e2e.9oyesaUK/bin/agent.sh
+agent script: /tmp/beacon-e2e.Pjw7e32Z/bin/agent.sh
 {
-  "run_id": "run_d9dbfcc86759f0ba97341336",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
   "status": "running",
   "run_status": "Running",
@@ -496,22 +496,22 @@ agent script: /tmp/beacon-e2e.9oyesaUK/bin/agent.sh
   "release_human_confirmed": false,
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-10-23T07:58:28.164561511Z",
-  "started_at": "2026-10-23T07:58:28.170878981Z",
+  "last_heartbeat_at": "2026-10-29T14:33:39.81262Z",
+  "started_at": "2026-10-29T14:33:39.874216000Z",
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_0a05ec8db1cc3490",
+    "topology_gate_ref": "bc_91c8d32273766b8d",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_0a05ec8db1cc3490"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_91c8d32273766b8d"
   }
 }
-run_id=run_d9dbfcc86759f0ba97341336
+run_id=run_e1493d7ac816ab7007ac18ed
 stage plan has no design stage (no --ux) verified
 
 ===== STEP 7: 7 goal admit =====
 {
   "schema": "goal-implement-admission.v1",
-  "run_id": "run_d9dbfcc86759f0ba97341336",
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
   "feature_slug": "e2e-login-2fa",
   "allow_implement": true,
   "status": "pass",
@@ -552,7 +552,7 @@ stage plan has no design stage (no --ux) verified
       "check": "baseline_merged",
       "ok": true,
       "applicable": true,
-      "detail": "worktree HEAD 55208074ed0a contains truth_baseline_commit 55208074ed0a"
+      "detail": "worktree HEAD cf3750a2924a contains truth_baseline_commit cf3750a2924a"
     },
     {
       "check": "dirty_policy",
@@ -564,7 +564,7 @@ stage plan has no design stage (no --ux) verified
       "check": "topology_gate",
       "ok": true,
       "applicable": true,
-      "detail": "topology gate pass over bc_0a05ec8db1cc3490 (single_repo, 1 scope(s))"
+      "detail": "topology gate pass over bc_91c8d32273766b8d (single_repo, 1 scope(s))"
     },
     {
       "check": "review_decision",
@@ -577,29 +577,29 @@ stage plan has no design stage (no --ux) verified
   "worktree_ref": "."
 }
 admit allow_implement=true verified (design_bound not applicable: no --ux)
-admission topology_gate item present and passing (AC-173, ref bc_0a05ec8db1cc3490)
+admission topology_gate item present and passing (AC-173, ref bc_91c8d32273766b8d)
 
 ===== STEP 8: 8 driver run-loop to release_gate =====
 {
-  "run_id": "run_d9dbfcc86759f0ba97341336",
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
   "state": "arming",
   "driver": {
-    "driver_id": "drv-a173e5268eb4",
+    "driver_id": "drv-608c936e0c7d",
     "state": "arming",
     "longrun": true,
     "turn_n": 0,
     "max_turns": 10,
     "turn_timeout_sec": 3600,
-    "started_at": "2026-10-23T07:58:28.304694619Z",
-    "updated_at": "2026-10-23T07:58:28.304697464Z",
+    "started_at": "2026-10-29T14:33:40.505591Z",
+    "updated_at": "2026-10-29T14:33:40.505593Z",
     "auto_release": false,
-    "lease_expires_at": "2026-10-23T08:08:28.304614449Z"
+    "lease_expires_at": "2026-10-29T14:43:40.505453Z"
   },
   "lease_active": true,
   "auto_release": false,
   "run": {
-    "run_id": "run_d9dbfcc86759f0ba97341336",
-    "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+    "run_id": "run_e1493d7ac816ab7007ac18ed",
+    "feature_id": "feat_3d20b0490734baf5ecba91c7",
     "feature_slug": "e2e-login-2fa",
     "status": "running",
     "run_status": "Running",
@@ -673,26 +673,26 @@ admission topology_gate item present and passing (AC-173, ref bc_0a05ec8db1cc349
     "release_human_confirmed": false,
     "repair_loop_count": 0,
     "blocked_streak": 0,
-    "last_heartbeat_at": "2026-10-23T07:58:28.164561511Z",
-    "started_at": "2026-10-23T07:58:28.170878981Z",
+    "last_heartbeat_at": "2026-10-29T14:33:39.81262Z",
+    "started_at": "2026-10-29T14:33:39.874216000Z",
     "driver": {
-      "driver_id": "drv-a173e5268eb4",
+      "driver_id": "drv-608c936e0c7d",
       "state": "arming",
       "longrun": true,
       "turn_n": 0,
       "max_turns": 10,
       "turn_timeout_sec": 3600,
-      "started_at": "2026-10-23T07:58:28.304694619Z",
-      "updated_at": "2026-10-23T07:58:28.304697464Z",
+      "started_at": "2026-10-29T14:33:40.505591Z",
+      "updated_at": "2026-10-29T14:33:40.505593Z",
       "auto_release": false,
-      "lease_expires_at": "2026-10-23T08:08:28.304614449Z"
+      "lease_expires_at": "2026-10-29T14:43:40.505453Z"
     },
     "supervisor": {
       "attached": true,
-      "session_id": "sup-8eb1c644c3ba",
+      "session_id": "sup-f1ac7460cd24",
       "state": "active",
       "interval_sec": 120,
-      "attached_at": "2026-10-23T07:58:28.305384004Z",
+      "attached_at": "2026-10-29T14:33:40.50754Z",
       "stall_count": 0
     },
     "budget": {
@@ -704,34 +704,34 @@ admission topology_gate item present and passing (AC-173, ref bc_0a05ec8db1cc349
     },
     "topology": {
       "status": "pass",
-      "topology_gate_ref": "bc_0a05ec8db1cc3490",
+      "topology_gate_ref": "bc_91c8d32273766b8d",
       "topology_kind": "single_repo",
-      "detail": "live topology gate evaluation over the recorded BranchContext bc_0a05ec8db1cc3490"
+      "detail": "live topology gate evaluation over the recorded BranchContext bc_91c8d32273766b8d"
     }
   }
 }
 {
-  "run_id": "run_d9dbfcc86759f0ba97341336",
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
   "rounds": 4,
   "final_state": "awaiting_human",
   "reason_code": "release_requires_human_confirmation",
   "driver": {
-    "driver_id": "drv-a173e5268eb4",
+    "driver_id": "drv-608c936e0c7d",
     "state": "awaiting_human",
     "longrun": true,
     "turn_n": 4,
     "max_turns": 10,
     "turn_timeout_sec": 3600,
-    "started_at": "2026-10-23T07:58:28.304694619Z",
-    "updated_at": "2026-10-23T07:58:28.529140577Z",
+    "started_at": "2026-10-29T14:33:40.505591Z",
+    "updated_at": "2026-10-29T14:33:43.131828Z",
     "halt_reason": "release_requires_human_confirmation",
     "next_prompt": "stage=release loop=release_gate next_skill=beacon-release action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
     "auto_release": false
   },
   "auto_release": false,
   "run": {
-    "run_id": "run_d9dbfcc86759f0ba97341336",
-    "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+    "run_id": "run_e1493d7ac816ab7007ac18ed",
+    "feature_id": "feat_3d20b0490734baf5ecba91c7",
     "feature_slug": "e2e-login-2fa",
     "status": "running",
     "run_status": "Running",
@@ -805,220 +805,220 @@ admission topology_gate item present and passing (AC-173, ref bc_0a05ec8db1cc349
     "release_human_confirmed": false,
     "repair_loop_count": 0,
     "blocked_streak": 0,
-    "last_heartbeat_at": "2026-10-23T07:58:28.529141788Z",
-    "started_at": "2026-10-23T07:58:28.170878981Z",
+    "last_heartbeat_at": "2026-10-29T14:33:43.131829Z",
+    "started_at": "2026-10-29T14:33:39.874216000Z",
     "driver": {
-      "driver_id": "drv-a173e5268eb4",
+      "driver_id": "drv-608c936e0c7d",
       "state": "awaiting_human",
       "longrun": true,
       "turn_n": 4,
       "max_turns": 10,
       "turn_timeout_sec": 3600,
-      "started_at": "2026-10-23T07:58:28.304694619Z",
-      "updated_at": "2026-10-23T07:58:28.529140577Z",
+      "started_at": "2026-10-29T14:33:40.505591Z",
+      "updated_at": "2026-10-29T14:33:43.131828Z",
       "halt_reason": "release_requires_human_confirmation",
       "next_prompt": "stage=release loop=release_gate next_skill=beacon-release action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
       "auto_release": false
     },
     "supervisor": {
       "attached": true,
-      "session_id": "sup-8eb1c644c3ba",
+      "session_id": "sup-f1ac7460cd24",
       "state": "active",
       "interval_sec": 120,
-      "attached_at": "2026-10-23T07:58:28.305384004Z",
+      "attached_at": "2026-10-29T14:33:40.50754Z",
       "stall_count": 0
     },
     "budget": {
       "max_rounds": 10,
       "max_duration_sec": 0,
       "used_rounds": 4,
-      "used_duration_sec": 0.208221609,
+      "used_duration_sec": 2.596587083,
       "exhausted": false
     },
     "topology": {
       "status": "pass",
-      "topology_gate_ref": "bc_0a05ec8db1cc3490",
+      "topology_gate_ref": "bc_91c8d32273766b8d",
       "topology_kind": "single_repo",
-      "detail": "live topology gate evaluation over the recorded BranchContext bc_0a05ec8db1cc3490"
+      "detail": "live topology gate evaluation over the recorded BranchContext bc_91c8d32273766b8d"
     }
   }
 }
 driver rounds=4, final_state=awaiting_human, loop_stage=release_gate
-/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336:
-total 20
-drwxr-x--- 2 root root  220 Oct 23 15:58 .
-drwxr-x--- 3 root root   60 Oct 23 15:58 ..
--rw-r----- 1 root root    0 Oct 23 15:58 implement-003.stderr.txt
--rw-r----- 1 root root  198 Oct 23 15:58 implement-003.stdout.txt
--rw-r----- 1 root root    0 Oct 23 15:58 plan-001.stderr.txt
--rw-r----- 1 root root  188 Oct 23 15:58 plan-001.stdout.txt
--rw-r----- 1 root root    0 Oct 23 15:58 qa-004.stderr.txt
--rw-r----- 1 root root  184 Oct 23 15:58 qa-004.stdout.txt
--rw-r----- 1 root root 2620 Oct 23 15:58 stage-context.json
--rw-r----- 1 root root    0 Oct 23 15:58 truth-002.stderr.txt
--rw-r----- 1 root root  190 Oct 23 15:58 truth-002.stdout.txt
+/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed:
+total 40
+drwxr-xr-x@ 11 apple  wheel   352 Oct 29 22:33 .
+drwxr-xr-x@  3 apple  wheel    96 Oct 29 22:33 ..
+-rw-r--r--@  1 apple  wheel     0 Oct 29 22:33 implement-003.stderr.txt
+-rw-r--r--@  1 apple  wheel   206 Oct 29 22:33 implement-003.stdout.txt
+-rw-r--r--@  1 apple  wheel     0 Oct 29 22:33 plan-001.stderr.txt
+-rw-r--r--@  1 apple  wheel   196 Oct 29 22:33 plan-001.stdout.txt
+-rw-r--r--@  1 apple  wheel     0 Oct 29 22:33 qa-004.stderr.txt
+-rw-r--r--@  1 apple  wheel   192 Oct 29 22:33 qa-004.stdout.txt
+-rw-r--r--@  1 apple  wheel  2652 Oct 29 22:33 stage-context.json
+-rw-r--r--@  1 apple  wheel     0 Oct 29 22:33 truth-002.stderr.txt
+-rw-r--r--@  1 apple  wheel   198 Oct 29 22:33 truth-002.stdout.txt
 
-/tmp/beacon-e2e.9oyesaUK/proj/e2e-work:
-total 12
-drwxrwx--- 2 root root 100 Oct 23 15:58 .
-drwxrwx--- 6 root root 140 Oct 23 15:58 ..
--rw-rw---- 1 root root 180 Oct 23 15:58 agent-output.txt
--rw-rw---- 1 root root  60 Oct 23 15:58 implementation.txt
--rw-rw---- 1 root root 222 Oct 23 15:58 qa-report.md
+/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work:
+total 24
+drwxr-xr-x@ 5 apple  wheel  160 Oct 29 22:33 .
+drwxr-xr-x@ 7 apple  wheel  224 Oct 29 22:33 ..
+-rw-r--r--@ 1 apple  wheel  180 Oct 29 22:33 agent-output.txt
+-rw-r--r--@ 1 apple  wheel   60 Oct 29 22:33 implementation.txt
+-rw-r--r--@ 1 apple  wheel  222 Oct 29 22:33 qa-report.md
 agent work products verified (implementation.txt, qa-report.md, kernel stage captures)
 
 ===== STEP 8b: 8b goal artifacts register (QA report -> registered evidence) =====
 {
   "artifact": {
-    "id": "art_2623b4dbfafe024da48af891",
-    "run_id": "run_d9dbfcc86759f0ba97341336",
+    "id": "art_95337a05c907d5b0057fdc89",
+    "run_id": "run_e1493d7ac816ab7007ac18ed",
     "kind": "qa_report",
-    "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md",
+    "abs_path": "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md",
     "content_hash": "06d88e074aca03a7acb44fa82a0e444141a7d4cea20c64f2660e6b259a7b2421",
     "size_bytes": 222,
-    "created_at": "2026-10-23T07:58:28.650141563Z"
+    "created_at": "2026-10-29T14:33:43.344509000Z"
   },
   "already_registered": false
 }
-QA report registered as artifact art_2623b4dbfafe024da48af891 (sha256 recorded by the register face)
+QA report registered as artifact art_95337a05c907d5b0057fdc89 (sha256 recorded by the register face)
 {
   "artifact_refs": [
     {
-      "id": "art_075b5249a63866174537480a",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_c22895eea06e957b394c5605",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_context",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
       "content_hash": "",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.31769592Z",
+      "created_at": "2026-10-29T14:33:40.529829000Z",
       "stale": true,
       "stale_reason": "hash_mismatch"
     },
     {
-      "id": "art_ba953b9a39eb102417d0170e",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_573ad9bfd4413e4c20d405ca",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stdout",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/plan-001.stdout.txt",
-      "content_hash": "beb8571f8b02620a28c45955eb2f0c783c51c826bc3733ea4799594c8405f08a",
-      "size_bytes": 188,
-      "created_at": "2026-10-23T07:58:28.32194694Z",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/plan-001.stdout.txt",
+      "content_hash": "4ac69edf0b63e4de8c5734fc333f70ff980dbcc11537f8851fb6df91fd8d907e",
+      "size_bytes": 196,
+      "created_at": "2026-10-29T14:33:41.163050000Z",
       "stale": false
     },
     {
-      "id": "art_11214dbcb7c2a310a2384c4a",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_348a5c895601c9d198d0b67a",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stderr",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/plan-001.stderr.txt",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/plan-001.stderr.txt",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.322064366Z",
+      "created_at": "2026-10-29T14:33:41.163242000Z",
       "stale": false
     },
     {
-      "id": "art_e56f933d9308633b2ef5f169",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_3eb2c76fe2176c1c2ae1dcd5",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_context",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
       "content_hash": "",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.334556293Z",
+      "created_at": "2026-10-29T14:33:41.276607000Z",
       "stale": true,
       "stale_reason": "hash_mismatch"
     },
     {
-      "id": "art_2f8d55ae05a986a596c21906",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_1a8a2f1313fc06beda218f5f",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stdout",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/truth-002.stdout.txt",
-      "content_hash": "f2660b3436d0c4fa9b60e3574de155d3a8d15a0c3d7c6eab781c3289207f2768",
-      "size_bytes": 190,
-      "created_at": "2026-10-23T07:58:28.337693861Z",
-      "stale": false
-    },
-    {
-      "id": "art_768b1677c9a985aaf418352a",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
-      "kind": "stage_stderr",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/truth-002.stderr.txt",
-      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.337903366Z",
-      "stale": false
-    },
-    {
-      "id": "art_62b6561ec672246fcc21448b",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
-      "kind": "stage_context",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
-      "content_hash": "",
-      "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.500337061Z",
-      "stale": true,
-      "stale_reason": "hash_mismatch"
-    },
-    {
-      "id": "art_e903c394a8c27fb99316347c",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
-      "kind": "stage_stdout",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/implement-003.stdout.txt",
-      "content_hash": "36c080c71c276fa37086024e777f861b41201028382f297920dd155c19de47a9",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/truth-002.stdout.txt",
+      "content_hash": "41abd6e0a381b66d323f79703b13d99958b46844f95f814adf93f3a05d9f6477",
       "size_bytes": 198,
-      "created_at": "2026-10-23T07:58:28.50320855Z",
+      "created_at": "2026-10-29T14:33:41.290526000Z",
       "stale": false
     },
     {
-      "id": "art_13521511bb01bd33a528334f",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_28bae6a9b05895a7d05bdaff",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stderr",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/implement-003.stderr.txt",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/truth-002.stderr.txt",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.503310463Z",
+      "created_at": "2026-10-29T14:33:41.290884000Z",
       "stale": false
     },
     {
-      "id": "art_31d6919d9bd7b55279a40929",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_4311a052560256986906efe9",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_context",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
       "content_hash": "",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.517313287Z",
+      "created_at": "2026-10-29T14:33:42.926542000Z",
       "stale": true,
       "stale_reason": "hash_mismatch"
     },
     {
-      "id": "art_f6faf60188b03ded15ae139e",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_3c3520a4b1bb2e7a616d2523",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stdout",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/qa-004.stdout.txt",
-      "content_hash": "bbfba3a24b27bd3953ea44ec61dd6c0f33bbd9d300c867f7fd5cec3ec4b37090",
-      "size_bytes": 184,
-      "created_at": "2026-10-23T07:58:28.520362083Z",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/implement-003.stdout.txt",
+      "content_hash": "332564dfec826c43050b840735c7598bcffeaaa550f5ae3582d209988abd51ae",
+      "size_bytes": 206,
+      "created_at": "2026-10-29T14:33:42.938041000Z",
       "stale": false
     },
     {
-      "id": "art_ebdad2c8e60e878d9542904d",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_46c169677f5c78b0b66b39d2",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stderr",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/qa-004.stderr.txt",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/implement-003.stderr.txt",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.520595633Z",
+      "created_at": "2026-10-29T14:33:42.938238000Z",
       "stale": false
     },
     {
-      "id": "art_2623b4dbfafe024da48af891",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_c8d1c9ccb3128141fb731140",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
+      "kind": "stage_context",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
+      "content_hash": "",
+      "size_bytes": 0,
+      "created_at": "2026-10-29T14:33:43.030601000Z",
+      "stale": true,
+      "stale_reason": "hash_mismatch"
+    },
+    {
+      "id": "art_f5df6d3688330fceffa8cc02",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
+      "kind": "stage_stdout",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/qa-004.stdout.txt",
+      "content_hash": "7dca5845530a0d6668644a4fbbf55100260e96c92170888d5de82606984fce48",
+      "size_bytes": 192,
+      "created_at": "2026-10-29T14:33:43.040952000Z",
+      "stale": false
+    },
+    {
+      "id": "art_b315ee5c375208259c822007",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
+      "kind": "stage_stderr",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/qa-004.stderr.txt",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "created_at": "2026-10-29T14:33:43.041136000Z",
+      "stale": false
+    },
+    {
+      "id": "art_95337a05c907d5b0057fdc89",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "qa_report",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md",
+      "abs_path": "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md",
       "content_hash": "06d88e074aca03a7acb44fa82a0e444141a7d4cea20c64f2660e6b259a7b2421",
       "size_bytes": 222,
-      "created_at": "2026-10-23T07:58:28.650141563Z",
+      "created_at": "2026-10-29T14:33:43.344509000Z",
       "stale": false
     }
   ],
-  "run_id": "run_d9dbfcc86759f0ba97341336"
+  "run_id": "run_e1493d7ac816ab7007ac18ed"
 }
 
 ===== STEP 9: 9 gate evaluate design/implement/qa/release =====
@@ -1035,11 +1035,11 @@ QA report registered as artifact art_2623b4dbfafe024da48af891 (sha256 recorded b
     }
   ],
   "evaluator": "e2e-evaluator",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
-  "run_id": "run_d9dbfcc86759f0ba97341336",
-  "gate_result_id": "gate_6914720c9b0ad2ff1dd3f8c8",
-  "evaluated_at": "2026-10-23T07:58:28.744745947Z"
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
+  "gate_result_id": "gate_a8b68b59e25973dea6de0a99",
+  "evaluated_at": "2026-10-29T14:33:43.499691000Z"
 }
 gate design cli_rc=0
 gate design verdict=pass
@@ -1082,7 +1082,7 @@ gate design verdict=pass
       "check": "baseline_merged",
       "ok": true,
       "applicable": true,
-      "detail": "worktree HEAD 55208074ed0a contains truth_baseline_commit 55208074ed0a"
+      "detail": "worktree HEAD cf3750a2924a contains truth_baseline_commit cf3750a2924a"
     },
     {
       "check": "dirty_policy",
@@ -1094,7 +1094,7 @@ gate design verdict=pass
       "check": "topology_gate",
       "ok": true,
       "applicable": true,
-      "detail": "topology gate pass over bc_0a05ec8db1cc3490 (single_repo, 1 scope(s))"
+      "detail": "topology gate pass over bc_91c8d32273766b8d (single_repo, 1 scope(s))"
     },
     {
       "check": "review_decision",
@@ -1104,11 +1104,11 @@ gate design verdict=pass
     }
   ],
   "evaluator": "e2e-evaluator",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
-  "run_id": "run_d9dbfcc86759f0ba97341336",
-  "gate_result_id": "gate_83f5f74257b34e3649840fef",
-  "evaluated_at": "2026-10-23T07:58:28.803730305Z"
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
+  "gate_result_id": "gate_7dd147b13c3bbc581bb7e347",
+  "evaluated_at": "2026-10-29T14:33:43.917761000Z"
 }
 gate implement cli_rc=0
 gate implement verdict=pass
@@ -1137,11 +1137,11 @@ gate implement verdict=pass
     }
   ],
   "evaluator": "e2e-evaluator",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
-  "run_id": "run_d9dbfcc86759f0ba97341336",
-  "gate_result_id": "gate_91999b54b259763ef6f4c830",
-  "evaluated_at": "2026-10-23T07:58:28.820117978Z"
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
+  "gate_result_id": "gate_40be71e32e4a9e32dde87fe9",
+  "evaluated_at": "2026-10-29T14:33:43.942056000Z"
 }
 gate qa cli_rc=0
 gate qa verdict=pass
@@ -1192,42 +1192,42 @@ gate qa verdict=pass
     }
   ],
   "evaluator": "e2e-evaluator",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
-  "run_id": "run_d9dbfcc86759f0ba97341336",
-  "gate_result_id": "gate_d599697663cbbcdcc6416954",
-  "evaluated_at": "2026-10-23T07:58:28.836310438Z"
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
+  "gate_result_id": "gate_03dcca5ecb76b2fe96ae489c",
+  "evaluated_at": "2026-10-29T14:33:43.969647000Z"
 }
 Error: gate evaluate: gate release blocked for feature e2e-login-2fa (release_requires_human_confirmation)
 gate release cli_rc=1
 gate release verdict=blocked
 {
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
   "gates": [
     {
       "gate_type": "truth_freeze",
       "evaluated": true,
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:28.029348716Z"
+      "evaluated_at": "2026-10-29T14:33:39.480796000Z"
     },
     {
       "gate_type": "design",
       "evaluated": true,
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:28.744745947Z"
+      "evaluated_at": "2026-10-29T14:33:43.499691000Z"
     },
     {
       "gate_type": "implement",
       "evaluated": true,
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:28.803730305Z"
+      "evaluated_at": "2026-10-29T14:33:43.917761000Z"
     },
     {
       "gate_type": "qa",
       "evaluated": true,
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:28.820117978Z"
+      "evaluated_at": "2026-10-29T14:33:43.942056000Z"
     },
     {
       "gate_type": "release",
@@ -1236,13 +1236,13 @@ gate release verdict=blocked
       "reason_codes": [
         "release_requires_human_confirmation"
       ],
-      "evaluated_at": "2026-10-23T07:58:28.836310438Z"
+      "evaluated_at": "2026-10-29T14:33:43.969647000Z"
     },
     {
       "gate_type": "truth_integrity",
       "evaluated": true,
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:27.831702227Z"
+      "evaluated_at": "2026-10-29T14:33:38.334296000Z"
     }
   ],
   "version": "v1.0.0"
@@ -1250,8 +1250,8 @@ gate release verdict=blocked
 
 ===== STEP 10: 10 attach-verifier + complete =====
 {
-  "run_id": "run_d9dbfcc86759f0ba97341336",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
   "status": "running",
   "run_status": "Running",
@@ -1322,54 +1322,54 @@ gate release verdict=blocked
     "required_for_complete": true,
     "present": true,
     "refs": [
-      "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md"
+      "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md"
     ],
     "source": "e2e-checker"
   },
   "release_human_confirmed": false,
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-10-23T07:58:28.529141788Z",
-  "started_at": "2026-10-23T07:58:28.170878981Z",
+  "last_heartbeat_at": "2026-10-29T14:33:43.131829Z",
+  "started_at": "2026-10-29T14:33:39.874216000Z",
   "driver": {
-    "driver_id": "drv-a173e5268eb4",
+    "driver_id": "drv-608c936e0c7d",
     "state": "awaiting_human",
     "longrun": true,
     "turn_n": 4,
     "max_turns": 10,
     "turn_timeout_sec": 3600,
-    "started_at": "2026-10-23T07:58:28.304694619Z",
-    "updated_at": "2026-10-23T07:58:28.529140577Z",
+    "started_at": "2026-10-29T14:33:40.505591Z",
+    "updated_at": "2026-10-29T14:33:43.131828Z",
     "halt_reason": "release_requires_human_confirmation",
     "next_prompt": "stage=release loop=release_gate next_skill=beacon-release action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
     "auto_release": false
   },
   "supervisor": {
     "attached": true,
-    "session_id": "sup-8eb1c644c3ba",
+    "session_id": "sup-f1ac7460cd24",
     "state": "active",
     "interval_sec": 120,
-    "attached_at": "2026-10-23T07:58:28.305384004Z",
+    "attached_at": "2026-10-29T14:33:40.50754Z",
     "stall_count": 0
   },
   "budget": {
     "max_rounds": 10,
     "max_duration_sec": 0,
     "used_rounds": 4,
-    "used_duration_sec": 0.208221609,
+    "used_duration_sec": 2.596587083,
     "exhausted": false
   },
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_0a05ec8db1cc3490",
+    "topology_gate_ref": "bc_91c8d32273766b8d",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_0a05ec8db1cc3490"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_91c8d32273766b8d"
   }
 }
 verifier attached (source=e2e-checker != maker=e2e-maker)
 {
-  "run_id": "run_d9dbfcc86759f0ba97341336",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
   "status": "completed",
   "run_status": "Succeeded",
@@ -1440,48 +1440,48 @@ verifier attached (source=e2e-checker != maker=e2e-maker)
     "required_for_complete": true,
     "present": true,
     "refs": [
-      "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md"
+      "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md"
     ],
     "source": "e2e-checker"
   },
   "release_human_confirmed": true,
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-10-23T07:58:28.529141788Z",
-  "started_at": "2026-10-23T07:58:28.170878981Z",
+  "last_heartbeat_at": "2026-10-29T14:33:43.131829Z",
+  "started_at": "2026-10-29T14:33:39.874216000Z",
   "driver": {
-    "driver_id": "drv-a173e5268eb4",
+    "driver_id": "drv-608c936e0c7d",
     "state": "awaiting_human",
     "longrun": true,
     "turn_n": 4,
     "max_turns": 10,
     "turn_timeout_sec": 3600,
-    "started_at": "2026-10-23T07:58:28.304694619Z",
-    "updated_at": "2026-10-23T07:58:28.529140577Z",
+    "started_at": "2026-10-29T14:33:40.505591Z",
+    "updated_at": "2026-10-29T14:33:43.131828Z",
     "halt_reason": "release_requires_human_confirmation",
     "next_prompt": "stage=release loop=release_gate next_skill=beacon-release action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
     "auto_release": false
   },
   "supervisor": {
     "attached": true,
-    "session_id": "sup-8eb1c644c3ba",
+    "session_id": "sup-f1ac7460cd24",
     "state": "active",
     "interval_sec": 120,
-    "attached_at": "2026-10-23T07:58:28.305384004Z",
+    "attached_at": "2026-10-29T14:33:40.50754Z",
     "stall_count": 0
   },
   "budget": {
     "max_rounds": 10,
     "max_duration_sec": 0,
     "used_rounds": 4,
-    "used_duration_sec": 0.208221609,
+    "used_duration_sec": 2.596587083,
     "exhausted": false
   },
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_0a05ec8db1cc3490",
+    "topology_gate_ref": "bc_91c8d32273766b8d",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_0a05ec8db1cc3490"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_91c8d32273766b8d"
   }
 }
 complete cli_rc=0
@@ -1489,11 +1489,11 @@ run completed (loop_stage=done)
 
 ===== STEP 11: 11 spine + trace read-back =====
 {
-  "run_id": "run_d9dbfcc86759f0ba97341336",
-  "project_key": "proj--48d7823fab",
-  "project_root": "/tmp/beacon-e2e.9oyesaUK/proj",
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
+  "project_key": "proj--3ebb1474ba",
+  "project_root": "/private/tmp/beacon-e2e.Pjw7e32Z/proj",
   "version": "v1.0.0",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
   "slug": "e2e-login-2fa",
   "lifecycle_stage": "Release",
@@ -1513,16 +1513,16 @@ run completed (loop_stage=done)
   "run_status": "Succeeded",
   "iteration": 0,
   "blocking_reason_codes": [],
-  "updated_at": "2026-10-23T07:58:28.871313027Z",
+  "updated_at": "2026-10-29T14:33:44.031151000Z",
   "run_count": 1,
   "latest_run": {
-    "id": "run_d9dbfcc86759f0ba97341336",
-    "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+    "id": "run_e1493d7ac816ab7007ac18ed",
+    "feature_id": "feat_3d20b0490734baf5ecba91c7",
     "run_kind": "goal",
     "status": "Succeeded",
     "iteration": 0,
-    "started_at": "2026-10-23T07:58:28.170878981Z",
-    "ended_at": "2026-10-23T07:58:28.871267098Z",
+    "started_at": "2026-10-29T14:33:39.874216000Z",
+    "ended_at": "2026-10-29T14:33:44.031112Z",
     "metadata_json": {
       "utterance": "给登录加 TOTP 二次验证",
       "ux_required": false,
@@ -1601,7 +1601,7 @@ run completed (loop_stage=done)
         "required_for_complete": true,
         "present": true,
         "refs": [
-          "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md"
+          "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md"
         ],
         "source": "e2e-checker"
       },
@@ -1610,31 +1610,31 @@ run completed (loop_stage=done)
       "blocked": false,
       "blocked_streak": 0,
       "repair_loop_count": 0,
-      "last_heartbeat_at": "2026-10-23T07:58:28.529141788Z",
+      "last_heartbeat_at": "2026-10-29T14:33:43.131829Z",
       "last_substep": "driver-turn-4",
       "last_checkpoint_next_action": "stage=release loop=release_gate next_skill=beacon-release action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
       "interrupt_pending": false,
       "interrupt_count": 0,
-      "last_tick_key": "run_d9dbfcc86759f0ba97341336|qa_routing|qa|3|admission_bundle=pass@2026-10-23T07:58:28.466151859Z|truth_freeze=pass@2026-10-23T07:58:28.029348716Z|truth_integrity=pass@2026-10-23T07:58:27.831702227Z",
+      "last_tick_key": "run_e1493d7ac816ab7007ac18ed|qa_routing|qa|3|admission_bundle=pass@2026-10-29T14:33:42.523766000Z|truth_freeze=pass@2026-10-29T14:33:39.480796000Z|truth_integrity=pass@2026-10-29T14:33:38.334296000Z",
       "driver": {
-        "driver_id": "drv-a173e5268eb4",
+        "driver_id": "drv-608c936e0c7d",
         "state": "awaiting_human",
         "longrun": true,
         "turn_n": 4,
         "max_turns": 10,
         "turn_timeout_sec": 3600,
-        "started_at": "2026-10-23T07:58:28.304694619Z",
-        "updated_at": "2026-10-23T07:58:28.529140577Z",
+        "started_at": "2026-10-29T14:33:40.505591Z",
+        "updated_at": "2026-10-29T14:33:43.131828Z",
         "halt_reason": "release_requires_human_confirmation",
         "next_prompt": "stage=release loop=release_gate next_skill=beacon-release action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
         "auto_release": false
       },
       "supervisor": {
         "attached": true,
-        "session_id": "sup-8eb1c644c3ba",
+        "session_id": "sup-f1ac7460cd24",
         "state": "active",
         "interval_sec": 120,
-        "attached_at": "2026-10-23T07:58:28.305384004Z",
+        "attached_at": "2026-10-29T14:33:40.50754Z",
         "stall_count": 0
       },
       "heartbeat_interval_sec": 120,
@@ -1643,7 +1643,7 @@ run completed (loop_stage=done)
         "max_rounds": 10,
         "max_duration_sec": 0,
         "used_rounds": 4,
-        "used_duration_sec": 0.208221609,
+        "used_duration_sec": 2.596587083,
         "exhausted": false
       },
       "todo_seq": 0,
@@ -1652,67 +1652,67 @@ run completed (loop_stage=done)
       },
       "exec": {
         "argv": [
-          "/tmp/beacon-e2e.9oyesaUK/bin/agent.sh"
+          "/tmp/beacon-e2e.Pjw7e32Z/bin/agent.sh"
         ],
         "profile": "codex-style",
         "profile_argv": [
-          "/tmp/beacon-e2e.9oyesaUK/bin/agent.sh"
+          "/tmp/beacon-e2e.Pjw7e32Z/bin/agent.sh"
         ]
       },
       "topology": {
         "status": "pass",
-        "topology_gate_ref": "bc_0a05ec8db1cc3490",
+        "topology_gate_ref": "bc_91c8d32273766b8d",
         "topology_kind": "single_repo",
-        "detail": "live topology gate evaluation over the recorded BranchContext bc_0a05ec8db1cc3490"
+        "detail": "live topology gate evaluation over the recorded BranchContext bc_91c8d32273766b8d"
       },
       "quota": {
         "quota_ledger": [
           {
             "slots": 1,
-            "at": "2026-10-23T07:58:28.332844364Z"
+            "at": "2026-10-29T14:33:41.274102Z"
           },
           {
             "slots": 1,
-            "at": "2026-10-23T07:58:28.349349984Z"
+            "at": "2026-10-29T14:33:41.461714Z"
           },
           {
             "slots": 1,
-            "at": "2026-10-23T07:58:28.515584483Z"
+            "at": "2026-10-29T14:33:43.029317Z"
           },
           {
             "slots": 1,
-            "at": "2026-10-23T07:58:28.529148849Z"
+            "at": "2026-10-29T14:33:43.131838Z"
           }
         ]
       },
       "spend_ledger": {
         "schema": "goal-spend-ledger.v1",
-        "goal_id": "run_d9dbfcc86759f0ba97341336",
+        "goal_id": "run_e1493d7ac816ab7007ac18ed",
         "quota_limit": 10,
         "spent": 4,
         "entries": [
           {
             "index": 1,
             "source": "delivery_completion",
-            "index_digest": "run_d9dbfcc86759f0ba97341336:turn:1",
+            "index_digest": "run_e1493d7ac816ab7007ac18ed:turn:1",
             "writeback_ref": ""
           },
           {
             "index": 2,
             "source": "delivery_completion",
-            "index_digest": "run_d9dbfcc86759f0ba97341336:turn:2",
+            "index_digest": "run_e1493d7ac816ab7007ac18ed:turn:2",
             "writeback_ref": ""
           },
           {
             "index": 3,
             "source": "delivery_completion",
-            "index_digest": "run_d9dbfcc86759f0ba97341336:turn:3",
+            "index_digest": "run_e1493d7ac816ab7007ac18ed:turn:3",
             "writeback_ref": ""
           },
           {
             "index": 4,
             "source": "delivery_completion",
-            "index_digest": "run_d9dbfcc86759f0ba97341336:turn:4",
+            "index_digest": "run_e1493d7ac816ab7007ac18ed:turn:4",
             "writeback_ref": ""
           }
         ]
@@ -1721,191 +1721,191 @@ run completed (loop_stage=done)
   },
   "gate_results": [
     {
-      "id": "gate_357e41004d94ee9faa7ed26c",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "gate_f5096220886ecc9430c3cbbb",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "gate_type": "admission_bundle",
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:28.466151859Z"
+      "evaluated_at": "2026-10-29T14:33:42.523766000Z"
     },
     {
-      "id": "gate_6914720c9b0ad2ff1dd3f8c8",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "gate_a8b68b59e25973dea6de0a99",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "gate_type": "design",
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:28.744745947Z"
+      "evaluated_at": "2026-10-29T14:33:43.499691000Z"
     },
     {
-      "id": "gate_83f5f74257b34e3649840fef",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "gate_7dd147b13c3bbc581bb7e347",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "gate_type": "implement",
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:28.803730305Z"
+      "evaluated_at": "2026-10-29T14:33:43.917761000Z"
     },
     {
-      "id": "gate_91999b54b259763ef6f4c830",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "gate_40be71e32e4a9e32dde87fe9",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "gate_type": "qa",
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:28.820117978Z"
+      "evaluated_at": "2026-10-29T14:33:43.942056000Z"
     },
     {
-      "id": "gate_d599697663cbbcdcc6416954",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "gate_03dcca5ecb76b2fe96ae489c",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "gate_type": "release",
       "verdict": "blocked",
       "reason_codes": [
         "release_requires_human_confirmation"
       ],
-      "evaluated_at": "2026-10-23T07:58:28.836310438Z"
+      "evaluated_at": "2026-10-29T14:33:43.969647000Z"
     },
     {
-      "id": "gate_d568e5575b182fa30f601564",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "gate_6cd306e3a67ca3e80e11210e",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "gate_type": "truth_freeze",
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:28.029348716Z"
+      "evaluated_at": "2026-10-29T14:33:39.480796000Z"
     },
     {
-      "id": "gate_19856f97cc2a9822315f57f5",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "gate_9c1eb5327002320cca548fdb",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "gate_type": "truth_integrity",
       "verdict": "pass",
-      "evaluated_at": "2026-10-23T07:58:27.831702227Z"
+      "evaluated_at": "2026-10-29T14:33:38.334296000Z"
     }
   ],
   "artifact_refs": [
     {
-      "id": "art_075b5249a63866174537480a",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_c22895eea06e957b394c5605",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_context",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
       "content_hash": "",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.31769592Z",
+      "created_at": "2026-10-29T14:33:40.529829000Z",
       "stale": true,
       "stale_reason": "hash_mismatch"
     },
     {
-      "id": "art_ba953b9a39eb102417d0170e",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_573ad9bfd4413e4c20d405ca",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stdout",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/plan-001.stdout.txt",
-      "content_hash": "beb8571f8b02620a28c45955eb2f0c783c51c826bc3733ea4799594c8405f08a",
-      "size_bytes": 188,
-      "created_at": "2026-10-23T07:58:28.32194694Z",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/plan-001.stdout.txt",
+      "content_hash": "4ac69edf0b63e4de8c5734fc333f70ff980dbcc11537f8851fb6df91fd8d907e",
+      "size_bytes": 196,
+      "created_at": "2026-10-29T14:33:41.163050000Z",
       "stale": false
     },
     {
-      "id": "art_11214dbcb7c2a310a2384c4a",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_348a5c895601c9d198d0b67a",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stderr",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/plan-001.stderr.txt",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/plan-001.stderr.txt",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.322064366Z",
+      "created_at": "2026-10-29T14:33:41.163242000Z",
       "stale": false
     },
     {
-      "id": "art_e56f933d9308633b2ef5f169",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_3eb2c76fe2176c1c2ae1dcd5",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_context",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
       "content_hash": "",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.334556293Z",
+      "created_at": "2026-10-29T14:33:41.276607000Z",
       "stale": true,
       "stale_reason": "hash_mismatch"
     },
     {
-      "id": "art_2f8d55ae05a986a596c21906",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_1a8a2f1313fc06beda218f5f",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stdout",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/truth-002.stdout.txt",
-      "content_hash": "f2660b3436d0c4fa9b60e3574de155d3a8d15a0c3d7c6eab781c3289207f2768",
-      "size_bytes": 190,
-      "created_at": "2026-10-23T07:58:28.337693861Z",
-      "stale": false
-    },
-    {
-      "id": "art_768b1677c9a985aaf418352a",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
-      "kind": "stage_stderr",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/truth-002.stderr.txt",
-      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.337903366Z",
-      "stale": false
-    },
-    {
-      "id": "art_62b6561ec672246fcc21448b",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
-      "kind": "stage_context",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
-      "content_hash": "",
-      "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.500337061Z",
-      "stale": true,
-      "stale_reason": "hash_mismatch"
-    },
-    {
-      "id": "art_e903c394a8c27fb99316347c",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
-      "kind": "stage_stdout",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/implement-003.stdout.txt",
-      "content_hash": "36c080c71c276fa37086024e777f861b41201028382f297920dd155c19de47a9",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/truth-002.stdout.txt",
+      "content_hash": "41abd6e0a381b66d323f79703b13d99958b46844f95f814adf93f3a05d9f6477",
       "size_bytes": 198,
-      "created_at": "2026-10-23T07:58:28.50320855Z",
+      "created_at": "2026-10-29T14:33:41.290526000Z",
       "stale": false
     },
     {
-      "id": "art_13521511bb01bd33a528334f",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_28bae6a9b05895a7d05bdaff",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stderr",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/implement-003.stderr.txt",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/truth-002.stderr.txt",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.503310463Z",
+      "created_at": "2026-10-29T14:33:41.290884000Z",
       "stale": false
     },
     {
-      "id": "art_31d6919d9bd7b55279a40929",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_4311a052560256986906efe9",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_context",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
       "content_hash": "",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.517313287Z",
+      "created_at": "2026-10-29T14:33:42.926542000Z",
       "stale": true,
       "stale_reason": "hash_mismatch"
     },
     {
-      "id": "art_f6faf60188b03ded15ae139e",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_3c3520a4b1bb2e7a616d2523",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stdout",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/qa-004.stdout.txt",
-      "content_hash": "bbfba3a24b27bd3953ea44ec61dd6c0f33bbd9d300c867f7fd5cec3ec4b37090",
-      "size_bytes": 184,
-      "created_at": "2026-10-23T07:58:28.520362083Z",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/implement-003.stdout.txt",
+      "content_hash": "332564dfec826c43050b840735c7598bcffeaaa550f5ae3582d209988abd51ae",
+      "size_bytes": 206,
+      "created_at": "2026-10-29T14:33:42.938041000Z",
       "stale": false
     },
     {
-      "id": "art_ebdad2c8e60e878d9542904d",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_46c169677f5c78b0b66b39d2",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "stage_stderr",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/qa-004.stderr.txt",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/implement-003.stderr.txt",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size_bytes": 0,
-      "created_at": "2026-10-23T07:58:28.520595633Z",
+      "created_at": "2026-10-29T14:33:42.938238000Z",
       "stale": false
     },
     {
-      "id": "art_2623b4dbfafe024da48af891",
-      "run_id": "run_d9dbfcc86759f0ba97341336",
+      "id": "art_c8d1c9ccb3128141fb731140",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
+      "kind": "stage_context",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
+      "content_hash": "",
+      "size_bytes": 0,
+      "created_at": "2026-10-29T14:33:43.030601000Z",
+      "stale": true,
+      "stale_reason": "hash_mismatch"
+    },
+    {
+      "id": "art_f5df6d3688330fceffa8cc02",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
+      "kind": "stage_stdout",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/qa-004.stdout.txt",
+      "content_hash": "7dca5845530a0d6668644a4fbbf55100260e96c92170888d5de82606984fce48",
+      "size_bytes": 192,
+      "created_at": "2026-10-29T14:33:43.040952000Z",
+      "stale": false
+    },
+    {
+      "id": "art_b315ee5c375208259c822007",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
+      "kind": "stage_stderr",
+      "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/qa-004.stderr.txt",
+      "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "created_at": "2026-10-29T14:33:43.041136000Z",
+      "stale": false
+    },
+    {
+      "id": "art_95337a05c907d5b0057fdc89",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
       "kind": "qa_report",
-      "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md",
+      "abs_path": "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md",
       "content_hash": "06d88e074aca03a7acb44fa82a0e444141a7d4cea20c64f2660e6b259a7b2421",
       "size_bytes": 222,
-      "created_at": "2026-10-23T07:58:28.650141563Z",
+      "created_at": "2026-10-29T14:33:43.344509000Z",
       "stale": false
     }
   ],
@@ -1914,11 +1914,11 @@ run completed (loop_stage=done)
 {
   "snapshots": [
     {
-      "run_id": "run_d9dbfcc86759f0ba97341336",
-      "project_key": "proj--48d7823fab",
-      "project_root": "/tmp/beacon-e2e.9oyesaUK/proj",
+      "run_id": "run_e1493d7ac816ab7007ac18ed",
+      "project_key": "proj--3ebb1474ba",
+      "project_root": "/private/tmp/beacon-e2e.Pjw7e32Z/proj",
       "version": "v1.0.0",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "feature_slug": "e2e-login-2fa",
       "slug": "e2e-login-2fa",
       "lifecycle_stage": "Release",
@@ -1938,16 +1938,16 @@ run completed (loop_stage=done)
       "run_status": "Succeeded",
       "iteration": 0,
       "blocking_reason_codes": [],
-      "updated_at": "2026-10-23T07:58:28.871313027Z",
+      "updated_at": "2026-10-29T14:33:44.031151000Z",
       "run_count": 1,
       "latest_run": {
-        "id": "run_d9dbfcc86759f0ba97341336",
-        "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+        "id": "run_e1493d7ac816ab7007ac18ed",
+        "feature_id": "feat_3d20b0490734baf5ecba91c7",
         "run_kind": "goal",
         "status": "Succeeded",
         "iteration": 0,
-        "started_at": "2026-10-23T07:58:28.170878981Z",
-        "ended_at": "2026-10-23T07:58:28.871267098Z",
+        "started_at": "2026-10-29T14:33:39.874216000Z",
+        "ended_at": "2026-10-29T14:33:44.031112Z",
         "metadata_json": {
           "utterance": "给登录加 TOTP 二次验证",
           "ux_required": false,
@@ -2026,7 +2026,7 @@ run completed (loop_stage=done)
             "required_for_complete": true,
             "present": true,
             "refs": [
-              "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md"
+              "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md"
             ],
             "source": "e2e-checker"
           },
@@ -2035,31 +2035,31 @@ run completed (loop_stage=done)
           "blocked": false,
           "blocked_streak": 0,
           "repair_loop_count": 0,
-          "last_heartbeat_at": "2026-10-23T07:58:28.529141788Z",
+          "last_heartbeat_at": "2026-10-29T14:33:43.131829Z",
           "last_substep": "driver-turn-4",
           "last_checkpoint_next_action": "stage=release loop=release_gate next_skill=beacon-release action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
           "interrupt_pending": false,
           "interrupt_count": 0,
-          "last_tick_key": "run_d9dbfcc86759f0ba97341336|qa_routing|qa|3|admission_bundle=pass@2026-10-23T07:58:28.466151859Z|truth_freeze=pass@2026-10-23T07:58:28.029348716Z|truth_integrity=pass@2026-10-23T07:58:27.831702227Z",
+          "last_tick_key": "run_e1493d7ac816ab7007ac18ed|qa_routing|qa|3|admission_bundle=pass@2026-10-29T14:33:42.523766000Z|truth_freeze=pass@2026-10-29T14:33:39.480796000Z|truth_integrity=pass@2026-10-29T14:33:38.334296000Z",
           "driver": {
-            "driver_id": "drv-a173e5268eb4",
+            "driver_id": "drv-608c936e0c7d",
             "state": "awaiting_human",
             "longrun": true,
             "turn_n": 4,
             "max_turns": 10,
             "turn_timeout_sec": 3600,
-            "started_at": "2026-10-23T07:58:28.304694619Z",
-            "updated_at": "2026-10-23T07:58:28.529140577Z",
+            "started_at": "2026-10-29T14:33:40.505591Z",
+            "updated_at": "2026-10-29T14:33:43.131828Z",
             "halt_reason": "release_requires_human_confirmation",
             "next_prompt": "stage=release loop=release_gate next_skill=beacon-release action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
             "auto_release": false
           },
           "supervisor": {
             "attached": true,
-            "session_id": "sup-8eb1c644c3ba",
+            "session_id": "sup-f1ac7460cd24",
             "state": "active",
             "interval_sec": 120,
-            "attached_at": "2026-10-23T07:58:28.305384004Z",
+            "attached_at": "2026-10-29T14:33:40.50754Z",
             "stall_count": 0
           },
           "heartbeat_interval_sec": 120,
@@ -2068,7 +2068,7 @@ run completed (loop_stage=done)
             "max_rounds": 10,
             "max_duration_sec": 0,
             "used_rounds": 4,
-            "used_duration_sec": 0.208221609,
+            "used_duration_sec": 2.596587083,
             "exhausted": false
           },
           "todo_seq": 0,
@@ -2077,67 +2077,67 @@ run completed (loop_stage=done)
           },
           "exec": {
             "argv": [
-              "/tmp/beacon-e2e.9oyesaUK/bin/agent.sh"
+              "/tmp/beacon-e2e.Pjw7e32Z/bin/agent.sh"
             ],
             "profile": "codex-style",
             "profile_argv": [
-              "/tmp/beacon-e2e.9oyesaUK/bin/agent.sh"
+              "/tmp/beacon-e2e.Pjw7e32Z/bin/agent.sh"
             ]
           },
           "topology": {
             "status": "pass",
-            "topology_gate_ref": "bc_0a05ec8db1cc3490",
+            "topology_gate_ref": "bc_91c8d32273766b8d",
             "topology_kind": "single_repo",
-            "detail": "live topology gate evaluation over the recorded BranchContext bc_0a05ec8db1cc3490"
+            "detail": "live topology gate evaluation over the recorded BranchContext bc_91c8d32273766b8d"
           },
           "quota": {
             "quota_ledger": [
               {
                 "slots": 1,
-                "at": "2026-10-23T07:58:28.332844364Z"
+                "at": "2026-10-29T14:33:41.274102Z"
               },
               {
                 "slots": 1,
-                "at": "2026-10-23T07:58:28.349349984Z"
+                "at": "2026-10-29T14:33:41.461714Z"
               },
               {
                 "slots": 1,
-                "at": "2026-10-23T07:58:28.515584483Z"
+                "at": "2026-10-29T14:33:43.029317Z"
               },
               {
                 "slots": 1,
-                "at": "2026-10-23T07:58:28.529148849Z"
+                "at": "2026-10-29T14:33:43.131838Z"
               }
             ]
           },
           "spend_ledger": {
             "schema": "goal-spend-ledger.v1",
-            "goal_id": "run_d9dbfcc86759f0ba97341336",
+            "goal_id": "run_e1493d7ac816ab7007ac18ed",
             "quota_limit": 10,
             "spent": 4,
             "entries": [
               {
                 "index": 1,
                 "source": "delivery_completion",
-                "index_digest": "run_d9dbfcc86759f0ba97341336:turn:1",
+                "index_digest": "run_e1493d7ac816ab7007ac18ed:turn:1",
                 "writeback_ref": ""
               },
               {
                 "index": 2,
                 "source": "delivery_completion",
-                "index_digest": "run_d9dbfcc86759f0ba97341336:turn:2",
+                "index_digest": "run_e1493d7ac816ab7007ac18ed:turn:2",
                 "writeback_ref": ""
               },
               {
                 "index": 3,
                 "source": "delivery_completion",
-                "index_digest": "run_d9dbfcc86759f0ba97341336:turn:3",
+                "index_digest": "run_e1493d7ac816ab7007ac18ed:turn:3",
                 "writeback_ref": ""
               },
               {
                 "index": 4,
                 "source": "delivery_completion",
-                "index_digest": "run_d9dbfcc86759f0ba97341336:turn:4",
+                "index_digest": "run_e1493d7ac816ab7007ac18ed:turn:4",
                 "writeback_ref": ""
               }
             ]
@@ -2146,191 +2146,191 @@ run completed (loop_stage=done)
       },
       "gate_results": [
         {
-          "id": "gate_357e41004d94ee9faa7ed26c",
-          "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+          "id": "gate_f5096220886ecc9430c3cbbb",
+          "feature_id": "feat_3d20b0490734baf5ecba91c7",
           "gate_type": "admission_bundle",
           "verdict": "pass",
-          "evaluated_at": "2026-10-23T07:58:28.466151859Z"
+          "evaluated_at": "2026-10-29T14:33:42.523766000Z"
         },
         {
-          "id": "gate_6914720c9b0ad2ff1dd3f8c8",
-          "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+          "id": "gate_a8b68b59e25973dea6de0a99",
+          "feature_id": "feat_3d20b0490734baf5ecba91c7",
           "gate_type": "design",
           "verdict": "pass",
-          "evaluated_at": "2026-10-23T07:58:28.744745947Z"
+          "evaluated_at": "2026-10-29T14:33:43.499691000Z"
         },
         {
-          "id": "gate_83f5f74257b34e3649840fef",
-          "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+          "id": "gate_7dd147b13c3bbc581bb7e347",
+          "feature_id": "feat_3d20b0490734baf5ecba91c7",
           "gate_type": "implement",
           "verdict": "pass",
-          "evaluated_at": "2026-10-23T07:58:28.803730305Z"
+          "evaluated_at": "2026-10-29T14:33:43.917761000Z"
         },
         {
-          "id": "gate_91999b54b259763ef6f4c830",
-          "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+          "id": "gate_40be71e32e4a9e32dde87fe9",
+          "feature_id": "feat_3d20b0490734baf5ecba91c7",
           "gate_type": "qa",
           "verdict": "pass",
-          "evaluated_at": "2026-10-23T07:58:28.820117978Z"
+          "evaluated_at": "2026-10-29T14:33:43.942056000Z"
         },
         {
-          "id": "gate_d599697663cbbcdcc6416954",
-          "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+          "id": "gate_03dcca5ecb76b2fe96ae489c",
+          "feature_id": "feat_3d20b0490734baf5ecba91c7",
           "gate_type": "release",
           "verdict": "blocked",
           "reason_codes": [
             "release_requires_human_confirmation"
           ],
-          "evaluated_at": "2026-10-23T07:58:28.836310438Z"
+          "evaluated_at": "2026-10-29T14:33:43.969647000Z"
         },
         {
-          "id": "gate_d568e5575b182fa30f601564",
-          "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+          "id": "gate_6cd306e3a67ca3e80e11210e",
+          "feature_id": "feat_3d20b0490734baf5ecba91c7",
           "gate_type": "truth_freeze",
           "verdict": "pass",
-          "evaluated_at": "2026-10-23T07:58:28.029348716Z"
+          "evaluated_at": "2026-10-29T14:33:39.480796000Z"
         },
         {
-          "id": "gate_19856f97cc2a9822315f57f5",
-          "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+          "id": "gate_9c1eb5327002320cca548fdb",
+          "feature_id": "feat_3d20b0490734baf5ecba91c7",
           "gate_type": "truth_integrity",
           "verdict": "pass",
-          "evaluated_at": "2026-10-23T07:58:27.831702227Z"
+          "evaluated_at": "2026-10-29T14:33:38.334296000Z"
         }
       ],
       "artifact_refs": [
         {
-          "id": "art_075b5249a63866174537480a",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
+          "id": "art_c22895eea06e957b394c5605",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
           "kind": "stage_context",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
           "content_hash": "",
           "size_bytes": 0,
-          "created_at": "2026-10-23T07:58:28.31769592Z",
+          "created_at": "2026-10-29T14:33:40.529829000Z",
           "stale": true,
           "stale_reason": "hash_mismatch"
         },
         {
-          "id": "art_ba953b9a39eb102417d0170e",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
+          "id": "art_573ad9bfd4413e4c20d405ca",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
           "kind": "stage_stdout",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/plan-001.stdout.txt",
-          "content_hash": "beb8571f8b02620a28c45955eb2f0c783c51c826bc3733ea4799594c8405f08a",
-          "size_bytes": 188,
-          "created_at": "2026-10-23T07:58:28.32194694Z",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/plan-001.stdout.txt",
+          "content_hash": "4ac69edf0b63e4de8c5734fc333f70ff980dbcc11537f8851fb6df91fd8d907e",
+          "size_bytes": 196,
+          "created_at": "2026-10-29T14:33:41.163050000Z",
           "stale": false
         },
         {
-          "id": "art_11214dbcb7c2a310a2384c4a",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
+          "id": "art_348a5c895601c9d198d0b67a",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
           "kind": "stage_stderr",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/plan-001.stderr.txt",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/plan-001.stderr.txt",
           "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "size_bytes": 0,
-          "created_at": "2026-10-23T07:58:28.322064366Z",
+          "created_at": "2026-10-29T14:33:41.163242000Z",
           "stale": false
         },
         {
-          "id": "art_e56f933d9308633b2ef5f169",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
+          "id": "art_3eb2c76fe2176c1c2ae1dcd5",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
           "kind": "stage_context",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
           "content_hash": "",
           "size_bytes": 0,
-          "created_at": "2026-10-23T07:58:28.334556293Z",
+          "created_at": "2026-10-29T14:33:41.276607000Z",
           "stale": true,
           "stale_reason": "hash_mismatch"
         },
         {
-          "id": "art_2f8d55ae05a986a596c21906",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
+          "id": "art_1a8a2f1313fc06beda218f5f",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
           "kind": "stage_stdout",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/truth-002.stdout.txt",
-          "content_hash": "f2660b3436d0c4fa9b60e3574de155d3a8d15a0c3d7c6eab781c3289207f2768",
-          "size_bytes": 190,
-          "created_at": "2026-10-23T07:58:28.337693861Z",
-          "stale": false
-        },
-        {
-          "id": "art_768b1677c9a985aaf418352a",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
-          "kind": "stage_stderr",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/truth-002.stderr.txt",
-          "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "size_bytes": 0,
-          "created_at": "2026-10-23T07:58:28.337903366Z",
-          "stale": false
-        },
-        {
-          "id": "art_62b6561ec672246fcc21448b",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
-          "kind": "stage_context",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
-          "content_hash": "",
-          "size_bytes": 0,
-          "created_at": "2026-10-23T07:58:28.500337061Z",
-          "stale": true,
-          "stale_reason": "hash_mismatch"
-        },
-        {
-          "id": "art_e903c394a8c27fb99316347c",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
-          "kind": "stage_stdout",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/implement-003.stdout.txt",
-          "content_hash": "36c080c71c276fa37086024e777f861b41201028382f297920dd155c19de47a9",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/truth-002.stdout.txt",
+          "content_hash": "41abd6e0a381b66d323f79703b13d99958b46844f95f814adf93f3a05d9f6477",
           "size_bytes": 198,
-          "created_at": "2026-10-23T07:58:28.50320855Z",
+          "created_at": "2026-10-29T14:33:41.290526000Z",
           "stale": false
         },
         {
-          "id": "art_13521511bb01bd33a528334f",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
+          "id": "art_28bae6a9b05895a7d05bdaff",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
           "kind": "stage_stderr",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/implement-003.stderr.txt",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/truth-002.stderr.txt",
           "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "size_bytes": 0,
-          "created_at": "2026-10-23T07:58:28.503310463Z",
+          "created_at": "2026-10-29T14:33:41.290884000Z",
           "stale": false
         },
         {
-          "id": "art_31d6919d9bd7b55279a40929",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
+          "id": "art_4311a052560256986906efe9",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
           "kind": "stage_context",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/stage-context.json",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
           "content_hash": "",
           "size_bytes": 0,
-          "created_at": "2026-10-23T07:58:28.517313287Z",
+          "created_at": "2026-10-29T14:33:42.926542000Z",
           "stale": true,
           "stale_reason": "hash_mismatch"
         },
         {
-          "id": "art_f6faf60188b03ded15ae139e",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
+          "id": "art_3c3520a4b1bb2e7a616d2523",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
           "kind": "stage_stdout",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/qa-004.stdout.txt",
-          "content_hash": "bbfba3a24b27bd3953ea44ec61dd6c0f33bbd9d300c867f7fd5cec3ec4b37090",
-          "size_bytes": 184,
-          "created_at": "2026-10-23T07:58:28.520362083Z",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/implement-003.stdout.txt",
+          "content_hash": "332564dfec826c43050b840735c7598bcffeaaa550f5ae3582d209988abd51ae",
+          "size_bytes": 206,
+          "created_at": "2026-10-29T14:33:42.938041000Z",
           "stale": false
         },
         {
-          "id": "art_ebdad2c8e60e878d9542904d",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
+          "id": "art_46c169677f5c78b0b66b39d2",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
           "kind": "stage_stderr",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/.beacon/artifacts/run_d9dbfcc86759f0ba97341336/qa-004.stderr.txt",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/implement-003.stderr.txt",
           "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "size_bytes": 0,
-          "created_at": "2026-10-23T07:58:28.520595633Z",
+          "created_at": "2026-10-29T14:33:42.938238000Z",
           "stale": false
         },
         {
-          "id": "art_2623b4dbfafe024da48af891",
-          "run_id": "run_d9dbfcc86759f0ba97341336",
+          "id": "art_c8d1c9ccb3128141fb731140",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
+          "kind": "stage_context",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/stage-context.json",
+          "content_hash": "",
+          "size_bytes": 0,
+          "created_at": "2026-10-29T14:33:43.030601000Z",
+          "stale": true,
+          "stale_reason": "hash_mismatch"
+        },
+        {
+          "id": "art_f5df6d3688330fceffa8cc02",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
+          "kind": "stage_stdout",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/qa-004.stdout.txt",
+          "content_hash": "7dca5845530a0d6668644a4fbbf55100260e96c92170888d5de82606984fce48",
+          "size_bytes": 192,
+          "created_at": "2026-10-29T14:33:43.040952000Z",
+          "stale": false
+        },
+        {
+          "id": "art_b315ee5c375208259c822007",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
+          "kind": "stage_stderr",
+          "abs_path": "/private/tmp/beacon-e2e.Pjw7e32Z/proj/.beacon/artifacts/run_e1493d7ac816ab7007ac18ed/qa-004.stderr.txt",
+          "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
+          "created_at": "2026-10-29T14:33:43.041136000Z",
+          "stale": false
+        },
+        {
+          "id": "art_95337a05c907d5b0057fdc89",
+          "run_id": "run_e1493d7ac816ab7007ac18ed",
           "kind": "qa_report",
-          "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md",
+          "abs_path": "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md",
           "content_hash": "06d88e074aca03a7acb44fa82a0e444141a7d4cea20c64f2660e6b259a7b2421",
           "size_bytes": 222,
-          "created_at": "2026-10-23T07:58:28.650141563Z",
+          "created_at": "2026-10-29T14:33:43.344509000Z",
           "stale": false
         }
       ],
@@ -2339,8 +2339,8 @@ run completed (loop_stage=done)
   ]
 }
 {
-  "run_id": "run_d9dbfcc86759f0ba97341336",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
   "run_kind": "goal",
   "status": "completed",
@@ -2348,10 +2348,10 @@ run completed (loop_stage=done)
   "event_count": 29,
   "events": [
     {
-      "id": "evt_2544fec008640cb5cb04e76e",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_d434347b1f0cfcffe78c6be9",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "goal_run_created",
@@ -2368,42 +2368,42 @@ run completed (loop_stage=done)
         "utterance": "给登录加 TOTP 二次验证",
         "ux_required": false
       },
-      "created_at": "2026-10-23T07:58:28.171055807Z"
+      "created_at": "2026-10-29T14:33:39.874694000Z"
     },
     {
-      "id": "evt_e0e3d3494a0234bd2eb5b8f0",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_86951b0abf08e6b144546e72",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "driver_start",
       "payload_json": {
-        "driver_id": "drv-a173e5268eb4",
+        "driver_id": "drv-608c936e0c7d",
         "lease_takeover": false,
         "max_turns": 10
       },
-      "created_at": "2026-10-23T07:58:28.30514814Z"
+      "created_at": "2026-10-29T14:33:40.506636000Z"
     },
     {
-      "id": "evt_ac55cf5c1f847fad9d57f8d8",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_152811d8ff310fff42f8f8ac",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "supervise_attach",
       "payload_json": {
         "interval_sec": 120,
-        "session_id": "sup-8eb1c644c3ba"
+        "session_id": "sup-f1ac7460cd24"
       },
-      "created_at": "2026-10-23T07:58:28.305402882Z"
+      "created_at": "2026-10-29T14:33:40.507569000Z"
     },
     {
-      "id": "evt_2f29ad48b07d50d914bbc24a",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_fee15ca09d6099790d4c9e9f",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "stage_executed",
@@ -2419,13 +2419,13 @@ run completed (loop_stage=done)
         "summary": "agent stage plan done",
         "timed_out": false
       },
-      "created_at": "2026-10-23T07:58:28.322145668Z"
+      "created_at": "2026-10-29T14:33:41.163358000Z"
     },
     {
-      "id": "evt_0851d33c76cc3c62a652a352",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_549d82f2e99d70fb8330460f",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "stage_advanced",
@@ -2434,32 +2434,32 @@ run completed (loop_stage=done)
         "loop_stage": "truth_routing",
         "to_stage": "truth"
       },
-      "created_at": "2026-10-23T07:58:28.332445245Z"
+      "created_at": "2026-10-29T14:33:41.273500000Z"
     },
     {
-      "id": "evt_60ad7983f9ab2fb5c6560b5b",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_0fca438ca838c06b6761d552",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "driver_turn_end",
       "payload_json": {
         "blocked": false,
-        "driver_id": "drv-a173e5268eb4",
+        "driver_id": "drv-608c936e0c7d",
         "handoff_truncated": false,
         "loop_stage": "truth_routing",
         "stage": "truth",
         "summary": "turn=1 stage=truth blocked=false",
         "turn_n": 1
       },
-      "created_at": "2026-10-23T07:58:28.332918044Z"
+      "created_at": "2026-10-29T14:33:41.274165000Z"
     },
     {
-      "id": "evt_d4f96804552efe03c9b2bf37",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_fb580cf43167a4c4fb0c92a7",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "goal_checkpoint",
@@ -2468,13 +2468,13 @@ run completed (loop_stage=done)
         "next_action": "stage=truth loop=truth_routing next_skill=beacon-truth action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
         "substep": "driver-turn-1"
       },
-      "created_at": "2026-10-23T07:58:28.333348931Z"
+      "created_at": "2026-10-29T14:33:41.275298000Z"
     },
     {
-      "id": "evt_7b68d6444f8264a153fdf44a",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_ea611c7462b1e81c4a5577b0",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "stage_executed",
@@ -2490,13 +2490,13 @@ run completed (loop_stage=done)
         "summary": "agent stage truth done",
         "timed_out": false
       },
-      "created_at": "2026-10-23T07:58:28.338061203Z"
+      "created_at": "2026-10-29T14:33:41.291031000Z"
     },
     {
-      "id": "evt_850ac0bcc386ec9ecdf814c5",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_29de2965bdc00d3e911cad06",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "stage_advanced",
@@ -2505,32 +2505,32 @@ run completed (loop_stage=done)
         "loop_stage": "implement_routing",
         "to_stage": "implement"
       },
-      "created_at": "2026-10-23T07:58:28.348752978Z"
+      "created_at": "2026-10-29T14:33:41.461331000Z"
     },
     {
-      "id": "evt_f218b0ff342ac5a71c40953c",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_682b36e368655bc09d5c6233",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "driver_turn_end",
       "payload_json": {
         "blocked": false,
-        "driver_id": "drv-a173e5268eb4",
+        "driver_id": "drv-608c936e0c7d",
         "handoff_truncated": false,
         "loop_stage": "implement_routing",
         "stage": "implement",
         "summary": "turn=2 stage=implement blocked=false",
         "turn_n": 2
       },
-      "created_at": "2026-10-23T07:58:28.349431546Z"
+      "created_at": "2026-10-29T14:33:41.461764000Z"
     },
     {
-      "id": "evt_a817dd33322f6b601cc31fe2",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_e5132191f75b2728696310c8",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "goal_checkpoint",
@@ -2539,20 +2539,20 @@ run completed (loop_stage=done)
         "next_action": "stage=implement loop=implement_routing next_skill=beacon-implement action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
         "substep": "driver-turn-2"
       },
-      "created_at": "2026-10-23T07:58:28.349932268Z"
+      "created_at": "2026-10-29T14:33:41.463340000Z"
     },
     {
-      "id": "evt_e412999bd341ae734e16667d",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_551bdc7dc6a520bbb1cda833",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "admission_bundle_evaluated",
       "payload_json": {
-        "baseline_commit": "55208074ed0a7b5ac0750f2049df45ac5585a4ce",
+        "baseline_commit": "cf3750a2924ae985ae689c22667cb27a79e846cf",
         "evaluator": "beacon-goal-admission",
-        "gate_result_id": "gate_357e41004d94ee9faa7ed26c",
+        "gate_result_id": "gate_f5096220886ecc9430c3cbbb",
         "gate_type": "admission_bundle",
         "items": [
           {
@@ -2595,15 +2595,15 @@ run completed (loop_stage=done)
         "schema": "admission-bundle.v1",
         "status": "pass",
         "verdict": "pass",
-        "worktree_dir": "/tmp/beacon-e2e.9oyesaUK/proj"
+        "worktree_dir": "/private/tmp/beacon-e2e.Pjw7e32Z/proj"
       },
-      "created_at": "2026-10-23T07:58:28.466289616Z"
+      "created_at": "2026-10-29T14:33:42.523951000Z"
     },
     {
-      "id": "evt_1b029e8e6898abb1125b4903",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_9ca1d41d7150dd7bf1c0e802",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "stage_executed",
@@ -2619,13 +2619,13 @@ run completed (loop_stage=done)
         "summary": "agent stage implement done",
         "timed_out": false
       },
-      "created_at": "2026-10-23T07:58:28.503379096Z"
+      "created_at": "2026-10-29T14:33:42.938324000Z"
     },
     {
-      "id": "evt_ef9f24bf62e96b62e5de2573",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_75866b8bd7579cdbbd4f4695",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "stage_advanced",
@@ -2634,32 +2634,32 @@ run completed (loop_stage=done)
         "loop_stage": "qa_routing",
         "to_stage": "qa"
       },
-      "created_at": "2026-10-23T07:58:28.515182039Z"
+      "created_at": "2026-10-29T14:33:43.028969000Z"
     },
     {
-      "id": "evt_74b4fe49f816309bbb35230a",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_e80ff3d719ff5b2751516b26",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "driver_turn_end",
       "payload_json": {
         "blocked": false,
-        "driver_id": "drv-a173e5268eb4",
+        "driver_id": "drv-608c936e0c7d",
         "handoff_truncated": false,
         "loop_stage": "qa_routing",
         "stage": "qa",
         "summary": "turn=3 stage=qa blocked=false",
         "turn_n": 3
       },
-      "created_at": "2026-10-23T07:58:28.515625715Z"
+      "created_at": "2026-10-29T14:33:43.029359000Z"
     },
     {
-      "id": "evt_7613ec66c969848adb70e6b0",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_282226f2e4ddca649ec625fd",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "goal_checkpoint",
@@ -2668,13 +2668,13 @@ run completed (loop_stage=done)
         "next_action": "stage=qa loop=qa_routing next_skill=beacon-qa action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
         "substep": "driver-turn-3"
       },
-      "created_at": "2026-10-23T07:58:28.515927978Z"
+      "created_at": "2026-10-29T14:33:43.029513000Z"
     },
     {
-      "id": "evt_6e9cc8198848f34868aa26ab",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_73bb1d5f051640391bfbd299",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "stage_executed",
@@ -2690,13 +2690,13 @@ run completed (loop_stage=done)
         "summary": "agent stage qa done",
         "timed_out": false
       },
-      "created_at": "2026-10-23T07:58:28.520678928Z"
+      "created_at": "2026-10-29T14:33:43.041217000Z"
     },
     {
-      "id": "evt_146860a8858c0ad8fdd57491",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_3db99d4128861d494a34d848",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "stage_advanced",
@@ -2705,47 +2705,47 @@ run completed (loop_stage=done)
         "loop_stage": "release_gate",
         "to_stage": "release"
       },
-      "created_at": "2026-10-23T07:58:28.528840206Z"
+      "created_at": "2026-10-29T14:33:43.131545000Z"
     },
     {
-      "id": "evt_d002051ba4d7ea0bfe053c57",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_50b575eee2826f010f4eddf0",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "driver_turn_end",
       "payload_json": {
         "blocked": false,
-        "driver_id": "drv-a173e5268eb4",
+        "driver_id": "drv-608c936e0c7d",
         "handoff_truncated": false,
         "loop_stage": "release_gate",
         "stage": "release",
         "summary": "turn=4 stage=release blocked=false",
         "turn_n": 4
       },
-      "created_at": "2026-10-23T07:58:28.529188659Z"
+      "created_at": "2026-10-29T14:33:43.131878000Z"
     },
     {
-      "id": "evt_3db3925d086372b0e0893b40",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_0789f23c4787e50c6fbb60f4",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "driver_awaiting_human",
       "payload_json": {
-        "driver_id": "drv-a173e5268eb4",
+        "driver_id": "drv-608c936e0c7d",
         "reason_code": "driver_awaiting_human",
         "turn_n": 4
       },
-      "created_at": "2026-10-23T07:58:28.529213246Z"
+      "created_at": "2026-10-29T14:33:43.131899000Z"
     },
     {
-      "id": "evt_f1238a2104c6037230970f92",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_3e8ef8cd5c143f396f19e433",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "goal_checkpoint",
@@ -2754,131 +2754,131 @@ run completed (loop_stage=done)
         "next_action": "stage=release loop=release_gate next_skill=beacon-release action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
         "substep": "driver-turn-4"
       },
-      "created_at": "2026-10-23T07:58:28.529393276Z"
+      "created_at": "2026-10-29T14:33:43.132038000Z"
     },
     {
-      "id": "evt_2b3582ef38053e8394cca3b1",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_1df63db101d8261f69b48285",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md",
-        "artifact_id": "art_2623b4dbfafe024da48af891",
+        "abs_path": "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md",
+        "artifact_id": "art_95337a05c907d5b0057fdc89",
         "content_hash": "06d88e074aca03a7acb44fa82a0e444141a7d4cea20c64f2660e6b259a7b2421",
         "kind": "qa_report",
         "registered_by": "e2e-evaluator",
         "size_bytes": 222
       },
-      "created_at": "2026-10-23T07:58:28.6504991Z"
+      "created_at": "2026-10-29T14:33:43.344953000Z"
     },
     {
-      "id": "evt_f515782cd7d56767886931f4",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_6df3740d56a6cd6d797b6d67",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "gate_evaluated",
       "payload_json": {
         "evaluator": "e2e-evaluator",
-        "gate_result_id": "gate_6914720c9b0ad2ff1dd3f8c8",
+        "gate_result_id": "gate_a8b68b59e25973dea6de0a99",
         "gate_type": "design",
         "reason_codes": null,
         "verdict": "pass"
       },
-      "created_at": "2026-10-23T07:58:28.744930233Z"
+      "created_at": "2026-10-29T14:33:43.499747000Z"
     },
     {
-      "id": "evt_37da86ecb1e07fe997c0a41b",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_4f0d923af1dcdc8781a82538",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "gate_evaluated",
       "payload_json": {
         "evaluator": "e2e-evaluator",
-        "gate_result_id": "gate_83f5f74257b34e3649840fef",
+        "gate_result_id": "gate_7dd147b13c3bbc581bb7e347",
         "gate_type": "implement",
         "reason_codes": null,
         "verdict": "pass"
       },
-      "created_at": "2026-10-23T07:58:28.803907631Z"
+      "created_at": "2026-10-29T14:33:43.917901000Z"
     },
     {
-      "id": "evt_b1ecebf76875c720052c99f9",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_0dad73a032a954b3e127f51c",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "gate_evaluated",
       "payload_json": {
         "evaluator": "e2e-evaluator",
-        "gate_result_id": "gate_91999b54b259763ef6f4c830",
+        "gate_result_id": "gate_40be71e32e4a9e32dde87fe9",
         "gate_type": "qa",
         "reason_codes": null,
         "verdict": "pass"
       },
-      "created_at": "2026-10-23T07:58:28.820223626Z"
+      "created_at": "2026-10-29T14:33:43.942261000Z"
     },
     {
-      "id": "evt_085d4d499611e6d3252f7cee",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_5c640439986148c54c2210b2",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "gate_evaluated",
       "payload_json": {
         "evaluator": "e2e-evaluator",
-        "gate_result_id": "gate_d599697663cbbcdcc6416954",
+        "gate_result_id": "gate_03dcca5ecb76b2fe96ae489c",
         "gate_type": "release",
         "reason_codes": [
           "release_requires_human_confirmation"
         ],
         "verdict": "blocked"
       },
-      "created_at": "2026-10-23T07:58:28.836421735Z"
+      "created_at": "2026-10-29T14:33:43.969732000Z"
     },
     {
-      "id": "evt_56cb2535a5c01d91fe9a00e4",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_d6a1ecc3e15aa5639afdfbfe",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "verifier_attached",
       "payload_json": {
         "cleared_block": false,
         "refs": [
-          "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md"
+          "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md"
         ],
         "source": "e2e-checker"
       },
-      "created_at": "2026-10-23T07:58:28.859861061Z"
+      "created_at": "2026-10-29T14:33:44.010509000Z"
     },
     {
-      "id": "evt_175edac84692dab6961a45dc",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_0e45596ca71781ac4d38fe6c",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "release_confirmed",
       "payload_json": {
         "by": "lai"
       },
-      "created_at": "2026-10-23T07:58:28.870739516Z"
+      "created_at": "2026-10-29T14:33:44.030631000Z"
     },
     {
-      "id": "evt_8740128b5bf399474927be6f",
-      "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+      "id": "evt_19a1fc3e21f7d0d3951c9fd4",
+      "feature_id": "feat_3d20b0490734baf5ecba91c7",
       "run_id": {
-        "String": "run_d9dbfcc86759f0ba97341336",
+        "String": "run_e1493d7ac816ab7007ac18ed",
         "Valid": true
       },
       "event_type": "goal_completed",
@@ -2886,13 +2886,13 @@ run completed (loop_stage=done)
         "human_confirmed_by": "lai",
         "verifier_source": "e2e-checker"
       },
-      "created_at": "2026-10-23T07:58:28.871216001Z"
+      "created_at": "2026-10-29T14:33:44.031075000Z"
     }
   ]
 }
 {
-  "run_id": "run_d9dbfcc86759f0ba97341336",
-  "feature_id": "feat_8fcc7a020b5b8a68be06f8de",
+  "run_id": "run_e1493d7ac816ab7007ac18ed",
+  "feature_id": "feat_3d20b0490734baf5ecba91c7",
   "feature_slug": "e2e-login-2fa",
   "status": "completed",
   "run_status": "Succeeded",
@@ -2963,51 +2963,51 @@ run completed (loop_stage=done)
     "required_for_complete": true,
     "present": true,
     "refs": [
-      "/tmp/beacon-e2e.9oyesaUK/proj/e2e-work/qa-report.md"
+      "/tmp/beacon-e2e.Pjw7e32Z/proj/e2e-work/qa-report.md"
     ],
     "source": "e2e-checker"
   },
   "release_human_confirmed": true,
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-10-23T07:58:28.529141788Z",
-  "started_at": "2026-10-23T07:58:28.170878981Z",
+  "last_heartbeat_at": "2026-10-29T14:33:43.131829Z",
+  "started_at": "2026-10-29T14:33:39.874216000Z",
   "driver": {
-    "driver_id": "drv-a173e5268eb4",
+    "driver_id": "drv-608c936e0c7d",
     "state": "awaiting_human",
     "longrun": true,
     "turn_n": 4,
     "max_turns": 10,
     "turn_timeout_sec": 3600,
-    "started_at": "2026-10-23T07:58:28.304694619Z",
-    "updated_at": "2026-10-23T07:58:28.529140577Z",
+    "started_at": "2026-10-29T14:33:40.505591Z",
+    "updated_at": "2026-10-29T14:33:43.131828Z",
     "halt_reason": "release_requires_human_confirmation",
     "next_prompt": "stage=release loop=release_gate next_skill=beacon-release action=load_next_skill; continue against frozen truth via resume-pack digest; never self-complete, never auto-release",
     "auto_release": false
   },
   "supervisor": {
     "attached": true,
-    "session_id": "sup-8eb1c644c3ba",
+    "session_id": "sup-f1ac7460cd24",
     "state": "active",
     "interval_sec": 120,
-    "attached_at": "2026-10-23T07:58:28.305384004Z",
+    "attached_at": "2026-10-29T14:33:40.50754Z",
     "stall_count": 0
   },
   "budget": {
     "max_rounds": 10,
     "max_duration_sec": 0,
     "used_rounds": 4,
-    "used_duration_sec": 0.208221609,
+    "used_duration_sec": 2.596587083,
     "exhausted": false
   },
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_0a05ec8db1cc3490",
+    "topology_gate_ref": "bc_91c8d32273766b8d",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_0a05ec8db1cc3490"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_91c8d32273766b8d"
   }
 }
 ==================================================================
-E2E RESULT: PASS — full chain completed (run run_d9dbfcc86759f0ba97341336 done)
-elapsed: 1s
-workspace kept at: /tmp/beacon-e2e.9oyesaUK
+E2E RESULT: PASS — full chain completed (run run_e1493d7ac816ab7007ac18ed done)
+elapsed: 7s
+workspace kept at: /tmp/beacon-e2e.Pjw7e32Z

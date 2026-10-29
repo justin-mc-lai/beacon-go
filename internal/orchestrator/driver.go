@@ -528,6 +528,18 @@ func (e *Engine) DriverRunLoop(ctx context.Context, runID string, maxRounds int,
 	rounds := 0
 	var last DriverView
 	for rounds < limit {
+		// AC-105: a host interrupt (SIGINT/SIGTERM) cancels the context
+		// the CLI passes in. Stop between turns and say why — the run
+		// keeps its checkpoint and resumes with `goal resume`.
+		if ctx.Err() != nil {
+			out := DriverLoopView{RunID: runID, Rounds: rounds, ReasonCode: core.ReasonHostInterrupted, AutoRelease: false}
+			if st, err := e.DriverStatus(runID); err == nil {
+				out.Run = st.Run
+				out.Driver = st.Driver
+				out.FinalState = st.State
+			}
+			return out, nil
+		}
 		dv, err := e.DriverRunOnce(ctx, runID)
 		if err != nil {
 			return DriverLoopView{}, err

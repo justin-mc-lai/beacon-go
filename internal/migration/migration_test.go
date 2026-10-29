@@ -468,3 +468,54 @@ func TestDoctorApply(t *testing.T) {
 		t.Errorf("rebuild overwrote lifecycle: %s", lc.Stage)
 	}
 }
+
+// AC-092: a real import snapshots the live ledger before writing, and the
+// snapshot is a usable database with the pre-import rows.
+func TestImportBacksUpLedgerFirst(t *testing.T) {
+	st := openTestStore(t)
+	root := buildV1Sample(t)
+	if _, err := st.Projects().Register(store.Project{RootPath: "/tmp/pre-existing", Name: "pre"}); err != nil {
+		t.Fatal(err)
+	}
+	rep, err := ImportV1(st, root, Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rep.BackupPath == "" {
+		t.Fatal("import did not record a backup path")
+	}
+	if _, err := os.Stat(rep.BackupPath); err != nil {
+		t.Fatalf("backup file missing: %v", err)
+	}
+	backup, err := store.Open(rep.BackupPath)
+	if err != nil {
+		t.Fatalf("backup is not a usable database: %v", err)
+	}
+	defer backup.Close()
+	projs, err := backup.Projects().List()
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	for _, p := range projs {
+		if p.RootPath == store.ResolveRootPath("/tmp/pre-existing") {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("backup does not contain the pre-import project rows: %+v", projs)
+	}
+}
+
+// A dry run writes nothing, so it must not create a backup either.
+func TestDryRunWritesNoBackup(t *testing.T) {
+	st := openTestStore(t)
+	root := buildV1Sample(t)
+	rep, err := ImportV1(st, root, Options{DryRun: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rep.BackupPath != "" {
+		t.Errorf("dry run recorded a backup: %q", rep.BackupPath)
+	}
+}
