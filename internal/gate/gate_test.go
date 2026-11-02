@@ -177,7 +177,7 @@ func baseIntegrityInput() IntegrityInput {
 			Slug:  "demo",
 			Truth: PackageFile{Path: "features/demo/truth.md", Present: true, Text: goodTruth},
 			Tests: PackageFile{Path: "features/demo/tests.md", Present: true, Text: goodTests},
-			Tasks: PackageFile{Path: "features/demo/tasks.md", Present: true, Text: "---\nslug: demo\n---\n- [ ] work\n"},
+			Tasks: PackageFile{Path: "features/demo/tasks.md", Present: true, Text: "---\nslug: demo\n---\n- [ ] work · ac=AC-001\n"},
 			Evidence: PackageFile{Path: "features/demo/evidence.md", Present: true,
 				Text: "# Evidence\n\n| Surface | Authority | Artifact |\n|---|---|---|\n| qa | qa_verdict | artifacts/qa-report.md |\n"},
 		},

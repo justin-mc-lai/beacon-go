@@ -42,7 +42,7 @@ func newGateEnv(t *testing.T, truthDoc string) gateTestEnv {
 	}
 	write("truth.md", truthDoc)
 	write("tests.md", frozenTestsDoc)
-	write("tasks.md", "---\nslug: feat-a\n---\n- [ ] the work\n")
+	write("tasks.md", "---\nslug: feat-a\n---\n- [ ] the work · ac=AC-001\n")
 	write("evidence.md", "# Evidence\n\n| Surface | Authority | Artifact |\n|---|---|---|\n| qa | qa_verdict | qa-report.md |\n\n(no artifacts referenced yet)\n")
 	ctx, err := env.st.ResolveFeature(env.root, "feat-a", "")
 	if err != nil {

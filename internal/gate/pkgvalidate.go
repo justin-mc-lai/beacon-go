@@ -10,11 +10,12 @@
 // AC row presence, test-row command/soft checks, checkbox ledger
 // shape, evidence authority table (required columns, forbidden
 // gate-truth fields, authority vocabulary).
-// NOT ported (residual differences, see the R2a report): the
-// v1.6.7 human-readable L0 sub-gate (truth_human_readable), the
-// task ac=/evidence= binding enforcement (a package-dialect rule
-// the Go task ledger does not carry), and the canonical-ready
-// machine-JSON checks. Missing package files are also not
+// Also ported: the task ac=/evidence= binding enforcement, adapted
+// to this repo's dialect (ac= on every row, evidence= on checked
+// rows, file existence only when the evidence token is path-shaped).
+// NOT ported (residual differences, see the R2a report): the v1.6.7
+// human-readable L0 sub-gate (truth_human_readable), the evidence
+// filename-width hint, and the canonical-ready machine-JSON checks. Missing package files are also not
 // re-reported here — CheckIntegrity step 1 owns them.
 package gate
 
@@ -265,6 +266,33 @@ var (
 
 var fpCheckboxRe = regexp.MustCompile(`^\s*-\s+\[([ xX-])\]\s+(?:` + "`?" + `([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{3,})` + "`?" + `\s+)?(.+?)\s*$`)
 
+// fpTaskRow is one checkbox ledger row: mark, id and title.
+type fpTaskRow struct {
+	ID    string
+	Mark  string
+	Title string
+	Line  int
+}
+
+// parseTaskRowsFP returns the parsed checkbox rows (feature_package.
+// _parse_checkboxes). Malformed lines are returned separately by
+// parseCheckboxesFP and are not task rows.
+func parseTaskRowsFP(markdown string) []fpTaskRow {
+	var rows []fpTaskRow
+	for i, line := range strings.Split(markdown, "\n") {
+		m := fpCheckboxRe.FindStringSubmatch(line)
+		if m == nil {
+			continue
+		}
+		id := m[2]
+		if id == "" {
+			id = "LINE-" + strconv.Itoa(i+1)
+		}
+		rows = append(rows, fpTaskRow{ID: id, Mark: m[1], Title: m[3], Line: i + 1})
+	}
+	return rows
+}
+
 // parseCheckboxesFP returns (rowCount, malformedLineNumbers).
 func parseCheckboxesFP(markdown string) (int, []int) {
 	count := 0
@@ -359,9 +387,31 @@ func declaredKeyPresent(text, field string) bool {
 	return false
 }
 
+// Task binding (feature_package.evaluate_task_ac_evidence_bindings,
+// adapted to this repo's dialect): every row must declare ac=; a
+// checked row must also declare evidence=. When that evidence is a
+// path-shaped token (feature_package.py:363-408), the file must exist
+// and be non-trivial (size >= 2). Identifier-shaped evidence (the Go
+// packages use test function names) is accepted as a declaration —
+// that is the deliberate ceiling: it proves the author named an
+// artifact, not that the artifact is a file.
+var (
+	fpTaskACRe       = regexp.MustCompile(`(?i)\bac\s*[=:]\s*([A-Z][A-Z0-9_-]*)`)
+	fpTaskEvidenceRe = regexp.MustCompile("(?i)\\bevidence\\s*[=:]\\s*`?([^`\\s|]+)`?")
+)
+
+func isPathShapedEvidence(s string) bool {
+	if strings.Contains(s, "/") {
+		return true
+	}
+	return strings.Contains(s[strings.LastIndex(s, "/")+1:], ".")
+}
+
 // ValidateFeaturePackage runs the ported structural validation
-// over the package and returns integrity findings.
-func ValidateFeaturePackage(pkg PackageFiles) []Finding {
+// over the package and returns integrity findings. resolveRef and
+// fileNonTrivial are only used by the task-evidence check; both may
+// be nil (the check then skips file existence).
+func ValidateFeaturePackage(pkg PackageFiles, resolveRef func(string) string, fileNonTrivial func(string) bool) []Finding {
 	var findings []Finding
 	add := func(file, code string) {
 		findings = append(findings, Finding{
@@ -423,6 +473,43 @@ func ValidateFeaturePackage(pkg PackageFiles) []Finding {
 		}
 		if count == 0 && len(bad) == 0 {
 			add(pkg.Tasks.Path, "checkbox_ledger_missing")
+		}
+		addTask := func(line int, code, detail string) {
+			findings = append(findings, Finding{
+				Kind: "feature_package_validation", ReasonCode: core.ReasonIntegrityPackageValid,
+				File: pkg.Tasks.Path, Line: line, Detail: code + ": " + detail,
+				RepairRoute: DefaultRepairRoute,
+			})
+		}
+		for _, row := range parseTaskRowsFP(pkg.Tasks.Text) {
+			ac := ""
+			if m := fpTaskACRe.FindStringSubmatch(row.Title); m != nil {
+				ac = m[1]
+			}
+			ev := ""
+			if m := fpTaskEvidenceRe.FindStringSubmatch(row.Title); m != nil {
+				ev = m[1]
+			}
+			checked := strings.EqualFold(row.Mark, "x")
+			if ac == "" {
+				addTask(row.Line, "task_binding_missing", row.ID+" missing ac= binding")
+				continue
+			}
+			if checked && ev == "" {
+				addTask(row.Line, "task_binding_missing", row.ID+" missing evidence= binding")
+				continue
+			}
+			if !checked || fileNonTrivial == nil || !isPathShapedEvidence(ev) {
+				continue
+			}
+			abs := ev
+			if resolveRef != nil {
+				abs = resolveRef(ev)
+			}
+			if !fileNonTrivial(abs) {
+				addTask(row.Line, "checkbox_checked_without_evidence_file",
+					row.ID+" checked but evidence missing or empty: "+ev)
+			}
 		}
 	}
 

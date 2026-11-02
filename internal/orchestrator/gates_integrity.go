@@ -96,6 +96,10 @@ func (e *Engine) integrityReportLive(ctx store.FeatureContext, mode string) (gat
 			_, err := os.Stat(abs)
 			return err == nil
 		},
+		FileNonTrivial: func(abs string) bool {
+			st, err := os.Stat(abs)
+			return err == nil && st.Size() >= 2
+		},
 	}, mode)
 	return rep, pkg, mode, nil
 }

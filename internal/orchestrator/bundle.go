@@ -196,6 +196,10 @@ func (e *Engine) bundleMaterials(run store.Run) BundleItem {
 		Pkg: pkg, Artifacts: artifacts,
 		ResolveRef: func(ref string) string { return resolvePkgPath(root, ref) },
 		FileExists: func(abs string) bool { _, err := os.Stat(abs); return err == nil },
+		FileNonTrivial: func(abs string) bool {
+			st, err := os.Stat(abs)
+			return err == nil && st.Size() >= 2
+		},
 	}, gate.IntegrityModeBlock)
 	item.Applicable = true
 	if rep.Verdict != gate.VerdictPass {

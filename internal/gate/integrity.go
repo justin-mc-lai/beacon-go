@@ -87,6 +87,10 @@ type IntegrityInput struct {
 	ResolveRef func(ref string) string
 	// FileExists reports whether an absolute path exists on disk.
 	FileExists func(absPath string) bool
+	// FileNonTrivial reports whether an absolute path exists and is
+	// non-trivial (v1's stat().st_size >= 2). Optional: when nil the
+	// task-binding check falls back to FileExists.
+	FileNonTrivial func(absPath string) bool
 }
 
 var (
@@ -499,7 +503,11 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 			findings = append(findings, scanDeterminismFile(f.pf)...)
 		}
 	}
-	findings = append(findings, ValidateFeaturePackage(in.Pkg)...)
+	nonTrivial := in.FileNonTrivial
+	if nonTrivial == nil && in.FileExists != nil {
+		nonTrivial = in.FileExists
+	}
+	findings = append(findings, ValidateFeaturePackage(in.Pkg, in.ResolveRef, nonTrivial)...)
 
 	rep := IntegrityReport{Mode: mode, Findings: findings, Verdict: VerdictPass}
 	// Warn-severity findings (the determinism hollow templates)

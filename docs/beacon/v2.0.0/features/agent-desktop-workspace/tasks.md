@@ -9,9 +9,9 @@ task_source: acceptance_criteria
 
 ## Task Ledger
 
-- [x] TASK-001 三栏单壳工作台（AC-001）· evidence=TestShellScriptParses
-- [x] TASK-002 账本数据流（AC-002）· evidence=TestUnregisteredProjectIsEmptyNotInvented
-- [x] TASK-003 Wails 工程化（AC-003）· evidence=TestWailsConfigValid
+- [x] TASK-001 三栏单壳工作台（AC-001） · ac=AC-001· evidence=TestShellScriptParses
+- [x] TASK-002 账本数据流（AC-002） · ac=AC-002· evidence=TestUnregisteredProjectIsEmptyNotInvented
+- [x] TASK-003 Wails 工程化（AC-003） · ac=AC-003· evidence=TestWailsConfigValid
 
 ## Boundary
 
