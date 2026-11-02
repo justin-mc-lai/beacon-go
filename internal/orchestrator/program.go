@@ -210,10 +210,11 @@ func (e *Engine) lakeFeature(run store.Run, slug string) (store.FeaturePackage, 
 
 // ProgramPlanInput is the ProgramPlan request.
 type ProgramPlanInput struct {
-	Slug   string
-	Goal   string
-	Lakes  []ProgramLakeInput
-	Freeze bool
+	Slug      string
+	Goal      string
+	ScopeMode string
+	Lakes     []ProgramLakeInput
+	Freeze    bool
 }
 
 func nowRFC() string { return time.Now().UTC().Format(time.RFC3339Nano) }
@@ -221,7 +222,10 @@ func nowRFC() string { return time.Now().UTC().Format(time.RFC3339Nano) }
 func programLakesOf(inputs []ProgramLakeInput, carry map[string]*LakeAdmission) []ProgramLake {
 	out := make([]ProgramLake, 0, len(inputs))
 	for _, in := range inputs {
-		l := ProgramLake{Slug: in.Slug, Goal: in.Goal, DependsOn: in.DependsOn, Touches: in.Touches}
+		l := ProgramLake{
+			Slug: in.Slug, Goal: in.Goal, DependsOn: in.DependsOn, Touches: in.Touches,
+			ParitySubset: in.ParitySubset, Status: in.Status,
+		}
 		if carry != nil {
 			if adm, ok := carry[in.Slug]; ok {
 				l.Admission = adm
@@ -255,11 +259,11 @@ func (e *Engine) ProgramPlan(runID string, in ProgramPlanInput) (ProgramState, e
 			"program plan is frozen; record a change with goal program change instead")
 	}
 	now := nowRFC()
-	st := &ProgramState{Slug: in.Slug, Goal: in.Goal, CreatedAt: now}
+	st := &ProgramState{Slug: in.Slug, Goal: in.Goal, ScopeMode: in.ScopeMode, CreatedAt: now}
 	event := "program_plan_created"
 	if m.Program != nil {
 		st = m.Program
-		st.Slug, st.Goal = in.Slug, in.Goal
+		st.Slug, st.Goal, st.ScopeMode = in.Slug, in.Goal, in.ScopeMode
 		st.UpdatedAt = now
 		event = "program_plan_updated"
 		carry := map[string]*LakeAdmission{}

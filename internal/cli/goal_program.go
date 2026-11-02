@@ -27,7 +27,8 @@ func newGoalProgramCmd() *cobra.Command {
 			"A frozen plan refuses direct edits: use change, which leaves a record.",
 	}
 	c.AddCommand(newGoalProgramPlanCmd(), newGoalProgramAdmitCmd(), newGoalProgramRouteCmd(),
-		newGoalProgramChangeCmd(), newGoalProgramFreezeCmd())
+		newGoalProgramChangeCmd(), newGoalProgramFreezeCmd(),
+		newGoalProgramValidateCmd(), newGoalProgramImportCmd())
 	return c
 }
 
@@ -287,6 +288,79 @@ func newGoalProgramRouteCmd() *cobra.Command {
 	}
 	c.Flags().StringVar(&runID, "run-id", "", "host goal run id (required)")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("run-id")
+	return c
+}
+
+func newGoalProgramValidateCmd() *cobra.Command {
+	var file string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "validate",
+		Short: "Validate an on-disk program feature-graph.json (v1 program validate-graph)",
+		Long: "Read docs/beacon/<version>/programs/<slug>/feature-graph.json and check the\n" +
+			"v1 required keys plus the dependency/cycle rules. Non-zero exit when blocked.",
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			g, problems, err := orchestrator.LoadProgramGraphFile(file)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				status := "pass"
+				if len(problems) > 0 {
+					status = "blocked"
+				}
+				if perr := printJSON(cmd, map[string]any{"status": status, "errors": problems, "graph": g}); perr != nil {
+					return perr
+				}
+			} else {
+				out := cmd.OutOrStdout()
+				fmt.Fprintf(out, "program: %s (lakes=%d)\n", g.ProgramSlug, len(g.Lakes))
+				for _, p := range problems {
+					fmt.Fprintf(out, "  %s: %s\n", p.ReasonCode, p.Detail)
+				}
+			}
+			if len(problems) > 0 {
+				return fail(problems[0].ReasonCode, "goal program validate", problems[0].Detail)
+			}
+			return nil
+		},
+	}
+	c.Flags().StringVar(&file, "file", "", "program feature-graph.json path (required)")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("file")
+	return c
+}
+
+func newGoalProgramImportCmd() *cobra.Command {
+	var file, runID string
+	var freeze, asJSON bool
+	c := &cobra.Command{
+		Use:   "import",
+		Short: "Validate an on-disk program graph and record it on a host goal run",
+		Long: "Same validation as `goal program validate`, then record the file graph as the\n" +
+			"run's program plan (parity_subset / status / scope_mode are kept). An invalid\n" +
+			"graph writes nothing.",
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			eng, closeFn, err := goalEngine("")
+			if err != nil {
+				return err
+			}
+			defer closeFn()
+			st, err := eng.ProgramImportFile(runID, file, freeze)
+			if err != nil {
+				return err
+			}
+			return printProgramState(cmd, st, asJSON)
+		},
+	}
+	c.Flags().StringVar(&file, "file", "", "program feature-graph.json path (required)")
+	c.Flags().StringVar(&runID, "run-id", "", "host goal run id (required)")
+	c.Flags().BoolVar(&freeze, "freeze", false, "freeze the imported plan")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("file")
 	_ = c.MarkFlagRequired("run-id")
 	return c
 }

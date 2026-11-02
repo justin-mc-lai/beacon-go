@@ -14,10 +14,12 @@ package orchestrator
 // goal, the lakes it depends on, and the surfaces it declares it
 // will touch (kept for parity with the parallel-plan input shape).
 type ProgramLakeInput struct {
-	Slug      string   `json:"slug"`
-	Goal      string   `json:"goal,omitempty"`
-	DependsOn []string `json:"depends_on,omitempty"`
-	Touches   []string `json:"touches,omitempty"`
+	Slug         string   `json:"slug"`
+	Goal         string   `json:"goal,omitempty"`
+	DependsOn    []string `json:"depends_on,omitempty"`
+	Touches      []string `json:"touches,omitempty"`
+	ParitySubset []string `json:"parity_subset,omitempty"`
+	Status       string   `json:"status,omitempty"`
 }
 
 // LakeAdmissionItem is one per-lake admission check.
@@ -42,11 +44,13 @@ type LakeAdmission struct {
 
 // ProgramLake is one lake of a recorded program plan.
 type ProgramLake struct {
-	Slug      string         `json:"slug"`
-	Goal      string         `json:"goal,omitempty"`
-	DependsOn []string       `json:"depends_on,omitempty"`
-	Touches   []string       `json:"touches,omitempty"`
-	Admission *LakeAdmission `json:"admission,omitempty"`
+	Slug         string         `json:"slug"`
+	Goal         string         `json:"goal,omitempty"`
+	DependsOn    []string       `json:"depends_on,omitempty"`
+	Touches      []string       `json:"touches,omitempty"`
+	ParitySubset []string       `json:"parity_subset,omitempty"`
+	Status       string         `json:"status,omitempty"`
+	Admission    *LakeAdmission `json:"admission,omitempty"`
 }
 
 // ProgramChange is one recorded change intent against a (possibly
@@ -68,6 +72,7 @@ type ProgramChange struct {
 type ProgramState struct {
 	Slug      string          `json:"slug"`
 	Goal      string          `json:"goal,omitempty"`
+	ScopeMode string          `json:"scope_mode,omitempty"`
 	Lakes     []ProgramLake   `json:"lakes"`
 	Frozen    bool            `json:"frozen"`
 	FrozenAt  string          `json:"frozen_at,omitempty"`

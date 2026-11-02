@@ -172,6 +172,7 @@ const (
 	ReasonProgramLakeNotInPlan     = "program_lake_not_in_plan"
 	ReasonProgramTruthNotFrozen    = "program_truth_not_frozen"
 	ReasonProgramGraphInvalid      = "feature_graph_invalid"
+	ReasonProgramGraphFileMissing  = "file_missing"
 )
 
 // ---- Hotfix family (P2d, G-13: prod_ops_v168.py) ----
