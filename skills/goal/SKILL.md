@@ -1,5 +1,5 @@
 ---
-name: beacon-goal
+name: beacon-go-goal
 description: Long-run delivery entry. One utterance becomes a staged run (plan -> truth -> design? -> implement -> qa -> release) that advances under hard gates, survives interruption, and never completes without an independent verifier and a human-confirmed release.
 triggers: goal, 长跑, 全流程, deliver this feature, drive it to release
 ---

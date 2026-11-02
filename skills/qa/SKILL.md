@@ -1,5 +1,5 @@
 ---
-name: beacon-qa
+name: beacon-go-qa
 description: Evidence-based acceptance. Register real artifacts with hashes, evaluate the qa gate, and score skills without editing them.
 triggers: 验收, QA, evidence, scorecard, 证据
 ---

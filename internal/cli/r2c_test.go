@@ -21,7 +21,7 @@ func TestSkillsInstallCLI(t *testing.T) {
 	if got, _ := doc["skills"].([]any); len(got) != 7 {
 		t.Fatalf("installed skills = %v, want 7", doc)
 	}
-	if _, err := os.Stat(filepath.Join(dir, "beacon-plan", "SKILL.md")); err != nil {
+	if _, err := os.Stat(filepath.Join(dir, "beacon-go-plan", "SKILL.md")); err != nil {
 		t.Fatalf("materialized plan skill: %v", err)
 	}
 	if _, err := runCLI(t, "skills", "install", "--dir", dir); err == nil {

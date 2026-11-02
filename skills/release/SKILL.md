@@ -1,5 +1,5 @@
 ---
-name: beacon-release
+name: beacon-go-release
 description: Final go/no-go. Release passes only when every gate is green and a human confirms; otherwise it stays blocked with named reasons.
 triggers: 发布, release, 上线, gate
 ---

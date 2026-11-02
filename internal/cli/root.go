@@ -57,13 +57,16 @@ import (
 // skills install, repo-carried state, archive/init/hooks), and the
 // intelligence faces (agent eval, qa strategy, intent decomposition,
 // brainstorm, code2truth, reopen). See docs/r2a..r2d reports.
+// v2.0.0-go.11 namespaces installed skills (beacon-go-<id>) so the Go track
+// can coexist with the Python v1 set in every host, adds the opencode host,
+// and ships a generated never-stale beacon-go router skill.
 // v2.0.0-go.10 closes the 2026-10-29 audit: the fake verify-harness is
 // now a real ledger+hash check, the default ledger is the Go track's own
 // beacon-go.db, migrations snapshot first, long runs honour SIGINT,
 // streaming forwards real deltas, benchmark and file-size gates exist,
 // and the frozen feature packages are reconciled (docs/changes/change-audit-2026-10-29.md).
 // Development builds between exits carried a dev suffix.
-const Version = "2.0.0-go.10"
+const Version = "2.0.0-go.11"
 
 // NewRootCmd builds the beacon root command with the six first-class
 // abilities as real command groups (P4a convergence): goal (the loop

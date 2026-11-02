@@ -27,8 +27,8 @@ func TestEmbeddedSetIsOnePlusSix(t *testing.T) {
 	if plan == nil {
 		t.Fatal("plan skill missing from the embedded set")
 	}
-	if plan.Name != "beacon-plan" {
-		t.Errorf("plan name = %q, want beacon-plan", plan.Name)
+	if plan.Name != "beacon-go-plan" {
+		t.Errorf("plan name = %q, want beacon-go-plan", plan.Name)
 	}
 	if _, ok := Get("plan"); !ok {
 		t.Error("Get(plan) failed")
@@ -45,20 +45,20 @@ func TestInstallMaterializesHostLayout(t *testing.T) {
 		t.Fatalf("installed %d skills, want 7", len(res.Skills))
 	}
 	for _, id := range IDs() {
-		skillPath := filepath.Join(dir, "beacon-"+id, "SKILL.md")
+		skillPath := filepath.Join(dir, InstallDirName(id), "SKILL.md")
 		raw, err := os.ReadFile(skillPath)
 		if err != nil {
 			t.Fatalf("installed SKILL.md for %s: %v", id, err)
 		}
-		if !strings.Contains(string(raw), "name: beacon-"+id) {
+		if !strings.Contains(string(raw), "name: "+InstallDirName(id)) {
 			t.Errorf("installed %s does not carry its name frontmatter", skillPath)
 		}
-		if _, err := os.Stat(filepath.Join(dir, "beacon-"+id, "references", "core.md")); err != nil {
+		if _, err := os.Stat(filepath.Join(dir, InstallDirName(id), "references", "core.md")); err != nil {
 			t.Errorf("installed references for %s: %v", id, err)
 		}
 		// The host must get the examples and the eval cases too —
 		// they are what anchors behaviour and what `qa score` reads.
-		if _, err := os.Stat(filepath.Join(dir, "beacon-"+id, "evals", "evals.json")); err != nil {
+		if _, err := os.Stat(filepath.Join(dir, InstallDirName(id), "evals", "evals.json")); err != nil {
 			t.Errorf("installed evals for %s: %v", id, err)
 		}
 		if n := len(Examples(id)); n < 3 {
@@ -66,7 +66,7 @@ func TestInstallMaterializesHostLayout(t *testing.T) {
 		}
 	}
 	// Host discovery shape: a flat beacon-plan dir at the top level.
-	if _, err := os.Stat(filepath.Join(dir, "beacon-plan", "SKILL.md")); err != nil {
+	if _, err := os.Stat(filepath.Join(dir, InstallDirName("plan"), "SKILL.md")); err != nil {
 		t.Errorf("host discovery layout broken: %v", err)
 	}
 }
@@ -78,7 +78,7 @@ func TestInstallConflictRefusesWholeInstall(t *testing.T) {
 	}
 	// Tamper a file: the refused pass must leave it alone, the
 	// forced pass must restore the shipped bytes.
-	skillPath := filepath.Join(dir, "beacon-plan", "SKILL.md")
+	skillPath := filepath.Join(dir, InstallDirName("plan"), "SKILL.md")
 	raw, err := os.ReadFile(skillPath)
 	if err != nil {
 		t.Fatal(err)

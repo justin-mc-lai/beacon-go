@@ -31,6 +31,7 @@ var hostSpecs = []struct {
 	{"workbuddy", filepath.Join(".workbuddy-ai", "skills")},
 	{"claude", filepath.Join(".claude", "skills")},
 	{"codex", filepath.Join(".codex", "skills")},
+	{"opencode", filepath.Join(".config", "opencode", "skills")},
 	{"agents", filepath.Join(".agents", "skills")},
 	{"cursor", filepath.Join(".cursor", "skills")},
 	{"windsurf", filepath.Join(".windsurf", "skills")},
@@ -130,7 +131,13 @@ func installedSkills(dir string) []string {
 	}
 	var out []string
 	for _, e := range entries {
-		if e.IsDir() && strings.HasPrefix(e.Name(), "beacon-") {
+		// Follow symlinks: hosts are often materialized as symlinks into a
+		// repository, and DirEntry.IsDir() reports false for a symlink.
+		info, err := os.Stat(filepath.Join(dir, e.Name()))
+		if err != nil || !info.IsDir() {
+			continue
+		}
+		if strings.HasPrefix(e.Name(), InstallPrefix) {
 			out = append(out, e.Name())
 		}
 	}

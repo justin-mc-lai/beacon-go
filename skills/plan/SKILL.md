@@ -1,5 +1,5 @@
 ---
-name: beacon-plan
+name: beacon-go-plan
 description: Think first, in the open. Socratic questions before freeze, multi-angle planner review, source-anchored research, sea-to-lake program planning. The planner never implements, never freezes truth, never issues a QA or release verdict.
 triggers: 规划, 先想清楚, plan, review, brainstorm, 审查, 拆海, program, 源码
 ---

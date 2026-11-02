@@ -74,7 +74,7 @@ Requires Go 1.27+.
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.10
+./bin/beacon --version          # Beacon CLI v2.0.0-go.11
 ```
 
 Five commands cover most of a day:
@@ -145,10 +145,14 @@ beacon skills hosts                 # which host dirs exist, what is installed
 beacon skills install --host workbuddy
 ```
 
-`skills install` writes `beacon-<id>/SKILL.md` plus its `references/`, `examples/`
-and `evals/` into the host's skill directory (workbuddy, claude, codex, agents,
-cursor, windsurf, trae). With no `--host` it auto-detects the first existing host
-directory and fails closed when none exists.
+`skills install` writes `beacon-go-<id>/SKILL.md` plus its `references/`,
+`examples/` and `evals/`, and the generated `beacon-go/` router skill, into the
+host's skill directory (workbuddy, claude, codex, opencode, agents, cursor,
+windsurf, trae). The `beacon-go-` prefix is deliberate: the Python v1 track
+already owns the flat `beacon-<id>` names, so the two tracks can be installed
+side by side without the host seeing two skills with one name. With no `--host`
+it auto-detects the first existing host directory and fails closed when none
+exists.
 
 Each package carries three worked examples and a `skill-evals.v1` eval set. The
 eval `checks` are machine-verifiable (`contains` / `references_contains` /

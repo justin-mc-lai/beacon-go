@@ -1,5 +1,5 @@
 ---
-name: beacon-implement
+name: beacon-go-implement
 description: Implementation lanes behind one admission check and one harvest rule. Single, team, and ralph lanes share the same entry gate and result contract.
 triggers: 实现, implement, 写代码, ralph, worktree
 ---

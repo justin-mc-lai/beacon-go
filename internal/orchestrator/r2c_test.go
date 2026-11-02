@@ -579,10 +579,10 @@ func TestPostReleaseHookTriggerAndBuiltinInstall(t *testing.T) {
 	if res.Status != "passed" {
 		t.Fatalf("builtin run = %+v, want passed", res)
 	}
-	if _, err := os.Stat(filepath.Join(home, ".claude", "skills", "beacon-plan", "SKILL.md")); err != nil {
+	if _, err := os.Stat(filepath.Join(home, ".claude", "skills", "beacon-go-plan", "SKILL.md")); err != nil {
 		t.Errorf("claude skill install: %v", err)
 	}
-	if _, err := os.Stat(filepath.Join(home, ".agents", "skills", "beacon-goal", "SKILL.md")); err != nil {
+	if _, err := os.Stat(filepath.Join(home, ".agents", "skills", "beacon-go-goal", "SKILL.md")); err != nil {
 		t.Errorf("agents skill install: %v", err)
 	}
 }

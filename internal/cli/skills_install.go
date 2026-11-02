@@ -1,7 +1,8 @@
 // skills install + references (R2c, H9): the host discovery path.
 // Hosts discover SKILL.md files on disk, not content inside a binary,
 // so this face materializes the embedded set into the host's skill
-// directory: <host>/beacon-<id>/SKILL.md plus its references/.
+// directory: <host>/beacon-go-<id>/SKILL.md plus its references/, and the
+// generated <host>/beacon-go/SKILL.md router.
 //
 // Host roots live in the skills package (skills/hosts.go) so this CLI
 // face and the post-release hook cannot drift. With no --host/--dir the
@@ -80,7 +81,7 @@ func newSkillsInstallCmd() *cobra.Command {
 	}
 	c.Flags().StringVar(&host, "host", "", "host skill directory: "+strings.Join(skills.HostNames(), "|")+" (default: auto-detect)")
 	c.Flags().StringVar(&dir, "dir", "", "explicit target skill directory (overrides --host)")
-	c.Flags().BoolVar(&force, "force", false, "overwrite existing beacon-<id> directories")
+	c.Flags().BoolVar(&force, "force", false, "overwrite existing beacon-go-<id> directories")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	return c
 }
@@ -169,7 +170,7 @@ func newSkillsExamplesCmd() *cobra.Command {
 }
 
 // newSkillsHostsCmd answers "why is beacon not in my host's skill list":// it prints every known host root, whether it exists, and which
-// beacon-* skills are already installed there.
+// beacon-go-* skills are already installed there.
 func newSkillsHostsCmd() *cobra.Command {
 	var asJSON bool
 	c := &cobra.Command{

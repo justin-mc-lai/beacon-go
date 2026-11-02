@@ -98,10 +98,19 @@ func References(id string) []RefFile {
 	return out
 }
 
+// InstallPrefix is the track namespace of every directory this binary
+// installs. The Python v1 track already owns flat `beacon-<id>` names
+// (beacon-goal, beacon-truth, ...); installing the Go set under the same
+// names makes a host see two skills with one name and pick either.
+const InstallPrefix = "beacon-go"
+
+// RouterSkillID is the generated entry skill that points at the
+// namespaced set and at the CLI fallback (`beacon-go skills show <id>`).
+const RouterSkillID = "beacon-go"
+
 // InstallDirName is the host-side directory name of one skill:
-// hosts discover flat beacon-<id> directories (Scheme A 1+6, the
-// Python agent_surface layout).
-func InstallDirName(id string) string { return "beacon-" + id }
+// hosts discover flat beacon-go-<id> directories.
+func InstallDirName(id string) string { return InstallPrefix + "-" + id }
 
 // EvalCheck is one machine-verifiable assertion about the package
 // bytes. It answers "does the skill actually state the rule this case
@@ -209,6 +218,7 @@ type InstallResult struct {
 // dir, as target-relative paths — the pre-write display surface.
 func PlannedFiles(targetDir string) []string {
 	var out []string
+	out = append(out, filepath.Join(targetDir, RouterSkillID, "SKILL.md"))
 	for _, id := range order {
 		base := filepath.Join(targetDir, InstallDirName(id))
 		for _, rel := range packageFiles(id) {
@@ -219,11 +229,11 @@ func PlannedFiles(targetDir string) []string {
 }
 
 // Install materializes the embedded skill packages into a host
-// skill directory: <target>/beacon-<id>/ with SKILL.md, references/,
-// examples/ and evals/. Existing beacon-<id> directories are a
-// conflict and refuse the WHOLE install unless force is set (no
-// half-written skill set). Unrelated directories in the target are
-// never touched.
+// skill directory: <target>/beacon-go-<id>/ with SKILL.md, references/,
+// examples/ and evals/, plus the generated <target>/beacon-go/ router.
+// Existing beacon-go-<id> directories are a conflict and refuse the WHOLE
+// install unless force is set (no half-written skill set). The Python v1
+// track's flat beacon-<id> entries are never touched.
 func Install(targetDir string, force bool) (InstallResult, error) {
 	if strings.TrimSpace(targetDir) == "" {
 		return InstallResult{}, fmt.Errorf("skills.Install: empty target dir")
@@ -239,6 +249,17 @@ func Install(targetDir string, force bool) (InstallResult, error) {
 		return InstallResult{}, &ConflictError{Paths: conflicts}
 	}
 	res := InstallResult{TargetDir: targetDir, Forced: force}
+	// The router skill is generated (never version-stale) and always
+	// refreshed; it is the entry a host can select even when it cannot
+	// pick a sub-skill by name.
+	routerPath := filepath.Join(targetDir, RouterSkillID, "SKILL.md")
+	if err := os.MkdirAll(filepath.Dir(routerPath), 0o755); err != nil {
+		return InstallResult{}, err
+	}
+	if err := os.WriteFile(routerPath, []byte(RouterSkillBody()), 0o644); err != nil {
+		return InstallResult{}, err
+	}
+	res.Files = append(res.Files, routerPath)
 	for _, id := range order {
 		base := filepath.Join(targetDir, InstallDirName(id))
 		files := packageFiles(id)
@@ -266,4 +287,62 @@ func Install(targetDir string, force bool) (InstallResult, error) {
 
 func readPackageFile(id, rel string) ([]byte, error) {
 	return files.ReadFile(id + "/" + rel)
+}
+
+// routerTemplate is the generated entry skill. It carries no embedded
+// version string (the binary reports its own), so it cannot go stale, and
+// it names the namespaced sub-skills so a host can select them directly.
+// § stands in for a backtick so the template can stay a raw string.
+const routerTemplate = `---
+name: beacon-go
+description: >
+  Beacon Go v2 track router. Always means the Go binary §beacon-go§
+  (never the Python v1 §beacon§). The abilities are installed next to this
+  file as beacon-go-goal / beacon-go-plan / beacon-go-truth /
+  beacon-go-design / beacon-go-implement / beacon-go-qa / beacon-go-release;
+  select one directly or load it with §beacon-go skills show <id>§.
+---
+
+# beacon-go
+
+**Hard rule:** §beacon-go§ = this Go v2 track. §beacon§ = the Python v1
+track. They run in parallel; never swap one for the other.
+
+- Go ledger: §~/.beacon/beacon-go.db§ (the §beacon-go§ wrapper exports
+  §BEACON_STORE_PATH§; the binary also defaults there).
+- Python ledger: §~/.beacon/beacon.db§ and per-project §.beacon/§.
+
+## Sub-skills
+
+| installed skill | load from the CLI |
+|---|---|
+{{SUB}}
+Deeper references: §beacon-go skills references <id>§.
+
+## Verify the install
+
+§§§sh
+which beacon-go && beacon-go --version
+beacon-go skills list
+beacon-go skills show truth
+§§§
+
+## Boundaries
+
+- Truth lives in §docs/beacon/<version>/features/<slug>/*.md§; the DB holds
+  pointers and events, never the requirement body.
+- Freeze is canonical-branch only; a pending change blocks freeze.
+- Release always needs a human confirmation; the driver never auto-releases.
+- §--executor recording§ is a placeholder; real execution needs an external
+  agent command.
+`
+
+// RouterSkillBody renders the generated beacon-go entry skill.
+func RouterSkillBody() string {
+	var sub strings.Builder
+	for _, id := range order {
+		sub.WriteString("| " + InstallDirName(id) + " | `beacon-go skills show " + id + "` |\n")
+	}
+	body := strings.ReplaceAll(routerTemplate, "{{SUB}}", sub.String())
+	return strings.ReplaceAll(body, "\u00a7", "`")
 }

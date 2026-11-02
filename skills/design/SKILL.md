@@ -1,5 +1,5 @@
 ---
-name: beacon-design
+name: beacon-go-design
 description: Design-primitive binding gate for UI work. Beacon tracks whether the visual rules are bound; it never draws prototypes.
 triggers: 设计, design, design primitive, UI gate
 ---

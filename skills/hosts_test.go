@@ -71,8 +71,8 @@ func TestHostDirsReportsInstalled(t *testing.T) {
 	if hosts[0].Name != "workbuddy" || !hosts[0].Exists {
 		t.Fatalf("workbuddy host = %+v", hosts[0])
 	}
-	if len(hosts[0].Installed) != len(IDs()) {
-		t.Fatalf("installed = %v, want %d beacon-* dirs", hosts[0].Installed, len(IDs()))
+	if len(hosts[0].Installed) != len(IDs())+1 {
+		t.Fatalf("installed = %v, want %d namespaced dirs + router", hosts[0].Installed, len(IDs())+1)
 	}
 	if hosts[1].Exists {
 		t.Fatalf("claude host should not exist in a temp home: %+v", hosts[1])

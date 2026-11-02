@@ -1,5 +1,5 @@
 ---
-name: beacon-truth
+name: beacon-go-truth
 description: Requirement truth package lifecycle. Ask first, sign the intent, freeze the package, govern changes, and self-check requirement-level drift.
 triggers: 冻需求, truth, freeze, change, refreeze, 需求真相
 ---

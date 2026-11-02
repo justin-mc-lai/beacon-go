@@ -12,4 +12,8 @@ here is distilled from it and says so).
 
 Hosts discover skills from files, not from binaries: run
 `beacon skills install` to materialize this set into a host skill
-directory (`~/.claude/skills`, `~/.agents/skills`, or `--dir`).
+directory (`~/.claude/skills`, `~/.codex/skills`,
+`~/.config/opencode/skills`, `~/.agents/skills`, or `--dir`).
+Installed names are namespaced (`beacon-go-goal`, `beacon-go-truth`, …)
+so they never collide with the Python v1 `beacon-<id>` set, plus one
+generated `beacon-go` router skill whose version comes from the binary.

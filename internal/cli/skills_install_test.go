@@ -24,7 +24,7 @@ func TestSkillsInstallIntoWorkBuddyDir(t *testing.T) {
 	}
 	for _, id := range skills.IDs() {
 		for _, rel := range []string{"SKILL.md", "references/core.md", "evals/evals.json"} {
-			p := filepath.Join(dir, "beacon-"+id, filepath.FromSlash(rel))
+			p := filepath.Join(dir, skills.InstallDirName(id), filepath.FromSlash(rel))
 			if _, err := os.Stat(p); err != nil {
 				t.Fatalf("missing %s: %v", p, err)
 			}
