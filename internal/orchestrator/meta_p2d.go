@@ -51,6 +51,13 @@ type ProgramLake struct {
 	ParitySubset []string       `json:"parity_subset,omitempty"`
 	Status       string         `json:"status,omitempty"`
 	Admission    *LakeAdmission `json:"admission,omitempty"`
+	// ProgramDrive binding (issue #7): the lake's own goal run and
+	// the last drive verdict. ProgramRoute derives live status on
+	// top of this; the binding is what survives a restart.
+	RunID         string `json:"run_id,omitempty"`
+	ProgramStatus string `json:"program_status,omitempty"` // running | awaiting_release | blocked | completed
+	ReasonCode    string `json:"reason_code,omitempty"`
+	UpdatedAt     string `json:"updated_at,omitempty"`
 }
 
 // ProgramChange is one recorded change intent against a (possibly
@@ -128,7 +135,19 @@ type LakeRoute struct {
 	ReasonCode string   `json:"reason_code,omitempty"`
 	FeatureID  string   `json:"feature_id,omitempty"`
 	GoalRunID  string   `json:"goal_run_id,omitempty"`
-	DriverHint string   `json:"driver_hint,omitempty"`
+	RunStage   string   `json:"run_stage,omitempty"`
+	// ProgramStatus is the drive verdict: running | awaiting_release
+	// | blocked | completed | pending.
+	ProgramStatus string `json:"program_status,omitempty"`
+	DriverHint    string `json:"driver_hint,omitempty"`
+}
+
+// ProgramRollup is the program-level count the route/board show.
+type ProgramRollup struct {
+	Completed       int `json:"completed"`
+	AwaitingRelease int `json:"awaiting_release"`
+	Blocked         int `json:"blocked"`
+	Pending         int `json:"pending"`
 }
 
 // ProgramRouteView is the read-only orchestration view (G-12): the
@@ -137,12 +156,14 @@ type LakeRoute struct {
 // (program_orchestrator.py's build_program_orchestrator_state,
 // re-based from files to the store).
 type ProgramRouteView struct {
-	RunID       string      `json:"run_id"`
-	ProgramSlug string      `json:"program_slug"`
-	Frozen      bool        `json:"frozen"`
-	Lakes       []LakeRoute `json:"lakes"`
-	NextBatch   []string    `json:"next_batch"`
-	AllComplete bool        `json:"all_complete"`
+	RunID         string        `json:"run_id"`
+	ProgramSlug   string        `json:"program_slug"`
+	Frozen        bool          `json:"frozen"`
+	Lakes         []LakeRoute   `json:"lakes"`
+	NextBatch     []string      `json:"next_batch"`
+	AllComplete   bool          `json:"all_complete"`
+	ProgramStatus string        `json:"program_status"` // running | awaiting_release | blocked | delivered
+	Rollup        ProgramRollup `json:"rollup"`
 }
 
 // Lake route statuses.

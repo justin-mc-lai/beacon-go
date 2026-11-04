@@ -150,6 +150,12 @@ func (e *Engine) ProgramRoute(runID string) (ProgramRouteView, error) {
 			row.FeatureID = feat.ID
 			completed, row.GoalRunID = e.featureCompleted(feat.ID)
 		}
+		// A completed lake's run is the one featureCompleted
+		// returned; otherwise the drive binding wins (featureCompleted
+		// returns the feature's newest run even when it is not done).
+		if lake.RunID != "" && !completed {
+			row.GoalRunID = lake.RunID
+		}
 		// Startability is stricter than admission: admission counts
 		// a dependency closed when it is completed OR admitted (the
 		// paperwork chain), but a lake may only START once its
@@ -179,6 +185,27 @@ func (e *Engine) ProgramRoute(runID string) (ProgramRouteView, error) {
 		default:
 			row.Status = LakeReady
 		}
+		row.ProgramStatus = "pending"
+		switch {
+		case completed:
+			row.ProgramStatus = "completed"
+		case row.Status == LakeBlocked:
+			row.ProgramStatus = "blocked"
+		case row.GoalRunID != "":
+			if stage, serr := e.lakeRunStage(row.GoalRunID); serr == nil {
+				row.RunStage = stage
+				switch stage {
+				case string(core.LoopReleaseGate):
+					row.ProgramStatus = "awaiting_release"
+				case string(core.LoopDone):
+					row.ProgramStatus = "completed"
+				case string(core.LoopErrorRecovery):
+					row.ProgramStatus = "blocked"
+				default:
+					row.ProgramStatus = "running"
+				}
+			}
+		}
 		if row.Status == LakeAdmitted || row.Status == LakeReady {
 			row.DriverHint = driverHintFor(runID, row)
 			view.NextBatch = append(view.NextBatch, slug)
@@ -189,7 +216,41 @@ func (e *Engine) ProgramRoute(runID string) (ProgramRouteView, error) {
 		bySlug[slug] = row
 		view.Lakes = append(view.Lakes, row)
 	}
+	for _, row := range view.Lakes {
+		switch row.ProgramStatus {
+		case "completed":
+			view.Rollup.Completed++
+		case "awaiting_release":
+			view.Rollup.AwaitingRelease++
+		case "blocked":
+			view.Rollup.Blocked++
+		default:
+			view.Rollup.Pending++
+		}
+	}
+	switch {
+	case view.AllComplete:
+		view.ProgramStatus = "delivered"
+	case view.Rollup.Blocked > 0:
+		view.ProgramStatus = "blocked"
+	case view.Rollup.AwaitingRelease > 0:
+		view.ProgramStatus = "awaiting_release"
+	default:
+		view.ProgramStatus = "running"
+	}
 	return view, nil
+}
+
+// lakeRunStage loads one bound lake run's loop stage.
+func (e *Engine) lakeRunStage(runID string) (string, error) {
+	if runID == "" {
+		return "", nil
+	}
+	_, m, _, err := e.loadRun(runID)
+	if err != nil {
+		return "", err
+	}
+	return m.LoopStage, nil
 }
 
 // driverHintFor renders the per-lake long-run suggestion: program

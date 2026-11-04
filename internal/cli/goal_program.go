@@ -28,7 +28,54 @@ func newGoalProgramCmd() *cobra.Command {
 	}
 	c.AddCommand(newGoalProgramPlanCmd(), newGoalProgramAdmitCmd(), newGoalProgramRouteCmd(),
 		newGoalProgramChangeCmd(), newGoalProgramFreezeCmd(),
-		newGoalProgramValidateCmd(), newGoalProgramImportCmd())
+		newGoalProgramValidateCmd(), newGoalProgramImportCmd(),
+		newGoalProgramDriveCmd())
+	return c
+}
+
+func newGoalProgramDriveCmd() *cobra.Command {
+	var runID, executor string
+	var maxRounds int
+	var asJSON bool
+	var ef execFlags
+	c := &cobra.Command{
+		Use:   "drive",
+		Short: "Advance one ready lake to its release gate (never auto-completes, never releases)",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			eng, closeFn, err := goalEngine("")
+			if err != nil {
+				return err
+			}
+			defer closeFn()
+			v, err := eng.ProgramDrive(runID, orchestrator.ProgramDriveOptions{
+				Executor: executor, Exec: ef.config(), MaxTurns: maxRounds,
+			})
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				return printJSON(cmd, v)
+			}
+			out := cmd.OutOrStdout()
+			fmt.Fprintf(out, "program:   %s (%s)\n", v.ProgramSlug, v.ProgramStatus)
+			if v.AdvancedLake != "" {
+				fmt.Fprintf(out, "lake:      %s -> %s (run %s)\n", v.AdvancedLake, v.LakeStatus, v.LakeRunID)
+			}
+			if v.ReasonCode != "" {
+				fmt.Fprintf(out, "reason:    %s\n", v.ReasonCode)
+			}
+			fmt.Fprintf(out, "rollup:    completed=%d awaiting_release=%d blocked=%d pending=%d\n",
+				v.Route.Rollup.Completed, v.Route.Rollup.AwaitingRelease, v.Route.Rollup.Blocked, v.Route.Rollup.Pending)
+			return nil
+		},
+	}
+	c.Flags().StringVar(&runID, "run-id", "", "host goal run id (required)")
+	c.Flags().StringVar(&executor, "executor", "", "stage executor: recording | subprocess | subprocess:<profile> | ralph")
+	c.Flags().IntVar(&maxRounds, "max-rounds", 0, "driver turn cap per lake (<=0 default)")
+	addExecFlags(c, &ef, true)
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("run-id")
 	return c
 }
 

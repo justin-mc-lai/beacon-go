@@ -1,0 +1,18 @@
+{
+  "feature": "program-drive",
+  "version": "v2.0.0",
+  "recorded_at": "2026-11-04T17:00:00Z",
+  "verification": {
+    "build": "PASS",
+    "go_test_all": "PASS",
+    "go_vet": "PASS",
+    "e2e": "PASS"
+  },
+  "notes": [
+    "program drive advances at most one ready lake to its release gate per call",
+    "lake<->run binding is persisted on the program snapshot and reused",
+    "a blocked lake records reason_code and never advances its dependents",
+    "program route exposes run_id, stage, rollup and program_status",
+    "no auto-complete and no new top-level command"
+  ]
+}
