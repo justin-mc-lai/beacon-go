@@ -29,14 +29,14 @@ func newGoalProgramCmd() *cobra.Command {
 	c.AddCommand(newGoalProgramPlanCmd(), newGoalProgramAdmitCmd(), newGoalProgramRouteCmd(),
 		newGoalProgramChangeCmd(), newGoalProgramFreezeCmd(),
 		newGoalProgramValidateCmd(), newGoalProgramImportCmd(),
-		newGoalProgramDriveCmd())
+		newGoalProgramDriveCmd(), newGoalProgramCompleteCmd())
 	return c
 }
 
 func newGoalProgramDriveCmd() *cobra.Command {
 	var runID, executor string
 	var maxRounds int
-	var asJSON bool
+	var asJSON, untilDone bool
 	var ef execFlags
 	c := &cobra.Command{
 		Use:   "drive",
@@ -49,7 +49,7 @@ func newGoalProgramDriveCmd() *cobra.Command {
 			}
 			defer closeFn()
 			v, err := eng.ProgramDrive(runID, orchestrator.ProgramDriveOptions{
-				Executor: executor, Exec: ef.config(), MaxTurns: maxRounds,
+				Executor: executor, Exec: ef.config(), MaxTurns: maxRounds, UntilDone: untilDone,
 			})
 			if err != nil {
 				return err
@@ -73,6 +73,7 @@ func newGoalProgramDriveCmd() *cobra.Command {
 	c.Flags().StringVar(&runID, "run-id", "", "host goal run id (required)")
 	c.Flags().StringVar(&executor, "executor", "", "stage executor: recording | subprocess | subprocess:<profile> | ralph")
 	c.Flags().IntVar(&maxRounds, "max-rounds", 0, "driver turn cap per lake (<=0 default)")
+	c.Flags().BoolVar(&untilDone, "until-done", false, "keep advancing ready lakes until all are release-ready or one blocks")
 	addExecFlags(c, &ef, true)
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("run-id")
@@ -409,5 +410,41 @@ func newGoalProgramImportCmd() *cobra.Command {
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("file")
 	_ = c.MarkFlagRequired("run-id")
+	return c
+}
+
+func newGoalProgramCompleteCmd() *cobra.Command {
+	var runID, confirmedBy string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "complete",
+		Short: "One program-level human confirmation: release every lake at its gate together",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			eng, closeFn, err := goalEngine("")
+			if err != nil {
+				return err
+			}
+			defer closeFn()
+			v, err := eng.ProgramComplete(runID, confirmedBy)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				return printJSON(cmd, v)
+			}
+			out := cmd.OutOrStdout()
+			fmt.Fprintf(out, "program:   %s (%s)\n", v.ProgramSlug, v.ProgramStatus)
+			fmt.Fprintf(out, "confirmed: %s\n", confirmedBy)
+			fmt.Fprintf(out, "rollup:    completed=%d awaiting_release=%d blocked=%d pending=%d\n",
+				v.Route.Rollup.Completed, v.Route.Rollup.AwaitingRelease, v.Route.Rollup.Blocked, v.Route.Rollup.Pending)
+			return nil
+		},
+	}
+	c.Flags().StringVar(&runID, "run-id", "", "host goal run id (required)")
+	c.Flags().StringVar(&confirmedBy, "confirmed-by", "", "human identity confirming the whole sea (required)")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("run-id")
+	_ = c.MarkFlagRequired("confirmed-by")
 	return c
 }
