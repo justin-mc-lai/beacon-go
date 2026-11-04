@@ -123,11 +123,12 @@ func TestProgramCompleteSingleSignature(t *testing.T) {
 	setRunStage(t, env, runB, string(core.LoopReleaseGate))
 	bindLake(t, env, hostID, "feat-a", runA)
 	bindLake(t, env, hostID, "feat-b", runB)
-	if _, err := env.st.Gates().Record(store.GateResult{FeatureID: env.feature.ID, GateType: "qa", Verdict: "pass"}); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := env.st.Gates().Record(store.GateResult{FeatureID: fb.ID, GateType: "qa", Verdict: "pass"}); err != nil {
-		t.Fatal(err)
+	for _, id := range []string{env.feature.ID, fb.ID} {
+		for _, gt := range []string{"truth_freeze", "implement", "qa"} {
+			if _, err := env.st.Gates().Record(store.GateResult{FeatureID: id, GateType: gt, Verdict: "pass"}); err != nil {
+				t.Fatal(err)
+			}
+		}
 	}
 	ref := filepath.Join(t.TempDir(), "qa.txt")
 	if err := os.WriteFile(ref, []byte("qa ok"), 0o644); err != nil {

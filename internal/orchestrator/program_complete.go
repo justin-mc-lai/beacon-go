@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"beacon-go/internal/core"
+	"beacon-go/internal/gate"
 )
 
 func (e *Engine) ProgramComplete(hostRunID, confirmedBy string) (ProgramDriveView, error) {
@@ -55,10 +56,30 @@ func (e *Engine) ProgramComplete(hostRunID, confirmedBy string) (ProgramDriveVie
 		pending = append(pending, row)
 	}
 	// Status validation is complete; now make sure every lake has an
-	// independent verifier before releasing any of them.
+	// independent verifier AND a passing formal release verdict before
+	// releasing any of them. The program signature covers only the
+	// human-confirmation check — the other gates are re-read live.
 	for _, row := range pending {
 		if err := e.ensureVerifier(row.GoalRunID); err != nil {
 			return ProgramDriveView{}, err
+		}
+		ctx, ok, err := e.featureContextOf(row.FeatureID)
+		if err != nil {
+			return ProgramDriveView{}, err
+		}
+		if !ok {
+			return ProgramDriveView{}, core.NewError(ReasonProjectNotRegistered, "goal.ProgramComplete",
+				"no feature context for lake "+row.Lake)
+		}
+		facts, err := e.releaseFacts(ctx)
+		if err != nil {
+			return ProgramDriveView{}, err
+		}
+		facts.HumanConfirmed = true
+		facts.HumanConfirmedBy = "program:" + confirmedBy
+		if ev := gate.EvaluateRelease(facts, "program:"+confirmedBy); ev.Verdict != gate.VerdictPass {
+			return ProgramDriveView{}, core.NewError(core.ReasonProgramLakeNotReady, "goal.ProgramComplete",
+				fmt.Sprintf("lake %s fails its formal release gate: %v", row.Lake, ev.ReasonCodes))
 		}
 	}
 	var confirmed []map[string]string
