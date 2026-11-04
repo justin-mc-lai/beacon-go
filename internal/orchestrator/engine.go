@@ -115,24 +115,26 @@ func (e *Engine) SetStopWhenEvaluator(ev core.StopWhenEvaluator) { e.stopWhen = 
 // RunView is the stable JSON surface of one goal run (AC-065 style:
 // snake_case, one document).
 type RunView struct {
-	RunID                 string           `json:"run_id"`
-	FeatureID             string           `json:"feature_id"`
-	FeatureSlug           string           `json:"feature_slug"`
-	Status                string           `json:"status"` // running | blocked | completed | error_recovery
-	RunStatus             string           `json:"run_status"`
-	Blocked               bool             `json:"blocked"`
-	ReasonCode            string           `json:"reason_code,omitempty"`
-	CurrentStage          string           `json:"current_stage,omitempty"`
-	LoopStage             string           `json:"loop_stage"`
-	NextSkill             string           `json:"next_skill,omitempty"`
-	StagePlan             []StagePlanEntry `json:"stage_plan"`
-	Verifier              *VerifierInfo    `json:"verifier,omitempty"`
-	ReleaseHumanConfirmed bool             `json:"release_human_confirmed"`
-	RepairLoopCount       int              `json:"repair_loop_count"`
-	BlockedStreak         int              `json:"blocked_streak"`
-	UpToDate              bool             `json:"up_to_date,omitempty"`
-	LastHeartbeatAt       string           `json:"last_heartbeat_at,omitempty"`
-	StartedAt             string           `json:"started_at"`
+	RunID                 string             `json:"run_id"`
+	FeatureID             string             `json:"feature_id"`
+	FeatureSlug           string             `json:"feature_slug"`
+	Status                string             `json:"status"` // running | blocked | completed | error_recovery
+	RunStatus             string             `json:"run_status"`
+	Blocked               bool               `json:"blocked"`
+	ReasonCode            string             `json:"reason_code,omitempty"`
+	CurrentStage          string             `json:"current_stage,omitempty"`
+	LoopStage             string             `json:"loop_stage"`
+	NextSkill             string             `json:"next_skill,omitempty"`
+	StagePlan             []StagePlanEntry   `json:"stage_plan"`
+	Verifier              *VerifierInfo      `json:"verifier,omitempty"`
+	ReleaseHumanConfirmed bool               `json:"release_human_confirmed"`
+	ReleasePolicy         string             `json:"release_policy"`
+	ReleaseShadow         *ReleaseShadowView `json:"release_shadow,omitempty"`
+	RepairLoopCount       int                `json:"repair_loop_count"`
+	BlockedStreak         int                `json:"blocked_streak"`
+	UpToDate              bool               `json:"up_to_date,omitempty"`
+	LastHeartbeatAt       string             `json:"last_heartbeat_at,omitempty"`
+	StartedAt             string             `json:"started_at"`
 	// P2b long-run care surfaces (present only when the corresponding
 	// subsystem has state on the run).
 	Driver          *DriverState     `json:"driver,omitempty"`
@@ -260,6 +262,7 @@ func viewOf(run store.Run, m *runMeta, slug string) RunView {
 		RunStatus: string(runStatusFor(m)), Blocked: m.Blocked,
 		LoopStage: m.LoopStage, StagePlan: m.StagePlan,
 		Verifier: m.Verifier, ReleaseHumanConfirmed: m.ReleaseHumanConfirmed,
+		ReleasePolicy: releasePolicyOrHuman(m.ReleasePolicy), ReleaseShadow: m.ReleaseShadow,
 		RepairLoopCount: m.RepairLoopCount, BlockedStreak: m.BlockedStreak,
 		LastHeartbeatAt: m.LastHeartbeatAt, StartedAt: run.StartedAt,
 		CurrentStage: m.currentStage(),
@@ -321,6 +324,9 @@ type CreateRunOptions struct {
 	// task-size field the lane router consults ("" = unset).
 	Lakes []string
 	Scale string
+	// ReleasePolicy is human (default) or auto_shadow. auto is
+	// refused; the shadow preview never weakens the human gate.
+	ReleasePolicy string
 	// Exec optionally records the run's subprocess-family executor
 	// configuration (P3c): later tick/driver/delegate invocations
 	// fall back to it when they carry no command of their own.
@@ -331,6 +337,10 @@ type CreateRunOptions struct {
 // goal_run_created event and parks the loop at governance_precheck
 // (create_goal_run + the first routing transition).
 func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
+	releasePolicy, err := NormalizeReleasePolicy(opts.ReleasePolicy)
+	if err != nil {
+		return RunView{}, err
+	}
 	root := store.ResolveRootPath(opts.ProjectRoot)
 	ctx, err := e.store.ResolveFeature(root, opts.FeatureSlug, opts.Version)
 	if err != nil {
@@ -351,6 +361,7 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 		CurrentStageIdx: 0,
 		ExecutorID:      opts.ExecutorID,
 		Verifier:        &VerifierInfo{RequiredForComplete: true, Present: false},
+		ReleasePolicy:   releasePolicy,
 		LastHeartbeatAt: time.Now().UTC().Format(time.RFC3339Nano),
 		Lakes:           opts.Lakes,
 		TaskScale:       opts.Scale,

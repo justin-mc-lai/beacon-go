@@ -119,19 +119,24 @@ type runMeta struct {
 	Verifier              *VerifierInfo    `json:"verifier,omitempty"`
 	ReleaseHumanConfirmed bool             `json:"release_human_confirmed"`
 	HumanConfirmedBy      string           `json:"human_confirmed_by,omitempty"`
-	Blocked               bool             `json:"blocked"`
-	BlockedStreak         int              `json:"blocked_streak"`
-	LastBlockReason       string           `json:"last_block_reason,omitempty"`
-	RepairLoopCount       int              `json:"repair_loop_count"`
-	StopWhen              string           `json:"stop_when,omitempty"`
-	LastHeartbeatAt       string           `json:"last_heartbeat_at,omitempty"`
-	HeartbeatSummary      string           `json:"heartbeat_summary,omitempty"`
-	LastSubstep           string           `json:"last_substep,omitempty"`
-	LastCheckpointAction  string           `json:"last_checkpoint_next_action,omitempty"`
-	InterruptPending      bool             `json:"interrupt_pending"`
-	InterruptSubstep      string           `json:"interrupt_substep,omitempty"`
-	InterruptCount        int              `json:"interrupt_count"`
-	LastTickKey           string           `json:"last_tick_key,omitempty"`
+	// ReleasePolicy is human (default) or auto_shadow. auto is not
+	// implemented; shadow records a would-pass verdict without
+	// weakening the human gate.
+	ReleasePolicy        string             `json:"release_policy,omitempty"`
+	ReleaseShadow        *ReleaseShadowView `json:"release_shadow,omitempty"`
+	Blocked              bool               `json:"blocked"`
+	BlockedStreak        int                `json:"blocked_streak"`
+	LastBlockReason      string             `json:"last_block_reason,omitempty"`
+	RepairLoopCount      int                `json:"repair_loop_count"`
+	StopWhen             string             `json:"stop_when,omitempty"`
+	LastHeartbeatAt      string             `json:"last_heartbeat_at,omitempty"`
+	HeartbeatSummary     string             `json:"heartbeat_summary,omitempty"`
+	LastSubstep          string             `json:"last_substep,omitempty"`
+	LastCheckpointAction string             `json:"last_checkpoint_next_action,omitempty"`
+	InterruptPending     bool               `json:"interrupt_pending"`
+	InterruptSubstep     string             `json:"interrupt_substep,omitempty"`
+	InterruptCount       int                `json:"interrupt_count"`
+	LastTickKey          string             `json:"last_tick_key,omitempty"`
 	// P2b long-run care fields (driver / supervisor / guardrails /
 	// queue provenance). All still live in runs.metadata_json — the
 	// single store snapshot; no side files (charter rule 7).

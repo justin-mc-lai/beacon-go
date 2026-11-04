@@ -540,7 +540,9 @@ const (
 	ReasonTruthMapStale                = "machine_json_source_hash_stale"
 	ReasonReleaseCheckHardBlock        = "release_check_hard_block"         // NEW (R2b): see family comment
 	ReasonReleaseCheckDowngraded       = "release_check_downgraded_warning" // NEW (R2b): see family comment
-	ReasonReviewSpecDrift              = "review_spec_drift_detected"       // NEW (R2b): see family comment
+	ReasonReleasePolicyUnsupported     = "release_policy_unsupported"
+	ReasonReleaseShadowNotConfigured   = "release_shadow_not_configured"
+	ReasonReviewSpecDrift              = "review_spec_drift_detected" // NEW (R2b): see family comment
 )
 
 // ---- Exec & host R2c family (Python v1.6 parity audit

@@ -68,6 +68,10 @@ func newGoalCmd() *cobra.Command {
 		// gate / fork / error-recovery) and the spend ledger (M9).
 		newGoalQuotaCmd(), newGoalDecideCmd(), newGoalGateCmd(), newGoalForkCmd(),
 		newGoalErrorRecoveryCmd(), newGoalSpendCmd(),
+		// Issue #8 shadow step: release_policy preview (auto_shadow
+		// only; auto is refused). Folded into goal, no new top-level
+		// command.
+		newGoalReleaseShadowCmd(),
 	)
 	return c
 }
@@ -133,7 +137,7 @@ func blockedErr(v orchestrator.RunView) error {
 }
 
 func newGoalRunCmd() *cobra.Command {
-	var project, version, feature, executorID, scale string
+	var project, version, feature, executorID, scale, releasePolicy string
 	var lakes []string
 	var ux, asJSON bool
 	var ef execFlags
@@ -154,7 +158,7 @@ func newGoalRunCmd() *cobra.Command {
 			v, err := eng.CreateRun(orchestrator.CreateRunOptions{
 				ProjectRoot: project, Version: version, FeatureSlug: feature,
 				Utterance: utterance, UXRequired: ux, ExecutorID: executorID,
-				Lakes: lakes, Scale: scale, Exec: ef.config(),
+				Lakes: lakes, Scale: scale, Exec: ef.config(), ReleasePolicy: releasePolicy,
 			})
 			if err != nil {
 				return err
@@ -169,6 +173,7 @@ func newGoalRunCmd() *cobra.Command {
 	c.Flags().StringArrayVar(&lakes, "lake", nil, "lake slugs (recorded on the run; lane routing and parallel plans consult them)")
 	c.Flags().StringVar(&scale, "scale", "", "task scale field (large routes the implement lane to ralph)")
 	c.Flags().StringVar(&executorID, "executor-id", "", "identity of the executing agent (maker, for maker!=checker)")
+	c.Flags().StringVar(&releasePolicy, "release-policy", "", "release confirmation policy: human (default) | auto_shadow (preview only; auto is refused)")
 	addExecFlags(c, &ef, true)
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	return c

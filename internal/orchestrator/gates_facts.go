@@ -250,13 +250,15 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 	return gate.EvaluateQA(f, evaluator), nil
 }
 
-// evalRelease composes the release facts: the other four gates'
-// latest verdicts + the human confirmation on record.
-func (e *Engine) evalRelease(ctx store.FeatureContext, evaluator string) (gate.Evaluation, error) {
+// releaseFacts composes the release facts: the other four gates'
+// latest verdicts + the human confirmation on record. Shared by the
+// formal release gate and the auto_shadow preview (the shadow sets
+// HumanConfirmed=true only on its own copy).
+func (e *Engine) releaseFacts(ctx store.FeatureContext) (gate.ReleaseFacts, error) {
 	f := gate.ReleaseFacts{}
 	latest, err := e.store.Gates().LatestByType(ctx.Feature.ID)
 	if err != nil {
-		return gate.Evaluation{}, err
+		return gate.ReleaseFacts{}, err
 	}
 	byType := map[string]store.GateResult{}
 	for _, g := range latest {
@@ -281,7 +283,7 @@ func (e *Engine) evalRelease(ctx store.FeatureContext, evaluator string) (gate.E
 	// record of the same confirmation (P2a口径).
 	_, m, has, err := e.latestGoalRun(ctx, "")
 	if err != nil {
-		return gate.Evaluation{}, err
+		return gate.ReleaseFacts{}, err
 	}
 	if has {
 		f.DesignApplicable = designRequired(m)
@@ -291,7 +293,7 @@ func (e *Engine) evalRelease(ctx store.FeatureContext, evaluator string) (gate.E
 	if !f.HumanConfirmed {
 		events, err := e.store.ListEvents(ctx.Feature.ID)
 		if err != nil {
-			return gate.Evaluation{}, err
+			return gate.ReleaseFacts{}, err
 		}
 		for _, ev := range events {
 			if ev.EventType != "release_confirmed" {
@@ -308,6 +310,17 @@ func (e *Engine) evalRelease(ctx store.FeatureContext, evaluator string) (gate.E
 				f.HumanConfirmedBy = p.By
 			}
 		}
+	}
+	return f, nil
+}
+
+// evalRelease is the formal release gate: the facts plus the human
+// confirmation exactly as recorded. The shadow path never goes
+// through here.
+func (e *Engine) evalRelease(ctx store.FeatureContext, evaluator string) (gate.Evaluation, error) {
+	f, err := e.releaseFacts(ctx)
+	if err != nil {
+		return gate.Evaluation{}, err
 	}
 	return gate.EvaluateRelease(f, evaluator), nil
 }
