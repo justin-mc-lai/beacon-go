@@ -13,6 +13,7 @@ package orchestrator
 
 import (
 	"os"
+	"path/filepath"
 
 	"beacon-go/internal/core"
 	"beacon-go/internal/gate"
@@ -57,6 +58,7 @@ type TruthMapView struct {
 	PackagePresent    bool                 `json:"package_present"`
 	LayoutOK          bool                 `json:"layout_ok"`
 	FingerprintStatus string               `json:"fingerprint_status,omitempty"` // fresh | stale | no_freeze_recorded
+	FeatureMapStatus  string               `json:"feature_map_status,omitempty"` // fresh | stale | missing
 	Diagnostics       []TruthMapDiagnostic `json:"diagnostics,omitempty"`
 	ReasonCodes       []string             `json:"reason_codes,omitempty"`
 }
@@ -219,6 +221,34 @@ func (e *Engine) TruthMapVerify(projectRoot, slug string) (TruthMapView, error) 
 			})
 		} else {
 			v.FingerprintStatus = "fresh"
+		}
+	}
+	// Feature map freshness: the map is a one-way projection of the
+	// package. A missing map is informational (the feature has not
+	// asked for one yet); a present map whose fingerprint no longer
+	// matches the package is an error — its verification commands
+	// point at an older requirement.
+	if present {
+		mapPath := filepath.Join(resolvePkgPath(fc.Project.RootPath, pkgDirOf(pkg.Truth.Path)), "feature-map.md")
+		if raw, merr := os.ReadFile(mapPath); merr != nil {
+			v.FeatureMapStatus = "missing"
+			v.Diagnostics = append(v.Diagnostics, TruthMapDiagnostic{
+				Code: core.ReasonFeatureMapMissing, Severity: "info",
+				Message: "no feature-map.md for this package; run `beacon truth map build` to generate it",
+			})
+		} else {
+			scalars, _, _ := gate.ParseFrontmatter(string(raw))
+			live := core.PackageSurfaceFingerprint([]byte(pkg.Truth.Text), []byte(pkg.Tests.Text),
+				[]byte(pkg.Tasks.Text), []byte(pkg.Evidence.Text))
+			if scalars["surface_fingerprint"] == "" || scalars["surface_fingerprint"] != live {
+				v.FeatureMapStatus = "stale"
+				v.Diagnostics = append(v.Diagnostics, TruthMapDiagnostic{
+					Code: core.ReasonFeatureMapStale, Severity: "error",
+					Message: "feature-map.md is older than the package; rerun `beacon truth map build`",
+				})
+			} else {
+				v.FeatureMapStatus = "fresh"
+			}
 		}
 	}
 	v.Status = "pass"

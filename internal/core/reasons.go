@@ -542,6 +542,8 @@ const (
 	ReasonReleaseCheckDowngraded       = "release_check_downgraded_warning" // NEW (R2b): see family comment
 	ReasonReleasePolicyUnsupported     = "release_policy_unsupported"
 	ReasonReleaseShadowNotConfigured   = "release_shadow_not_configured"
+	ReasonFeatureMapMissing            = "feature_map_missing"
+	ReasonFeatureMapStale              = "feature_map_stale"
 	ReasonReviewSpecDrift              = "review_spec_drift_detected" // NEW (R2b): see family comment
 )
 
