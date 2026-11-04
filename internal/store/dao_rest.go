@@ -113,7 +113,15 @@ type ArtifactDao struct {
 // Artifacts returns the ArtifactDao.
 func (s *Store) Artifacts() *ArtifactDao { return &ArtifactDao{s: s, q: s.db} }
 
-// Add inserts a blob pointer. AbsPath must be absolute (AC-083).
+// Add upserts a blob pointer. AbsPath must be absolute (AC-083).
+//
+// Registering the same (run_id, abs_path) again refreshes
+// content_hash / size_bytes / created_at on the row already on record
+// instead of appending a second one (AC-001, artifact-upsert), and the
+// row keeps its original id so external references survive a stage
+// re-run (AC-002). A row is inserted only when the key has no row yet.
+// Re-running a stage therefore can no longer leave an unmatchable old
+// hash behind for the qa evidence check to trip over.
 func (d *ArtifactDao) Add(a ArtifactRef) (ArtifactRef, error) {
 	if err := writable(d.s, d.inTx); err != nil {
 		return ArtifactRef{}, err
@@ -122,13 +130,30 @@ func (d *ArtifactDao) Add(a ArtifactRef) (ArtifactRef, error) {
 		return ArtifactRef{}, core.NewError(ReasonArtifactPathNotAbs, "ArtifactDao.Add",
 			"abs_path must be absolute: "+a.AbsPath)
 	}
+	a.CreatedAt = orNow(a.CreatedAt)
+	// One statement, one dbtx handle: the upsert and the read-back
+	// below must see the same transaction when called inside WithTx.
+	res, err := d.q.Exec(`UPDATE artifact_refs SET content_hash = ?, size_bytes = ?, created_at = ? WHERE run_id = ? AND abs_path = ?`,
+		a.ContentHash, a.SizeBytes, a.CreatedAt, a.RunID, a.AbsPath)
+	if err != nil {
+		return ArtifactRef{}, err
+	}
+	updated, err := res.RowsAffected()
+	if err != nil {
+		return ArtifactRef{}, err
+	}
+	if updated > 0 {
+		// Identity stays with the stored row: the existing id (and
+		// kind) wins over whatever the caller passed in, and legacy
+		// duplicate rows of the same key are refreshed along with it.
+		return scanArtifact(d.q.QueryRow(`SELECT `+artifactCols+` FROM artifact_refs WHERE run_id = ? AND abs_path = ? ORDER BY created_at DESC, rowid DESC LIMIT 1`,
+			a.RunID, a.AbsPath))
+	}
 	if a.ID == "" {
 		a.ID = newID("art_")
 	}
-	a.CreatedAt = orNow(a.CreatedAt)
-	_, err := d.q.Exec(`INSERT INTO artifact_refs(id, run_id, kind, abs_path, content_hash, size_bytes, created_at) VALUES(?,?,?,?,?,?,?)`,
-		a.ID, a.RunID, a.Kind, a.AbsPath, a.ContentHash, a.SizeBytes, a.CreatedAt)
-	if err != nil {
+	if _, err := d.q.Exec(`INSERT INTO artifact_refs(id, run_id, kind, abs_path, content_hash, size_bytes, created_at) VALUES(?,?,?,?,?,?,?)`,
+		a.ID, a.RunID, a.Kind, a.AbsPath, a.ContentHash, a.SizeBytes, a.CreatedAt); err != nil {
 		return ArtifactRef{}, err
 	}
 	return a, nil

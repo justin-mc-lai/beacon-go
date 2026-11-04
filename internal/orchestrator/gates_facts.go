@@ -196,6 +196,15 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 	if err != nil {
 		return gate.Evaluation{}, err
 	}
+	// AC-003/AC-004 (artifact-upsert): only the newest row per
+	// (run, path) is the live pointer. Legacy DBs may still hold
+	// several rows for one path — validating the older ones would
+	// read every re-registration as qa_artifact_stale forever. No
+	// migration is needed: ListByRun ascends by (created_at, rowid),
+	// so the last row seen for a key wins and the older rows simply
+	// never reach the staleness check.
+	latest := map[string]store.ArtifactRef{}
+	var keys []string
 	for _, run := range runs {
 		arts, err := e.store.Artifacts().ListByRun(run.ID)
 		if err != nil {
@@ -205,10 +214,11 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 			if !qaKind(a.Kind) {
 				continue
 			}
-			f.QAArtifactCount++
-			if stale, reason := store.ArtifactStaleness(a); stale {
-				f.StaleArtifacts = append(f.StaleArtifacts, gate.StaleRef{Kind: a.Kind, Path: a.AbsPath, Reason: reason})
+			key := run.ID + "\x00" + a.AbsPath
+			if _, seen := latest[key]; !seen {
+				keys = append(keys, key)
 			}
+			latest[key] = a
 		}
 		events, err := e.store.ListEventsByRun(run.ID)
 		if err != nil {
@@ -228,6 +238,13 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 			if p.Stage == StageQA && p.Outcome != "failed" {
 				f.QAStageExecuted = true
 			}
+		}
+	}
+	for _, key := range keys {
+		a := latest[key]
+		f.QAArtifactCount++
+		if stale, reason := store.ArtifactStaleness(a); stale {
+			f.StaleArtifacts = append(f.StaleArtifacts, gate.StaleRef{Kind: a.Kind, Path: a.AbsPath, Reason: reason})
 		}
 	}
 	return gate.EvaluateQA(f, evaluator), nil

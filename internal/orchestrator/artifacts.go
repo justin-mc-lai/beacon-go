@@ -65,8 +65,10 @@ func ValidRegisterKind(kind string) bool {
 
 // ArtifactRegistration is the outcome of one RegisterArtifact call:
 // the stored pointer, whether it already existed unchanged, and —
-// when the same run+kind+path was previously registered with a
-// different hash — the superseded row's id.
+// when a different row id still has to be referred to (legacy
+// duplicates from before the (run_id, abs_path) upsert) — that row's
+// id. A plain content refresh keeps the same id and reports nothing
+// under Supersedes (AC-002).
 type ArtifactRegistration struct {
 	Artifact          store.ArtifactRef `json:"artifact"`
 	AlreadyRegistered bool              `json:"already_registered"`
@@ -78,9 +80,10 @@ type ArtifactRegistration struct {
 // as a regular file; its sha256 and size are computed from disk at
 // registration time. Re-registering the same run+kind+path with an
 // unchanged hash is idempotent (returns the existing row, writes
-// nothing). The same run+kind+path with a changed hash appends a new
-// row and reports the previous row as superseded; old rows are never
-// mutated, so gate staleness checks keep seeing the full history.
+// nothing). With a changed hash the stored pointer is refreshed in
+// place (AC-001/AC-002, artifact-upsert): the row keeps its id, so
+// the qa evidence check sees a live pointer instead of a stale
+// leftover, and the event trail records the refresh.
 func (e *Engine) RegisterArtifact(runID, kind, path, by string) (ArtifactRegistration, error) {
 	if strings.TrimSpace(by) == "" {
 		return ArtifactRegistration{}, core.NewError(ReasonArtifactRegistrarRequired,
@@ -125,7 +128,7 @@ func (e *Engine) RegisterArtifact(runID, kind, path, by string) (ArtifactRegistr
 	if err != nil {
 		return ArtifactRegistration{}, err
 	}
-	var supersedes string
+	var previous, previousHash string
 	for _, a := range existing {
 		if a.Kind != kind || a.AbsPath != abs {
 			continue
@@ -133,7 +136,8 @@ func (e *Engine) RegisterArtifact(runID, kind, path, by string) (ArtifactRegistr
 		if a.ContentHash == sum {
 			return ArtifactRegistration{Artifact: a, AlreadyRegistered: true}, nil
 		}
-		supersedes = a.ID // latest previous row for this run+kind+path
+		previous = a.ID // previous row for this run+kind+path
+		previousHash = a.ContentHash
 	}
 	ref, err := e.store.Artifacts().Add(store.ArtifactRef{
 		RunID: run.ID, Kind: kind, AbsPath: abs,
@@ -146,8 +150,18 @@ func (e *Engine) RegisterArtifact(runID, kind, path, by string) (ArtifactRegistr
 		"artifact_id": ref.ID, "kind": kind, "abs_path": abs,
 		"content_hash": sum, "size_bytes": size, "registered_by": by,
 	}
-	if supersedes != "" {
-		payload["supersedes"] = supersedes
+	// Add upserts by (run_id, abs_path), so a changed file refreshes
+	// the previous row instead of leaving it behind as a stale
+	// pointer. Supersedes is only set if a different row id survives
+	// (legacy data); the refresh itself is flagged explicitly.
+	supersedes := ""
+	if previous != "" {
+		payload["refreshed"] = true
+		payload["previous_content_hash"] = previousHash
+		if previous != ref.ID {
+			supersedes = previous
+			payload["supersedes"] = previous
+		}
 	}
 	if err := e.appendEvent(run, EventArtifactRegistered, payload); err != nil {
 		return ArtifactRegistration{}, err

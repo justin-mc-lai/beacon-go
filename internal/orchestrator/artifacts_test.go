@@ -127,21 +127,45 @@ func TestRegisterArtifactIdempotentAndSupersede(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if next.AlreadyRegistered || next.Artifact.ID == first.Artifact.ID || next.Supersedes != first.Artifact.ID {
-		t.Fatalf("changed content must append a superseding row, got %+v", next)
+	// artifact-upsert AC-001/AC-002: changed content refreshes the
+	// same (run_id, abs_path) row in place — same id, no new row.
+	if next.AlreadyRegistered || next.Artifact.ID != first.Artifact.ID || next.Supersedes != "" {
+		t.Fatalf("changed content must refresh the existing pointer, got %+v vs %+v", next, first)
 	}
 	rows, err := env.st.Artifacts().ListByRun(run.RunID)
-	if err != nil || len(rows) != 2 {
-		t.Fatalf("want 2 rows (original + superseding), got %d err=%v", len(rows), err)
+	if err != nil || len(rows) != 1 {
+		t.Fatalf("want 1 row (in-place refresh), got %d err=%v", len(rows), err)
 	}
-	// The gate's view of history: the superseding row is fresh, the
-	// original row now reads stale (its hash no longer matches disk).
+	if rows[0].ContentHash != next.Artifact.ContentHash {
+		t.Fatalf("stored hash = %q, want the refreshed %q", rows[0].ContentHash, next.Artifact.ContentHash)
+	}
+	// The gate's view of the pointer: one row, fresh (no stale
+	// leftover to poison the qa verdict).
 	views, err := env.eng.ListRunArtifacts(run.RunID)
-	if err != nil || len(views) != 2 {
+	if err != nil || len(views) != 1 {
+		t.Fatalf("view rows = %d err=%v, want 1", len(views), err)
+	}
+	if views[0].Stale {
+		t.Fatalf("refreshed pointer must read fresh, got %+v", views[0])
+	}
+	// The trail records the refresh against the same artifact id.
+	events, err := env.st.ListEventsByRun(run.RunID)
+	if err != nil {
 		t.Fatal(err)
 	}
-	if !views[0].Stale || views[0].StaleReason != "hash_mismatch" || views[1].Stale {
-		t.Fatalf("staleness view wrong after supersede: %+v", views)
+	refreshed := false
+	for _, ev := range events {
+		if ev.EventType != EventArtifactRegistered {
+			continue
+		}
+		var p map[string]any
+		_ = json.Unmarshal(ev.Payload, &p)
+		if p["artifact_id"] == next.Artifact.ID && p["refreshed"] == true {
+			refreshed = true
+		}
+	}
+	if !refreshed {
+		t.Fatal("in-place refresh must leave an artifact_registered event flagged refreshed")
 	}
 }
 
