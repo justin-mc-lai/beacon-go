@@ -203,13 +203,21 @@ func TestImplementGateIsAdmission(t *testing.T) {
 	if ev.Verdict != gate.VerdictPass {
 		t.Fatalf("frozen + bound run must pass implement gate, got %+v", ev)
 	}
-	// The gate checks ARE the admission items (same names, same count).
+	// The gate checks ARE the admission items (same names, same
+	// order) plus the ONE exit-side work-evidence item this lake adds
+	// (implement-work-gate AC-001). The fixtures are not git repos, so
+	// that item is not_applicable (implement_work_unverified) and the
+	// verdict above stays admission-driven.
 	adm, err := env.eng.CheckImplementAdmission(run.RunID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(ev.Checks) != len(adm.Items) {
-		t.Fatalf("gate checks (%d) must mirror admission items (%d)", len(ev.Checks), len(adm.Items))
+	if len(ev.Checks) != len(adm.Items)+1 {
+		t.Fatalf("gate checks (%d) must be admission items (%d) + implement_work_recorded", len(ev.Checks), len(adm.Items))
+	}
+	last := ev.Checks[len(ev.Checks)-1]
+	if last.Check != gate.CheckImplementWorkRecorded || last.Applicable || last.ReasonCode != core.ReasonImplementWorkUnverified {
+		t.Fatalf("trailing check = %+v, want not_applicable %s", last, gate.CheckImplementWorkRecorded)
 	}
 	// Pending steering blocks BOTH surfaces with the same headline.
 	if _, err := env.eng.Steer(run.RunID, "objective", "change direction"); err != nil {

@@ -59,7 +59,8 @@ func resolveGateFeature(st *store.Store, project, slug, version string) (store.F
 
 func newGateEvaluateCmd() *cobra.Command {
 	var project, feature, version, runID, evaluator string
-	var asJSON bool
+	var workGate string
+	var asJSON, allowEmpty bool
 	c := &cobra.Command{
 		Use:   "evaluate <gate-type>",
 		Short: "Formally evaluate one gate (truth_freeze|design|implement|qa|release) and persist the verdict",
@@ -75,15 +76,46 @@ func newGateEvaluateCmd() *cobra.Command {
 				return err
 			}
 			eng := orchestrator.NewEngine(st)
+			if err := eng.SetImplementWorkGate(workGate); err != nil {
+				return err
+			}
+			// AC-003: an explicitly declared empty implement stage is
+			// recorded on the run BEFORE the evaluation reads it, so
+			// the implement_work_recorded item reports not_applicable
+			// in this very evaluation (idempotent across repeats).
+			var allowance *orchestrator.AllowEmptyResult
+			if allowEmpty {
+				if args[0] != string(gate.GateImplement) {
+					return fail(core.ReasonGateTypeUnknown, "gate evaluate",
+						"--allow-empty applies to the implement gate only, got "+args[0])
+				}
+				if strings.TrimSpace(evaluator) == "" {
+					return fail(core.ReasonGateEvaluatorRequired, "gate evaluate",
+						"an evaluator identity is required (--evaluator); the empty-stage declaration is attributed")
+				}
+				res, aerr := eng.AllowEmptyImplement(ctx, runID, evaluator, "declared via gate evaluate --allow-empty")
+				if aerr != nil {
+					return aerr
+				}
+				allowance = &res
+			}
 			ev, err := eng.EvaluateGate(ctx, args[0], runID, evaluator)
 			if err != nil {
 				return err
 			}
 			if asJSON {
-				if perr := printJSON(cmd, ev); perr != nil {
+				if allowance != nil {
+					if perr := printJSON(cmd, map[string]any{"allow_empty": allowance, "evaluation": ev}); perr != nil {
+						return perr
+					}
+				} else if perr := printJSON(cmd, ev); perr != nil {
 					return perr
 				}
 			} else {
+				if allowance != nil {
+					fmt.Fprintf(cmd.OutOrStdout(), "allow-empty: %s (run %s, appended=%v)\n",
+						allowance.Detail, allowance.RunID, allowance.Appended)
+				}
 				printEvaluationHuman(cmd, ev)
 			}
 			if ev.Verdict == gate.VerdictBlocked {
@@ -101,6 +133,9 @@ func newGateEvaluateCmd() *cobra.Command {
 	c.Flags().StringVar(&version, "version", "", "docs version filter")
 	c.Flags().StringVar(&runID, "run", "", "goal run id (binds run-scoped gates; default: newest goal run)")
 	c.Flags().StringVar(&evaluator, "evaluator", "", "evaluator identity (required; unattributed verdicts are refused)")
+	c.Flags().StringVar(&workGate, "implement-work-gate", "on", "implement_work_gate config: on|off (off reports the work-evidence check not_applicable)")
+	c.Flags().BoolVar(&allowEmpty, "allow-empty", false,
+		"implement gate: record an explicitly empty implement stage (implement_empty_allowed) for the bound run")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	return c
 }

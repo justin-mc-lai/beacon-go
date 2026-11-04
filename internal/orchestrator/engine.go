@@ -52,6 +52,10 @@ type Engine struct {
 	executors     map[string]StageExecutor
 	laneExecutors map[string]StageExecutor
 	stopWhen      core.StopWhenEvaluator
+	// implementWorkGate is the implement_work_gate config switch
+	// (implement-work-gate truth 配置项). "" and "on" both mean on
+	// — the zero value must never silently disable a gate.
+	implementWorkGate string
 }
 
 // NewEngine builds an engine with no executors registered.

@@ -116,6 +116,14 @@ func naItem(check, detail string) CheckItem {
 	return CheckItem{Check: check, OK: true, Applicable: false, Detail: detail}
 }
 
+// naItemCode is naItem for a not-applicable item that still names WHY
+// it was not judged (the AC-003/AC-004 caliber: the reason code rides
+// on the item — it never enters the evaluation's ReasonCodes, because
+// a not-applicable item proves nothing and must not block).
+func naItemCode(check, code, detail string) CheckItem {
+	return CheckItem{Check: check, OK: true, Applicable: false, ReasonCode: code, Detail: detail}
+}
+
 func failItem(check, code, detail string) CheckItem {
 	return CheckItem{Check: check, Applicable: true, ReasonCode: code, Detail: detail}
 }

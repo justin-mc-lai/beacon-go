@@ -5,6 +5,7 @@
 package gate
 
 import (
+	"strconv"
 	"strings"
 
 	"beacon-go/internal/core"
@@ -123,14 +124,91 @@ func EvaluateDesign(f DesignFacts, evaluator string) Evaluation {
 
 // ---- implement ----
 
-// ImplementFacts carry the shared admission checker's outcome (G-04).
-// The gate adds NO judgement of its own: Items are the admission
-// items mapped 1:1, and the verdict is pass iff admission allowed.
+// CheckImplementWorkRecorded is the implement exit's work-evidence
+// item (implement-work-gate AC-001): at the stage exit the bound work
+// tree must be able to prove that the stage moved something.
+const CheckImplementWorkRecorded = "implement_work_recorded"
+
+// ImplementWorkFacts carry the exit-side work evidence of one
+// implement stage (implement-work-gate AC-001..006). Every field is
+// gathered by READ-ONLY git probes plus store reads: the worktree is
+// never written, no commit is created and no run state is mutated, so
+// re-evaluating the same stage yields the same conclusion (AC-006).
+type ImplementWorkFacts struct {
+	// GateEnabled is the implement_work_gate config (default on).
+	// false = the item is not_applicable with implement_work_gate_off.
+	GateEnabled bool
+	// EmptyAllowed: the run explicitly declared the empty stage
+	// (implement_empty_allowed lifecycle event) — not_applicable
+	// with implement_empty_allowed (AC-003).
+	EmptyAllowed bool
+	// Unverified: the work tree could not be read at all (missing
+	// directory, not a git repository, git failure) or the run has
+	// no consumable baseline commit to compare HEAD against. Never a
+	// failure and never a pass: not_applicable with
+	// implement_work_unverified (AC-004).
+	Unverified       bool
+	UnverifiedDetail string
+	// Dirty: the bound worktree carries uncommitted changes.
+	Dirty      bool
+	DirtyCount int
+	// BaselineCommit is the run feature's consumable baseline
+	// (truth_baseline_commit); HeadCommit is the live HEAD of the
+	// bound worktree. HeadMoved means HEAD no longer equals the
+	// recorded baseline.
+	BaselineCommit string
+	HeadCommit     string
+	HeadMoved      bool
+}
+
+// shortHash trims a commit hash for item details (git's own calendar).
+func shortHash(s string) string {
+	if len(s) > 12 {
+		return s[:12]
+	}
+	if s == "" {
+		return "(none)"
+	}
+	return s
+}
+
+// implementWorkItem is the implement exit's work-evidence judgement:
+// pass when the work tree is dirty or its HEAD moved past the recorded
+// baseline, fail when the stage provably changed nothing, and
+// not_applicable when the question cannot be answered (AC-001..004).
+func implementWorkItem(w ImplementWorkFacts) CheckItem {
+	switch {
+	case !w.GateEnabled:
+		return naItemCode(CheckImplementWorkRecorded, core.ReasonImplementWorkGateOff,
+			"implement_work_gate is off: the exit's work evidence is not judged")
+	case w.EmptyAllowed:
+		return naItemCode(CheckImplementWorkRecorded, core.ReasonImplementEmptyAllowed,
+			"the run declares an explicitly empty implement stage (implement_empty_allowed event): no work evidence required")
+	case w.Unverified:
+		return naItemCode(CheckImplementWorkRecorded, core.ReasonImplementWorkUnverified,
+			"work tree unreadable ("+w.UnverifiedDetail+"): the exit's work evidence is not judged")
+	case w.Dirty:
+		return okItem(CheckImplementWorkRecorded,
+			"work tree carries "+strconv.Itoa(w.DirtyCount)+" uncommitted change(s)")
+	case w.HeadMoved:
+		return okItem(CheckImplementWorkRecorded,
+			"HEAD "+shortHash(w.HeadCommit)+" moved past baseline "+shortHash(w.BaselineCommit))
+	}
+	return failItem(CheckImplementWorkRecorded, core.ReasonImplementNoWork,
+		"HEAD is still at baseline "+shortHash(w.BaselineCommit)+" and the work tree is clean: "+
+			"the implement stage recorded no work (declare an intentional empty stage with --allow-empty)")
+}
+
+// ImplementFacts carry the shared admission checker's outcome (G-04)
+// plus the exit's work evidence. The gate adds no admission judgement
+// of its own: Items are the admission items mapped 1:1. The ONE
+// addition is the work-evidence item (AC-001), fed by Work.
 type ImplementFacts struct {
 	HasRun         bool
 	AllowImplement bool
 	HeadlineCode   string
 	Items          []CheckItem
+	Work           ImplementWorkFacts
 }
 
 func EvaluateImplement(f ImplementFacts, evaluator string) Evaluation {
@@ -140,7 +218,10 @@ func EvaluateImplement(f ImplementFacts, evaluator string) Evaluation {
 				"implement admission is per-run; no goal run exists for this feature (pass --run or create one)"),
 		})
 	}
-	ev := finish(GateImplement, evaluator, f.Items)
+	checks := make([]CheckItem, 0, len(f.Items)+1)
+	checks = append(checks, f.Items...)
+	checks = append(checks, implementWorkItem(f.Work))
+	ev := finish(GateImplement, evaluator, checks)
 	// Consistency guard: the mapped items and the admission headline
 	// must agree; if they ever drift, the headline wins (fail closed).
 	if ev.Verdict == VerdictPass && !f.AllowImplement {

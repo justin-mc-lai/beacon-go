@@ -140,6 +140,35 @@ func MergeInto(ctx context.Context, dir, branch string) (conflicts []string, out
 	return conflicts, out, err
 }
 
+// WorkTreeState is a READ-ONLY snapshot of one git work tree: its
+// HEAD commit and the dirty paths of its working tree (tracked
+// modifications + untracked files, Beacon's reserved runtime
+// directories excluded, rename entries reported by destination).
+// Both probes are reads — taking the snapshot never writes the tree,
+// stages anything or creates a commit (implement-work-gate AC-006).
+type WorkTreeState struct {
+	Head       string
+	DirtyPaths []string
+}
+
+// Dirty reports whether the snapshot carries uncommitted changes.
+func (w WorkTreeState) Dirty() bool { return len(w.DirtyPaths) > 0 }
+
+// SnapshotWorkTree reads dir's HEAD commit + dirty paths in one call.
+// Any git failure is returned as an error carrying git's own words, so
+// callers can report "unverified" instead of guessing a verdict.
+func SnapshotWorkTree(ctx context.Context, dir string) (WorkTreeState, error) {
+	head, err := HeadCommit(ctx, dir)
+	if err != nil {
+		return WorkTreeState{}, err
+	}
+	paths, err := StatusEntries(ctx, dir)
+	if err != nil {
+		return WorkTreeState{}, err
+	}
+	return WorkTreeState{Head: head, DirtyPaths: paths}, nil
+}
+
 // IsAncestor reports whether commit `anc` is reachable from `desc`
 // (merge-base --is-ancestor; exit 1 = not an ancestor).
 func IsAncestor(ctx context.Context, dir, anc, desc string) (bool, error) {

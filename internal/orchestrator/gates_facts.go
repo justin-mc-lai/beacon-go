@@ -6,11 +6,13 @@
 package orchestrator
 
 import (
+	"context"
 	"encoding/json"
 	"strings"
 
 	"beacon-go/internal/core"
 	"beacon-go/internal/gate"
+	"beacon-go/internal/harness"
 	"beacon-go/internal/store"
 )
 
@@ -84,7 +86,10 @@ func (e *Engine) evalDesign(ctx store.FeatureContext, run store.Run, evaluator s
 
 // evalImplement wraps the ONE shared admission checker (G-04): the
 // gate's verdict is the admission verdict, with the admission items
-// mapped 1:1 — no second judgement is implemented here.
+// mapped 1:1 — no second judgement is implemented here. The ONE item
+// the gate adds is the exit's work evidence (implement-work-gate
+// AC-001): admission asks "may this stage start", the work item asks
+// "did this stage do anything" — the beacon-go#4 hole.
 func (e *Engine) evalImplement(ctx store.FeatureContext, run store.Run, evaluator string) (gate.Evaluation, error) {
 	_, m, _, err := e.loadRun(run.ID)
 	if err != nil {
@@ -103,7 +108,74 @@ func (e *Engine) evalImplement(ctx store.FeatureContext, run store.Run, evaluato
 			ReasonCode: it.ReasonCode, Detail: it.Detail,
 		})
 	}
+	work, err := e.implementWorkFacts(run, m)
+	if err != nil {
+		return gate.Evaluation{}, err
+	}
+	facts.Work = work
 	return gate.EvaluateImplement(facts, evaluator), nil
+}
+
+// implementWorkFacts gathers the implement exit's work evidence
+// (implement-work-gate AC-001..006) with READ-ONLY reads only: the
+// run's declaration event, the bound worktree's HEAD + dirty state
+// and the feature's recorded baseline commit. Nothing here writes the
+// worktree, creates a commit or touches the run snapshot, so the same
+// run evaluated twice yields the same facts (AC-006).
+//
+// Unreadable work trees are reported as Unverified, never as a
+// failure AND never as a pass (AC-004): a missing directory, a non-git
+// project, a git failure and a run with no consumable baseline commit
+// all land there.
+func (e *Engine) implementWorkFacts(run store.Run, m *runMeta) (gate.ImplementWorkFacts, error) {
+	f := gate.ImplementWorkFacts{GateEnabled: e.implementWorkGateEnabled()}
+	recorded, err := e.implementEmptyAllowedRecorded(run.ID)
+	if err != nil {
+		return f, err
+	}
+	f.EmptyAllowed = recorded
+	// Both not_applicable legs settle the item already: reading git
+	// would buy nothing.
+	if !f.GateEnabled || f.EmptyAllowed {
+		return f, nil
+	}
+	slug := ""
+	if feat, ferr := e.store.Features().GetByID(run.FeatureID); ferr == nil {
+		slug = feat.Slug
+	}
+	b, err := e.bindingOf(run, m, slug)
+	if err != nil {
+		return f, err
+	}
+	if !b.Applicable {
+		f.Unverified, f.UnverifiedDetail = true, b.Note
+		return f, nil
+	}
+	st, err := harness.SnapshotWorkTree(context.Background(), b.Dir)
+	if err != nil {
+		f.Unverified = true
+		f.UnverifiedDetail = "git read failed in " + b.Dir + ": " + strings.TrimSpace(err.Error())
+		return f, nil
+	}
+	commit, status, frozen, err := e.baselineCommitOf(run.FeatureID)
+	if err != nil {
+		return f, err
+	}
+	f.HeadCommit, f.Dirty, f.DirtyCount = st.Head, st.Dirty(), len(st.DirtyPaths)
+	if !frozen || status != BaselineCommitted || commit == "" {
+		f.Unverified = true
+		f.UnverifiedDetail = "no consumable truth_baseline_commit to compare HEAD against (baseline_status=" + status + ")"
+		if !frozen {
+			f.UnverifiedDetail = "truth is not frozen, so there is no baseline commit to compare HEAD against"
+		}
+		return f, nil
+	}
+	f.BaselineCommit = commit
+	// HEAD "moved" = it no longer equals the baseline commit. A HEAD
+	// that moved backwards also counts: the stage did SOMETHING, and
+	// judging direction is qa's job, not this check's (non-goals).
+	f.HeadMoved = st.Head != commit
+	return f, nil
 }
 
 // qaKind reports whether an artifact kind marks QA evidence.
