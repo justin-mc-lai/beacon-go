@@ -1,0 +1,23 @@
+{
+  "name": "beacon-go",
+  "owner": {
+    "name": "justin-mc-lai",
+    "url": "https://github.com/justin-mc-lai"
+  },
+  "description": "Beacon Go as an installable Claude Code plugin: requirement truth, hard gates, and evidence-first QA.",
+  "plugins": [
+    {
+      "name": "beacon-go",
+      "source": "./",
+      "description": "Evidence-first requirement truth and hard gates for coding agents (1 goal + 6 abilities).",
+      "category": "engineering",
+      "keywords": [
+        "requirements",
+        "truth",
+        "qa",
+        "release",
+        "gates"
+      ]
+    }
+  ]
+}

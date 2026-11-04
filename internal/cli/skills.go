@@ -20,7 +20,8 @@ func newSkillsCmd() *cobra.Command {
 		Short: "List, show or install the embedded public skills (1+6 Scheme A set)",
 	}
 	c.AddCommand(newSkillsListCmd(), newSkillsShowCmd(), newSkillsReferencesCmd(),
-		newSkillsExamplesCmd(), newSkillsInstallCmd(), newSkillsHostsCmd())
+		newSkillsExamplesCmd(), newSkillsInstallCmd(), newSkillsHostsCmd(),
+		newSkillsVerifyCmd())
 	return c
 }
 

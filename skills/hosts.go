@@ -137,7 +137,11 @@ func installedSkills(dir string) []string {
 		if err != nil || !info.IsDir() {
 			continue
 		}
-		if strings.HasPrefix(e.Name(), InstallPrefix) {
+		// The namespace is exactly `beacon-go` (router) plus
+		// `beacon-go-*` (skills). The old loose prefix also matched
+		// v1's `beacon-goal`, which made a v1 install look like a
+		// Go install and could be reported as drift.
+		if e.Name() == InstallPrefix || strings.HasPrefix(e.Name(), InstallPrefix+"-") {
 			out = append(out, e.Name())
 		}
 	}

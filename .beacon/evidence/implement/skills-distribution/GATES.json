@@ -1,0 +1,16 @@
+{
+  "feature": "skills-distribution",
+  "version": "v2.0.0",
+  "recorded_at": "2026-11-04T16:35:00Z",
+  "verification": {
+    "build": "PASS",
+    "go_test_all": "PASS",
+    "go_vet": "PASS",
+    "e2e": "PASS"
+  },
+  "notes": [
+    "plugin manifests list exactly the 1+6 skills",
+    "skills verify is report-only by default; --strict is the CI gate",
+    "v1 beacon-* names are outside the beacon-go namespace and are never deleted or counted as extra"
+  ]
+}

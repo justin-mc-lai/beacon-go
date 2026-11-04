@@ -1,0 +1,29 @@
+{
+  "name": "beacon-go",
+  "version": "2.0.0-go.11",
+  "description": "Beacon Go — evidence-first requirement truth and hard gates for coding agents. Skills that can prove they did the work.",
+  "author": {
+    "name": "justin-mc-lai",
+    "url": "https://github.com/justin-mc-lai"
+  },
+  "homepage": "https://github.com/justin-mc-lai/beacon-go",
+  "repository": "https://github.com/justin-mc-lai/beacon-go",
+  "license": "MIT",
+  "keywords": [
+    "requirements",
+    "truth",
+    "qa",
+    "release",
+    "gates",
+    "skills"
+  ],
+  "skills": [
+    "./skills/goal",
+    "./skills/plan",
+    "./skills/truth",
+    "./skills/design",
+    "./skills/implement",
+    "./skills/qa",
+    "./skills/release"
+  ]
+}
