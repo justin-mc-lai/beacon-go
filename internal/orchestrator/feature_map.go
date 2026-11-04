@@ -140,7 +140,7 @@ func (e *Engine) BuildFeatureMap(projectRoot, slug string) (FeatureMapView, erro
 	if len(view.Rows) > 0 && view.Mapped == len(view.Rows) {
 		view.Status = "pass"
 	}
-	dir := resolvePkgPath(fc.Project.RootPath, pkgDirOf(pkg.Truth.Path))
+	dir := packageDirPath(projectRoot, pkg.Truth.Path)
 	view.Path = filepath.Join(dir, "feature-map.md")
 	if err := os.WriteFile(view.Path, []byte(renderFeatureMap(view)), 0o644); err != nil {
 		return FeatureMapView{}, err
@@ -170,4 +170,16 @@ func cell(s string) string {
 		return "—"
 	}
 	return strings.ReplaceAll(s, "|", "\\|")
+}
+
+// packageDirPath resolves the directory that holds a package's
+// four-piece files. A root-level package (truth.md with no slash)
+// lives at the project root itself; resolvePkgPath("") would return
+// an empty string and drop the generated file into the process CWD.
+func packageDirPath(root, truthPath string) string {
+	dir := pkgDirOf(truthPath)
+	if dir == "" {
+		return root
+	}
+	return resolvePkgPath(root, dir)
 }

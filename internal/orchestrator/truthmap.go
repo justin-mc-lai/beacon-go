@@ -229,7 +229,7 @@ func (e *Engine) TruthMapVerify(projectRoot, slug string) (TruthMapView, error) 
 	// matches the package is an error — its verification commands
 	// point at an older requirement.
 	if present {
-		mapPath := filepath.Join(resolvePkgPath(fc.Project.RootPath, pkgDirOf(pkg.Truth.Path)), "feature-map.md")
+		mapPath := filepath.Join(packageDirPath(projectRoot, pkg.Truth.Path), "feature-map.md")
 		if raw, merr := os.ReadFile(mapPath); merr != nil {
 			v.FeatureMapStatus = "missing"
 			v.Diagnostics = append(v.Diagnostics, TruthMapDiagnostic{

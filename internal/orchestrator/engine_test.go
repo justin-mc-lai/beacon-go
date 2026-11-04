@@ -2,6 +2,7 @@ package orchestrator
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -27,6 +28,9 @@ func newTestEnv(t *testing.T, featureStatus string) testEnv {
 	}
 	t.Cleanup(func() { st.Close() })
 	root := filepath.Join(t.TempDir(), "proj")
+	if err := os.MkdirAll(root, 0o755); err != nil {
+		t.Fatal(err)
+	}
 	p, err := st.Projects().Register(store.Project{RootPath: root, Name: "proj"})
 	if err != nil {
 		t.Fatal(err)
