@@ -11,3 +11,7 @@ bench/seed-store/
 .omc/
 .workbuddy-ai/
 logs/
+
+# runtime state (not shipped)
+.beacon/artifacts/
+.beacon/autotest/

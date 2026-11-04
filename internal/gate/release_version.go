@@ -242,7 +242,7 @@ func EvaluateVersionRelease(f VersionReleaseFacts, sel ReleaseProfileSelection) 
 		"no feature carries an unrefrozen truth change"))
 	checks = append(checks, item(VersionCheckIntegrity, core.ReasonIntegrityPackageValid,
 		failures(func(x VersionFeatureFacts) bool { return x.IntegrityBlocked }),
-		"every feature's integrity verdict passes (audit counts for frozen packages)"))
+		"every feature's integrity verdict passes (audit counts only for historical frozen packages with no run; release candidates must pass)"))
 	checks = append(checks, item(VersionCheckGates, core.ReasonGatePrereqNotPassed,
 		failures(func(x VersionFeatureFacts) bool { return !x.GatesPass }),
 		"every feature's four gates hold a latest pass verdict"))

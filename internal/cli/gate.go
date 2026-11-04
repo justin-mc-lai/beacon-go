@@ -9,7 +9,9 @@
 //   - integrity             the Truth Integrity Gate (AC-101) as its
 //     own entry: evaluates AND persists under gate_type=
 //     truth_integrity. Default mode follows AC-101: an already-frozen
-//     package is audit_only (reported, not blocking).
+//     package is audit_only (reported, not blocking). --strict forces
+//     block mode for a frozen package, so a release candidate can be
+//     checked without relaxing AC-101's historical default.
 package cli
 
 import (
@@ -238,7 +240,7 @@ func newGateStatusCmd() *cobra.Command {
 
 func newGateIntegrityCmd() *cobra.Command {
 	var project, feature, version, evaluator, mode string
-	var asJSON bool
+	var asJSON, strict bool
 	c := &cobra.Command{
 		Use:   "integrity",
 		Short: "Run the Truth Integrity Gate (AC-101) for a feature package and persist the verdict",
@@ -254,7 +256,15 @@ func newGateIntegrityCmd() *cobra.Command {
 				return err
 			}
 			eng := orchestrator.NewEngine(st)
-			v, err := eng.EvaluateIntegrity(ctx, evaluator, mode)
+			effectiveMode := mode
+			if strict {
+				if mode != "" && mode != gate.IntegrityModeBlock {
+					return fail(core.ReasonGateTypeUnknown, "gate integrity",
+						"--strict conflicts with --mode "+mode+" (strict always means block)")
+				}
+				effectiveMode = gate.IntegrityModeBlock
+			}
+			v, err := eng.EvaluateIntegrity(ctx, evaluator, effectiveMode)
 			if err != nil {
 				return err
 			}
@@ -292,6 +302,7 @@ func newGateIntegrityCmd() *cobra.Command {
 	c.Flags().StringVar(&version, "version", "", "docs version filter")
 	c.Flags().StringVar(&evaluator, "evaluator", "", "evaluator identity (required; unattributed verdicts are refused)")
 	c.Flags().StringVar(&mode, "mode", "", "block | audit_only (default: audit_only for already-frozen packages, block otherwise)")
+	c.Flags().BoolVar(&strict, "strict", false, "force block mode even for an already-frozen package (release-candidate tightening)")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	return c
 }

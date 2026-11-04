@@ -1,0 +1,51 @@
+{
+  "feature": "gate-strict-integrity",
+  "version": "v2.0.0",
+  "recorded_at": "2026-11-04T15:55:00Z",
+  "gate_results": [
+    {
+      "gate_type": "truth_freeze",
+      "verdict": "pass",
+      "evaluator": "host",
+      "note": "truth_freeze evaluated after freeze; package is complete and frozen"
+    },
+    {
+      "gate_type": "truth_integrity",
+      "verdict": "pass",
+      "mode": "block",
+      "gate_result_id": "gate_5b71c0956a8a5172dd402ef7",
+      "note": "strict integrity passed after the evidence log was cleaned (mode block, verdict pass)"
+    },
+    {
+      "gate_type": "implement",
+      "verdict": "blocked",
+      "reason_codes": [
+        "gate_run_required"
+      ],
+      "note": "implement admission is per-run; evaluated before a run existed"
+    },
+    {
+      "gate_type": "qa",
+      "verdict": "blocked",
+      "reason_codes": [
+        "stage_exit_qa_evidence_missing",
+        "qa_stage_not_executed"
+      ],
+      "note": "no QA artifact pointers at evaluation time"
+    }
+  ],
+  "goal_run": {
+    "run_id": "run_ad5c88353b5d961b8442f5e8",
+    "status": "blocked",
+    "stage": "truth",
+    "reason_code": "canonical_refreeze_not_committed",
+    "note": "driver advanced plan then parked at the truth gate until the frozen package is committed"
+  },
+  "verification": {
+    "build": "PASS",
+    "go_test_all": "PASS",
+    "go_vet": "PASS",
+    "e2e": "PASS",
+    "strict_integrity": "PASS"
+  }
+}

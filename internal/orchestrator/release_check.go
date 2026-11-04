@@ -107,7 +107,20 @@ func (e *Engine) versionFeatureFacts(ctx store.FeatureContext) (gate.VersionFeat
 	ff.PendingChange = frozen.ChangePending
 	ff.MaterialsStale = len(e.staleMaterialSurfaces(ctx)) > 0
 
-	rep, pkg, _, err := e.integrityReportLive(ctx, "")
+	// AC-101's audit-only default protects historical frozen
+	// packages; it must not protect a package that is part of the
+	// release candidate. A feature with at least one run is a
+	// candidate, so its integrity verdict is evaluated in block
+	// mode. A frozen package with no run stays audit-only.
+	runs, err := e.store.Runs().ListByFeature(ctx.Feature.ID)
+	if err != nil {
+		return ff, err
+	}
+	integrityMode := ""
+	if len(runs) > 0 {
+		integrityMode = gate.IntegrityModeBlock
+	}
+	rep, pkg, _, err := e.integrityReportLive(ctx, integrityMode)
 	if err != nil {
 		return ff, err
 	}
@@ -175,11 +188,7 @@ func (e *Engine) versionFeatureFacts(ctx store.FeatureContext) (gate.VersionFeat
 			}
 		}
 	}
-	// QA evidence across the feature's runs.
-	runs, err := e.store.Runs().ListByFeature(ctx.Feature.ID)
-	if err != nil {
-		return ff, err
-	}
+	// QA evidence across the feature's runs (listed above).
 	for _, run := range runs {
 		arts, err := e.store.Artifacts().ListByRun(run.ID)
 		if err != nil {
