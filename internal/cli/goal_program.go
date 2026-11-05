@@ -14,6 +14,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"beacon-go/internal/core"
 	"beacon-go/internal/orchestrator"
 )
 
@@ -169,6 +170,14 @@ func newGoalProgramPlanCmd() *cobra.Command {
 					return err
 				}
 				return printProgramState(cmd, st, asJSON)
+			}
+			hasPlan, err := eng.HasProgramPlan(runID)
+			if err != nil {
+				return err
+			}
+			if !hasPlan {
+				return fail(core.ReasonLakeProposalRequired, "goal program",
+					"a new program must start from a human-selected lake proposal: run `beacon goal program propose` then `beacon goal program select`, or pass --from-proposal")
 			}
 			if strings.TrimSpace(program) == "" {
 				return fail("program_slug_required", "goal program",

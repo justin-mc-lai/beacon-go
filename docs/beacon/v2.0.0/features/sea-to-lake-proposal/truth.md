@@ -21,7 +21,7 @@ canonical_refs:
 
 ## 人话
 
-给 Beacon 内核的使用者：一句话要做一个项目时，AI 先给 3–7 个“可选的湖”，每个湖说清用户能得到什么、商业价值、怎么衡量、怎么运营、依赖谁、多大、验收起点；人看着表格多选确认后，内核才建草稿包并冻结湖图。未选中的湖不建、不跑；拒绝过的湖留痕，防止 AI 反复瞎发挥。
+给 Beacon 内核的使用者：一句话要做一个项目时，AI 先给 3–7 个“可选的湖”，每个湖说清用户能得到什么、商业价值、怎么衡量、怎么运营、依赖谁、多大、验收起点；人看着表格多选确认后，内核才建草稿包并冻结湖图。未选中的湖不建、不跑；拒绝过的湖留痕，防止 AI 反复瞎发挥。技能层写清流程之外，内核也会拒绝“新海直接排期”；只有已经有 plan 的重排才放行。
 
 ## User Intent Snapshot
 
@@ -56,6 +56,7 @@ scope_mode: focused
 | AC-006 | 目标「只跑选中的湖」 | internal/orchestrator/program_route.go |
 | AC-007 | 目标「留痕可追溯」 | internal/orchestrator/meta.go |
 | AC-008 | 目标「skill 可执行」 | skills/plan/SKILL.md |
+| AC-009 | 目标「内核层也强制」 | internal/cli/goal_program.go |
 
 ## Acceptance Criteria
 
@@ -69,6 +70,7 @@ scope_mode: focused
 | AC-006 | `goal program plan --from-proposal --freeze` 只记录选中的湖；依赖未选中的湖时拒绝 |
 | AC-007 | 事件可追溯：`lake_proposal_created`、`lake_proposal_selected`；route 显示 proposal 与 selected/rejected 计数 |
 | AC-008 | `beacon-go-plan` 的 pln-program 写清 propose → 表格 → 多选 → confirm → freeze；全仓 test/vet/e2e 通过 |
+| AC-009 | 首次为 run 建立 program 时，若该 run 尚无 plan 且没有已选提案，`goal program plan` 必须拒绝并返回 `lake_proposal_required`；已有 plan 的重排/change 不受影响；`plan --from-proposal` 仍可用 |
 
 ## Boundary
 

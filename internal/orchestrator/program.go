@@ -369,3 +369,14 @@ func (e *Engine) ProgramChange(runID, note string, lakes []ProgramLakeInput, rep
 	}
 	return *m.Program, nil
 }
+
+// HasProgramPlan reports whether the run already carries a program
+// plan. The CLI uses it to refuse a first-cut direct plan while still
+// allowing a re-plan of an existing program (and `change`).
+func (e *Engine) HasProgramPlan(runID string) (bool, error) {
+	_, m, _, err := e.loadRun(runID)
+	if err != nil {
+		return false, err
+	}
+	return m.Program != nil, nil
+}

@@ -22,6 +22,7 @@ Every row is a real test run on 2026-11-05; nothing below is a plan.
 | AC-006 | TestProgramPlanFromProposalRefusesUnselectedDependency | PASS — dependency on an unselected lake refused |
 | AC-007 | TestProgramRouteShowsProposalCounts | PASS — route exposes proposal id and selected/rejected counts |
 | AC-008 | TestPlanSkillMentionsProposalFlow | PASS — plan skill documents propose, select and freeze |
+| AC-009 | TestProgramPlanRequiresProposal | PASS — first-cut direct plan refused with lake_proposal_required; re-plan of an existing program allowed |
 
 ## Whole-repo verification (2026-11-05)
 

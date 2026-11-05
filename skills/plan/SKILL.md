@@ -55,7 +55,9 @@ only the selected lakes are created and driven.
    runs only the selected lakes.
 
 Never invent the selection, never create unselected lakes, and never
-freeze on the user's behalf.
+freeze on the user's behalf. The kernel refuses a first-cut
+`program plan --lake ...` with `lake_proposal_required` when no
+human-selected proposal exists; use `--from-proposal`.
 
 ## Route examples
 

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -59,10 +60,33 @@ func TestGoalP2DChain(t *testing.T) {
 	}
 	runID := strField(t, parseDoc(t, out), "run_id")
 
-	// Program: three lakes in a chain, frozen at record time.
-	out, err = runCLI(t, "goal", "program", "plan", "--run-id", runID, "--program", "platform",
-		"--lake", "lake-a", "--lake", "lake-b", "--lake", "lake-c",
-		"--depends", "lake-b=lake-a", "--depends", "lake-c=lake-b", "--freeze", "--json")
+	// Program: the AI proposes three lakes, the human selects all
+	// three, then the plan freezes. A first-cut direct plan is refused.
+	proposalPath := filepath.Join(t.TempDir(), "proposal.json")
+	proposal := `{
+  "schema": "lake-proposal.v1",
+  "utterance": "ship the platform",
+  "lakes": [
+    {"slug":"lake-a","outcome":"a","value":"v","metric":"m","operable":"o","size":"S","acceptance_seed":"s"},
+    {"slug":"lake-b","outcome":"b","value":"v","metric":"m","operable":"o","size":"S","acceptance_seed":"s","depends_on":["lake-a"]},
+    {"slug":"lake-c","outcome":"c","value":"v","metric":"m","operable":"o","size":"S","acceptance_seed":"s","depends_on":["lake-b"]}
+  ],
+  "not_proposed": [{"slug":"extra","reason":"later"}]
+}`
+	if err := os.WriteFile(proposalPath, []byte(proposal), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	out, err = runCLI(t, "goal", "program", "propose", "--run-id", runID, "--file", proposalPath)
+	if err != nil {
+		t.Fatalf("program propose: %v (out %s)", err, out)
+	}
+	proposalID := strField(t, parseDoc(t, out), "proposal_id")
+	if _, err = runCLI(t, "goal", "program", "select", "--run-id", runID, "--proposal", proposalID,
+		"--lake", "lake-a", "--lake", "lake-b", "--lake", "lake-c", "--by", "test"); err != nil {
+		t.Fatalf("program select: %v", err)
+	}
+	out, err = runCLI(t, "goal", "program", "plan", "--run-id", runID,
+		"--from-proposal", proposalID, "--freeze", "--json")
 	if err != nil {
 		t.Fatalf("program plan: %v (out %s)", err, out)
 	}

@@ -552,6 +552,7 @@ const (
 	ReasonLakeProposalSelectionEmpty   = "lake_proposal_selection_empty"
 	ReasonLakeProposalUnknownLake      = "lake_proposal_unknown_lake"
 	ReasonLakeProposalDepNotSelected   = "lake_proposal_dependency_not_selected"
+	ReasonLakeProposalRequired         = "lake_proposal_required"
 	ReasonProgramLakeNotReady          = "program_lake_not_ready"
 	ReasonProgramBlocked               = "program_blocked"
 	ReasonFeatureMapStale              = "feature_map_stale"

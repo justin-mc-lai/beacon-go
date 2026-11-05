@@ -16,3 +16,4 @@ materials_status: current
 | AC-006 | TC-006 | behavior | `go test ./internal/orchestrator -run TestProgramPlanFromProposalRefusesUnselectedDependency -count=1` | 依赖未选中的湖时拒绝 |
 | AC-007 | TC-007 | behavior | `go test ./internal/orchestrator -run TestProgramRouteShowsProposalCounts -count=1` | route 暴露 proposal 与选择计数 |
 | AC-008 | TC-008 | static | `go test ./skills -run TestPlanSkillMentionsProposalFlow -count=1` | plan skill 写清 propose/select/freeze |
+| AC-009 | TC-009 | behavior | `go test ./internal/cli -run TestProgramPlanRequiresProposal -count=1` | 首次直接 plan 被拒；已有 plan 重排放行 |

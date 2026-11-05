@@ -19,6 +19,7 @@ task_source: acceptance_criteria
 - [x] TASK-008 CLI propose/select/plan --from-proposal · ac=AC-008 · evidence=internal/cli/goal_program.go
 - [x] TASK-009 plan skill 写清提案多选流程 · ac=AC-008 · evidence=skills/plan/SKILL.md
 - [x] TASK-010 Validate package gates (truth review + freeze) · ac=GATES · evidence=.beacon/evidence/implement/sea-to-lake-proposal/GATES.json
+- [x] TASK-011 内核拒绝新 program 直接 plan · ac=AC-009 · evidence=internal/cli/goal_program.go
 
 ## Boundary
 

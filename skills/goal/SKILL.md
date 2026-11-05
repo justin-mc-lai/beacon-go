@@ -53,8 +53,10 @@ lakes on the user's behalf:
 5. `beacon goal program complete --run-id <host> --confirmed-by <name>` — the one
    program-level human signature that releases every lake at its gate together.
 
-Refuse to call `program plan --lake ...` on a new sea before a human-selected
-proposal exists; ask for the proposal instead.
+The kernel refuses a first-cut `program plan --lake ...` with
+`lake_proposal_required` when no human-selected proposal exists; pass
+`--from-proposal` instead. Direct `--lake` only works when the run already has a
+plan (re-plan path).
 
 `drive --until-done` stops on the first blocked lake and never auto-completes a lake.
 

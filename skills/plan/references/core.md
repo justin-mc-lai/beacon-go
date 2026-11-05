@@ -40,7 +40,9 @@ route to another public core instead of stretching this one.
    selected lakes.
 
 Direct `program plan --lake ...` remains for re-planning an existing
-selected/frozen program, never for the first cut of a new sea.
+selected/frozen program, never for the first cut of a new sea. The CLI
+enforces this: a run with no plan and no selected proposal is refused with
+`lake_proposal_required`.
 
 ## What planning produces in the Go kernel
 
