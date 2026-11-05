@@ -13,9 +13,11 @@ engine**: long-running coding work that plans itself into stages, advances
 step by step under hard gates, survives interruptions, and never marks
 itself done without independent verification and a human-confirmed release.
 
-Current release: **v2.0.0-go.9** · 407 behavior tests · full end-to-end
-chain green. v2.0.0-go.9 closes the 26 high/medium gaps found by the
-Python v1.6.19 parity audit (`docs/parity-audit-python-v16.md`).
+Current release: **v2.0.0-go.12** · full behavior suite · full end-to-end
+chain green. go.12 adds program-level sea delivery (`goal program drive
+--until-done` + one `goal program complete`), release shadow
+(`auto_shadow`), feature maps (`truth map build/verify`), skill drift
+verification (`skills verify`), and monotonic lifecycle guards.
 
 ## Why a rewrite
 
@@ -74,7 +76,7 @@ Requires Go 1.27+.
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.11
+./bin/beacon --version          # Beacon CLI v2.0.0-go.12
 ```
 
 Five commands cover most of a day:

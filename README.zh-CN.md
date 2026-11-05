@@ -10,10 +10,11 @@ Beacon Go 是 Beacon 内核的 Go 语言重构版。它保留 Python 版 Beacon 
 自己排阶段、在硬门禁下逐步推进、断了能续跑，并且永远不能绕过独立
 检查者和人工确认自称完成。
 
-当前版本：**v2.0.0-go.11** · 407 个行为级测试 · 端到端全链跑通。
-go.11 给安装的技能加 `beacon-go-` 命名空间，Go 轨与 Python v1 可同宿主共存，并新增 opencode 宿主。go.10 收口了 2026-10-29 全仓审查（报告见
-`docs/changes/change-audit-2026-10-29.md`）：验资杠杆改为真校验、
-Go 账本独立成文件、冻结包与代码对齐。
+当前版本：**v2.0.0-go.12** · 全量行为测试 · 端到端全链跑通。
+go.12 增加多湖整片海交付（`goal program drive --until-done` + 一次
+`goal program complete`）、release 影子预演（`auto_shadow`）、特征地图
+（`truth map build/verify`）、技能漂移校验（`skills verify`）和生命周期
+单调守卫。
 
 ## 为什么重构
 
@@ -65,7 +66,7 @@ Go 版按一份书面口径执行（[`docs/scope-charter.md`](docs/scope-charter
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.9
+./bin/beacon --version          # Beacon CLI v2.0.0-go.12
 ```
 
 日常五条命令：
