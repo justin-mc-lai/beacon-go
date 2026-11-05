@@ -18,6 +18,7 @@ task_source: acceptance_criteria
 - [x] TASK-007 route 暴露 awaiting_release / delivered · ac=AC-007 · evidence=internal/orchestrator/program_route.go
 - [x] TASK-008 CLI：drive --until-done + program complete · ac=AC-008 · evidence=internal/cli/goal_program.go
 - [x] TASK-009 补循环与单次确认测试 · ac=AC-004 · evidence=internal/orchestrator/program_sea_complete_test.go
+- [x] TASK-011 依赖湖到 gate 视为 release-ready，下游可启动 · ac=AC-009 · evidence=internal/orchestrator/program_drive.go
 - [x] TASK-010 Validate package gates (truth review + freeze) · ac=GATES · evidence=.beacon/evidence/implement/program-sea-complete/GATES.json
 
 ## Boundary
