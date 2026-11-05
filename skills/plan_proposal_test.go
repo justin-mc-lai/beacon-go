@@ -19,3 +19,22 @@ func TestPlanSkillMentionsProposalFlow(t *testing.T) {
 		}
 	}
 }
+
+func TestGoalAndCoreMentionProposalGate(t *testing.T) {
+	checks := map[string][]string{
+		filepath.Join("goal", "SKILL.md"):              {"propose", "multi-select", "--from-proposal"},
+		filepath.Join("plan", "references", "core.md"): {"lake-proposal.v1", "program select", "--from-proposal"},
+	}
+	for file, wants := range checks {
+		raw, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		text := string(raw)
+		for _, want := range wants {
+			if !strings.Contains(text, want) {
+				t.Fatalf("%s must mention %q", file, want)
+			}
+		}
+	}
+}

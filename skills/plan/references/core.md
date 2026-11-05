@@ -19,9 +19,28 @@ route to another public core instead of stretching this one.
 | pln-review | multi-angle planner review | reviewers run as real subprocesses in Go; one valid block blocks all; the verdict writes back into the run's state machine (P0 blocks implement, drift routes to change/refreeze) |
 | pln-brainstorm | brainstorm before freeze | Socratic four questions + first-principles decomposition; in Go the questions live in the truth ask/answer ledger, one at a time, each carrying a recommendation |
 | pln-source | source-anchored research | anchor every claim to code that exists; "对着源码，别瞎编" — findings feed the intent snapshot |
-| pln-program | sea-to-lake program plan | dependency graph over lakes; a cycle or a missing dependency is refused, and a frozen plan's graph changes only through a recorded change |
-| pln-program-auto / pln-program-interactive | program variants | same graph, different driving: automatic advance vs step-by-step human routing |
+| pln-program | sea-to-lake program plan | AI proposes 3-7 lakes (`lake-proposal.v1`), the human multi-selects, only selected lakes become drafts; `plan --from-proposal` records the graph; a cycle, unknown lake, unselected dependency or empty selection is refused |
+| pln-program-auto / pln-program-interactive | program variants | same selected graph, different driving: automatic advance vs step-by-step human routing |
 | pln-friction | friction intake | capture what hurt during delivery as a first-class input to the next plan |
+
+## Program proposal gate (pln-program)
+
+`program plan` is not the first step for a new sea. The order is:
+
+1. AI writes a `lake-proposal.v1` file: 3-7 lakes, each with outcome, value,
+   metric, operable, size and acceptance_seed, plus a non-empty `not_proposed`.
+2. `beacon goal program propose --run-id <host> --file proposal.json` validates
+   and records it. The kernel never invents lakes.
+3. Present the table; the human multi-selects.
+4. `beacon goal program select --run-id <host> --proposal <id> --lake ... --reject ... --by <name>`
+   records the decision and creates drafts for selected lakes only.
+5. `beacon goal program plan --run-id <host> --from-proposal <id> --freeze`
+   records the graph; a dependency on an unselected lake is refused.
+6. `beacon goal program drive --run-id <host> --until-done` runs only the
+   selected lakes.
+
+Direct `program plan --lake ...` remains for re-planning an existing
+selected/frozen program, never for the first cut of a new sea.
 
 ## What planning produces in the Go kernel
 

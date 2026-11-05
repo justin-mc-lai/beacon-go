@@ -11,6 +11,9 @@ Use `goal` when the work will outlive one turn.
 ## HARD GATE
 
 - Orchestrate only: never write product code, never judge your own work, never release.
+- A new sea is never cut by the goal skill. Route to `beacon-go-plan`
+  (pln-program): the AI proposes 3-7 lakes, the human multi-selects, and only
+  the selected lakes are planned and driven.
 - No stage advances because time passed. It advances when the stage exit gate
   passes; a filled form is not a pass.
 - Completion needs all four: at `release_gate` + human confirmation on record +
@@ -31,14 +34,27 @@ Use `goal` when the work will outlive one turn.
 
 ## Program (multi-lake)
 
-A program is several lakes (feature packages) with dependencies on one host run:
+A program is several lakes (feature packages) with dependencies on one host run.
+A new sea always goes through the proposal gate first; the goal skill never cuts
+lakes on the user's behalf:
 
-- `beacon goal program plan --run-id <host> --program <slug> --lake <slug> ... --freeze`
-- `beacon goal program route --run-id <host>` — topological next batch + rollup
-- `beacon goal program drive --run-id <host> --until-done --executor ...` — pushes every
-  ready lake to its release gate; a dependency at its gate counts as release-ready
-- `beacon goal program complete --run-id <host> --confirmed-by <name>` — the one
-  program-level human signature that releases every lake at its gate together
+1. Route to `beacon-go-plan` (pln-program). The planner writes a
+   `lake-proposal.v1` file (3-7 lakes, each with outcome/value/metric/
+   operable/size/acceptance_seed plus a non-empty `not_proposed`), the human
+   multi-selects, and only the selected lakes become draft packages.
+2. `beacon goal program plan --run-id <host> --from-proposal <id> --freeze` —
+   records the selected graph. Direct `--lake` planning is for re-planning an
+   existing selected/frozen program, never for the first cut of a new sea.
+3. `beacon goal program route --run-id <host>` — topological next batch + rollup,
+   plus the proposal id and selected/rejected counts.
+4. `beacon goal program drive --run-id <host> --until-done --executor ...` — pushes
+   every ready selected lake to its release gate; a dependency at its gate counts
+   as release-ready.
+5. `beacon goal program complete --run-id <host> --confirmed-by <name>` — the one
+   program-level human signature that releases every lake at its gate together.
+
+Refuse to call `program plan --lake ...` on a new sea before a human-selected
+proposal exists; ask for the proposal instead.
 
 `drive --until-done` stops on the first blocked lake and never auto-completes a lake.
 
