@@ -15,7 +15,7 @@ then work it):
 | pln-brainstorm | Socratic questions + first-principles decomposition before freeze | `beacon truth ask` / `beacon truth answer` (one question at a time, each with a recommendation) |
 | pln-review | multi-angle planner review of a plan or package | `beacon goal planner-review` / `beacon qa planner-review` (real subprocess reviewers, one block blocks all) |
 | pln-source | source-anchored research — read the code, never invent | host reads the repo; findings land in the intent (`beacon truth intent`) |
-| pln-program | sea-to-lake: split the big thing into boilable lakes | `beacon goal program plan` (dependency graph; cycles and missing deps refused) |
+| pln-program | sea-to-lake: split the big thing into boilable lakes, then the human multi-selects | `beacon goal program propose` / `select` / `plan --from-proposal` (3-7 lakes; cycles, unknown lakes and unselected deps refused) |
 | pln-friction | capture friction into the improvement input | record it as a truth question (`beacon truth ask`) until intake exists |
 
 The chain inside a package is **ask -> sign**: questions close one
@@ -31,6 +31,31 @@ Hard rules (from the Python beacon-plan core):
 3. No fake delivery — placeholders and docs-only evidence are not a plan.
 4. Stay in the harness: planner != implementer; route onward to
    beacon-truth / beacon-goal instead of stretching this skill.
+
+## Sea -> lake proposal (pln-program)
+
+Sea-to-lake is a human decision, not an AI free-run. The AI proposes
+3-7 lakes through a commercial/operable lens; the human multi-selects;
+only the selected lakes are created and driven.
+
+1. **Propose** - write a `lake-proposal.v1` file. Every lake carries
+   `outcome`, `value`, `metric`, `operable`, `size` (S/M/L) and
+   `acceptance_seed`; `not_proposed` lists what is deliberately
+   excluded, with a reason. Record it:
+   `beacon goal program propose --run-id <host> --file proposal.json`
+2. **Present** - show a compact table: lake, user value, success
+   metric, size, dependencies, and what is not proposed.
+3. **Multi-select** - the human picks. Record it:
+   `beacon goal program select --run-id <host> --proposal <id> --lake <slug>... --reject <slug>... --by <name>`
+   Draft packages are created for the selected lakes only.
+4. **Plan + freeze** - `beacon goal program plan --run-id <host> --from-proposal <id> --freeze`
+   refuses a dependency whose lake was not selected. Nothing runs
+   until the human freezes.
+5. **Drive** - `beacon goal program drive --run-id <host> --until-done`
+   runs only the selected lakes.
+
+Never invent the selection, never create unselected lakes, and never
+freeze on the user's behalf.
 
 ## Route examples
 

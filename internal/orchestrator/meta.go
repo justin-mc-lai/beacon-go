@@ -124,6 +124,9 @@ type runMeta struct {
 	// weakening the human gate.
 	ReleasePolicy        string             `json:"release_policy,omitempty"`
 	ReleaseShadow        *ReleaseShadowView `json:"release_shadow,omitempty"`
+	// LakeProposal is the AI's sea-to-lake proposal plus the human's
+	// multi-select decision; it is folded into a frozen program plan.
+	LakeProposal         *LakeProposal      `json:"lake_proposal,omitempty"`
 	Blocked              bool               `json:"blocked"`
 	BlockedStreak        int                `json:"blocked_streak"`
 	LastBlockReason      string             `json:"last_block_reason,omitempty"`

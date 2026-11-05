@@ -164,6 +164,11 @@ type ProgramRouteView struct {
 	AllComplete   bool          `json:"all_complete"`
 	ProgramStatus string        `json:"program_status"` // running | awaiting_release | blocked | delivered
 	Rollup        ProgramRollup `json:"rollup"`
+	// Proposal provenance (sea-to-lake): the AI proposal and the
+	// human's multi-select counts, so route can show intent drift.
+	ProposalID       string `json:"proposal_id,omitempty"`
+	ProposalSelected int    `json:"proposal_selected,omitempty"`
+	ProposalRejected int    `json:"proposal_rejected,omitempty"`
 }
 
 // Lake route statuses.

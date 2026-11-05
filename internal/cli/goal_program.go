@@ -7,7 +7,9 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -29,7 +31,8 @@ func newGoalProgramCmd() *cobra.Command {
 	c.AddCommand(newGoalProgramPlanCmd(), newGoalProgramAdmitCmd(), newGoalProgramRouteCmd(),
 		newGoalProgramChangeCmd(), newGoalProgramFreezeCmd(),
 		newGoalProgramValidateCmd(), newGoalProgramImportCmd(),
-		newGoalProgramDriveCmd(), newGoalProgramCompleteCmd())
+		newGoalProgramDriveCmd(), newGoalProgramCompleteCmd(),
+		newGoalProgramProposeCmd(), newGoalProgramSelectCmd())
 	return c
 }
 
@@ -147,7 +150,7 @@ func lakeSlugsOf(st orchestrator.ProgramState) []string {
 }
 
 func newGoalProgramPlanCmd() *cobra.Command {
-	var runID, program, goal string
+	var runID, program, goal, fromProposal string
 	var lakes, lakeGoals, depends, touches []string
 	var freeze, asJSON bool
 	c := &cobra.Command{
@@ -155,15 +158,26 @@ func newGoalProgramPlanCmd() *cobra.Command {
 		Short: "Record (or, while unfrozen, replace) the program plan on a host goal run",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inputs, err := parseProgramLakes(lakes, lakeGoals, depends, touches)
-			if err != nil {
-				return err
-			}
 			eng, closeFn, err := goalEngine("")
 			if err != nil {
 				return err
 			}
 			defer closeFn()
+			if fromProposal != "" {
+				st, err := eng.ProgramPlanFromProposal(runID, fromProposal, freeze)
+				if err != nil {
+					return err
+				}
+				return printProgramState(cmd, st, asJSON)
+			}
+			if strings.TrimSpace(program) == "" {
+				return fail("program_slug_required", "goal program",
+					"--program is required unless --from-proposal is set")
+			}
+			inputs, err := parseProgramLakes(lakes, lakeGoals, depends, touches)
+			if err != nil {
+				return err
+			}
 			st, err := eng.ProgramPlan(runID, orchestrator.ProgramPlanInput{
 				Slug: program, Goal: goal, Lakes: inputs, Freeze: freeze,
 			})
@@ -174,16 +188,81 @@ func newGoalProgramPlanCmd() *cobra.Command {
 		},
 	}
 	c.Flags().StringVar(&runID, "run-id", "", "host goal run id (required)")
-	c.Flags().StringVar(&program, "program", "", "program slug (required)")
+	c.Flags().StringVar(&program, "program", "", "program slug (required unless --from-proposal)")
 	c.Flags().StringVar(&goal, "goal", "", "the big goal in one line")
 	c.Flags().StringArrayVar(&lakes, "lake", nil, "lake slug = feature slug (repeatable)")
 	c.Flags().StringArrayVar(&lakeGoals, "lake-goal", nil, "lake goal as slug=text (repeatable)")
 	c.Flags().StringArrayVar(&depends, "depends", nil, "dependencies as lake=dep1,dep2 (repeatable)")
 	c.Flags().StringArrayVar(&touches, "touch", nil, "declared touch as lake=surface (repeatable)")
+	c.Flags().StringVar(&fromProposal, "from-proposal", "", "build the plan from a selected lake proposal id")
 	c.Flags().BoolVar(&freeze, "freeze", false, "freeze the plan as recorded (later edits need change)")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("run-id")
-	_ = c.MarkFlagRequired("program")
+	return c
+}
+
+func newGoalProgramProposeCmd() *cobra.Command {
+	var runID, file string
+	c := &cobra.Command{
+		Use:   "propose",
+		Short: "Validate and record an AI lake proposal (3-7 lakes, commercial lens)",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			raw, err := os.ReadFile(file)
+			if err != nil {
+				return err
+			}
+			var p orchestrator.LakeProposal
+			if err := json.Unmarshal(raw, &p); err != nil {
+				return err
+			}
+			eng, closeFn, err := goalEngine("")
+			if err != nil {
+				return err
+			}
+			defer closeFn()
+			v, err := eng.ProgramPropose(runID, p)
+			if err != nil {
+				return err
+			}
+			return printJSON(cmd, v)
+		},
+	}
+	c.Flags().StringVar(&runID, "run-id", "", "host goal run id (required)")
+	c.Flags().StringVar(&file, "file", "", "lake-proposal.v1 JSON file (required)")
+	_ = c.MarkFlagRequired("run-id")
+	_ = c.MarkFlagRequired("file")
+	return c
+}
+
+func newGoalProgramSelectCmd() *cobra.Command {
+	var runID, proposal, by string
+	var lakes, rejects []string
+	c := &cobra.Command{
+		Use:   "select",
+		Short: "Record the human multi-select (drafts are created for selected lakes only)",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			eng, closeFn, err := goalEngine("")
+			if err != nil {
+				return err
+			}
+			defer closeFn()
+			v, err := eng.ProgramSelect(runID, proposal, lakes, rejects, by)
+			if err != nil {
+				return err
+			}
+			return printJSON(cmd, v)
+		},
+	}
+	c.Flags().StringVar(&runID, "run-id", "", "host goal run id (required)")
+	c.Flags().StringVar(&proposal, "proposal", "", "proposal id (required)")
+	c.Flags().StringArrayVar(&lakes, "lake", nil, "selected lake slug (repeatable)")
+	c.Flags().StringArrayVar(&rejects, "reject", nil, "rejected lake slug (repeatable)")
+	c.Flags().StringVar(&by, "by", "", "human identity confirming the selection (required)")
+	_ = c.MarkFlagRequired("run-id")
+	_ = c.MarkFlagRequired("proposal")
+	_ = c.MarkFlagRequired("by")
 	return c
 }
 
@@ -324,6 +403,9 @@ func newGoalProgramRouteCmd() *cobra.Command {
 			}
 			out := cmd.OutOrStdout()
 			fmt.Fprintf(out, "program: %s (frozen=%v, all_complete=%v)\n", v.ProgramSlug, v.Frozen, v.AllComplete)
+			if v.ProposalID != "" {
+				fmt.Fprintf(out, "proposal: %s selected=%d rejected=%d\n", v.ProposalID, v.ProposalSelected, v.ProposalRejected)
+			}
 			for _, row := range v.Lakes {
 				fmt.Fprintf(out, "  %-16s %-10s %s\n", row.Lake, row.Status, row.ReasonCode)
 				if row.DriverHint != "" {

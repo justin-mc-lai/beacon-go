@@ -140,6 +140,11 @@ func (e *Engine) ProgramRoute(runID string) (ProgramRouteView, error) {
 			"recorded program graph has a cycle")
 	}
 	view := ProgramRouteView{RunID: runID, ProgramSlug: plan.Slug, Frozen: plan.Frozen, AllComplete: len(order) > 0}
+	if m.LakeProposal != nil {
+		view.ProposalID = m.LakeProposal.ProposalID
+		view.ProposalSelected = len(m.LakeProposal.Selected)
+		view.ProposalRejected = len(m.LakeProposal.Rejected)
+	}
 	bySlug := map[string]LakeRoute{}
 	for _, slug := range order {
 		lake := plan.lake(slug)
