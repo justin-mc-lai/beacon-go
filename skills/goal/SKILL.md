@@ -29,6 +29,19 @@ Use `goal` when the work will outlive one turn.
 4. Blockers are recorded, not hidden: `beacon goal block --reason-code ...`.
 5. Completion requires `attach-verifier` + qa pass + `complete` at the release gate.
 
+## Program (multi-lake)
+
+A program is several lakes (feature packages) with dependencies on one host run:
+
+- `beacon goal program plan --run-id <host> --program <slug> --lake <slug> ... --freeze`
+- `beacon goal program route --run-id <host>` — topological next batch + rollup
+- `beacon goal program drive --run-id <host> --until-done --executor ...` — pushes every
+  ready lake to its release gate; a dependency at its gate counts as release-ready
+- `beacon goal program complete --run-id <host> --confirmed-by <name>` — the one
+  program-level human signature that releases every lake at its gate together
+
+`drive --until-done` stops on the first blocked lake and never auto-completes a lake.
+
 ## Load before acting
 
 Read `references/core.md` completely before the first command. It carries the

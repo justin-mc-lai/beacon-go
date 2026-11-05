@@ -22,6 +22,15 @@ The chain is **ask -> sign -> freeze -> govern -> self-check**:
 Rules: truth lives only in `docs/beacon/<version>/features/<slug>/*.md`; the store
 keeps pointers and events, never the body. Freeze is canonical-branch only.
 
+## Integrity and feature map
+
+- `beacon gate integrity --strict` forces block mode for an already-frozen package
+  (release-candidate tightening); the default stays AC-101 audit-only.
+- `beacon truth map build` writes `feature-map.md` (AC -> entry point + runnable
+  verification command); `beacon truth map verify` reports fresh/stale/missing.
+- Release/Completed is terminal: a new run, refreeze, or tick never downgrades a
+  released feature's lifecycle.
+
 ## Route examples
 
 Three worked routes; open the file before acting (examples are not
