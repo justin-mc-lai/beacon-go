@@ -156,7 +156,7 @@ func (e *Engine) Complete(runID string, opts CompleteOptions) (RunView, error) {
 		if err := e.saveRunOn(tx, run, m); err != nil {
 			return err
 		}
-		_ = tx.Features().UpdateLifecycle(store.Lifecycle{
+		_ = updateLifecycleMonotonic(tx.Features(), store.Lifecycle{
 			FeatureID: run.FeatureID, Stage: core.StageRelease, Status: core.StatusCompleted,
 		})
 		return nil

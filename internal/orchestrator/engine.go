@@ -410,7 +410,7 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 		if err := e.saveRunOn(tx, run, m); err != nil {
 			return err
 		}
-		return tx.Features().UpdateLifecycle(store.Lifecycle{
+		return updateLifecycleMonotonic(tx.Features(), store.Lifecycle{
 			FeatureID: ctx.Feature.ID, Stage: workflowStageForProductStage(stages[0]),
 			Status: core.StatusInProgress,
 		})

@@ -55,7 +55,7 @@ func (e *Engine) applyBlockOn(w writeSet, run store.Run, m *runMeta, reasonCode,
 		m.LastBlockReason = ReasonBlockedStreak
 	}
 	if stage := m.currentStage(); stage != "" {
-		_ = w.Features().UpdateLifecycle(store.Lifecycle{
+		_ = updateLifecycleMonotonic(w.Features(), store.Lifecycle{
 			FeatureID: run.FeatureID, Stage: workflowStageForProductStage(stage),
 			Status: core.StatusBlocked, ReasonCodes: []string{m.LastBlockReason},
 		})
@@ -209,7 +209,7 @@ func (e *Engine) Tick(ctx context.Context, runID string) (RunView, error) {
 		}
 	}
 	if err := e.store.WithTx(func(tx *store.Tx) error {
-		_ = tx.Features().UpdateLifecycle(store.Lifecycle{
+		_ = updateLifecycleMonotonic(tx.Features(), store.Lifecycle{
 			FeatureID: run.FeatureID, Stage: workflowStageForProductStage(stage),
 			Status: core.StatusCompleted,
 		})

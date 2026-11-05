@@ -278,7 +278,7 @@ func (e *Engine) CreateTruthPackage(projectRoot, version, slug string) (TruthPac
 	if err != nil {
 		return TruthPackageView{}, err
 	}
-	if err := e.store.Features().UpdateLifecycle(store.Lifecycle{
+	if err := updateLifecycleMonotonic(e.store.Features(), store.Lifecycle{
 		FeatureID: feat.ID, Stage: core.StageThink, Status: core.StatusNotStarted,
 	}); err != nil {
 		return TruthPackageView{}, err
@@ -413,7 +413,7 @@ func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload
 	if err := e.store.Features().UpdatePackageStatus(ctx.Feature.ID, "frozen"); err != nil {
 		return TruthPackageView{}, err
 	}
-	if err := e.store.Features().UpdateLifecycle(store.Lifecycle{
+	if err := updateLifecycleMonotonic(e.store.Features(), store.Lifecycle{
 		FeatureID: ctx.Feature.ID, Stage: core.StageFreeze, Status: core.StatusCompleted,
 	}); err != nil {
 		return TruthPackageView{}, err
@@ -466,7 +466,7 @@ func (e *Engine) FreezeTruthPackage(ctx store.FeatureContext, by string) (TruthP
 		// if it drifted, but never rewrite the document or stack
 		// duplicate freeze events when nothing changed.
 		if view.LifecycleStage != string(core.StageFreeze) || view.LifecycleStatus != string(core.StatusCompleted) {
-			if err := e.store.Features().UpdateLifecycle(store.Lifecycle{
+			if err := updateLifecycleMonotonic(e.store.Features(), store.Lifecycle{
 				FeatureID: ctx.Feature.ID, Stage: core.StageFreeze, Status: core.StatusCompleted,
 			}); err != nil {
 				return TruthPackageView{}, err
