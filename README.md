@@ -13,7 +13,7 @@ engine**: long-running coding work that plans itself into stages, advances
 step by step under hard gates, survives interruptions, and never marks
 itself done without independent verification and a human-confirmed release.
 
-Current release: **v2.0.0-go.13** · full behavior suite · full end-to-end
+Current release: **v2.0.0-go.14** · full behavior suite · full end-to-end
 chain green. go.13 adds SDD version iteration (greenfield `v0.0.1`, explicit
 `projects bump`, docs/runtime axis separation); go.12 added program-level sea
 delivery (`goal program drive --until-done` + one `goal program complete`),
@@ -77,7 +77,7 @@ Requires Go 1.27+.
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.13
+./bin/beacon --version          # Beacon CLI v2.0.0-go.14
 ```
 
 Five commands cover most of a day:

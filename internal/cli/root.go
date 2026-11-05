@@ -57,7 +57,7 @@ import (
 // skills install, repo-carried state, archive/init/hooks), and the
 // intelligence faces (agent eval, qa strategy, intent decomposition,
 // brainstorm, code2truth, reopen). See docs/r2a..r2d reports.
-// v2.0.0-go.13 adds SDD docs-version iteration: greenfield v0.0.1,
+// v2.0.0-go.14 adds SDD docs-version iteration: greenfield v0.0.1,
 // explicit projects bump, current/latest resolution, and docs/runtime
 // axis separation.
 // v2.0.0-go.12 adds program-level sea delivery (drive --until-done +
@@ -72,7 +72,7 @@ import (
 // streaming forwards real deltas, benchmark and file-size gates exist,
 // and the frozen feature packages are reconciled (docs/changes/change-audit-2026-10-29.md).
 // Development builds between exits carried a dev suffix.
-const Version = "2.0.0-go.13"
+const Version = "2.0.0-go.14"
 
 // NewRootCmd builds the beacon root command with the six first-class
 // abilities as real command groups (P4a convergence): goal (the loop
