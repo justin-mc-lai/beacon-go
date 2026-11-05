@@ -11,6 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"beacon-go/internal/orchestrator"
 	"beacon-go/internal/store"
 )
 
@@ -52,7 +53,8 @@ func newProjectsCmd() *cobra.Command {
 		Short: "Machine-level multi-project registry (AC-021)",
 	}
 	c.AddCommand(newProjectsRegisterCmd(), newProjectsListCmd(), newProjectsShowCmd(),
-		newProjectsInitCmd(), newProjectsExportStateCmd(), newProjectsImportStateCmd())
+		newProjectsInitCmd(), newProjectsExportStateCmd(), newProjectsImportStateCmd(),
+		newProjectsBumpCmd())
 	return c
 }
 
@@ -91,6 +93,11 @@ func newProjectsRegisterCmd() *cobra.Command {
 			// Already registered: return the existing record unchanged
 			// (idempotent); only the version bookkeeping below may add.
 			if version != "" {
+				norm, nerr := orchestrator.NormalizeDocsVersion(version)
+				if nerr != nil {
+					return nerr
+				}
+				version = norm
 				if err := ensureVersion(st, p, version, docsRoot); err != nil {
 					return err
 				}
@@ -257,6 +264,74 @@ func newProjectsShowCmd() *cobra.Command {
 		},
 	}
 	c.Flags().StringVar(&project, "project", ".", "project root path")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	return c
+}
+
+func newProjectsBumpCmd() *cobra.Command {
+	var path, project, level string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "bump",
+		Short: "Open the next docs delivery line (patch by default; minor/major explicit)",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			st, err := openWriteStore()
+			if err != nil {
+				return err
+			}
+			defer st.Close()
+			if project != "" && project != path {
+				path = project
+			}
+			root := store.ResolveRootPath(path)
+			p, err := st.Projects().GetByRootPath(root)
+			if errors.Is(err, sql.ErrNoRows) {
+				return fail("project_not_registered", "projects bump",
+					"project not registered: "+root+" (run `beacon projects register` first)")
+			}
+			if err != nil {
+				return err
+			}
+			versions, err := st.Projects().ListVersions(p.ID)
+			if err != nil {
+				return err
+			}
+			base := ""
+			for _, v := range versions {
+				if v.IsCurrent {
+					base = v.Version
+				}
+			}
+			if base == "" {
+				if best, ok := orchestrator.LatestDocsVersion(versions); ok {
+					base = best.Version
+				}
+			}
+			if base == "" {
+				base = "v0.0.0"
+			}
+			next, err := orchestrator.BumpDocsVersion(base, level)
+			if err != nil {
+				return err
+			}
+			if err := ensureVersion(st, p, next, ""); err != nil {
+				return err
+			}
+			view, err := buildProjectView(st, p)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				return printJSON(cmd, map[string]any{"from": base, "version": next, "project": view})
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "bumped %s -> %s (current)\n", base, next)
+			return nil
+		},
+	}
+	c.Flags().StringVar(&path, "path", ".", "project root path")
+	c.Flags().StringVar(&project, "project", "", "alias of --path (project root path)")
+	c.Flags().StringVar(&level, "level", "patch", "bump level: patch|minor|major")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	return c
 }

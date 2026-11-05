@@ -543,6 +543,7 @@ const (
 	ReasonReleasePolicyUnsupported     = "release_policy_unsupported"
 	ReasonReleaseShadowNotConfigured   = "release_shadow_not_configured"
 	ReasonFeatureMapMissing            = "feature_map_missing"
+	ReasonDocsVersionInvalid           = "docs_version_invalid"
 	ReasonProgramLakeNotReady          = "program_lake_not_ready"
 	ReasonProgramBlocked               = "program_blocked"
 	ReasonFeatureMapStale              = "feature_map_stale"

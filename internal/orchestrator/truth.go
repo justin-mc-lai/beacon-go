@@ -232,19 +232,63 @@ func (e *Engine) CreateTruthPackage(projectRoot, version, slug string) (TruthPac
 	if err != nil {
 		return TruthPackageView{}, err
 	}
+	// SDD version rule: a docs version is a delivery line, not a
+	// per-feature counter. Empty/auto use current; latest uses the
+	// largest registered line; an explicit line must already exist.
 	var ver *store.ProjectVersion
-	for i := range versions {
-		if version != "" && versions[i].Version == version {
-			ver = &versions[i]
-			break
+	raw := strings.ToLower(strings.TrimSpace(version))
+	switch raw {
+	case "", "auto", "latest":
+		if len(versions) == 0 {
+			// Greenfield: the first delivery line is v0.0.1.
+			opened, aerr := e.store.Projects().AddVersion(store.ProjectVersion{
+				ProjectID: proj.ID, Version: "v0.0.1",
+				DocsRoot: filepath.Join("docs", "beacon", "v0.0.1"), IsCurrent: true,
+			})
+			if aerr != nil {
+				return TruthPackageView{}, aerr
+			}
+			versions = []store.ProjectVersion{opened}
+			ver = &versions[0]
+		} else {
+			for i := range versions {
+				if versions[i].IsCurrent {
+					ver = &versions[i]
+				}
+			}
+			if raw == "latest" || ver == nil {
+				best, ok := latestDocsVersion(versions)
+				if !ok {
+					return TruthPackageView{}, core.NewError(ReasonTruthVersionMissing, "truth.Create",
+						"no usable docs version recorded for project "+root)
+				}
+				if !best.IsCurrent {
+					if serr := e.store.Projects().SetCurrent(best.ID); serr != nil {
+						return TruthPackageView{}, serr
+					}
+				}
+				best.IsCurrent = true
+				ver = &best
+			}
 		}
-		if version == "" && versions[i].IsCurrent {
-			ver = &versions[i]
+	default:
+		norm, nerr := NormalizeDocsVersion(version)
+		if nerr != nil {
+			return TruthPackageView{}, nerr
+		}
+		for i := range versions {
+			if versions[i].Version == norm {
+				ver = &versions[i]
+			}
+		}
+		if ver == nil {
+			return TruthPackageView{}, core.NewError(ReasonTruthVersionMissing, "truth.Create",
+				"docs version "+norm+" is not registered; open it with `beacon projects bump --level patch` or register it first")
 		}
 	}
 	if ver == nil {
 		return TruthPackageView{}, core.NewError(ReasonTruthVersionMissing, "truth.Create",
-			"no usable docs version recorded for project "+root+" (register one with `beacon projects register --version`)")
+			"no usable docs version recorded for project "+root)
 	}
 	if _, err := e.store.Features().GetBySlug(ver.ID, slug); err == nil {
 		return TruthPackageView{}, core.NewError(ReasonTruthPackageExists, "truth.Create",

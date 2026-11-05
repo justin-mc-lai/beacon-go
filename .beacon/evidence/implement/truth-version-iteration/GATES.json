@@ -1,0 +1,17 @@
+{
+  "feature": "truth-version-iteration",
+  "version": "v2.0.0",
+  "recorded_at": "2026-11-05T01:30:00Z",
+  "verification": {
+    "build": "PASS",
+    "go_test_all": "PASS",
+    "go_vet": "PASS",
+    "e2e": "PASS"
+  },
+  "notes": [
+    "greenfield truth create auto-opens v0.0.1",
+    "same iteration shares the current docs version",
+    "explicit projects bump is required for a new delivery line",
+    "docs versions are pure vX.Y.Z; runtime-shaped lines are refused"
+  ]
+}

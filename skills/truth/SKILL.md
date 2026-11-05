@@ -22,6 +22,15 @@ The chain is **ask -> sign -> freeze -> govern -> self-check**:
 Rules: truth lives only in `docs/beacon/<version>/features/<slug>/*.md`; the store
 keeps pointers and events, never the body. Freeze is canonical-branch only.
 
+## Version = delivery line (SDD)
+
+- Greenfield: the first `truth create` auto-opens `v0.0.1`.
+- Same iteration: every feature shares the project's current docs version.
+- New iteration: `beacon projects bump --level patch` (minor/major only when explicit).
+- `truth create --version auto` = current; `latest` = largest registered line.
+- Docs versions are pure `vX.Y.Z`; runtime lines (`2.0.0-go.12`) are a separate
+  axis and are refused as docs versions.
+
 ## Integrity and feature map
 
 - `beacon gate integrity --strict` forces block mode for an already-frozen package
