@@ -164,3 +164,80 @@ tests.md 缺失 / 矩阵不可解析 / truth 无 AC 三种均 fail-closed 且非
 - 只读原仓库代码与 git；未切分支、未 commit、未 push、未改实现、未碰 `kernel-eval-gate`。
 - 唯一写入原仓库的文件是本 verdict。
 - 自造夹具仅存在于 `/tmp/qa-reg-new`、`/tmp/qa-reg-old` 导出副本，未进入仓库。
+
+## 12. Re-verify @ 8a465df（复验，绑定新 HEAD）
+
+- verdict: **PASS**（回归/负向判定维持不变）
+- 绑定 HEAD: `8a465df`（`8a465df29e9b1d012cba9470bc7cc164c6b250d3`）
+- 产出时实际工作区 HEAD: `075ae9c`（`8a465df` 之后仅两个 docs-only 提交：`b60414a` 记录 kernel-eval-gate 包、`075ae9c` 记录 QA verdict）
+- current_stage: `qa / Freeze/Completed`（truth: `frozen`，drift clean）
+- main: 仍 `ae95587`（未合并、未 push）
+
+### 12.1 代码零改动自证
+
+```
+git rev-parse HEAD           → 075ae9c...
+git diff 4db7bd8..8a465df -- cmd internal   → 空（0 行代码改动）
+git diff 8a465df..HEAD  -- cmd internal     → 空（后续两提交亦无代码改动）
+git diff 4db7bd8..HEAD  -- cmd internal     → 空（整段代码路径与首次验收字节一致）
+```
+
+`git diff 4db7bd8..8a465df --stat`：7 files changed（全为 docs 包 tests/tasks/evidence/changes 与证据文件）。
+`git diff 8a465df..HEAD --stat`：22 files changed（全为 kernel-eval-gate docs 包 + 三份 QA verdict，无代码）。
+`git diff ae95587..8a465df --stat -- '*_test.go'`：仅 3 个**新增**测试文件（cli/gate/orchestrator 的 kernel_traceability 测试），既有测试文件零改动。
+
+### 12.2 全量回归（自己实跑）
+
+```
+go test ./... -count=1
+EXIT_CODE=0；14 个测试包全 ok；grep FAIL|panic → NO_FAILURES
+```
+
+### 12.3 TC-010 新命令（两包选择器 + -v）
+
+```
+go test -v ./internal/cli ./internal/orchestrator \
+  -run 'TestProgramPlanRequiresProposal|TestProgramPlanFreezeChange|TestProgramSelectRecordsDecision' -count=1
+```
+真实输出（三个 RUN / 三个 PASS）：
+```
+=== RUN   TestProgramPlanRequiresProposal
+--- PASS: TestProgramPlanRequiresProposal (0.03s)
+ok   beacon-go/internal/cli
+=== RUN   TestProgramSelectRecordsDecision
+--- PASS: TestProgramSelectRecordsDecision (0.09s)
+=== RUN   TestProgramPlanFreezeChange
+--- PASS: TestProgramPlanFreezeChange (0.02s)
+ok   beacon-go/internal/orchestrator
+EXIT=0
+```
+
+### 12.4 历史包 not_required 与坏包拦截未回退
+
+引擎侧（HEAD 真实代码）：
+```
+go test -v ./internal/gate ./internal/orchestrator ./internal/cli \
+  -run 'TestConformanceTraceability|TestParseCoverageMatrixKeepsPipesInCodeSpan' -count=1
+--- PASS: TestConformanceTraceabilityAllCovered
+--- PASS: TestConformanceTraceabilityMissingTC
+--- PASS: TestConformanceTraceabilityMissingEvidence
+--- PASS: TestConformanceTraceabilityFailClosed
+--- PASS: TestConformanceTraceabilityNotDeclaredKeepsLegacyVerdict   (not_required 兼容)
+--- PASS: TestParseCoverageMatrixKeepsPipesInCodeSpan
+EXIT=0
+```
+
+自造夹具在 HEAD 新鲜导出树 `/tmp/qa-reg-head`（`git archive HEAD`）重跑（不复用制造方夹具）：
+```
+GOOD            pass=true   detail="2 AC covered by 2 executable TC(s) with in-package evidence"
+MISSING_TC      codes=[traceability_missing_tc] missing=[AC-002]
+MISSING_EVIDENCE codes=[traceability_missing_evidence] missing=[AC-002/TC-002]
+OUT_OF_BOUNDS   codes=[traceability_missing_evidence] missing=[AC-002/TC-002]   (evidence/../../outside.txt 被拒)
+HISTORICAL      status=not_required pass=true failed=[]
+CLI GOOD exit=0 / CLI BAD exit!=0 / CLI TEXT exit!=0
+```
+即：好包全绿、缺 TC/证据不存在/越界均非 0 且 reason code 正确、历史包 not_required 兼容，与 `4db7bd8` 判定完全一致，**无回退**。
+
+### 12.5 结论
+
+`4db7bd8..8a465df`（及至 `075ae9c`）零代码改动，全量测试 0 退出，TC-010 三 RUN/PASS，not_required 兼容与坏包拦截全部未回退。**regression verdict 维持 PASS，并绑定 `8a465df`。**

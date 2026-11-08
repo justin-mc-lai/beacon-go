@@ -1,100 +1,97 @@
-# QA Verdict — spec/AC 合规（kernel-truth-traceability · #1）
+# Spec / AC Compliance Verdict — kernel-truth-traceability
 
-- **verdict: FAIL**
-- **mode_id**: `qa-spec-ac`
-- **run_id**: 无（独立只读验收，未建 goal run；基于实现分支 `feat/kernel-truth-traceability` @ `4db7bd8`）
-- **stage**: `qa` / `Freeze/Completed`
-- **reviewer**: 验收员（独立验收，maker≠checker）
-- **truth status**: `frozen`，`change_pending=false`；`branch_check=mismatch`（冻结记账记在 main，工作区在实现分支，合并前属预期）
-- **判定依据**: 只按冻结 truth.md / tests.md 文本与实跑测试证据判定，不改产出
+- **verdict**: **PASS**
+- **current_stage**: `qa / Freeze/Completed`
+- **verified HEAD**: `8a465df` (`8a465df29e9b1d012cba9470bc7cc164c6b250d3`), branch `feat/kernel-truth-traceability`
+- **note on HEAD**: re-verification started when the branch HEAD was `075ae9c`; the truth package bytes are identical between `8a465df` and `075ae9c` (`git diff --stat 8a465df..HEAD -- <package> ':!<package>/evidence/qa'` is empty), so this verdict binds `8a465df` as instructed.
+- **main**: `ae95587` (unchanged, not merged, not pushed)
+- **truth**: `status=frozen`, `change_pending=false`, `lifecycle_stage=Freeze`, `lifecycle_status=Completed`, `truth drift clean=true` / `body drift=false`
+- **supersedes**: the FAIL verdict issued against `4db7bd8`
 
-## 结论摘要
+## 1. Resolution of the two blocking findings
 
-**实现代码层面对 AC-001～AC-005 全部按冻结文本落地，无需求扩张**；12 条 TC 的命令逐条实跑通过，`go test ./... -count=1` 退出码 0，既有测试文件零改动。
+| Finding (at `4db7bd8`) | Status at `8a465df` | Evidence |
+|---|---|---|
+| **P1-1** TC-010 command only ran `./internal/cli`, so two of three AC-009 proposal-gate tests were silently skipped | **Resolved** — command is now `go test ./internal/cli ./internal/orchestrator -run 'TestProgramPlanRequiresProposal\|TestProgramPlanFreezeChange\|TestProgramSelectRecordsDecision' -count=1 -v`; real run shows 3 `=== RUN`, 3 `--- PASS`, exit 0 | `evidence/ac009-regression.txt`; rerun in §3 |
+| **P2-1** TASK-001～010 checked with no `evidence=` binding | **Resolved** — every one of TASK-001～010 carries an `evidence=` path, all files exist inside the package and match the task surface; TASK-011 remains unchecked | `tasks.md`; §4 |
+| index nit: `qa-spec.md` / `qa-runtime.md` / `qa-regression.md` typos | **Resolved** — index now reads `spec-ac.md`, `runtime.md`, `regression.md`, status `recorded`; all 20 indexed artifacts resolve to real files | `evidence.md`; §5 |
 
-**但本包作为「可追溯」交付，自身的冻结测试证据存在一处硬缺陷**：TC-010 的命令只跑了三个 AC-009 提案门测试中的 1 个，无法复现其 Assertion。这正是本 feature 要防的“证据对不上断言”问题，且 #2 评测门会直接复用该命令，若不修会把假绿带进回归集。因此综合 verdict 为 **FAIL**，必改项都在 truth 包文档层，不需要改实现代码。
+## 2. Per-AC verdict
 
-## 逐条 AC 结论
+| AC | Verdict | Basis (code + live run) |
+|----|---------|-------------------------|
+| **AC-001** | **PASS** | `conformanceTraceability` (`internal/orchestrator/delivery_paradigm.go:504`) appends `ac_tc_evidence_coverage`; three layers implemented: AC set non-empty (`gate.DefinedACs`, line 532), non-soft + non-empty + non-docs-only TC (`row.IsSoft()`, `gate.IsDocsOnlyCommand`, lines 560-566), Evidence path inside package `evidence/` and present on disk (`traceabilityEvidencePath` + `os.Stat`, lines 587-597). `TestConformanceTraceabilityAllCovered` PASS. |
+| **AC-002** | **PASS** | Missing TC → `traceability_missing_tc` naming all missing AC IDs (lines 568-573, 601-605, detail comma-separated). Missing / outside-package / non-existent evidence → `traceability_missing_evidence` naming `AC-ID/TC-ID` (lines 574-599, 606-610). Fail-closed paths: truth.md missing (line 517), unreadable frontmatter (521), truth defines no AC (533), tests.md missing (542), matrix unparseable (547) — all fail, never `pass`/`not_required`. CLI text and `--json` items/failed carry reason code + missing IDs (`traceabilityFailureLabel`, line 487). `TestConformanceTraceabilityMissingTC`, `…MissingEvidence`, `…FailClosed`, `TestGoalConformanceTraceabilityExitCode` all PASS. |
+| **AC-003** | **PASS** | Undeclared package returns `not_required` (`delivery_paradigm.go:526-531`); the item is appended but contributes nothing to `Failed`, so `v.Pass` still depends only on `truth_frozen`, `gates_evaluated`, `verifier_attached`, `state_exported` (line 468). CLI handles `not_required` (`internal/cli/goal.go:124`). `TestConformanceTraceabilityNotDeclaredKeepsLegacyVerdict` PASS (also exercised on a fresh `git archive` tree by the regression verdict). |
+| **AC-004** | **PASS** | `truth change` writes `base_requirement_fingerprints` into the change doc and event (`internal/orchestrator/truth_change.go:136-168, 213-219`). `refreeze` computes base→after diff and fails closed when neither the change record nor the latest freeze record carries a base (`truth_change.go:301-315`); writes `## AC Diff` to every closed change doc and `change_ac_diff` into `truth_refrozen` (`truth_change.go:274-287`). `truth show --json` returns `change_ac_diff`. `TestRefreezeRecordsACDiff`, `TestTruthShowExposesChangeACDiff`, `TestRefreezeACDiffFailClosed` all PASS. |
+| **AC-005** | **PASS** | `git diff --name-status ae95587..HEAD -- '*_test.go'` = 3 `A` files only (no existing test modified). TC-010 two-package run: 3 RUN / 3 PASS / exit 0. `TestDeliveryParadigmEndToEnd` PASS. `go test ./... -count=1` exit 0, 14 packages ok. |
 
-| AC | 结论 | 核对方式与事实 |
-|----|------|----------------|
-| AC-001 | **PASS** | `internal/orchestrator/delivery_paradigm.go` 新增 `ac_tc_evidence_coverage`；`conformanceTraceability` 三层判定落地：AC 集合（`gate.DefinedACs`）→ 非软且非 docs-only 的 TC 行（`row.IsSoft()`、`gate.IsDocsOnlyCommand`）→ Evidence 路径在包 `evidence/` 内且 `os.Stat` 为普通文件（`traceabilityEvidencePath`）。`TestConformanceTraceabilityAllCovered` exit 0，detail 为 `2 AC covered by 2 executable TC(s) with in-package evidence`。 |
-| AC-002 | **PASS** | 两个 reason code 在 `internal/core/reasons.go` 常量固定；缺 TC → `traceability_missing_tc:missing=AC-002`；证据缺失/越界/不存在 → `traceability_missing_evidence:missing=AC-001/TC-001`；tests.md 缺失、矩阵不可解析、truth 无 AC 三路全部 fail-closed（`TestConformanceTraceabilityFailClosed` 三组均 `pass=false` 且带 reason code）。CLI 文本与 `--json` 的 `items.reason_codes/missing`、`failed` 数组都带 reason code 与缺失 ID（`TestGoalConformanceTraceabilityExitCode` 非 0 退出）。 |
-| AC-003 | **PASS** | 未声明 `traceability_required: true` 的包新增项为 `not_required`，`Pass` 仍只由 `truth_frozen`、`gates_evaluated`、`verifier_attached`、`state_exported` 四项决定（`TestConformanceTraceabilityNotDeclaredKeepsLegacyVerdict`：四项 pass、`failed` 为空、整体 pass）。CLI 文本对 `not_required` 标 `n/a`，不计失败。 |
-| AC-004 | **PASS** | `truth change` 把 base 的 `requirement_fingerprints` 写入 change 文档与 `truth_change_requested` 事件；`truth refreeze` 在状态翻转前计算并写入 `## AC Diff`（added/changed/removed，changed 带 before/after 前 12 位），同一 diff 进 `truth_refrozen` payload；`truth show --json` 透出 `change_ac_diff`。change 文档不可写时 refreeze 报 `truth_change_ac_diff_write_failed`、包保持 `change_pending`、无 `truth_refrozen` 事件（`TestRefreezeACDiffFailClosed`）。 |
-| AC-005 | **PASS（断言事实成立，但 TC-010 命令不成立，见必改项 P1-1）** | `git diff --name-status ae95587..4db7bd8` 中测试文件只有 3 个 A（新增），无既有测试文件改动；三个 AC-009 提案门测试与 `TestDeliveryParadigmEndToEnd` 实跑全部 PASS；`go test ./... -count=1` 退出码 0（14 个测试包全 ok）。 |
+AC text: `git diff 4db7bd8..HEAD -- …/truth.md` is empty and `shasum -a 256 truth.md` = `7672008cae638f0901ad67e2d393e317b7aea194857e477d70307c320e8be632`, identical to the base recorded at change-open and refreeze. **Zero AC text change.**
 
-## 必改项
-
-### P1-1（阻断合并）TC-010 的冻结命令无法复现其 Assertion
-
-tests.md TC-010 写的是：
-
-```
-go test ./internal/cli -run 'TestProgramPlanRequiresProposal|TestProgramPlanFreezeChange|TestProgramSelectRecordsDecision' -count=1
-```
-
-但这三个测试分布在两个包：
-
-- `TestProgramPlanRequiresProposal` → `internal/cli/goal_proposal_gate_test.go`
-- `TestProgramPlanFreezeChange` → `internal/orchestrator/p2d_program_test.go`
-- `TestProgramSelectRecordsDecision` → `internal/orchestrator/lake_proposal_test.go`
-
-实跑冻结命令的 `-v` 输出只有 `=== RUN TestProgramPlanRequiresProposal`，另外两个被静默跳过（Go 对 `-run` 未匹配到测试的包不报错）。因此该 TC 的 Command 证明不了 Assertion（“三个 AC-009 提案门测试原样通过”）。`evidence/ac009-regression.txt` 里人工补跑了 orchestrator 两条，说明事实成立，但矩阵命令本身不可复现，且 #2 评测门会直接执行这些命令。
-
-**已实测可行的修法**（二选一，推荐前者，一条命令）：
+## 3. Commands actually run and real results
 
 ```
-go test ./internal/cli ./internal/orchestrator -run 'TestProgramPlanRequiresProposal|TestProgramPlanFreezeChange|TestProgramSelectRecordsDecision' -count=1
+$ git rev-parse HEAD            → 075ae9c (8a465df..HEAD both commits are docs-only)
+$ git rev-parse main            → ae95587
+$ git diff 4db7bd8..HEAD -- cmd internal   → (empty: zero implementation change)
+$ git diff --stat 8a465df..HEAD -- <pkg excluding evidence/qa> → (empty)
+
+$ go test ./internal/cli ./internal/orchestrator \
+    -run 'TestProgramPlanRequiresProposal|TestProgramPlanFreezeChange|TestProgramSelectRecordsDecision' -count=1 -v
+=== RUN   TestProgramPlanRequiresProposal
+--- PASS: TestProgramPlanRequiresProposal (0.03s)
+ok  	beacon-go/internal/cli	0.671s
+=== RUN   TestProgramSelectRecordsDecision
+--- PASS: TestProgramSelectRecordsDecision (0.09s)
+=== RUN   TestProgramPlanFreezeChange
+--- PASS: TestProgramPlanFreezeChange (0.03s)
+ok  	beacon-go/internal/orchestrator	1.257s
+RUN count=3  PASS count=3  EXIT=0
+
+$ go test ./... -count=1
+EXIT=0 — 14 packages ok (desktop, agentapi, benchgate, cli, core, gate, harness, llm,
+migration, orchestrator, session, store, workspace, skills)
+
+$ go test ./internal/orchestrator -run '<AC-001..004 + e2e tests>' -count=1 -v
+8/8 --- PASS, exit 0
+$ go test ./internal/cli -run 'TestGoalConformanceTraceabilityExitCode|TestTruthShowExposesChangeACDiff' -count=1 -v
+2/2 --- PASS, exit 0
+
+$ go run ./cmd/beacon truth show --feature kernel-truth-traceability --json
+status=frozen, frozen=true, change_pending=false, lifecycle=Freeze/Completed,
+change_ac_diff={added:[],changed:[],removed:[]}, exit 0
+$ go run ./cmd/beacon truth drift --feature kernel-truth-traceability
+clean: true, body drift: false, exit 0
 ```
 
-实测：cli 跑 `TestProgramPlanRequiresProposal`，orchestrator 跑 `TestProgramSelectRecordsDecision` + `TestProgramPlanFreezeChange`，全部 PASS。或拆成 TC-010/TC-010b 两行。
+## 4. tests.md matrix and tasks.md bindings
 
-**修复方式**：走 `truth change` → 改 tests.md（只改 Command，不改 AC 文本）→ 重跑证据 → `truth refreeze`。tests.md 属 surface 变更，refreeze 不会被 AC-137 空差异规则拒绝。
+- 12 TC rows (TC-001～012); matrix AC set `{AC-001..AC-005}` equals the truth AC set; every AC has ≥1 row.
+- No empty Command / Assertion / Evidence; all 12 Commands are `go test`; no `docs_only`.
+- All 12 Evidence paths are inside this package's `evidence/` and exist on disk.
+- TC-010's Command contains `|` inside a code span; the gate parser keeps it (`TestParseCoverageMatrixKeepsPipesInCodeSpan` PASS), and the row parses as one row.
+- TASK-001～010: all checked with existing in-package `evidence=` files; TASK-011 remains unchecked — correct, since the three QA verdicts are not yet final/committed (regression.md still carries an uncommitted re-verify section and this spec verdict is being re-issued now). The maker must not self-tick the QA gate.
 
-### P2-1（合并前应修）tasks.md 勾选未绑定 evidence
+## 5. evidence.md index
 
-tasks.md 的 Boundary 自己写明：“`[x]` is valid only when the bound evidence file exists”。但 TASK-001～010 全部打勾却没有任何 `evidence=` 绑定（全文件仅 TASK-000 有）。AC 级证据确实存在，但按本包自己的规则，这些勾选不可核验。应在同一次 truth change 里为 TASK-001～010 补 `evidence=` 指向对应的 TC Evidence 文件。
+All 20 indexed artifacts resolve to real files (`truth.md`, `tests.md`, `tasks.md`, `evidence.md` at package root; data artifacts under `evidence/`; verdicts under `evidence/qa/`). Spec/runtime/regression are `recorded` and use the real filenames.
 
-## 非阻断发现
+## 6. Review of the missing `base_requirement_fingerprints` block (requested judgement)
 
-- **P3** `evidence.md` 索引与实际 verdict 文件名不一致：索引写 `qa-spec.md` / `qa-runtime.md` / `qa-regression.md`，实际落盘为 `spec-ac.md` / `runtime.md` / `regression.md`；且 runtime、regression 已落盘但索引仍标 `planned`。三份 verdict 齐后更新索引即可。
-- **P3** `internal/cli/goal.go` 的 `goal conformance` 帮助文本仍写 “Exit code 0 only when all four pass”，实际已是四项 + `ac_tc_evidence_coverage`（或 `not_required`）。行为正确，文案陈旧。
+**Conclusion: does not affect AC traceability; non-blocking.**
 
-## 实跑命令与结果（本次验收真实执行）
+1. This change doc (`chg_400ac770a361`, opened 2026-11-08T22:43:57Z) was created by the old binary still deployed on `main`; the new `truth change` path that writes the block did not exist there. Implementation does satisfy AC-004 clause 1 today.
+2. The change event records `base_truth_sha256 = 7672008c…`, byte-identical to the current `truth.md` SHA256, so base and after are provably the same body; an empty AC Diff is a genuine answer, not a fabricated one.
+3. `refreeze` does not depend on the doc block alone: it falls back to the latest `truth_frozen` record's per-AC `requirement_fingerprints`, and fails closed with `truth_refreeze_ac_diff_base_missing` when neither source has a base (`truth_change.go:301-315`).
+4. Those per-AC base fingerprints were extracted to `evidence/change-base-fingerprints.txt` and match the `truth_frozen` event payload exactly (AC-001 `38c7883c…`, AC-002 `9c8e3baa…`, AC-003 `7ee957d4…`, AC-004 `1069035b…`, AC-005 `0bdf0975…`), so the base used by the diff is auditable.
+5. Residual (not a defect for this merge): a tool that reads only that legacy change doc would not see the per-AC base. Every change opened by the new code will carry the block, and TC-007 exercises the refreeze diff path.
 
-| # | 命令 | 退出码 | 结果 |
-|---|------|--------|------|
-| 1 | `go test ./internal/orchestrator -run TestConformanceTraceabilityAllCovered -count=1` | 0 | ok |
-| 2 | `go test ./internal/orchestrator -run TestConformanceTraceabilityMissingTC -count=1` | 0 | ok |
-| 3 | `go test ./internal/orchestrator -run TestConformanceTraceabilityMissingEvidence -count=1` | 0 | ok |
-| 4 | `go test ./internal/cli -run TestGoalConformanceTraceabilityExitCode -count=1` | 0 | ok |
-| 5 | `go test ./internal/orchestrator -run TestConformanceTraceabilityFailClosed -count=1` | 0 | ok |
-| 6 | `go test ./internal/orchestrator -run TestConformanceTraceabilityNotDeclaredKeepsLegacyVerdict -count=1` | 0 | ok |
-| 7 | `go test ./internal/orchestrator -run TestRefreezeRecordsACDiff -count=1` | 0 | ok |
-| 8 | `go test ./internal/cli -run TestTruthShowExposesChangeACDiff -count=1` | 0 | ok |
-| 9 | `go test ./internal/orchestrator -run TestRefreezeACDiffFailClosed -count=1` | 0 | ok |
-| 10 | `go test ./internal/cli -run 'TestProgramPlanRequiresProposal\|TestProgramPlanFreezeChange\|TestProgramSelectRecordsDecision' -count=1 -v` | 0 | **只跑 1/3（复现 P1-1）** |
-| 11 | `go test ./internal/orchestrator -run 'TestProgramPlanFreezeChange\|TestProgramSelectRecordsDecision' -count=1 -v` | 0 | 2 个 PASS（人工补跑） |
-| 12 | `go test ./internal/cli ./internal/orchestrator -run '三个测试名' -count=1 -v` | 0 | 3 个全 PASS（建议修法） |
-| 13 | `go test ./internal/orchestrator -run TestDeliveryParadigmEndToEnd -count=1` | 0 | ok |
-| 14 | `go test ./... -count=1` | 0 | 14 个测试包全 ok |
+## 7. Non-blocking observations (P3, no rework required)
 
-## 证据路径（绝对路径）
+- `internal/cli/goal.go:97` help text still says "Exit code 0 only when all four pass"; a fifth check now exists. Documentation-only, no behavior impact.
+- TASK-006's bound artifact documents the base fingerprints from the `truth_frozen` record rather than the legacy change doc's own frontmatter — it supports the AC-004 audit trail but is not a direct artifact of that task for this particular change.
+- AC-004 clause 1 (change doc records base fingerprints) has no dedicated TC asserting the frontmatter block; per-AC coverage is satisfied by TC-007～009. Consider covering the block explicitly the next time this package is opened for change.
 
-- truth: `/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/kernel-truth-traceability/truth.md`
-- tests: `/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/kernel-truth-traceability/tests.md`
-- tasks: `/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/kernel-truth-traceability/tasks.md`
-- AC-009 证据: `/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/kernel-truth-traceability/evidence/ac009-regression.txt`
-- 全量测试证据: `/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/kernel-truth-traceability/evidence/go-test-all.txt`
-- 覆盖矩阵解析缺陷证据: `/Users/apple/Developer/Personal/products/beacon-go/internal/gate/traceability_matrix_test.go`（`TestParseCoverageMatrixKeepsPipesInCodeSpan` PASS）
+## 8. Boundary
 
-## 边界声明
-
-只读代码与 git；未切分支、未 commit、未 push、未改实现、未动 `kernel-eval-gate` 包。本次唯一写入是本 verdict 文件。
-
-## next
-
-1. 制造方按 P1-1、P2-1 走 `truth change` 修 tests.md / tasks.md 并 refreeze（不改 AC 文本、不改实现代码）。
-2. 修复后重跑 TC-010 与全量测试，更新 `ac009-regression.txt`。
-3. 本验收员复验 TC-010 可复现性与 tasks 绑定后，再出 PASS/FAIL 终判。
+Read-only verification: no branch switch, no commit, no push, no implementation change, no touch of `kernel-eval-gate` or the other two verdicts. The only file written is this verdict.
