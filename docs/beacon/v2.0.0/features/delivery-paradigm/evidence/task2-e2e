@@ -1,0 +1,4 @@
+=== RUN   TestDeliveryParadigmEndToEnd
+--- PASS: TestDeliveryParadigmEndToEnd (0.63s)
+PASS
+ok  	beacon-go/internal/orchestrator	1.089s

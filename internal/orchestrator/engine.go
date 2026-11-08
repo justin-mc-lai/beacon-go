@@ -299,7 +299,7 @@ func viewOf(run store.Run, m *runMeta, slug string) RunView {
 	if m.LastBlockReason != "" && m.Blocked {
 		v.ReasonCode = m.LastBlockReason
 	}
-	if m.isManualExecutor() {
+	if m.isManualExecutor() && m.LoopStage != string(core.LoopDone) {
 		v.TickHint = "not auto-driven: record each stage with `beacon goal tick --run-id " +
 			run.ID + " --by <identity>`"
 	}

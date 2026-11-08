@@ -1,0 +1,53 @@
+# delivery-paradigm task2: K1 tick identity + K3 external write-back (real CLI)
+
+--- K1: manual run is not auto-driven; an unknown selector is refused at creation ---
+run:    run_aae17e532c3250ee37d2d3af
+status: running (loop_stage governance_precheck)
+stage:  plan
+blocked: false
+executor: manual
+hint:   not auto-driven: record each stage with `beacon goal tick --run-id run_aae17e532c3250ee37d2d3af --by <identity>`
+next:   beacon-plan
+executor manual does NOT auto-drive this run; record each stage's completion with:
+  beacon goal tick --run-id run_aae17e532c3250ee37d2d3af --by <identity>
+exit=0
+
+--- K1: tick without --by parks with a reason that names the fix ---
+run: run_7261b26f65249440c9139444
+run:    run_7261b26f65249440c9139444
+status: blocked (loop_stage governance_precheck)
+stage:  plan
+blocked: true
+executor: manual
+reason: stage_manual_tick_required
+hint:   not auto-driven: record each stage with `beacon goal tick --run-id run_7261b26f65249440c9139444 --by <identity>`
+next:   beacon-plan
+Error: goal: run run_7261b26f65249440c9139444 is blocked (stage_manual_tick_required)
+exit status 1
+exit=1
+
+--- K1: tick --by records the completion and advances ---
+run:    run_7261b26f65249440c9139444
+status: running (loop_stage truth_routing)
+stage:  truth
+blocked: false
+executor: manual
+hint:   not auto-driven: record each stage with `beacon goal tick --run-id run_7261b26f65249440c9139444 --by <identity>`
+next:   beacon-truth
+exit=0
+
+--- K3: an external room writes a finished lake back (no delegation id) ---
+external result: run run_7261b26f65249440c9139444 status completed artifacts=1 by renlink-dev-room
+exit=0
+
+--- status after external write-back ---
+run:    run_7261b26f65249440c9139444
+status: completed (loop_stage done)
+stage:  
+blocked: false
+executor: manual
+
+--- K1 negative: unknown executor is refused before creation ---
+Error: goal.CreateRun: executor telepathy is not supported; choose manual | external | recording | subprocess | subprocess:<profile> | ralph (manual/external do not auto-drive: record each stage with `goal tick --by <identity>`) (stage_executor_unsupported)
+exit status 1
+exit=1

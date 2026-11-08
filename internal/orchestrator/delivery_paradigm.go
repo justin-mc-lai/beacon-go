@@ -208,6 +208,7 @@ func (e *Engine) ReceiveExternalResult(runID string, in ExternalResultInput) (Ru
 	for i := range m.StagePlan {
 		m.StagePlan[i].Status = "done"
 	}
+	m.CurrentStageIdx = len(m.StagePlan)
 	m.ExternalResult = &ExternalResult{By: in.By, Summary: in.Summary, ArtifactIDs: ids, At: at}
 	m.Blocked = false
 	m.BlockedStreak = 0
@@ -291,6 +292,13 @@ func (e *Engine) Conformance(runID string) (ConformanceView, error) {
 		gt := stageGateType(entry.Stage)
 		if gt == "" {
 			gateProblems = append(gateProblems, entry.Stage+": no gate axis")
+			continue
+		}
+		// The run itself must have LEFT the stage: a feature-scoped
+		// verdict recorded by another run of the same feature is not
+		// this run's delivery.
+		if entry.Status != "done" {
+			gateProblems = append(gateProblems, entry.Stage+": stage not completed ("+entry.Status+")")
 			continue
 		}
 		g, gerr := e.store.Gates().Latest(run.FeatureID, gt)

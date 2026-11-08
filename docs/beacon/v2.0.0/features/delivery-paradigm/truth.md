@@ -54,14 +54,14 @@ Every AC must trace to the intent or evidence it serves.
 
 | AC ID | Intent Source | Evidence |
 |-------|---------------|----------|
-| AC-001 | K1 观察：manual/external 执行器创建后永报未注册 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6.txt |
-| AC-002 | K1 期望：创建期直接拒绝并说明 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6.txt |
-| AC-003 | K2 观察：阶段在跑、门没评估 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6.txt |
-| AC-004 | K3 观察：外部完成没有回写入口 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6.txt |
-| AC-005 | K4 观察：route 只给 blocked 与 next batch | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6.txt |
-| AC-006 | K5 观察：ux_required=false 但正文有 UI 规格章节 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6.txt |
-| AC-007 | K6 观察：没有 conformance 自检 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6.txt |
-| AC-008 | DoD：端到端测试全过 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/go-test-main.txt |
+| AC-001 | K1 观察：manual/external 执行器创建后永报未注册 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+| AC-002 | K1 期望：创建期直接拒绝并说明 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+| AC-003 | K2 观察：阶段在跑、门没评估 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+| AC-004 | K3 观察：外部完成没有回写入口 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+| AC-005 | K4 观察：route 只给 blocked 与 next batch | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+| AC-006 | K5 观察：ux_required=false 但正文有 UI 规格章节 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+| AC-007 | K6 观察：没有 conformance 自检 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+| AC-008 | DoD：端到端测试全过 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/go-test-main |
 | AC-009 | 已冻结行为：新 program 必须走提案门 | docs/beacon/v2.0.0/features/sea-to-lake-proposal/truth.md |
 
 ## Acceptance Criteria

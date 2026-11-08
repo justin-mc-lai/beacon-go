@@ -1,0 +1,42 @@
+# delivery-paradigm task2: Step 0 truth change + refreeze
+
+$ beacon-go truth change --feature delivery-paradigm --summary "统一 Intent Coverage 的证据引用..."
+change: chg_4662b4340536 (docs/beacon/v2.0.0/features/delivery-paradigm/changes/chg_4662b4340536.md)
+
+$ beacon-go truth rebase --change chg_4662b4340536 --accept-current --note "..."
+rebased: chg_4662b4340536 (base realigned to the frozen body; the edit is limited to evidence paths)
+
+$ beacon-go truth refreeze --feature delivery-paradigm --by beacon-go-kernel
+
+$ beacon-go truth show --feature delivery-paradigm
+package:  delivery-paradigm (v2.0.0)
+status:   frozen
+dir:      docs/beacon/v2.0.0/features/delivery-paradigm
+lifecycle: Freeze/Completed
+branch:   check=mismatch current=fix/delivery-paradigm canonical=main
+baseline: uncommitted
+
+$ beacon-go truth list --project . | grep delivery-paradigm
+delivery-paradigm                          v2.0.0   frozen/Freeze
+
+--- truth.md Intent Coverage now references existing files ---
+57:| AC-001 | K1 观察：manual/external 执行器创建后永报未注册 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+58:| AC-002 | K1 期望：创建期直接拒绝并说明 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+59:| AC-003 | K2 观察：阶段在跑、门没评估 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+60:| AC-004 | K3 观察：外部完成没有回写入口 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+61:| AC-005 | K4 观察：route 只给 blocked 与 next batch | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+62:| AC-006 | K5 观察：ux_required=false 但正文有 UI 规格章节 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+63:| AC-007 | K6 观察：没有 conformance 自检 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+64:| AC-008 | DoD：端到端测试全过 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/go-test-main |
+
+freeze-log
+go-test-branch
+go-test-main
+repro-k1-k6
+task2-conformance
+task2-freeze-log
+task2-gate-status
+task2-k1-executor
+task2-k1-k3-real
+task2-route
+task2-ux-integrity
