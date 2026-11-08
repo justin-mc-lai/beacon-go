@@ -17,3 +17,13 @@ blocked: false
 executor: recording
 gate:   release evaluated=true verdict=pass
 next:   beacon-release
+
+--- AC-003 display: a stage with no recorded verdict says so ---
+$ beacon-go goal status --run-id run_6c2f43dacbfad2c278a17732   # feature demo-ui, never ticked
+run:    run_6c2f43dacbfad2c278a17732
+status: running (loop_stage governance_precheck)
+stage:  plan
+blocked: false
+executor: recording
+gate:   plan evaluated=false (this stage has no recorded verdict)
+next:   beacon-plan
