@@ -1,0 +1,16 @@
+# go test ./... on main@5ab05f5 (hard gate, run 2026-11-08)
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.730s
+ok  	beacon-go/internal/agentapi	2.411s
+ok  	beacon-go/internal/benchgate	(cached)
+ok  	beacon-go/internal/cli	13.185s
+ok  	beacon-go/internal/core	(cached)
+ok  	beacon-go/internal/gate	(cached)
+ok  	beacon-go/internal/harness	10.036s
+ok  	beacon-go/internal/llm	(cached)
+ok  	beacon-go/internal/migration	(cached)
+ok  	beacon-go/internal/orchestrator	83.075s
+ok  	beacon-go/internal/session	(cached)
+ok  	beacon-go/internal/store	(cached)
+ok  	beacon-go/internal/workspace	2.360s
+ok  	beacon-go/skills	(cached)
