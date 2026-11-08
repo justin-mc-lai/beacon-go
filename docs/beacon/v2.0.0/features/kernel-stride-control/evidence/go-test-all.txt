@@ -1,0 +1,22 @@
+# go test ./... -count=1 (kernel-stride-control freeze round)
+# repo: /Users/apple/Developer/Personal/products/beacon-go
+# branch: main  head: acaa7a6
+# at: 2026-11-09T07:42:20+0800
+# note: truth-only round, zero implementation code changes
+
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.954s
+ok  	beacon-go/internal/agentapi	2.853s
+ok  	beacon-go/internal/benchgate	0.510s
+ok  	beacon-go/internal/cli	15.116s
+ok  	beacon-go/internal/core	0.821s
+ok  	beacon-go/internal/gate	1.345s
+ok  	beacon-go/internal/harness	10.428s
+ok  	beacon-go/internal/llm	2.403s
+ok  	beacon-go/internal/migration	1.831s
+ok  	beacon-go/internal/orchestrator	99.272s
+ok  	beacon-go/internal/session	2.515s
+ok  	beacon-go/internal/store	2.454s
+ok  	beacon-go/internal/workspace	3.497s
+ok  	beacon-go/skills	2.284s
+EXIT=0
