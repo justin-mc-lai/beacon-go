@@ -1,15 +1,16 @@
 ?   	beacon-go/cmd/beacon	[no test files]
-ok  	beacon-go/desktop	1.120s
-ok  	beacon-go/internal/agentapi	5.977s
-ok  	beacon-go/internal/benchgate	1.936s
-ok  	beacon-go/internal/cli	18.124s
-ok  	beacon-go/internal/core	3.506s
-ok  	beacon-go/internal/gate	2.148s
-ok  	beacon-go/internal/harness	13.036s
-ok  	beacon-go/internal/llm	3.977s
-ok  	beacon-go/internal/migration	2.716s
-ok  	beacon-go/internal/orchestrator	91.549s
-ok  	beacon-go/internal/session	4.374s
-ok  	beacon-go/internal/store	4.563s
-ok  	beacon-go/internal/workspace	5.704s
-ok  	beacon-go/skills	4.115s
+ok  	beacon-go/desktop	1.459s
+ok  	beacon-go/internal/agentapi	3.019s
+ok  	beacon-go/internal/benchgate	1.018s
+ok  	beacon-go/internal/cli	15.369s
+ok  	beacon-go/internal/core	2.537s
+ok  	beacon-go/internal/gate	0.252s
+ok  	beacon-go/internal/harness	10.784s
+ok  	beacon-go/internal/llm	1.585s
+ok  	beacon-go/internal/migration	2.267s
+ok  	beacon-go/internal/orchestrator	94.167s
+ok  	beacon-go/internal/session	2.560s
+ok  	beacon-go/internal/store	2.322s
+ok  	beacon-go/internal/workspace	2.930s
+ok  	beacon-go/skills	2.172s
+EXIT_CODE=0

@@ -1,0 +1,9 @@
+$ sqlite3 ~/.beacon/beacon-go.db "select json_extract(payload_json,...) from lifecycle_events where feature_id=... and event_type in (truth_frozen, truth_change_requested)"
+change_id=chg_400ac770a361
+change_base_truth_sha256=7672008cae638f0901ad67e2d393e317b7aea194857e477d70307c320e8be632
+# base requirement fingerprints recorded by the truth_frozen event (reqfp-v1)
+frozen_base_requirement_fingerprint.AC-001=38c7883c24199361da75dcac4d0c05fcc73dccb51c8df6cacabce47f3a48ffa0
+frozen_base_requirement_fingerprint.AC-002=9c8e3baa22e2ba9c24d7f0221b3fce9a6635f450fd330dc1e99d7ed23d24304f
+frozen_base_requirement_fingerprint.AC-003=7ee957d4b73e9bcbedcf3dab0034c9b9a6ff8779b5df931bbc99de25a4d72557
+frozen_base_requirement_fingerprint.AC-004=1069035b26b7b5fa35ad0f546db8689191a68fda0b172e8ede1258f8f51d9b96
+frozen_base_requirement_fingerprint.AC-005=0bdf09752425a14c4c8cd0253bfe45685e2f73adb3453545eee23ed13cbc36ef
