@@ -11,12 +11,90 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"beacon-go/internal/core"
 	"beacon-go/internal/gate"
 	"beacon-go/internal/store"
 )
+
+// ACDiff is the requirement-level difference one refreeze closes:
+// which ACs the change added, changed and removed. The same value is
+// rendered into the change document's `## AC Diff` section and stored
+// in the truth_refrozen event payload, so `truth show --json` can
+// answer which ACs a change covered without re-reading the document.
+type ACDiff struct {
+	Added   []string       `json:"added"`
+	Changed []ACDiffChange `json:"changed"`
+	Removed []string       `json:"removed"`
+}
+
+// ACDiffChange is one AC present on both sides with a different
+// requirement fingerprint (the first 12 hex chars are the stable
+// comparison prefix).
+type ACDiffChange struct {
+	AC     string `json:"ac"`
+	Before string `json:"before"`
+	After  string `json:"after"`
+}
+
+const (
+	ReasonTruthACDiffBaseMissing = "truth_change_ac_diff_base_missing"
+	ReasonTruthACDiffWriteFailed = "truth_change_ac_diff_write_failed"
+	acDiffSectionHeading         = "## AC Diff"
+	acFingerprintPrefixLen       = 12
+)
+
+// fingerprintPrefix is the stable short form written into the change
+// document and the JSON view.
+func fingerprintPrefix(fp string) string {
+	if len(fp) > acFingerprintPrefixLen {
+		return fp[:acFingerprintPrefixLen]
+	}
+	return fp
+}
+
+// sortedFingerprintKeys returns the AC ids of a fingerprint map in
+// stable order (the document must not depend on map iteration).
+func sortedFingerprintKeys(m map[string]string) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+// renderACDiff renders the change document section. The three groups
+// are always present, so "removed: (none)" is explicit rather than an
+// absent section.
+func renderACDiff(diff ACDiff) string {
+	var b strings.Builder
+	b.WriteString("\n" + acDiffSectionHeading + "\n\n")
+	b.WriteString("added:\n")
+	if len(diff.Added) == 0 {
+		b.WriteString("- (none)\n")
+	}
+	for _, id := range diff.Added {
+		b.WriteString("- " + id + "\n")
+	}
+	b.WriteString("\nchanged:\n")
+	if len(diff.Changed) == 0 {
+		b.WriteString("- (none)\n")
+	}
+	for _, c := range diff.Changed {
+		b.WriteString(fmt.Sprintf("- %s (before %s → after %s)\n", c.AC, c.Before, c.After))
+	}
+	b.WriteString("\nremoved:\n")
+	if len(diff.Removed) == 0 {
+		b.WriteString("- (none)\n")
+	}
+	for _, id := range diff.Removed {
+		b.WriteString("- " + id + "\n")
+	}
+	return b.String()
+}
 
 // ---- change ----
 
@@ -70,6 +148,24 @@ func (e *Engine) RequestTruthChange(ctx store.FeatureContext, summary, by string
 		rawTruth, _ := os.ReadFile(resolvePkgPath(ctx.Project.RootPath, ctx.Feature.TruthPath))
 		baseTruthSHA = sha256HexOf(rawTruth)
 	}
+	baseReqFP := map[string]string{}
+	if recs.freeze != nil {
+		for k, v := range recs.freeze.RequirementFingerprints {
+			baseReqFP[k] = v
+		}
+	}
+	if len(baseReqFP) == 0 {
+		if rawTruth, rerr := os.ReadFile(resolvePkgPath(ctx.Project.RootPath, ctx.Feature.TruthPath)); rerr == nil {
+			baseReqFP = core.RequirementFingerprints(rawTruth)
+		}
+	}
+	var baseFPBlock strings.Builder
+	if len(baseReqFP) > 0 {
+		baseFPBlock.WriteString("base_requirement_fingerprints:\n")
+		for _, id := range sortedFingerprintKeys(baseReqFP) {
+			baseFPBlock.WriteString("  " + id + ": " + baseReqFP[id] + "\n")
+		}
+	}
 	doc := fmt.Sprintf(`---
 change_id: %s
 slug: %s
@@ -78,6 +174,7 @@ created_by: %s
 created_at: %s
 base_truth_sha256: %s
 base_package_fingerprint: %s
+%s
 ---
 
 # Change Request: %s
@@ -87,7 +184,7 @@ base_package_fingerprint: %s
 ## Route
 
 Edit the package truth (and its tests/tasks/evidence as needed), then close this change with `+"`beacon truth refreeze`"+`. The change stays pending — and the truth_freeze gate stays blocked — until the refreeze lands.
-`, changeID, view.Slug, by, nowISO(), baseTruthSHA, basePackageFP, summary, summary)
+`, changeID, view.Slug, by, nowISO(), baseTruthSHA, basePackageFP, baseFPBlock.String(), summary, summary)
 	absChange := resolvePkgPath(ctx.Project.RootPath, changeRel)
 	if err := os.MkdirAll(filepath.Dir(absChange), 0o755); err != nil {
 		return TruthPackageView{}, err
@@ -118,6 +215,7 @@ Edit the package truth (and its tests/tasks/evidence as needed), then close this
 		"change_doc":          filepath.ToSlash(changeRel),
 		"package_fingerprint": openFP, "fingerprint_alg": core.FingerprintAlg,
 		"base_truth_sha256": baseTruthSHA, "base_package_fingerprint": basePackageFP,
+		"base_requirement_fingerprints": baseReqFP, "requirement_fingerprint_alg": core.RequirementFingerprintAlg,
 		"materials_marked_stale": staleMarked,
 	}); err != nil {
 		return TruthPackageView{}, err
@@ -169,13 +267,122 @@ func (e *Engine) RefreezeTruthPackage(ctx store.FeatureContext, by string) (Trut
 	if !ok {
 		return pre, freezeBlockedError("truth.Refreeze", pre)
 	}
+	// K7 (AC-004): compute the base -> after AC difference BEFORE the
+	// status flip. A missing base fingerprint or a change document
+	// that cannot be written fails the refreeze closed: the package
+	// stays change_pending and no truth_refrozen event is written.
+	diff, err := e.changeACDiff(ctx)
+	if err != nil {
+		return view, err
+	}
+	if err := e.writeChangeACDiff(ctx, diff); err != nil {
+		return view, err
+	}
 	changeIDs := append([]string{}, view.PendingChangeIDs...)
 	// applyFreeze's truth_refrozen event clears the pending list in
 	// the trail scan, so the returned view already reads frozen with
 	// no pending change; changeIDs rides along in the event payload.
 	return e.applyFreeze(ctx, EventTruthRefrozen, map[string]any{
-		"by": by, "change_ids": changeIDs,
+		"by": by, "change_ids": changeIDs, "change_ac_diff": diff,
 	})
+}
+
+// changeACDiff compares the base requirement fingerprints recorded at
+// change-open with the truth about to be frozen. It fails closed when
+// neither the change record nor the latest freeze record carries a
+// base: without a base there is no answer to "which ACs did this
+// change cover", and a silent empty diff would be a fake answer.
+func (e *Engine) changeACDiff(ctx store.FeatureContext) (ACDiff, error) {
+	empty := ACDiff{Added: []string{}, Changed: []ACDiffChange{}, Removed: []string{}}
+	recs, err := e.trailRecords(ctx.Feature.ID)
+	if err != nil {
+		return empty, err
+	}
+	base := map[string]string{}
+	if len(recs.pendingChanges) > 0 {
+		for k, v := range recs.pendingChanges[0].BaseRequirementFingerprints {
+			base[k] = v
+		}
+	}
+	if len(base) == 0 && recs.freeze != nil {
+		for k, v := range recs.freeze.RequirementFingerprints {
+			base[k] = v
+		}
+	}
+	if len(base) == 0 {
+		return empty, core.NewError(ReasonTruthACDiffBaseMissing, "truth.Refreeze",
+			"the pending change carries no base requirement fingerprints and the latest freeze record has none; AC diff cannot be computed (fail-closed)")
+	}
+	raw, err := os.ReadFile(resolvePkgPath(ctx.Project.RootPath, ctx.Feature.TruthPath))
+	if err != nil {
+		return empty, err
+	}
+	after := core.RequirementFingerprints(raw)
+	union := map[string]bool{}
+	for id := range base {
+		union[id] = true
+	}
+	for id := range after {
+		union[id] = true
+	}
+	ids := make([]string, 0, len(union))
+	for id := range union {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+	for _, id := range ids {
+		b, inBase := base[id]
+		a, inAfter := after[id]
+		switch {
+		case !inBase && inAfter:
+			empty.Added = append(empty.Added, id)
+		case inBase && !inAfter:
+			empty.Removed = append(empty.Removed, id)
+		case inBase && inAfter && b != a:
+			empty.Changed = append(empty.Changed, ACDiffChange{
+				AC: id, Before: fingerprintPrefix(b), After: fingerprintPrefix(a),
+			})
+		}
+	}
+	return empty, nil
+}
+
+// writeChangeACDiff appends the AC Diff section to every change
+// document this refreeze closes. The section is replaced when present,
+// so retrying after a later failure cannot stack duplicate sections.
+func (e *Engine) writeChangeACDiff(ctx store.FeatureContext, diff ACDiff) error {
+	recs, err := e.trailRecords(ctx.Feature.ID)
+	if err != nil {
+		return err
+	}
+	pkgDir := filepath.Dir(ctx.Feature.TruthPath)
+	paths := make([]string, 0, len(recs.pendingChanges))
+	for _, ch := range recs.pendingChanges {
+		if ch.ChangeID == "" {
+			continue
+		}
+		paths = append(paths, filepath.Join(pkgDir, "changes", ch.ChangeID+".md"))
+	}
+	for _, rel := range paths {
+		abs := resolvePkgPath(ctx.Project.RootPath, rel)
+		text, rerr := os.ReadFile(abs)
+		if rerr != nil {
+			return core.NewError(ReasonTruthACDiffWriteFailed, "truth.Refreeze",
+				"change document "+filepath.ToSlash(rel)+" cannot be read for the AC Diff: "+rerr.Error())
+		}
+		body := string(text)
+		if idx := strings.Index(body, "\n"+acDiffSectionHeading); idx >= 0 {
+			body = body[:idx]
+		}
+		if !strings.HasSuffix(body, "\n") {
+			body += "\n"
+		}
+		if werr := os.WriteFile(abs, []byte(body+renderACDiff(diff)), 0o644); werr != nil {
+			return core.NewError(ReasonTruthACDiffWriteFailed, "truth.Refreeze",
+				"change document "+filepath.ToSlash(rel)+" cannot be written: "+werr.Error())
+		}
+	}
+	return nil
 }
 
 // checkChangeBase is the R1 parallel-change guard: every pending

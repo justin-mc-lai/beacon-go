@@ -119,7 +119,11 @@ func newGoalConformanceCmd() *cobra.Command {
 				fmt.Fprintf(out, "run:         %s\nfeature:     %s\nconformance: %s\n", v.RunID, v.FeatureSlug, verdict)
 				for _, it := range v.Items {
 					mark := "ok"
-					if it.Status != "pass" {
+					switch it.Status {
+					case "pass":
+					case "not_required":
+						mark = "n/a"
+					default:
 						mark = "FAIL"
 					}
 					fmt.Fprintf(out, "  [%-4s] %-18s %s\n", mark, it.Check, it.Detail)

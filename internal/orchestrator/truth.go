@@ -67,28 +67,31 @@ const (
 // feature package: where it lives, what state it is in, and — for
 // blocked freeze attempts — exactly what stopped it.
 type TruthPackageView struct {
-	Slug             string         `json:"slug"`
-	FeatureID        string         `json:"feature_id"`
-	ProjectRoot      string         `json:"project_root"`
-	Version          string         `json:"version"`
-	Status           string         `json:"status"` // draft | frozen | change_pending
-	Frozen           bool           `json:"frozen"`
-	ChangePending    bool           `json:"change_pending"`
-	PendingChangeIDs []string       `json:"pending_change_ids,omitempty"`
-	PackageDir       string         `json:"package_dir"`
-	TruthPath        string         `json:"truth_path"`
-	TestsPath        string         `json:"tests_path"`
-	TasksPath        string         `json:"tasks_path"`
-	EvidencePath     string         `json:"evidence_path"`
-	LifecycleStage   string         `json:"lifecycle_stage,omitempty"`
-	LifecycleStatus  string         `json:"lifecycle_status,omitempty"`
-	AlreadyFrozen    bool           `json:"already_frozen,omitempty"`
-	ChangeID         string         `json:"change_id,omitempty"`
-	ChangeDoc        string         `json:"change_doc,omitempty"`
-	TruthSHA256      string         `json:"truth_sha256,omitempty"`
-	Blocked          bool           `json:"blocked,omitempty"`
-	BlockReasons     []string       `json:"block_reasons,omitempty"`
-	Findings         []gate.Finding `json:"integrity_findings,omitempty"`
+	Slug             string   `json:"slug"`
+	FeatureID        string   `json:"feature_id"`
+	ProjectRoot      string   `json:"project_root"`
+	Version          string   `json:"version"`
+	Status           string   `json:"status"` // draft | frozen | change_pending
+	Frozen           bool     `json:"frozen"`
+	ChangePending    bool     `json:"change_pending"`
+	PendingChangeIDs []string `json:"pending_change_ids,omitempty"`
+	PackageDir       string   `json:"package_dir"`
+	TruthPath        string   `json:"truth_path"`
+	TestsPath        string   `json:"tests_path"`
+	TasksPath        string   `json:"tasks_path"`
+	EvidencePath     string   `json:"evidence_path"`
+	LifecycleStage   string   `json:"lifecycle_stage,omitempty"`
+	LifecycleStatus  string   `json:"lifecycle_status,omitempty"`
+	AlreadyFrozen    bool     `json:"already_frozen,omitempty"`
+	ChangeID         string   `json:"change_id,omitempty"`
+	ChangeDoc        string   `json:"change_doc,omitempty"`
+	// K7 (AC-004): the most recent refreeze's AC difference, so
+	// `truth show --json` can answer which ACs a change covered.
+	ChangeACDiff *ACDiff        `json:"change_ac_diff,omitempty"`
+	TruthSHA256  string         `json:"truth_sha256,omitempty"`
+	Blocked      bool           `json:"blocked,omitempty"`
+	BlockReasons []string       `json:"block_reasons,omitempty"`
+	Findings     []gate.Finding `json:"integrity_findings,omitempty"`
 	// S1 (AC-136/139): the branch fact of the package's project
 	// and, for frozen packages, the committed-baseline state.
 	BranchCheck      string `json:"branch_check,omitempty"`
@@ -190,6 +193,9 @@ func (e *Engine) TruthPackage(ctx store.FeatureContext) (TruthPackageView, error
 		v.Status = feat.Status
 	}
 	v.Frozen = fmStatus == "frozen" && !v.ChangePending
+	if recs, rerr := e.trailRecords(feat.ID); rerr == nil {
+		v.ChangeACDiff = recs.changeACDiff
+	}
 	// S1 facts: the branch discipline state of the project
 	// (always reported — a non-git project says so instead of
 	// silently skipping) and, for a frozen package, whether the

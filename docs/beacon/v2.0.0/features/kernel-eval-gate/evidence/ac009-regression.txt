@@ -1,0 +1,7 @@
+# TC-013 Evidence: ac009-regression.txt
+
+- Command: go test ./internal/cli ./internal/orchestrator -run 'TestProgramPlanRequiresProposal|TestProgramPlanFreezeChange|TestProgramSelectRecordsDecision|TestDeliveryParadigmEndToEnd' -count=1
+- Assertion: AC-009 proposal gates and delivery-paradigm end-to-end pass unchanged
+- Status: planned
+- Producer: implementation round writes the real observed output over this file
+- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-013

@@ -188,15 +188,17 @@ type baselineRecord struct {
 }
 
 type changeOpenRecord struct {
-	ChangeID          string
-	FingerprintAtOpen string // package_fingerprint when the change was opened ("" = pre-S1 change)
-	BaseTruthSHA256   string // frozen body hash the change was authored against (R1)
+	ChangeID                    string
+	FingerprintAtOpen           string            // package_fingerprint when the change was opened ("" = pre-S1 change)
+	BaseTruthSHA256             string            // frozen body hash the change was authored against (R1)
+	BaseRequirementFingerprints map[string]string // per-AC fingerprints the change was authored against (K7)
 }
 
 type trailRecords struct {
 	baseline       *baselineRecord // nil = no live baseline record
 	freeze         *freezeRecord   // latest freeze/refreeze record
 	pendingChanges []changeOpenRecord
+	changeACDiff   *ACDiff // latest refreeze's AC difference (K7)
 }
 
 // trailRecords scans the feature trail once and derives: the
@@ -243,10 +245,21 @@ func (e *Engine) trailRecords(featureID string) (trailRecords, error) {
 		case EventTruthChangeRequested, "change_requested", "gen_change":
 			recs.pendingChanges = append(recs.pendingChanges, changeOpenRecord{
 				ChangeID: str("change_id"), FingerprintAtOpen: str("package_fingerprint"),
-				BaseTruthSHA256: str("base_truth_sha256"),
+				BaseTruthSHA256:             str("base_truth_sha256"),
+				BaseRequirementFingerprints: stringMap(p["base_requirement_fingerprints"]),
 			})
 		case EventTruthFrozen, EventTruthRefrozen, "refreeze", "gen_refreeze":
 			recs.pendingChanges = nil
+			if ev.EventType == EventTruthFrozen {
+				recs.changeACDiff = nil
+			} else if raw, ok := p["change_ac_diff"]; ok && raw != nil {
+				if b, merr := json.Marshal(raw); merr == nil {
+					var d ACDiff
+					if json.Unmarshal(b, &d) == nil {
+						recs.changeACDiff = &d
+					}
+				}
+			}
 			recs.freeze = &freezeRecord{
 				Fingerprint:             str("package_fingerprint"),
 				SurfaceFingerprint:      str("surface_fingerprint"),

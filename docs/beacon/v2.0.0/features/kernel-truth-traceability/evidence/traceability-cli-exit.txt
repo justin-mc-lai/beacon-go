@@ -1,0 +1,15 @@
+command: go test ./internal/cli -run TestGoalConformanceTraceabilityExitCode -count=1
+result: PASS (the fixture run exits non-zero and names the missing AC)
+
+text output:
+run:         run_5a765f75b7d4750622a24d21
+feature:     feat-gate
+conformance: fail
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [ok  ] gates_evaluated    every stage gate carries a recorded pass
+  [ok  ] verifier_attached  verifier independent-verifier with /var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/TestGoalConformanceTraceabilityExitCode1929348739/004/verifier.md
+  [ok  ] state_exported     snapshot /private/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/TestGoalConformanceTraceabilityExitCode1929348739/002/gate-proj/.beacon/state/project-state.json
+  [FAIL] ac_tc_evidence_coverage traceability_missing_tc: AC without executable TC: AC-002
+
+json failed array:
+ac_tc_evidence_coverage:reason=traceability_missing_tc:missing=AC-002

@@ -1,0 +1,7 @@
+# TC-010 Evidence: evalgate-mismatch-fails.json
+
+- Command: go test ./internal/evalgate -run TestEvalMismatchFailsLoudly -count=1
+- Assertion: injected mismatched expectation makes the suite fail and name case=<ID> with expected/actual
+- Status: planned
+- Producer: implementation round writes the real observed output over this file
+- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-010
