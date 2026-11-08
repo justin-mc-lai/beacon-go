@@ -8,22 +8,22 @@
 | tests | test_truth | tests.md | frozen | qa |
 | tasks | support_advisory | tasks.md | present | truth |
 | freeze | acceptance_truth | freeze-log.md | recorded | truth |
-| eval suite | support_advisory | evalgate-suite.txt | planned | qa |
-| eval registry | support_advisory | evalgate-registry.json | planned | qa |
-| conformance pass | support_advisory | evalgate-conformance-positive.json | planned | qa |
-| conformance missing TC | support_advisory | evalgate-conformance-missing-tc.json | planned | qa |
-| conformance evidence | support_advisory | evalgate-conformance-evidence.json | planned | qa |
-| conformance fail closed | support_advisory | evalgate-conformance-failclosed.json | planned | qa |
-| conformance compat | support_advisory | evalgate-conformance-not-required.json | planned | qa |
-| stage gate | support_advisory | evalgate-stage-gate.json | planned | qa |
-| rejection paths | support_advisory | evalgate-rejection-paths.json | planned | qa |
-| no degradation | support_advisory | evalgate-mismatch-fails.json | planned | qa |
-| determinism offline | support_advisory | evalgate-deterministic-offline.txt | planned | qa |
-| full suite | acceptance_truth | go-test-all.txt | planned | qa |
-| AC-009 regression | acceptance_truth | ac009-regression.txt | planned | qa |
-| QA verdict spec | acceptance_truth | qa-spec.md | planned | qa |
-| QA verdict runtime | acceptance_truth | qa-runtime.md | planned | qa |
-| QA verdict regression | acceptance_truth | qa-regression.md | planned | qa |
+| eval suite | support_advisory | evalgate-suite.txt | recorded | qa |
+| eval registry | support_advisory | evalgate-registry.json | recorded | qa |
+| conformance pass | support_advisory | evalgate-conformance-positive.json | recorded | qa |
+| conformance missing TC | support_advisory | evalgate-conformance-missing-tc.json | recorded | qa |
+| conformance evidence | support_advisory | evalgate-conformance-evidence.json | recorded | qa |
+| conformance fail closed | support_advisory | evalgate-conformance-failclosed.json | recorded | qa |
+| conformance compat | support_advisory | evalgate-conformance-not-required.json | recorded | qa |
+| stage gate | support_advisory | evalgate-stage-gate.json | recorded | qa |
+| rejection paths | support_advisory | evalgate-rejection-paths.json | recorded | qa |
+| no degradation | support_advisory | evalgate-mismatch-fails.json | recorded | qa |
+| determinism offline | support_advisory | evalgate-deterministic-offline.txt | recorded | qa |
+| full suite | acceptance_truth | go-test-all.txt | recorded | qa |
+| AC-009 regression | acceptance_truth | ac009-regression.txt | recorded | qa |
+| QA verdict spec | acceptance_truth | qa/spec-ac.md | recorded | qa |
+| QA verdict runtime | acceptance_truth | qa/runtime.md | recorded | qa |
+| QA verdict regression | acceptance_truth | qa/regression.md | recorded | qa |
 
 ## Coverage Plan
 

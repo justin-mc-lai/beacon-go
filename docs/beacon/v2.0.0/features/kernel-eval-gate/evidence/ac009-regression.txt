@@ -1,7 +1,12 @@
-# TC-013 Evidence: ac009-regression.txt
-
-- Command: go test ./internal/cli ./internal/orchestrator -run 'TestProgramPlanRequiresProposal|TestProgramPlanFreezeChange|TestProgramSelectRecordsDecision|TestDeliveryParadigmEndToEnd' -count=1
-- Assertion: AC-009 proposal gates and delivery-paradigm end-to-end pass unchanged
-- Status: planned
-- Producer: implementation round writes the real observed output over this file
-- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-013
+=== RUN   TestProgramPlanRequiresProposal
+--- PASS: TestProgramPlanRequiresProposal (0.03s)
+PASS
+ok  	beacon-go/internal/cli	0.657s
+=== RUN   TestDeliveryParadigmEndToEnd
+--- PASS: TestDeliveryParadigmEndToEnd (0.58s)
+=== RUN   TestProgramSelectRecordsDecision
+--- PASS: TestProgramSelectRecordsDecision (0.09s)
+=== RUN   TestProgramPlanFreezeChange
+--- PASS: TestProgramPlanFreezeChange (0.03s)
+PASS
+ok  	beacon-go/internal/orchestrator	1.022s

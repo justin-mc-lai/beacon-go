@@ -1,7 +1,11 @@
-# TC-007 Evidence: evalgate-conformance-not-required.json
-
-- Command: go test ./internal/evalgate -run TestEvalConformanceNotRequiredCompat -count=1
-- Assertion: undeclared historical package reports not_required with the four legacy items unchanged
-- Status: planned
-- Producer: implementation round writes the real observed output over this file
-- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-007
+{
+  "command": "go test ./internal/evalgate -run TestEvalConformanceNotRequiredCompat -count=1",
+  "head": "suite",
+  "note": "test_result is the TC subtest; observed is what the kernel call actually returned",
+  "observed": {
+    "exit_code": 0,
+    "status": "not_required",
+    "detail": "package does not declare traceability_required: true; the four base judgements decide conformance"
+  },
+  "test_result": "pass"
+}
