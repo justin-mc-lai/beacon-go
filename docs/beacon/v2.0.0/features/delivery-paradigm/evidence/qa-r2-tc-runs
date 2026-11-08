@@ -1,0 +1,28 @@
+# qa-r2 TC-001..TC-015 (independent run)
+date: 2026-11-08T15:39:43Z
+
+--- PASS: TestDeliveryParadigmEndToEnd (0.52s)
+--- PASS: TestConformanceRejectsUnevaluatedExternalResult (0.07s)
+--- PASS: TestManualImplementEntryEvaluatesAdmissionBundle (2.18s)
+--- PASS: TestManualImplementEntryBlocksOnAdmission (2.10s)
+--- PASS: TestGateFactsAreRunScoped (0.91s)
+--- PASS: TestConformanceStateExportedAcceptsRecordOnly (0.96s)
+--- PASS: TestStageExitRecordCarriesAttribution (0.06s)
+--- PASS: TestManualExecutorRunAdvancesViaTick (0.04s)
+--- PASS: TestTickPersistsStageExitVerdict (0.08s)
+--- PASS: TestProgramRouteNextActionsTopological (0.06s)
+--- PASS: TestProgramRouteShowsLakeCompletedAfterExternalResult (0.04s)
+--- PASS: TestProgramSelectRecordsDecision (0.08s)
+--- PASS: TestProgramPlanFreezeChange (0.02s)
+ok  	beacon-go/internal/orchestrator	7.480s
+--- PASS: TestGoalRunManualExecutorPrintsTickHint (0.03s)
+--- PASS: TestGoalRunRejectsUnknownExecutor (0.01s)
+--- PASS: TestGateStatusShowsPlanAndImplementEvaluated (0.37s)
+--- PASS: TestGoalReceiveResultExternalWithoutDelegation (0.03s)
+--- PASS: TestGoalConformanceAllPassAndFailure (0.53s)
+--- PASS: TestGateIntegrityStrictBlocksUxMismatch (0.01s)
+--- PASS: TestGoalRunWithoutExecutorDefaultsToManual (0.03s)
+--- PASS: TestProgramPlanRequiresProposal (0.02s)
+ok  	beacon-go/internal/cli	1.383s
+--- PASS: TestIntegrityFlagsUxMismatch (0.00s)
+ok  	beacon-go/internal/gate	0.931s

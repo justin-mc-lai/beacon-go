@@ -1,0 +1,13 @@
+# qa-r2 AC-009: proposal gate not regressed
+date: 2026-11-08T15:39:33Z
+
+$ git diff --name-only main..HEAD | grep -E "goal_proposal_gate_test|p2d_program_test|lake_proposal_test"
+(empty above = no change)
+
+## live: direct program plan on a run with no proposal (run run_3a7c9a9f97e1ac5e10cc7739)
+Error: goal program: a new program must start from a human-selected lake proposal: run `beacon goal program propose` then `beacon goal program select`, or pass --from-proposal (lake_proposal_required)
+
+## named tests
+--- PASS: TestProgramPlanRequiresProposal (0.03s)
+--- PASS: TestProgramSelectRecordsDecision (0.09s)
+--- PASS: TestProgramPlanFreezeChange (0.03s)

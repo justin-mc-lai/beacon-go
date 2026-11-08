@@ -1,0 +1,23 @@
+# qa-r2 B2: manual/external runs pass the AC-142 implement entry admission bundle
+date: 2026-11-08T15:38:58Z
+
+Project /tmp/qa-r2-demo, feature qa-r2-feat. Manual run run_107a0de4076c7ef602238719 ticked plan->truth->implement->qa with --by qa-probe.
+
+## events
+admission_bundle_evaluated|1
+goal_blocked|1
+goal_run_created|1
+stage_advanced|3
+stage_exit_blocked|1
+stage_exit_evaluated|3
+
+## admission_bundle_evaluated payload
+{"baseline_commit":"","evaluator":"beacon-goal-admission","gate_result_id":"gate_ab60c534cf0b4287886ee1e3","gate_type":"admission_bundle","items":[{"applicable":true,"check":"truth_map_verify","ok":true,"reason_code":"","source":"derived"},{"applicable":true,"check":"verify_materials_strict","ok":true,"reason_code":"","source":"live"},{"applicable":false,"check":"git_diff_check","ok":true,"reason_code":"","source":"live"},{"applicable":false,"check":"branch_governance_verify","ok":true,"reason_code":"","source":"recorded"},{"applicable":true,"check":"workspace_admission","ok":true,"reason_code":"","source":"recorded"}],"reason_codes":null,"schema":"admission-bundle.v1","status":"pass","verdict":"pass","worktree_dir":""}
+
+## gate_results referenced by this run's events
+gate_60b9d7fe7bef6b75ce2d86e6|plan|pass|2026-11-08T15:35:31.136239000Z
+gate_27d4100509216af6affe955b|truth_freeze|pass|2026-11-08T15:35:31.202642000Z
+gate_ab60c534cf0b4287886ee1e3|admission_bundle|pass|2026-11-08T15:35:31.481067000Z
+gate_b5d8407af8883bb83c18cc23|implement|pass|2026-11-08T15:35:31.520306000Z
+
+## code: internal/orchestrator/tick.go:142 admissionBundleForEntry runs BEFORE the manual branch (:155)
