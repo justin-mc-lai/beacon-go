@@ -15,6 +15,7 @@
 package orchestrator
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -87,23 +88,108 @@ type StageGateView struct {
 	Evaluated   bool   `json:"evaluated"`
 	Verdict     string `json:"verdict,omitempty"`
 	EvaluatedAt string `json:"evaluated_at,omitempty"`
+	// Source names where the judgement came from. Only this run's own
+	// stage_exit_evaluated record is a run-scoped fact; another run's
+	// verdict on the same feature must never appear as this run's gate.
+	Source string `json:"source,omitempty"`
 }
 
-// stageGateView reads the latest recorded verdict of one stage's gate.
-func (e *Engine) stageGateView(featureID, stage string) *StageGateView {
+// stageGateView reads the verdict THIS RUN recorded for the stage. A
+// run that has not left a stage has no exit record, so the view says
+// evaluated=false even when another run of the same feature already
+// passed the same gate axis (review B3: no cross-run green).
+func (e *Engine) stageGateView(runID, stage string) *StageGateView {
 	gt := stageGateType(stage)
 	if gt == "" {
 		return nil
 	}
 	v := &StageGateView{Stage: stage, GateType: gt}
-	g, err := e.store.Gates().Latest(featureID, gt)
+	byGate, byStage, err := e.runGateFacts(runID)
 	if err != nil {
 		return v
 	}
-	v.Evaluated = true
-	v.Verdict = g.Verdict
-	v.EvaluatedAt = g.EvaluatedAt
+	if rec, ok := byStage[stage]; ok {
+		v.Evaluated = true
+		v.Verdict = rec.Verdict
+		v.EvaluatedAt = rec.EvaluatedAt
+		v.Source = rec.Source
+		return v
+	}
+	// A formal gate evaluation bound to this run is also run-scoped
+	// evidence (e.g. `gate evaluate design --run <id>`), never another
+	// run's row.
+	if rec, ok := byGate[gt]; ok {
+		v.Evaluated = true
+		v.Verdict = rec.Verdict
+		v.EvaluatedAt = rec.EvaluatedAt
+		v.Source = rec.Source
+	}
 	return v
+}
+
+// runGateRecord is one gate fact attributed to a run by its own trail.
+type runGateRecord struct {
+	GateType     string
+	Stage        string
+	Verdict      string
+	ReasonCodes  []string
+	Evaluator    string
+	EvaluatedAt  string
+	GateResultID string
+	Source       string // stage_exit | formal_gate | admission_bundle
+}
+
+// runGateFacts reads the gates THIS RUN evaluated, from its own events:
+// stage exits (recorded in the same transaction as the advance), formal
+// gate evaluations bound to the run, and admission bundles. It never
+// consults the feature-level latest row — that row is shared by every
+// run of the feature and is the source of the cross-run false green
+// review B3 reproduced.
+func (e *Engine) runGateFacts(runID string) (map[string]runGateRecord, map[string]runGateRecord, error) {
+	byGate := map[string]runGateRecord{}
+	byStage := map[string]runGateRecord{}
+	events, err := e.store.ListEventsByRun(runID)
+	if err != nil {
+		return byGate, byStage, err
+	}
+	type gatePayload struct {
+		Stage       string   `json:"stage"`
+		GateType    string   `json:"gate_type"`
+		Verdict     string   `json:"verdict"`
+		ReasonCodes []string `json:"reason_codes"`
+		Evaluator   string   `json:"evaluator"`
+		GateResult  string   `json:"gate_result_id"`
+	}
+	for _, ev := range events {
+		source := ""
+		switch ev.EventType {
+		case "stage_exit_evaluated":
+			source = "stage_exit"
+		case EventGateEvaluated:
+			source = "formal_gate"
+		case EventAdmissionBundleEvaluated:
+			source = "admission_bundle"
+		default:
+			continue
+		}
+		if len(ev.Payload) == 0 {
+			continue
+		}
+		var p gatePayload
+		if err := json.Unmarshal(ev.Payload, &p); err != nil || p.GateType == "" {
+			continue
+		}
+		rec := runGateRecord{
+			GateType: p.GateType, Stage: p.Stage, Verdict: p.Verdict,
+			ReasonCodes: p.ReasonCodes, Evaluator: p.Evaluator,
+			EvaluatedAt: ev.CreatedAt, GateResultID: p.GateResult, Source: source,
+		}
+		byGate[p.GateType] = rec
+		if p.Stage != "" {
+			byStage[p.Stage] = rec
+		}
+	}
+	return byGate, byStage, nil
 }
 
 // recordStageExit persists the exit judgement of the stage the run is
@@ -135,7 +221,8 @@ func (e *Engine) recordStageExit(w writeSet, run store.Run, m *runMeta, stage st
 	payload := map[string]any{
 		"stage": stage, "gate_type": gt, "verdict": "pass",
 		"gate_result_id": rec.ID, "evaluator": judgeBy,
-		"derived": verdict.Derived, "formal_verdict": verdict.FormalVerdict,
+		"evaluated_at": rec.EvaluatedAt,
+		"derived":      verdict.Derived, "formal_verdict": verdict.FormalVerdict,
 		"frozen_source": verdict.FrozenSource,
 	}
 	if m.isManualExecutor() {
@@ -205,10 +292,12 @@ func (e *Engine) ReceiveExternalResult(runID string, in ExternalResultInput) (Ru
 	// path that does not go through Engine.Complete, and it says so.
 	m.LoopStage = string(core.LoopDone)
 	m.StageHistory = append(m.StageHistory, string(core.LoopDone))
-	for i := range m.StagePlan {
-		m.StagePlan[i].Status = "done"
-	}
-	m.CurrentStageIdx = len(m.StagePlan)
+	// Review B1: the external room reports that the LAKE finished; it
+	// does not testify that this run evaluated every stage gate. The
+	// stage plan therefore keeps whatever status the run actually
+	// reached — marking all stages "done" here made an unevaluated run
+	// look conformant. The completion itself is the loop state + the
+	// external_result_received / goal_completed(source=external) trail.
 	m.ExternalResult = &ExternalResult{By: in.By, Summary: in.Summary, ArtifactIDs: ids, At: at}
 	m.Blocked = false
 	m.BlockedStreak = 0
@@ -279,35 +368,65 @@ func (e *Engine) Conformance(runID string) (ConformanceView, error) {
 	ff, ferr := e.frozenFactByID(run.FeatureID)
 	if ferr != nil {
 		add("truth_frozen", false, ferr.Error())
+	} else if ff.Frozen {
+		add("truth_frozen", true, "frozen source: "+ff.Source)
 	} else {
-		add("truth_frozen", ff.Frozen, "frozen source: "+ff.Source)
+		// P2: an unfrozen package must not print a "frozen source".
+		add("truth_frozen", false, "truth package is not frozen (status source: "+ff.Source+")")
 	}
 
-	// gates_evaluated: every stage in the run's plan must have a
-	// recorded pass verdict on its gate axis. A missing row is an
-	// unevaluated gate; a blocked/fail row is an evaluated gate that
-	// still forbids calling the delivery done.
+	// gates_evaluated: every stage in the run's plan must carry THIS
+	// RUN's own evaluation. The evidence is the run's stage_exit_evaluated
+	// trail (resolved to its gate_results row), never StagePlan[i].Status
+	// (self-reported) and never the feature-level latest row (shared by
+	// sibling runs). Release is the human-gated stage: its evidence is a
+	// formal release gate evaluation bound to this run.
+	byGate, byStage, evErr := e.runGateFacts(runID)
 	var gateProblems []string
-	for _, entry := range m.StagePlan {
-		gt := stageGateType(entry.Stage)
-		if gt == "" {
-			gateProblems = append(gateProblems, entry.Stage+": no gate axis")
-			continue
-		}
-		// The run itself must have LEFT the stage: a feature-scoped
-		// verdict recorded by another run of the same feature is not
-		// this run's delivery.
-		if entry.Status != "done" {
-			gateProblems = append(gateProblems, entry.Stage+": stage not completed ("+entry.Status+")")
-			continue
-		}
-		g, gerr := e.store.Gates().Latest(run.FeatureID, gt)
-		if gerr != nil {
-			gateProblems = append(gateProblems, entry.Stage+": gate "+gt+" not evaluated")
-			continue
-		}
-		if g.Verdict != "pass" {
-			gateProblems = append(gateProblems, entry.Stage+": gate "+gt+" verdict "+g.Verdict)
+	if evErr != nil {
+		gateProblems = append(gateProblems, "run trail unreadable: "+evErr.Error())
+	} else {
+		for _, entry := range m.StagePlan {
+			gt := stageGateType(entry.Stage)
+			if gt == "" {
+				gateProblems = append(gateProblems, entry.Stage+": no gate axis")
+				continue
+			}
+			var rec runGateRecord
+			var ok bool
+			if entry.Stage == StageRelease {
+				rec, ok = byGate[gt]
+				if !ok || rec.Source != "formal_gate" {
+					gateProblems = append(gateProblems, entry.Stage+": no release gate verdict bound to this run")
+					continue
+				}
+			} else {
+				rec, ok = byStage[entry.Stage]
+				if !ok {
+					gateProblems = append(gateProblems, entry.Stage+": stage exit not evaluated by this run")
+					continue
+				}
+				if rec.GateType != gt {
+					gateProblems = append(gateProblems, entry.Stage+": exit recorded gate "+rec.GateType+", want "+gt)
+					continue
+				}
+			}
+			if rec.Verdict != "pass" {
+				gateProblems = append(gateProblems, entry.Stage+": verdict "+rec.Verdict)
+				continue
+			}
+			if rec.GateResultID == "" {
+				gateProblems = append(gateProblems, entry.Stage+": exit record carries no gate result")
+				continue
+			}
+			g, gerr := e.store.Gates().GetByID(rec.GateResultID)
+			if gerr != nil {
+				gateProblems = append(gateProblems, entry.Stage+": recorded gate result missing")
+				continue
+			}
+			if g.Verdict != rec.Verdict {
+				gateProblems = append(gateProblems, entry.Stage+": trail verdict differs from the stored gate result")
+			}
 		}
 	}
 	if len(gateProblems) == 0 {
@@ -331,7 +450,9 @@ func (e *Engine) Conformance(runID string) (ConformanceView, error) {
 }
 
 // stateExported reports whether the run's project carries the
-// portable state snapshot produced by `projects export-state`.
+// portable state snapshot produced by `projects export-state`, OR the
+// feature trail carries a state_snapshot_exported record (truth Q5:
+// either evidence counts; only when both are missing does it fail).
 func (e *Engine) stateExported(featureID string) (bool, string) {
 	feat, err := e.store.Features().GetByID(featureID)
 	if err != nil {
@@ -348,6 +469,20 @@ func (e *Engine) stateExported(featureID string) (bool, string) {
 	abs := filepath.Join(proj.RootPath, StateSnapshotRelPath)
 	if info, serr := os.Stat(abs); serr == nil && info.Mode().IsRegular() {
 		return true, "snapshot " + abs
+	}
+	if events, eerr := e.store.ListEvents(featureID); eerr == nil {
+		for i := len(events) - 1; i >= 0; i-- {
+			if events[i].EventType != EventStateExported {
+				continue
+			}
+			var p struct {
+				ExportedAt string `json:"exported_at"`
+			}
+			if len(events[i].Payload) > 0 {
+				_ = json.Unmarshal(events[i].Payload, &p)
+			}
+			return true, "export record " + p.ExportedAt + " (snapshot file absent at " + abs + ")"
+		}
 	}
 	return false, "no state snapshot at " + abs + " (run `beacon-go projects export-state --project <root>`)"
 }

@@ -1,0 +1,29 @@
+$ goal run --executor manual -> run_75592c366cf9ce1bda17f664
+$ goal tick --by room-host #1
+run:    run_75592c366cf9ce1bda17f664
+status: running (loop_stage truth_routing)
+stage:  truth
+blocked: false
+$ goal tick --by room-host #2
+run:    run_75592c366cf9ce1bda17f664
+status: running (loop_stage implement_routing)
+stage:  implement
+blocked: false
+$ goal tick --by room-host #3
+run:    run_75592c366cf9ce1bda17f664
+status: running (loop_stage qa_routing)
+stage:  qa
+blocked: false
+
+$ goal trace (admission evidence on the manual run)
+      "event_type": "stage_exit_evaluated",
+      "event_type": "stage_advanced",
+      "event_type": "stage_exit_evaluated",
+      "event_type": "stage_advanced",
+      "event_type": "admission_bundle_evaluated",
+        "gate_type": "admission_bundle",
+      "event_type": "stage_exit_evaluated",
+      "event_type": "stage_advanced",
+
+$ gate status --feature demo4 (admission_bundle row)
+implement        pass       [stage_exit_ok] (2026-11-08T15:24:43.527837000Z)

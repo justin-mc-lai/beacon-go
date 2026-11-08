@@ -59,6 +59,16 @@ func (f *execFlags) config() *orchestrator.ExecutorConfig {
 	return cfg
 }
 
+// empty reports whether no executable configuration was supplied. An
+// all-default config is not a recorded command; goal run uses this to
+// tell "no executor at all" apart from "an executor was configured".
+func (f *execFlags) empty() bool {
+	return strings.TrimSpace(f.execCmd) == "" && len(f.execArgs) == 0 &&
+		strings.TrimSpace(f.ralphCmd) == "" && len(f.ralphArgs) == 0 &&
+		f.profile == "" && strings.TrimSpace(f.reviewerCmd) == "" &&
+		f.ralphMax == 0 && f.timeoutSec == 0
+}
+
 func addExecFlags(c *cobra.Command, f *execFlags, withReviewer bool) {
 	c.Flags().StringVar(&f.execCmd, "exec-cmd", "", "real executor command: ONE program path (argv execution, never a shell string)")
 	c.Flags().StringArrayVar(&f.execArgs, "exec-arg", nil, "argument for --exec-cmd (repeatable; each value is one argv element)")

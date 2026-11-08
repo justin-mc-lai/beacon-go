@@ -1,0 +1,36 @@
+$ goal conformance (before export, expect FAIL state_exported)
+run:         run_b0b3f8497f7e4849d9041f39
+feature:     demo4
+conformance: fail
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [ok  ] gates_evaluated    every stage gate carries a recorded pass
+  [ok  ] verifier_attached  verifier independent-verifier with /tmp/dp-demo4/verifier.md
+  [FAIL] state_exported     no state snapshot at /private/tmp/dp-demo4/.beacon/state/project-state.json (run `beacon-go projects export-state --project <root>`)
+Error: goal conformance: delivery not recognised; failed: state_exported (goal_conformance_failed)
+exit=1
+
+$ projects export-state
+state snapshot: /private/tmp/dp-demo4/.beacon/state/project-state.json (1 versions, 1 features)
+
+$ goal conformance (after export, expect pass)
+run:         run_b0b3f8497f7e4849d9041f39
+feature:     demo4
+conformance: pass
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [ok  ] gates_evaluated    every stage gate carries a recorded pass
+  [ok  ] verifier_attached  verifier independent-verifier with /tmp/dp-demo4/verifier.md
+  [ok  ] state_exported     snapshot /private/tmp/dp-demo4/.beacon/state/project-state.json
+exit=0
+
+$ python3: remove snapshot file, keep state_snapshot_exported record
+total 0
+
+$ goal conformance (record only, expect pass — truth Q5)
+run:         run_b0b3f8497f7e4849d9041f39
+feature:     demo4
+conformance: pass
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [ok  ] gates_evaluated    every stage gate carries a recorded pass
+  [ok  ] verifier_attached  verifier independent-verifier with /tmp/dp-demo4/verifier.md
+  [ok  ] state_exported     export record 2026-11-08T15:24:28Z (snapshot file absent at /private/tmp/dp-demo4/.beacon/state/project-state.json)
+exit=0

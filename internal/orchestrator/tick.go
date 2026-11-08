@@ -134,7 +134,36 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 	}
 	// Release never executes or exits on tick (human gate).
 	if stage != StageRelease {
-		if m.isManualExecutor() {
+		// AC-142 (review B2): the implement-entry admission bundle is the
+		// ONE shared judgement. It runs for EVERY executor before any
+		// stage execution — manual/external runs included. A manual run
+		// that enters implement without the bundle would skip the frozen
+		// entry gate that the delegate lanes also obey.
+		if stage == StageImplement {
+			bundle, admErr := e.admissionBundleForEntry(run, m)
+			if admErr != nil {
+				return RunView{}, admErr
+			}
+			if !bundle.AllowImplement {
+				m.LastTickKey = key
+				if err := e.applyBlockBatched(run, m, bundle.ReasonCode, "implement_admission_blocked"); err != nil {
+					return RunView{}, err
+				}
+				return viewOf(run, m, slug), nil
+			}
+		}
+		manual := m.isManualExecutor()
+		if manual && m.ExecutorDefaulted && strings.TrimSpace(by) == "" {
+			// B4: a run created without an executor selector defaults to
+			// manual (the CLI prints that contract). When a tick supplies a
+			// real executor (e.g. `goal tick --executor recording`), that
+			// registered executor drives the stage instead of the manual
+			// completion contract.
+			if _, ok := e.tickExecutor(m, stage); ok {
+				manual = false
+			}
+		}
+		if manual {
 			// K1: a manual/external run has no stage executor by
 			// design. The tick identity records the completion; with
 			// no identity there is nothing to record, so the run
@@ -148,38 +177,7 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 			}
 			by = strings.TrimSpace(by)
 		} else {
-			// Implement entry is gated by the AC-142 admission bundle
-			// (S2): the superset verdict whose fifth item IS the one
-			// shared admission checker (G-04) — the same bundle
-			// DelegateRalph packs under. The evaluation is persisted
-			// (gate_type=admission_bundle + admission_bundle_evaluated
-			// event) as the entry evidence. A blocked bundle blocks
-			// the tick before any executor runs — no lane gets a
-			// second judgement.
-			if stage == StageImplement {
-				bundle, admErr := e.admissionBundleForEntry(run, m)
-				if admErr != nil {
-					return RunView{}, admErr
-				}
-				if !bundle.AllowImplement {
-					m.LastTickKey = key
-					// applyBlock already persists m (with LastTickKey);
-					// the extra saveRun this branch used to do rewrote
-					// the identical snapshot — dropped in the batching
-					// pass, final state unchanged.
-					if err := e.applyBlockBatched(run, m, bundle.ReasonCode, "implement_admission_blocked"); err != nil {
-						return RunView{}, err
-					}
-					return viewOf(run, m, slug), nil
-				}
-			}
-			var ex StageExecutor
-			var ok bool
-			if stage == StageImplement {
-				ex, ok = e.implementExecutor(m)
-			} else {
-				ex, ok = e.executors[stage]
-			}
+			ex, ok := e.tickExecutor(m, stage)
 			if !ok {
 				// LastTickKey is set before the block so the batched
 				// save inside applyBlock persists it (previously a
@@ -315,6 +313,15 @@ func (e *Engine) handleStageFailure(run store.Run, m *runMeta, slug, stage, reas
 		return RunView{}, err
 	}
 	return viewOf(run, m, slug), nil
+}
+
+// tickExecutor resolves the executor a tick would drive the stage with.
+func (e *Engine) tickExecutor(m *runMeta, stage string) (StageExecutor, bool) {
+	if stage == StageImplement {
+		return e.implementExecutor(m)
+	}
+	ex, ok := e.executors[stage]
+	return ex, ok
 }
 
 // Continue mirrors goal_continue_run + the v1 resume unblock: a blocked

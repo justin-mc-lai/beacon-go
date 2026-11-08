@@ -227,6 +227,19 @@ func newGoalRunCmd() *cobra.Command {
 			if len(args) > 0 {
 				utterance = args[0]
 			}
+			// B4: no selector and no command is not auto-driveable. Say so
+			// at creation by defaulting to manual (and printing the tick
+			// contract) instead of creating a run that only fails on its
+			// first tick with stage_executor_not_registered.
+			executorDefaulted := false
+			execCfg := ef.config()
+			if ef.empty() {
+				execCfg = nil
+			}
+			if strings.TrimSpace(executorMode) == "" && execCfg == nil {
+				executorMode = orchestrator.ExecutorModeManual
+				executorDefaulted = true
+			}
 			eng, closeFn, err := goalEngine("")
 			if err != nil {
 				return err
@@ -235,8 +248,8 @@ func newGoalRunCmd() *cobra.Command {
 			v, err := eng.CreateRun(orchestrator.CreateRunOptions{
 				ProjectRoot: project, Version: version, FeatureSlug: feature,
 				Utterance: utterance, UXRequired: ux, ExecutorID: executorID,
-				ExecutorMode: executorMode,
-				Lakes:        lakes, Scale: scale, Exec: ef.config(), ReleasePolicy: releasePolicy,
+				ExecutorMode: executorMode, ExecutorDefaulted: executorDefaulted,
+				Lakes: lakes, Scale: scale, Exec: execCfg, ReleasePolicy: releasePolicy,
 			})
 			if err != nil {
 				return err
@@ -244,7 +257,11 @@ func newGoalRunCmd() *cobra.Command {
 			if err := printGoalView(cmd, v, asJSON); err != nil {
 				return err
 			}
-			if !asJSON && (executorMode == orchestrator.ExecutorModeManual || executorMode == orchestrator.ExecutorModeExternal) {
+			if !asJSON && executorDefaulted {
+				fmt.Fprintf(cmd.OutOrStdout(),
+					"no --executor given: defaulted to executor manual. This run does NOT auto-drive; record each stage's completion with:\n"+
+						"  beacon goal tick --run-id %s --by <identity>\n", v.RunID)
+			} else if !asJSON && (executorMode == orchestrator.ExecutorModeManual || executorMode == orchestrator.ExecutorModeExternal) {
 				// K1: the creation output states the contract up front.
 				fmt.Fprintf(cmd.OutOrStdout(),
 					"executor %s does NOT auto-drive this run; record each stage's completion with:\n"+

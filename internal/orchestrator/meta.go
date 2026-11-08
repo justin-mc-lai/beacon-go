@@ -121,6 +121,12 @@ type runMeta struct {
 	// A manual-or-external run is advanced by `goal tick --by <id>`,
 	// never by a registered stage executor.
 	ExecutorMode string `json:"executor_mode,omitempty"`
+	// ExecutorDefaulted marks a run created without any executor
+	// selector: it defaulted to manual and says so at creation (B4).
+	// A later tick that supplies a real executor may still drive it;
+	// without one it parks with the manual tick contract instead of
+	// stage_executor_not_registered.
+	ExecutorDefaulted bool `json:"executor_defaulted,omitempty"`
 	// ExternalResult is the recorded return of an external room
 	// (goal receive-result --external): who reported it, what it says
 	// and the artifact pointers it brought.

@@ -322,7 +322,7 @@ func (e *Engine) Status(runID string) (RunView, error) {
 	// recorded verdict — a run stuck before its gate must not look
 	// like it is merely "in progress".
 	if v.CurrentStage != "" {
-		v.StageGate = e.stageGateView(run.FeatureID, v.CurrentStage)
+		v.StageGate = e.stageGateView(run.ID, v.CurrentStage)
 	}
 	return v, nil
 }
@@ -343,6 +343,11 @@ type CreateRunOptions struct {
 	// ralph). Validated at creation; an unknown value is refused
 	// before any run row exists.
 	ExecutorMode string
+	// ExecutorDefaulted records that the caller supplied no executor
+	// selector and the run defaulted to manual (the creation output
+	// must say so — review B4 keeps the original silent-create path
+	// from recurring).
+	ExecutorDefaulted bool
 	// Lakes are the run's lake slugs (v1 goal run records them; the
 	// parallel plan and lane routing consult the count). Scale is the
 	// task-size field the lane router consults ("" = unset).
@@ -386,17 +391,18 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 	}
 	stages := BuildStageOrder(opts.UXRequired)
 	m := &runMeta{
-		Utterance:       opts.Utterance,
-		UXRequired:      opts.UXRequired,
-		CurrentStageIdx: 0,
-		ExecutorID:      opts.ExecutorID,
-		ExecutorMode:    execMode,
-		Verifier:        &VerifierInfo{RequiredForComplete: true, Present: false},
-		ReleasePolicy:   releasePolicy,
-		LastHeartbeatAt: time.Now().UTC().Format(time.RFC3339Nano),
-		Lakes:           opts.Lakes,
-		TaskScale:       opts.Scale,
-		Exec:            opts.Exec,
+		Utterance:         opts.Utterance,
+		UXRequired:        opts.UXRequired,
+		CurrentStageIdx:   0,
+		ExecutorID:        opts.ExecutorID,
+		ExecutorMode:      execMode,
+		ExecutorDefaulted: opts.ExecutorDefaulted,
+		Verifier:          &VerifierInfo{RequiredForComplete: true, Present: false},
+		ReleasePolicy:     releasePolicy,
+		LastHeartbeatAt:   time.Now().UTC().Format(time.RFC3339Nano),
+		Lakes:             opts.Lakes,
+		TaskScale:         opts.Scale,
+		Exec:              opts.Exec,
 		// S3 (AC-173): the topology fact is part of the run's fact
 		// layer from creation — recorded openly (missing included),
 		// never a creation-time block.

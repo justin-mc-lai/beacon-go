@@ -1,0 +1,119 @@
+$ goal run --project /tmp/dp-demo4 --feature demo4 --executor external --json
+{
+  "run_id": "run_ba7ac81fd530e91ed4ea7a1b",
+  "feature_id": "feat_e56e9c41cfc519342bdbc523",
+  "feature_slug": "demo4",
+  "status": "running",
+  "run_status": "Running",
+  "blocked": false,
+  "current_stage": "plan",
+  "loop_stage": "governance_precheck",
+  "next_skill": "beacon-plan",
+  "stage_plan": [
+    {
+      "stage": "plan",
+      "status": "active",
+      "skills": [
+        "beacon-plan",
+        "mode:pln-program",
+        "mode:pln-program-auto",
+        "mode:pln-program-interactive",
+        "mode:pln-review",
+        "mode:pln-friction",
+        "mode:pln-brainstorm",
+        "mode:pln-source"
+      ],
+      "loop_stage": "governance_precheck"
+    },
+    {
+      "stage": "truth",
+      "status": "pending",
+      "skills": [
+        "beacon-truth",
+        "mode:gen-truth",
+        "mode:gen-truth-init",
+        "mode:gen-change",
+        "mode:gen-refreeze"
+      ],
+      "loop_stage": "truth_routing"
+    },
+    {
+      "stage": "implement",
+      "status": "pending",
+      "skills": [
+        "beacon-implement",
+        "mode:gen-implement"
+      ],
+      "loop_stage": "implement_routing"
+    },
+    {
+      "stage": "qa",
+      "status": "pending",
+      "skills": [
+        "beacon-qa",
+        "mode:eval-qa",
+        "mode:eval-qa-deep",
+        "mode:eval-real-project",
+        "mode:eval-agent"
+      ],
+      "loop_stage": "qa_routing"
+    },
+    {
+      "stage": "release",
+      "status": "pending",
+      "skills": [
+        "beacon-release",
+        "mode:eval-release"
+      ],
+      "loop_stage": "release_gate"
+    }
+  ],
+  "verifier": {
+    "required_for_complete": true,
+    "present": false
+  },
+  "release_human_confirmed": false,
+  "executor_mode": "external",
+  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_ba7ac81fd530e91ed4ea7a1b --by \u003cidentity\u003e`",
+  "release_policy": "human",
+  "repair_loop_count": 0,
+  "blocked_streak": 0,
+  "last_heartbeat_at": "2026-11-08T15:23:45.550995Z",
+  "started_at": "2026-11-08T15:23:45.571702000Z",
+  "topology": {
+    "status": "not_applicable",
+    "detail": "not a git repository and no projection recorded: topology gate does not apply"
+  }
+}
+
+$ goal attach-verifier
+run:    run_ba7ac81fd530e91ed4ea7a1b
+status: running (loop_stage governance_precheck)
+stage:  plan
+blocked: false
+executor: external
+hint:   not auto-driven: record each stage with `beacon goal tick --run-id run_ba7ac81fd530e91ed4ea7a1b --by <identity>`
+next:   beacon-plan
+
+$ goal receive-result --external
+external result: run run_ba7ac81fd530e91ed4ea7a1b status completed artifacts=1 by renlink-dev-room
+
+$ goal conformance (zero ticks, expect FAIL)
+run:         run_ba7ac81fd530e91ed4ea7a1b
+feature:     demo4
+conformance: fail
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [FAIL] gates_evaluated    plan: stage exit not evaluated by this run; truth: stage exit not evaluated by this run; implement: stage exit not evaluated by this run; qa: stage exit not evaluated by this run; release: no release gate verdict bound to this run
+  [ok  ] verifier_attached  verifier independent-verifier with /tmp/dp-demo4/lake-result.md
+  [FAIL] state_exported     no state snapshot at /private/tmp/dp-demo4/.beacon/state/project-state.json (run `beacon-go projects export-state --project <root>`)
+Error: goal conformance: delivery not recognised; failed: gates_evaluated, state_exported (goal_conformance_failed)
+exit=1
+
+$ goal status
+run:    run_ba7ac81fd530e91ed4ea7a1b
+status: completed (loop_stage done)
+stage:  plan
+blocked: false
+executor: external
+gate:   plan evaluated=false (this stage has no recorded verdict)
+next:   beacon-plan

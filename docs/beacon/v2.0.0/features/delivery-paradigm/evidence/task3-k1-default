@@ -1,0 +1,22 @@
+$ goal run --executor-id renlink-dev-room   (original K1 command, no --executor, no --exec-cmd)
+run:    run_d83becb4fe36820f26ae8fcf
+status: running (loop_stage governance_precheck)
+stage:  plan
+blocked: false
+executor: manual
+hint:   not auto-driven: record each stage with `beacon goal tick --run-id run_d83becb4fe36820f26ae8fcf --by <identity>`
+next:   beacon-plan
+no --executor given: defaulted to executor manual. This run does NOT auto-drive; record each stage's completion with:
+  beacon goal tick --run-id run_d83becb4fe36820f26ae8fcf --by <identity>
+
+$ goal tick --run-id (no --by, no executor)
+run:    run_d83becb4fe36820f26ae8fcf
+status: blocked (loop_stage governance_precheck)
+stage:  plan
+blocked: true
+executor: manual
+reason: stage_manual_tick_required
+hint:   not auto-driven: record each stage with `beacon goal tick --run-id run_d83becb4fe36820f26ae8fcf --by <identity>`
+next:   beacon-plan
+Error: goal: run run_d83becb4fe36820f26ae8fcf is blocked (stage_manual_tick_required)
+exit=1

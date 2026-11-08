@@ -1,0 +1,24 @@
+$ gate status (delivered run A recorded design pass at feature level)
+plan             pass       [stage_exit_ok] (2026-11-08T15:23:55.128065000Z)
+truth_freeze     pass       [stage_exit_ok] (2026-11-08T15:23:55.185149000Z)
+design           pass       [stage_exit_ok] (2026-11-08T15:23:55.277190000Z)
+implement        pass       [stage_exit_ok] (2026-11-08T15:24:16.889289000Z)
+
+$ goal run (run B, same feature, --ux)
+run_9b716e562c702da2ed339343
+$ goal tick run B #1/#2
+run:    run_9b716e562c702da2ed339343
+status: running (loop_stage truth_routing)
+stage:  truth
+run:    run_9b716e562c702da2ed339343
+status: running (loop_stage review_routing)
+stage:  design
+
+$ goal status run B (fresh run must NOT show design evaluated=true)
+run:    run_9b716e562c702da2ed339343
+status: running (loop_stage review_routing)
+stage:  design
+blocked: false
+executor: recording
+gate:   design evaluated=false (this stage has no recorded verdict)
+next:   beacon-design
