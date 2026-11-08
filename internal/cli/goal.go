@@ -9,9 +9,11 @@ package cli
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
+	"beacon-go/internal/core"
 	"beacon-go/internal/orchestrator"
 )
 
@@ -68,11 +70,71 @@ func newGoalCmd() *cobra.Command {
 		// gate / fork / error-recovery) and the spend ledger (M9).
 		newGoalQuotaCmd(), newGoalDecideCmd(), newGoalGateCmd(), newGoalForkCmd(),
 		newGoalErrorRecoveryCmd(), newGoalSpendCmd(),
+		// Delivery paradigm (K6): one command that judges whether this
+		// run is a delivery the kernel can recognise.
+		newGoalConformanceCmd(),
 		// Issue #8 shadow step: release_policy preview (auto_shadow
 		// only; auto is refused). Folded into goal, no new top-level
 		// command.
 		newGoalReleaseShadowCmd(),
 	)
+	return c
+}
+
+// newGoalConformanceCmd is the delivery-paradigm self-check (K6):
+// truth frozen, every stage gate evaluated, a verifier attached and
+// the state exported — four facts, one verdict and one exit code.
+func newGoalConformanceCmd() *cobra.Command {
+	var runID string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "conformance",
+		Short: "Judge whether this run is a complete delivery: truth frozen + gates evaluated + verifier attached + state exported",
+		Long: "Conformance answers one question about a run: did the kernel actually\n" +
+			"record a delivery? It checks four facts from stored evidence — the truth\n" +
+			"is frozen, every stage in the plan carries a recorded pass verdict, an\n" +
+			"independent verifier is attached, and the project state was exported.\n" +
+			"Exit code 0 only when all four pass; the failed items are listed otherwise.",
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			eng, closeFn, err := goalReadEngine()
+			if err != nil {
+				return err
+			}
+			defer closeFn()
+			v, err := eng.Conformance(runID)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				if perr := printJSON(cmd, v); perr != nil {
+					return perr
+				}
+			} else {
+				out := cmd.OutOrStdout()
+				verdict := "fail"
+				if v.Pass {
+					verdict = "pass"
+				}
+				fmt.Fprintf(out, "run:         %s\nfeature:     %s\nconformance: %s\n", v.RunID, v.FeatureSlug, verdict)
+				for _, it := range v.Items {
+					mark := "ok"
+					if it.Status != "pass" {
+						mark = "FAIL"
+					}
+					fmt.Fprintf(out, "  [%-4s] %-18s %s\n", mark, it.Check, it.Detail)
+				}
+			}
+			if !v.Pass {
+				return fail(core.ReasonConformanceFailed, "goal conformance",
+					"delivery not recognised; failed: "+strings.Join(v.Failed, ", "))
+			}
+			return nil
+		},
+	}
+	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("run-id")
 	return c
 }
 
@@ -113,8 +175,23 @@ func printGoalView(cmd *cobra.Command, v orchestrator.RunView, asJSON bool) erro
 	}
 	fmt.Fprintf(cmd.OutOrStdout(), "run:    %s\nstatus: %s (loop_stage %s)\nstage:  %s\nblocked: %v",
 		v.RunID, v.Status, v.LoopStage, v.CurrentStage, v.Blocked)
+	if v.ExecutorMode != "" {
+		fmt.Fprintf(cmd.OutOrStdout(), "\nexecutor: %s", v.ExecutorMode)
+	}
 	if v.ReasonCode != "" {
 		fmt.Fprintf(cmd.OutOrStdout(), "\nreason: %s", v.ReasonCode)
+	}
+	if v.StageGate != nil {
+		if v.StageGate.Evaluated {
+			fmt.Fprintf(cmd.OutOrStdout(), "\ngate:   %s evaluated=true verdict=%s",
+				v.StageGate.GateType, v.StageGate.Verdict)
+		} else {
+			fmt.Fprintf(cmd.OutOrStdout(), "\ngate:   %s evaluated=false (this stage has no recorded verdict)",
+				v.StageGate.GateType)
+		}
+	}
+	if v.TickHint != "" {
+		fmt.Fprintf(cmd.OutOrStdout(), "\nhint:   %s", v.TickHint)
 	}
 	if v.NextSkill != "" {
 		fmt.Fprintf(cmd.OutOrStdout(), "\nnext:   %s", v.NextSkill)
@@ -137,7 +214,7 @@ func blockedErr(v orchestrator.RunView) error {
 }
 
 func newGoalRunCmd() *cobra.Command {
-	var project, version, feature, executorID, scale, releasePolicy string
+	var project, version, feature, executorID, executorMode, scale, releasePolicy string
 	var lakes []string
 	var ux, asJSON bool
 	var ef execFlags
@@ -158,12 +235,22 @@ func newGoalRunCmd() *cobra.Command {
 			v, err := eng.CreateRun(orchestrator.CreateRunOptions{
 				ProjectRoot: project, Version: version, FeatureSlug: feature,
 				Utterance: utterance, UXRequired: ux, ExecutorID: executorID,
-				Lakes: lakes, Scale: scale, Exec: ef.config(), ReleasePolicy: releasePolicy,
+				ExecutorMode: executorMode,
+				Lakes:        lakes, Scale: scale, Exec: ef.config(), ReleasePolicy: releasePolicy,
 			})
 			if err != nil {
 				return err
 			}
-			return printGoalView(cmd, v, asJSON)
+			if err := printGoalView(cmd, v, asJSON); err != nil {
+				return err
+			}
+			if !asJSON && (executorMode == orchestrator.ExecutorModeManual || executorMode == orchestrator.ExecutorModeExternal) {
+				// K1: the creation output states the contract up front.
+				fmt.Fprintf(cmd.OutOrStdout(),
+					"executor %s does NOT auto-drive this run; record each stage's completion with:\n"+
+						"  beacon goal tick --run-id %s --by <identity>\n", executorMode, v.RunID)
+			}
+			return nil
 		},
 	}
 	c.Flags().StringVarP(&project, "project", "p", ".", "project root path")
@@ -173,6 +260,8 @@ func newGoalRunCmd() *cobra.Command {
 	c.Flags().StringArrayVar(&lakes, "lake", nil, "lake slugs (recorded on the run; lane routing and parallel plans consult them)")
 	c.Flags().StringVar(&scale, "scale", "", "task scale field (large routes the implement lane to ralph)")
 	c.Flags().StringVar(&executorID, "executor-id", "", "identity of the executing agent (maker, for maker!=checker)")
+	c.Flags().StringVar(&executorMode, "executor", "",
+		"executor selector: manual | external (not auto-driven; record with goal tick --by) | recording | subprocess | subprocess:<profile> | ralph")
 	c.Flags().StringVar(&releasePolicy, "release-policy", "", "release confirmation policy: human (default) | auto_shadow (preview only; auto is refused)")
 	addExecFlags(c, &ef, true)
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
@@ -207,7 +296,7 @@ func newGoalStatusCmd() *cobra.Command {
 }
 
 func newGoalTickCmd(cont bool) *cobra.Command {
-	var runID, project, executor, note string
+	var runID, project, executor, note, by string
 	var asJSON bool
 	var ef execFlags
 	name, short := "tick", "Advance the run by one step (exit-gate judged, idempotent)"
@@ -226,9 +315,9 @@ func newGoalTickCmd(cont bool) *cobra.Command {
 			defer closeFn()
 			var v orchestrator.RunView
 			if cont {
-				v, err = eng.Continue(cmd.Context(), runID)
+				v, err = eng.ContinueBy(cmd.Context(), runID, by)
 			} else {
-				v, err = eng.Tick(cmd.Context(), runID)
+				v, err = eng.TickBy(cmd.Context(), runID, by)
 			}
 			if err != nil {
 				return err
@@ -243,6 +332,7 @@ func newGoalTickCmd(cont bool) *cobra.Command {
 	c.Flags().StringVarP(&project, "project", "p", "", "project root path (accepted for v1 parity)")
 	c.Flags().StringVar(&executor, "executor", "", "stage executor: recording (placeholder, no real work) | subprocess (real, needs --exec-cmd or a recorded one) | subprocess:<profile> (real harness profile) | ralph (real loop, implement lane)")
 	c.Flags().StringVar(&note, "note", "", "free-form note (accepted for v1 parity)")
+	c.Flags().StringVar(&by, "by", "", "who records this stage as complete (required for manual/external runs)")
 	addExecFlags(c, &ef, false)
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("run-id")

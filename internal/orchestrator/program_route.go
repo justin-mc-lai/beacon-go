@@ -243,7 +243,56 @@ func (e *Engine) ProgramRoute(runID string) (ProgramRouteView, error) {
 	default:
 		view.ProgramStatus = "running"
 	}
+	view.NextActions = programNextActions(runID, view.Lakes)
 	return view, nil
+}
+
+// programNextActions turns the route into the order a caller actually
+// executes (K4): topological order, one primary step per unfinished
+// lake, and — crucially — a `truth freeze` suggestion for every lake
+// whose truth is not frozen yet, naming the lake slug. A lake whose
+// dependencies are still open gets a wait step instead of a start
+// step, so nobody starts work the graph forbids.
+func programNextActions(hostRunID string, lakes []LakeRoute) []ProgramNextAction {
+	var out []ProgramNextAction
+	add := func(lake, action, command, reason string) {
+		out = append(out, ProgramNextAction{Order: len(out) + 1, Lake: lake, Action: action, Command: command, Reason: reason})
+	}
+	for _, row := range lakes {
+		if row.Status == LakeCompleted {
+			continue
+		}
+		switch {
+		case row.ReasonCode == core.ReasonProgramLakeFeatureMiss:
+			add(row.Lake, "truth_package", "beacon truth create --project . --slug "+row.Lake,
+				"no feature package for lake "+row.Lake+" in the host project version")
+		case row.ReasonCode == core.ReasonProgramTruthNotFrozen:
+			add(row.Lake, "truth_freeze", "beacon truth freeze --project . --feature "+row.Lake,
+				"lake "+row.Lake+" truth is not frozen (fill != freeze): freeze it before admission")
+		case row.ProgramStatus == "awaiting_release":
+			cmd := "beacon goal complete --run-id " + row.GoalRunID + " --human-confirmed --confirmed-by <identity>"
+			add(row.Lake, "complete_lake", cmd, "lake run reached its release gate; human confirmation completes it")
+		case row.GoalRunID != "":
+			add(row.Lake, "drive", "beacon goal driver start --run-id "+row.GoalRunID,
+				"advance the lake run to its release gate")
+		case row.Status == LakeWaiting:
+			deps := strings.Join(row.DependsOn, ", ")
+			add(row.Lake, "wait_dependency", "",
+				"waiting for dependencies to complete: "+deps)
+		case row.Status == LakeReady:
+			add(row.Lake, "admit", "beacon goal program admit --run-id "+hostRunID+" --lake "+row.Lake,
+				"lake "+row.Lake+" is ready; admit it before starting its run")
+			add(row.Lake, "start_lake_run", "beacon goal run --project . --feature "+row.Lake,
+				"create the lake's goal run after admission")
+		case row.Status == LakeAdmitted:
+			add(row.Lake, "start_lake_run", "beacon goal run --project . --feature "+row.Lake,
+				"lake "+row.Lake+" is admitted")
+		default:
+			add(row.Lake, "start_lake_run", "beacon goal run --project . --feature "+row.Lake,
+				"no lake run bound yet")
+		}
+	}
+	return out
 }
 
 // lakeRunStage loads one bound lake run's loop stage.

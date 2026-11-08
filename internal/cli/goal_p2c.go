@@ -15,6 +15,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"beacon-go/internal/core"
 	"beacon-go/internal/orchestrator"
 )
 
@@ -164,9 +165,9 @@ func newGoalDelegateRalphCmd() *cobra.Command {
 }
 
 func newGoalReceiveResultCmd() *cobra.Command {
-	var runID, delegationID, status, summary, kind string
+	var runID, delegationID, status, summary, kind, by string
 	var artifacts []string
-	var asJSON bool
+	var asJSON, external bool
 	c := &cobra.Command{
 		Use:   "receive-result",
 		Short: "Collect a delegation's return under the shared harvest rule (artifacts + implement evidence)",
@@ -174,9 +175,17 @@ func newGoalReceiveResultCmd() *cobra.Command {
 			"(The v1 surface had no receive command — returns landed via the host " +
 			"loop; the name is new in P2c and noted in the report.) A done return " +
 			"must bring artifact files (--artifact, absolute paths) and the " +
-			"implement evidence produced after the delegation went out.",
+			"implement evidence produced after the delegation went out. " +
+			"--external instead writes back a result produced by an outside room " +
+			"(no delegation exists): it needs --by, --summary and at least one " +
+			"absolute --artifact path, registers the pointers and closes the run " +
+			"as externally completed so program route reports the lake completed.",
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if !external && strings.TrimSpace(delegationID) == "" {
+				return fail(core.ReasonDelegationNotFound, "goal receive-result",
+					"--delegation-id is required unless --external is set")
+			}
 			eng, closeFn, err := goalEngine("")
 			if err != nil {
 				return err
@@ -185,6 +194,23 @@ func newGoalReceiveResultCmd() *cobra.Command {
 			var inputs []orchestrator.ArtifactInput
 			for _, p := range artifacts {
 				inputs = append(inputs, orchestrator.ArtifactInput{Kind: kind, AbsPath: p})
+			}
+			if external {
+				v, err := eng.ReceiveExternalResult(runID, orchestrator.ExternalResultInput{
+					By: by, Summary: summary, Artifacts: inputs,
+				})
+				if err != nil {
+					if v.RunID != "" && asJSON {
+						_ = printJSON(cmd, v)
+					}
+					return err
+				}
+				if asJSON {
+					return printJSON(cmd, v)
+				}
+				fmt.Fprintf(cmd.OutOrStdout(), "external result: run %s status %s artifacts=%d by %s\n",
+					v.RunID, v.Status, len(artifacts), by)
+				return nil
 			}
 			v, err := eng.ReceiveRalphResult(runID, delegationID, orchestrator.LaneResultInput{
 				Status: status, Summary: summary, Artifacts: inputs,
@@ -205,13 +231,14 @@ func newGoalReceiveResultCmd() *cobra.Command {
 	}
 	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
 	c.Flags().StringVar(&delegationID, "delegation-id", "", "delegation id from goal delegate-ralph (required)")
+	c.Flags().BoolVar(&external, "external", false, "write back a result produced outside the kernel (no delegation-id needed)")
+	c.Flags().StringVar(&by, "by", "", "who reports an external result (required with --external)")
 	c.Flags().StringVar(&status, "status", "done", "return status: done|failed")
 	c.Flags().StringVar(&summary, "summary", "", "return summary")
 	c.Flags().StringArrayVar(&artifacts, "artifact", nil, "artifact file absolute path (repeatable)")
 	c.Flags().StringVar(&kind, "kind", "implement_artifact", "artifact kind for --artifact pointers")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("run-id")
-	_ = c.MarkFlagRequired("delegation-id")
 	return c
 }
 

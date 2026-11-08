@@ -76,8 +76,10 @@ func TestGateEvaluateWritesAndStatusReadsBack(t *testing.T) {
 	}
 	doc = parseDoc(t, out)
 	gates, _ := doc["gates"].([]any)
-	if len(gates) != 6 {
-		t.Fatalf("status must list all six gate types, got %v", doc["gates"])
+	// Seven since delivery-paradigm AC-005: the plan stage's exit gate
+	// is a first-class, recorded gate axis of its own.
+	if len(gates) != 7 {
+		t.Fatalf("status must list all seven gate types, got %v", doc["gates"])
 	}
 	seen := map[string]map[string]any{}
 	for _, g := range gates {

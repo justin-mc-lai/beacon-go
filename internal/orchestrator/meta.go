@@ -109,37 +109,46 @@ type VerifierInfo struct {
 
 // runMeta is the goal snapshot persisted in runs.metadata_json.
 type runMeta struct {
-	Utterance             string           `json:"utterance,omitempty"`
-	UXRequired            bool             `json:"ux_required"`
-	LoopStage             string           `json:"loop_stage"`
-	StageHistory          []string         `json:"stage_history,omitempty"`
-	CurrentStageIdx       int              `json:"current_stage_idx"`
-	StagePlan             []StagePlanEntry `json:"stage_plan"`
-	ExecutorID            string           `json:"executor_id,omitempty"`
-	Verifier              *VerifierInfo    `json:"verifier,omitempty"`
-	ReleaseHumanConfirmed bool             `json:"release_human_confirmed"`
-	HumanConfirmedBy      string           `json:"human_confirmed_by,omitempty"`
+	Utterance       string           `json:"utterance,omitempty"`
+	UXRequired      bool             `json:"ux_required"`
+	LoopStage       string           `json:"loop_stage"`
+	StageHistory    []string         `json:"stage_history,omitempty"`
+	CurrentStageIdx int              `json:"current_stage_idx"`
+	StagePlan       []StagePlanEntry `json:"stage_plan"`
+	ExecutorID      string           `json:"executor_id,omitempty"`
+	// ExecutorMode is the executor selector the run was created with
+	// (manual / external / recording / subprocess[:profile] / ralph).
+	// A manual-or-external run is advanced by `goal tick --by <id>`,
+	// never by a registered stage executor.
+	ExecutorMode string `json:"executor_mode,omitempty"`
+	// ExternalResult is the recorded return of an external room
+	// (goal receive-result --external): who reported it, what it says
+	// and the artifact pointers it brought.
+	ExternalResult        *ExternalResult `json:"external_result,omitempty"`
+	Verifier              *VerifierInfo   `json:"verifier,omitempty"`
+	ReleaseHumanConfirmed bool            `json:"release_human_confirmed"`
+	HumanConfirmedBy      string          `json:"human_confirmed_by,omitempty"`
 	// ReleasePolicy is human (default) or auto_shadow. auto is not
 	// implemented; shadow records a would-pass verdict without
 	// weakening the human gate.
-	ReleasePolicy        string             `json:"release_policy,omitempty"`
-	ReleaseShadow        *ReleaseShadowView `json:"release_shadow,omitempty"`
+	ReleasePolicy string             `json:"release_policy,omitempty"`
+	ReleaseShadow *ReleaseShadowView `json:"release_shadow,omitempty"`
 	// LakeProposal is the AI's sea-to-lake proposal plus the human's
 	// multi-select decision; it is folded into a frozen program plan.
-	LakeProposal         *LakeProposal      `json:"lake_proposal,omitempty"`
-	Blocked              bool               `json:"blocked"`
-	BlockedStreak        int                `json:"blocked_streak"`
-	LastBlockReason      string             `json:"last_block_reason,omitempty"`
-	RepairLoopCount      int                `json:"repair_loop_count"`
-	StopWhen             string             `json:"stop_when,omitempty"`
-	LastHeartbeatAt      string             `json:"last_heartbeat_at,omitempty"`
-	HeartbeatSummary     string             `json:"heartbeat_summary,omitempty"`
-	LastSubstep          string             `json:"last_substep,omitempty"`
-	LastCheckpointAction string             `json:"last_checkpoint_next_action,omitempty"`
-	InterruptPending     bool               `json:"interrupt_pending"`
-	InterruptSubstep     string             `json:"interrupt_substep,omitempty"`
-	InterruptCount       int                `json:"interrupt_count"`
-	LastTickKey          string             `json:"last_tick_key,omitempty"`
+	LakeProposal         *LakeProposal `json:"lake_proposal,omitempty"`
+	Blocked              bool          `json:"blocked"`
+	BlockedStreak        int           `json:"blocked_streak"`
+	LastBlockReason      string        `json:"last_block_reason,omitempty"`
+	RepairLoopCount      int           `json:"repair_loop_count"`
+	StopWhen             string        `json:"stop_when,omitempty"`
+	LastHeartbeatAt      string        `json:"last_heartbeat_at,omitempty"`
+	HeartbeatSummary     string        `json:"heartbeat_summary,omitempty"`
+	LastSubstep          string        `json:"last_substep,omitempty"`
+	LastCheckpointAction string        `json:"last_checkpoint_next_action,omitempty"`
+	InterruptPending     bool          `json:"interrupt_pending"`
+	InterruptSubstep     string        `json:"interrupt_substep,omitempty"`
+	InterruptCount       int           `json:"interrupt_count"`
+	LastTickKey          string        `json:"last_tick_key,omitempty"`
 	// P2b long-run care fields (driver / supervisor / guardrails /
 	// queue provenance). All still live in runs.metadata_json — the
 	// single store snapshot; no side files (charter rule 7).

@@ -92,7 +92,12 @@ type ExitInput struct {
 // verdict (P3a); FormalVerdict carries the deciding (or, for the
 // still-derived stages, the latest recorded) formal verdict.
 type ExitVerdict struct {
-	Allowed       bool   `json:"allowed"`
+	Allowed bool `json:"allowed"`
+	// Evaluated marks that a real judgement was established from the
+	// stage's facts. false means no gate covers the stage (or none of
+	// its facts could be read): the run must park with
+	// stage_gate_not_evaluated instead of advancing on a guess.
+	Evaluated     bool   `json:"evaluated"`
 	ReasonCode    string `json:"reason_code"`
 	ResumeAction  string `json:"resume_action"`
 	FillSkill     string `json:"fill_skill,omitempty"`
@@ -115,11 +120,11 @@ func firstCode(codes []string, fallback string) string {
 func blockedVerdict(reason, resume, fill string) ExitVerdict {
 	// Default is Derived=true; callers that were decided by a formal
 	// gate verdict override it (and set FormalVerdict).
-	return ExitVerdict{Allowed: false, ReasonCode: reason, ResumeAction: resume, FillSkill: fill, Derived: true}
+	return ExitVerdict{Allowed: false, Evaluated: true, ReasonCode: reason, ResumeAction: resume, FillSkill: fill, Derived: true}
 }
 
 func passVerdict() ExitVerdict {
-	return ExitVerdict{Allowed: true, ReasonCode: ReasonStageExitOK, ResumeAction: core.ResumeNone, Derived: true}
+	return ExitVerdict{Allowed: true, Evaluated: true, ReasonCode: ReasonStageExitOK, ResumeAction: core.ResumeNone, Derived: true}
 }
 
 // formalVerdictOf returns the latest formal verdict recorded for a
@@ -259,8 +264,11 @@ func EvaluateStageExit(in ExitInput) ExitVerdict {
 		// Source-exact: release never auto-exits on tick.
 		return blockedVerdict(core.ReasonReleaseRequiresHuman, core.ResumeAwaitHumanRelease, "beacon-release")
 	default:
-		// Unknown stage: fail closed, never default-pass.
-		return blockedVerdict(ReasonStageExitPlanIncompl, core.ResumeNone, "")
+		// Unknown stage: no gate covers it, so there is nothing to
+		// evaluate. Fail closed and name the real defect — the run may
+		// not advance on a stage the kernel cannot judge.
+		return ExitVerdict{Allowed: false, Evaluated: false, ReasonCode: core.ReasonStageGateNotEvaluated,
+			ResumeAction: core.ResumeNone, Derived: true}
 	}
 }
 
