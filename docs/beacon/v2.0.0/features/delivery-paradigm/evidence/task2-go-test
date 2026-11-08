@@ -1,18 +1,18 @@
-# delivery-paradigm task2: full go test ./...
-# 2026-11-08T14:52:44Z on fix/delivery-paradigm at d4d30a0
+# delivery-paradigm task2: full go test ./... -count=1 (fresh, final HEAD)
+# 2026-11-08T14:56:38Z branch=fix/delivery-paradigm head=231801b
 
 ?   	beacon-go/cmd/beacon	[no test files]
-ok  	beacon-go/desktop	1.221s
-ok  	beacon-go/internal/agentapi	3.179s
-ok  	beacon-go/internal/benchgate	(cached)
-ok  	beacon-go/internal/cli	14.404s
-ok  	beacon-go/internal/core	(cached)
-ok  	beacon-go/internal/gate	(cached)
-ok  	beacon-go/internal/harness	(cached)
-ok  	beacon-go/internal/llm	(cached)
-ok  	beacon-go/internal/migration	(cached)
-ok  	beacon-go/internal/orchestrator	88.473s
-ok  	beacon-go/internal/session	(cached)
-ok  	beacon-go/internal/store	(cached)
-ok  	beacon-go/internal/workspace	2.951s
-ok  	beacon-go/skills	(cached)
+ok  	beacon-go/desktop	0.488s
+ok  	beacon-go/internal/agentapi	5.627s
+ok  	beacon-go/internal/benchgate	0.802s
+ok  	beacon-go/internal/cli	17.779s
+ok  	beacon-go/internal/core	1.948s
+ok  	beacon-go/internal/gate	2.716s
+ok  	beacon-go/internal/harness	12.330s
+ok  	beacon-go/internal/llm	4.381s
+ok  	beacon-go/internal/migration	3.293s
+ok  	beacon-go/internal/orchestrator	87.780s
+ok  	beacon-go/internal/session	4.432s
+ok  	beacon-go/internal/store	4.727s
+ok  	beacon-go/internal/workspace	5.198s
+ok  	beacon-go/skills	3.567s
