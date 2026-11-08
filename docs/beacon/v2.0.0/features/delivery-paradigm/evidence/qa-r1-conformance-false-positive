@@ -1,0 +1,26 @@
+# qa-r1 AC-007 / conformance false positive
+date: 2026-11-08T15:09:43Z
+
+Project /tmp/dp-demo, feature demo (already has a full pass set from earlier runs).
+Run M2 run_3f1797796dc46bb528b17685 was created with --executor external, then
+attach-verifier + receive-result --external. It never ticked and has no stage_exit_evaluated.
+
+$ beacon goal conformance --run-id run_3f1797796dc46bb528b17685
+run:         run_3f1797796dc46bb528b17685
+feature:     demo
+conformance: pass
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [ok  ] gates_evaluated    every stage gate carries a recorded pass
+  [ok  ] verifier_attached  verifier independent-verifier with /tmp/qa-r1-verifier.md
+  [ok  ] state_exported     snapshot /private/tmp/dp-demo/.beacon/state/project-state.json
+exit=0
+
+## M2 events
+goal_run_created
+verifier_attached
+external_result_received
+goal_completed
+
+## conclusion: conformance PASS although the run has zero gate exits of its own.
+## Cause: ReceiveExternalResult marks every StagePlan entry 'done' (delivery_paradigm.go:208-211)
+## and Conformance reads feature-level Latest (delivery_paradigm.go:304) guarded only by that status.

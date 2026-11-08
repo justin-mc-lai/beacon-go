@@ -422,6 +422,16 @@ func newGoalProgramRouteCmd() *cobra.Command {
 				}
 			}
 			fmt.Fprintf(out, "next batch: %s\n", strings.Join(v.NextBatch, ", "))
+			if len(v.NextActions) > 0 {
+				fmt.Fprintln(out, "next actions:")
+				for _, a := range v.NextActions {
+					if a.Command != "" {
+						fmt.Fprintf(out, "  %d. %s %s\n     %s\n     %s\n", a.Order, a.Action, a.Lake, a.Command, a.Reason)
+					} else {
+						fmt.Fprintf(out, "  %d. %s %s — %s\n", a.Order, a.Action, a.Lake, a.Reason)
+					}
+				}
+			}
 			return nil
 		},
 	}

@@ -1,0 +1,18 @@
+# qa-r2 K5: ux consistency on the real renlink l5 package
+date: 2026-11-08T15:39:22Z
+
+docs/beacon/v0.1.0/features/l5-miniprogram-pages/truth.md:8 -> ux_required: false
+docs/beacon/v0.1.0/features/l5-miniprogram-pages/truth.md:80 -> ## UI 规格说明书（前端实现手册级）
+8:ux_required: false
+80:## UI 规格说明书（前端实现手册级）
+
+## default (audit)
+exit=0
+  [truth_ux_requirement_mismatch] docs/beacon/v0.1.0/features/l5-miniprogram-pages/truth.md:80 — truth declares ux_required: false but the body carries a UI/design section: ## UI 规格说明书（前端实现手册级） (set ux_required: true or remove the design section) (repair: beacon-gen-truth)
+reasons:   truth_integrity_audit_only, truth_ux_requirement_mismatch, truth_integrity_evidence_artifact_unregistered, truth_integrity_evidence_artifact_missing, TRUTH_DETERMINISM_PLACEHOLDER, feature_package_validation_failed
+
+## --strict
+exit=1
+  [truth_ux_requirement_mismatch] docs/beacon/v0.1.0/features/l5-miniprogram-pages/truth.md:80 — truth declares ux_required: false but the body carries a UI/design section: ## UI 规格说明书（前端实现手册级） (set ux_required: true or remove the design section) (repair: beacon-gen-truth)
+reasons:   truth_ux_requirement_mismatch, truth_integrity_evidence_artifact_unregistered, truth_integrity_evidence_artifact_missing, TRUTH_DETERMINISM_PLACEHOLDER, feature_package_validation_failed
+Error: gate integrity: truth integrity blocked for feature l5-miniprogram-pages (repair route: beacon-gen-truth) (truth_ux_requirement_mismatch)

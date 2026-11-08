@@ -17,6 +17,11 @@ package gate
 type GateType string
 
 const (
+	// GatePlan is the plan stage's exit gate: the recorded judgement
+	// that plan may be left (delivery-paradigm K2). It has no formal
+	// `gate evaluate` entry — the engine records the exit judgement —
+	// but it is a first-class gate axis for `gate status`.
+	GatePlan           GateType = "plan"
 	GateTruthFreeze    GateType = "truth_freeze"
 	GateDesign         GateType = "design"
 	GateImplement      GateType = "implement"
@@ -29,13 +34,13 @@ const (
 // reports, in pipeline order (integrity last: it stands apart from
 // the four stage gates + release composition).
 var OrderedGateTypes = []GateType{
-	GateTruthFreeze, GateDesign, GateImplement, GateQA, GateRelease, GateTruthIntegrity,
+	GatePlan, GateTruthFreeze, GateDesign, GateImplement, GateQA, GateRelease, GateTruthIntegrity,
 }
 
 // Known reports whether t is one of the evaluable gate types.
 func (t GateType) Known() bool {
 	switch t {
-	case GateTruthFreeze, GateDesign, GateImplement, GateQA, GateRelease, GateTruthIntegrity:
+	case GatePlan, GateTruthFreeze, GateDesign, GateImplement, GateQA, GateRelease, GateTruthIntegrity:
 		return true
 	}
 	return false

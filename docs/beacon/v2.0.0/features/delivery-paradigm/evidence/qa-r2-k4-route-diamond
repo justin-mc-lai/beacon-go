@@ -1,0 +1,46 @@
+# qa-r2 K4: program route next actions, topological (own 4-lake diamond)
+date: 2026-11-08T15:39:18Z
+
+Project /tmp/qa-r2-demo, host run run_ea66d30778c9909f1f5f11cd, program sea-lp_qa_r2_diamond.
+Graph: lake-p -> lake-q, lake-p -> lake-r, lake-q + lake-r -> lake-s.
+$ beacon goal program route --run-id run_ea66d30778c9909f1f5f11cd
+program: sea-lp_qa_r2_diamond (frozen=true, all_complete=false)
+proposal: lp_qa_r2_diamond selected=4 rejected=0
+  lake-p           blocked    program_truth_not_frozen
+  lake-q           blocked    program_truth_not_frozen
+  lake-r           blocked    program_truth_not_frozen
+  lake-s           blocked    program_truth_not_frozen
+next batch: 
+next actions:
+  1. truth_freeze lake-p
+     beacon truth freeze --project . --feature lake-p
+     lake lake-p truth is not frozen (fill != freeze): freeze it before admission
+  2. truth_freeze lake-q
+     beacon truth freeze --project . --feature lake-q
+     lake lake-q truth is not frozen (fill != freeze): freeze it before admission
+  3. truth_freeze lake-r
+     beacon truth freeze --project . --feature lake-r
+     lake lake-r truth is not frozen (fill != freeze): freeze it before admission
+  4. truth_freeze lake-s
+     beacon truth freeze --project . --feature lake-s
+     lake lake-s truth is not frozen (fill != freeze): freeze it before admission
+
+## second program: sea-lp_1794150405917087000 (4 lakes, lake-a externally completed)
+$ beacon goal program route --run-id run_8a46b794080ff07efec68445
+program: sea-lp_1794150405917087000 (frozen=true, all_complete=false)
+proposal: lp_1794150405917087000 selected=4 rejected=0
+  lake-a           completed  
+  lake-b           blocked    program_truth_not_frozen
+  lake-c           blocked    program_truth_not_frozen
+  lake-d           blocked    program_truth_not_frozen
+next batch: 
+next actions:
+  1. truth_freeze lake-b
+     beacon truth freeze --project . --feature lake-b
+     lake lake-b truth is not frozen (fill != freeze): freeze it before admission
+  2. truth_freeze lake-c
+     beacon truth freeze --project . --feature lake-c
+     lake lake-c truth is not frozen (fill != freeze): freeze it before admission
+  3. truth_freeze lake-d
+     beacon truth freeze --project . --feature lake-d
+     lake lake-d truth is not frozen (fill != freeze): freeze it before admission

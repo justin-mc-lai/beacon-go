@@ -391,7 +391,10 @@ func TestTraceOrderAndBundle(t *testing.T) {
 	for _, ev := range bundle.Events {
 		types = append(types, ev.EventType)
 	}
-	wantPrefix := []string{"goal_run_created", "stage_executed", "stage_advanced", "goal_blocked"}
+	// stage_exit_evaluated is the delivery-paradigm exit record: every
+	// successful stage exit persists its gate judgement before the
+	// advance event (AC-003).
+	wantPrefix := []string{"goal_run_created", "stage_executed", "stage_exit_evaluated", "stage_advanced", "goal_blocked"}
 	for i, w := range wantPrefix {
 		if types[i] != w {
 			t.Errorf("event[%d] = %s want %s (all: %v)", i, types[i], w, types)

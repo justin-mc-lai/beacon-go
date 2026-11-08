@@ -1,0 +1,26 @@
+# qa-r2 B1: conformance rejects a zero-tick external run
+date: 2026-11-08T15:38:45Z
+
+Project /tmp/qa-r2-demo (feature qa-r2-feat, truth frozen).
+Run run_9409ede0582b51581b85fbd5 was created with --executor external, then
+receive-result --external, then the verifier was attached. It never ticked
+(events: goal_run_created, external_result_received, goal_completed, verifier_attached).
+
+$ beacon goal conformance --run-id run_9409ede0582b51581b85fbd5
+run:         run_9409ede0582b51581b85fbd5
+feature:     qa-r2-feat
+conformance: fail
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [FAIL] gates_evaluated    plan: stage exit not evaluated by this run; truth: stage exit not evaluated by this run; implement: stage exit not evaluated by this run; qa: stage exit not evaluated by this run; release: no release gate verdict bound to this run
+  [ok  ] verifier_attached  verifier qa-r2-verifier with /tmp/qa-r2-verifier.md
+  [ok  ] state_exported     snapshot /private/tmp/qa-r2-demo/.beacon/state/project-state.json
+Error: goal conformance: delivery not recognised; failed: gates_evaluated (goal_conformance_failed)
+exit=1
+
+## events
+goal_run_created
+external_result_received
+goal_completed
+verifier_attached
+
+## conclusion: gates_evaluated FAILs and exit is 1; ReceiveExternalResult no longer marks stages done.

@@ -1,0 +1,24 @@
+# qa-r2 K3: external receive-result writes back without a delegation id
+date: 2026-11-08T15:39:25Z
+
+Project /tmp/qa-r2-demo. Run run_9409ede0582b51581b85fbd5 (feature qa-r2-feat, --executor external).
+$ beacon goal receive-result --run-id run_9409ede0582b51581b85fbd5 --external --by ext-room --summary "lake done" --artifact /tmp/qa-r2-artifact.md
+external result: run run_9409ede0582b51581b85fbd5 status completed artifacts=1 by ext-room
+exit=0  (no --delegation-id given)
+
+## run status
+status: completed (loop_stage done)
+stage:  plan
+blocked: false
+executor: external
+## artifact_refs
+art_7a97e7d22694f286f8943f8c|run_9409ede0582b51581b85fbd5|implement_artifact|/tmp/qa-r2-artifact.md||0|2026-11-08T15:35:51.794955000Z
+## program route (program sea-lp_qa_r2_k3, host run run_8d8433a0457d605e9672d008)
+program: sea-lp_qa_r2_k3 (frozen=true, all_complete=false)
+proposal: lp_qa_r2_k3 selected=3 rejected=0
+  qa-r2-feat       completed  
+  lake-m           blocked    program_truth_not_frozen
+  lake-n           blocked    program_truth_not_frozen
+next batch: 
+next actions:
+  1. truth_freeze lake-m

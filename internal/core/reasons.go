@@ -14,14 +14,24 @@ import "strings"
 // ---- Stage exit family (goal_reason_codes.py) ----
 
 const (
-	ReasonStageExitOK              = "stage_exit_ok"
-	ReasonStageExitPlanIncomplete  = "stage_exit_plan_incomplete"
-	ReasonStageExitTruthNotFrozen  = "stage_exit_truth_not_frozen"
-	ReasonStageExitTruthMissing    = "stage_exit_truth_package_missing"
-	ReasonStageExitDesignIncompl   = "stage_exit_design_incomplete"
-	ReasonStageExitImplementBlock  = "stage_exit_implement_blocked"
-	ReasonStageExitQAEvidenceMiss  = "stage_exit_qa_evidence_missing"
-	ReasonStageExitBlocked         = "stage_exit_blocked"
+	ReasonStageExitOK             = "stage_exit_ok"
+	ReasonStageExitPlanIncomplete = "stage_exit_plan_incomplete"
+	ReasonStageExitTruthNotFrozen = "stage_exit_truth_not_frozen"
+	ReasonStageExitTruthMissing   = "stage_exit_truth_package_missing"
+	ReasonStageExitDesignIncompl  = "stage_exit_design_incomplete"
+	ReasonStageExitImplementBlock = "stage_exit_implement_blocked"
+	ReasonStageExitQAEvidenceMiss = "stage_exit_qa_evidence_missing"
+	ReasonStageExitBlocked        = "stage_exit_blocked"
+	// Delivery-paradigm family (K1/K2): the kernel refuses an
+	// executor selector it cannot drive at creation, requires every
+	// stage exit to be a recorded judgement, and names the manual /
+	// external executor's tick obligation explicitly.
+	ReasonExecutorUnsupported      = "stage_executor_unsupported"
+	ReasonStageGateNotEvaluated    = "stage_gate_not_evaluated"
+	ReasonManualTickRequired       = "stage_manual_tick_required"
+	ReasonExternalActorRequired    = "external_result_actor_required"
+	ReasonExternalSummRequired     = "external_result_summary_required"
+	ReasonConformanceFailed        = "goal_conformance_failed"
 	ReasonFreezeAckRequired        = "freeze_ack_required"
 	ReasonGoalImplementFeatReq     = "goal_implement_feature_required"
 	ReasonGoalImplementAdmissBlock = "goal_implement_admission_blocked"
@@ -42,6 +52,12 @@ var ReasonCatalog = map[string]string{
 	ReasonStageExitImplementBlock: "Implement admission failed",
 	ReasonStageExitQAEvidenceMiss: "QA lacks scorecard/evidence artifact",
 	ReasonReleaseRequiresHuman:    "Release requires human confirmation",
+	ReasonExecutorUnsupported:     "Executor selector is not supported; no run was created",
+	ReasonStageGateNotEvaluated:   "Stage has no exit gate verdict; the run cannot advance",
+	ReasonManualTickRequired:      "Manual/external executor: record completion with goal tick --by <identity>",
+	ReasonExternalActorRequired:   "An external result must name who reports it (--by)",
+	ReasonExternalSummRequired:    "An external result must carry a summary (--summary)",
+	ReasonConformanceFailed:       "The delivery is not recognised by the kernel: see the failed conformance items",
 	ReasonFreezeAckRequired:       "Freeze ack required before implement (fill ≠ self-sign)",
 	ReasonMainImplementForbidden:  "Business path commit on main/master forbidden",
 	ReasonMainDocsPolicyForbidden: "Docs path outside allowed main docs policy",
@@ -286,6 +302,10 @@ const (
 	ReasonIntegrityEvidenceMissing   = "truth_integrity_evidence_artifact_missing"
 	ReasonIntegritySlugMismatch      = "truth_integrity_slug_mismatch"
 	ReasonIntegrityAuditOnly         = "truth_integrity_audit_only"
+	// K5: the truth body carries a UI/design section while the
+	// frontmatter declares ux_required: false (audit by default,
+	// blocking under gate integrity --strict).
+	ReasonIntegrityUxMismatch = "truth_ux_requirement_mismatch"
 )
 
 // ---- Intent gate family (R1: ask before sign) ----

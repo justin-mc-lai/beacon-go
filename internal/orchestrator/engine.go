@@ -115,26 +115,33 @@ func (e *Engine) SetStopWhenEvaluator(ev core.StopWhenEvaluator) { e.stopWhen = 
 // RunView is the stable JSON surface of one goal run (AC-065 style:
 // snake_case, one document).
 type RunView struct {
-	RunID                 string             `json:"run_id"`
-	FeatureID             string             `json:"feature_id"`
-	FeatureSlug           string             `json:"feature_slug"`
-	Status                string             `json:"status"` // running | blocked | completed | error_recovery
-	RunStatus             string             `json:"run_status"`
-	Blocked               bool               `json:"blocked"`
-	ReasonCode            string             `json:"reason_code,omitempty"`
-	CurrentStage          string             `json:"current_stage,omitempty"`
-	LoopStage             string             `json:"loop_stage"`
-	NextSkill             string             `json:"next_skill,omitempty"`
-	StagePlan             []StagePlanEntry   `json:"stage_plan"`
-	Verifier              *VerifierInfo      `json:"verifier,omitempty"`
-	ReleaseHumanConfirmed bool               `json:"release_human_confirmed"`
-	ReleasePolicy         string             `json:"release_policy"`
-	ReleaseShadow         *ReleaseShadowView `json:"release_shadow,omitempty"`
-	RepairLoopCount       int                `json:"repair_loop_count"`
-	BlockedStreak         int                `json:"blocked_streak"`
-	UpToDate              bool               `json:"up_to_date,omitempty"`
-	LastHeartbeatAt       string             `json:"last_heartbeat_at,omitempty"`
-	StartedAt             string             `json:"started_at"`
+	RunID                 string           `json:"run_id"`
+	FeatureID             string           `json:"feature_id"`
+	FeatureSlug           string           `json:"feature_slug"`
+	Status                string           `json:"status"` // running | blocked | completed | error_recovery
+	RunStatus             string           `json:"run_status"`
+	Blocked               bool             `json:"blocked"`
+	ReasonCode            string           `json:"reason_code,omitempty"`
+	CurrentStage          string           `json:"current_stage,omitempty"`
+	LoopStage             string           `json:"loop_stage"`
+	NextSkill             string           `json:"next_skill,omitempty"`
+	StagePlan             []StagePlanEntry `json:"stage_plan"`
+	Verifier              *VerifierInfo    `json:"verifier,omitempty"`
+	ReleaseHumanConfirmed bool             `json:"release_human_confirmed"`
+	// ExecutorMode / TickHint / StageGate make the run's delivery
+	// mechanics readable: an executor the kernel does not drive says
+	// so, and the current stage's gate shows whether it was evaluated
+	// (delivery-paradigm AC-001 / AC-003).
+	ExecutorMode    string             `json:"executor_mode,omitempty"`
+	TickHint        string             `json:"tick_hint,omitempty"`
+	StageGate       *StageGateView     `json:"stage_gate,omitempty"`
+	ReleasePolicy   string             `json:"release_policy"`
+	ReleaseShadow   *ReleaseShadowView `json:"release_shadow,omitempty"`
+	RepairLoopCount int                `json:"repair_loop_count"`
+	BlockedStreak   int                `json:"blocked_streak"`
+	UpToDate        bool               `json:"up_to_date,omitempty"`
+	LastHeartbeatAt string             `json:"last_heartbeat_at,omitempty"`
+	StartedAt       string             `json:"started_at"`
 	// P2b long-run care surfaces (present only when the corresponding
 	// subsystem has state on the run).
 	Driver          *DriverState     `json:"driver,omitempty"`
@@ -262,6 +269,7 @@ func viewOf(run store.Run, m *runMeta, slug string) RunView {
 		RunStatus: string(runStatusFor(m)), Blocked: m.Blocked,
 		LoopStage: m.LoopStage, StagePlan: m.StagePlan,
 		Verifier: m.Verifier, ReleaseHumanConfirmed: m.ReleaseHumanConfirmed,
+		ExecutorMode:  m.ExecutorMode,
 		ReleasePolicy: releasePolicyOrHuman(m.ReleasePolicy), ReleaseShadow: m.ReleaseShadow,
 		RepairLoopCount: m.RepairLoopCount, BlockedStreak: m.BlockedStreak,
 		LastHeartbeatAt: m.LastHeartbeatAt, StartedAt: run.StartedAt,
@@ -291,6 +299,10 @@ func viewOf(run store.Run, m *runMeta, slug string) RunView {
 	if m.LastBlockReason != "" && m.Blocked {
 		v.ReasonCode = m.LastBlockReason
 	}
+	if m.isManualExecutor() && m.LoopStage != string(core.LoopDone) {
+		v.TickHint = "not auto-driven: record each stage with `beacon goal tick --run-id " +
+			run.ID + " --by <identity>`"
+	}
 	if v.CurrentStage != "" {
 		if skills := ProgressiveSkills[v.CurrentStage]; len(skills) > 0 {
 			v.NextSkill = skills[0]
@@ -305,7 +317,14 @@ func (e *Engine) Status(runID string) (RunView, error) {
 	if err != nil {
 		return RunView{}, err
 	}
-	return viewOf(run, m, slug), nil
+	v := viewOf(run, m, slug)
+	// AC-003: status says whether the current stage's gate has a
+	// recorded verdict — a run stuck before its gate must not look
+	// like it is merely "in progress".
+	if v.CurrentStage != "" {
+		v.StageGate = e.stageGateView(run.ID, v.CurrentStage)
+	}
+	return v, nil
 }
 
 // ---- CreateRun (G-01) ----
@@ -319,6 +338,16 @@ type CreateRunOptions struct {
 	Utterance   string
 	UXRequired  bool
 	ExecutorID  string
+	// ExecutorMode is the explicit executor selector (manual |
+	// external | recording | subprocess | subprocess:<profile> |
+	// ralph). Validated at creation; an unknown value is refused
+	// before any run row exists.
+	ExecutorMode string
+	// ExecutorDefaulted records that the caller supplied no executor
+	// selector and the run defaulted to manual (the creation output
+	// must say so — review B4 keeps the original silent-create path
+	// from recurring).
+	ExecutorDefaulted bool
 	// Lakes are the run's lake slugs (v1 goal run records them; the
 	// parallel plan and lane routing consult the count). Scale is the
 	// task-size field the lane router consults ("" = unset).
@@ -341,6 +370,12 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 	if err != nil {
 		return RunView{}, err
 	}
+	// K1: an executor the kernel cannot drive is refused HERE, before
+	// the run row exists — no run that only fails on its first tick.
+	execMode, err := NormalizeRunExecutor(opts.ExecutorMode)
+	if err != nil {
+		return RunView{}, err
+	}
 	root := store.ResolveRootPath(opts.ProjectRoot)
 	ctx, err := e.store.ResolveFeature(root, opts.FeatureSlug, opts.Version)
 	if err != nil {
@@ -356,16 +391,18 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 	}
 	stages := BuildStageOrder(opts.UXRequired)
 	m := &runMeta{
-		Utterance:       opts.Utterance,
-		UXRequired:      opts.UXRequired,
-		CurrentStageIdx: 0,
-		ExecutorID:      opts.ExecutorID,
-		Verifier:        &VerifierInfo{RequiredForComplete: true, Present: false},
-		ReleasePolicy:   releasePolicy,
-		LastHeartbeatAt: time.Now().UTC().Format(time.RFC3339Nano),
-		Lakes:           opts.Lakes,
-		TaskScale:       opts.Scale,
-		Exec:            opts.Exec,
+		Utterance:         opts.Utterance,
+		UXRequired:        opts.UXRequired,
+		CurrentStageIdx:   0,
+		ExecutorID:        opts.ExecutorID,
+		ExecutorMode:      execMode,
+		ExecutorDefaulted: opts.ExecutorDefaulted,
+		Verifier:          &VerifierInfo{RequiredForComplete: true, Present: false},
+		ReleasePolicy:     releasePolicy,
+		LastHeartbeatAt:   time.Now().UTC().Format(time.RFC3339Nano),
+		Lakes:             opts.Lakes,
+		TaskScale:         opts.Scale,
+		Exec:              opts.Exec,
 		// S3 (AC-173): the topology fact is part of the run's fact
 		// layer from creation — recorded openly (missing included),
 		// never a creation-time block.

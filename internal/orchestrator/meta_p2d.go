@@ -156,19 +156,35 @@ type ProgramRollup struct {
 // (program_orchestrator.py's build_program_orchestrator_state,
 // re-based from files to the store).
 type ProgramRouteView struct {
-	RunID         string        `json:"run_id"`
-	ProgramSlug   string        `json:"program_slug"`
-	Frozen        bool          `json:"frozen"`
-	Lakes         []LakeRoute   `json:"lakes"`
-	NextBatch     []string      `json:"next_batch"`
-	AllComplete   bool          `json:"all_complete"`
-	ProgramStatus string        `json:"program_status"` // running | awaiting_release | blocked | delivered
-	Rollup        ProgramRollup `json:"rollup"`
+	RunID       string      `json:"run_id"`
+	ProgramSlug string      `json:"program_slug"`
+	Frozen      bool        `json:"frozen"`
+	Lakes       []LakeRoute `json:"lakes"`
+	NextBatch   []string    `json:"next_batch"`
+	// NextActions is the executable order (K4): every unfinished lake's
+	// next step, in topological order, naming the lake and the exact
+	// command — including `truth freeze` for lakes whose truth is not
+	// frozen yet. NextBatch stays the admission batch; NextActions is
+	// what a caller actually runs next.
+	NextActions   []ProgramNextAction `json:"next_actions,omitempty"`
+	AllComplete   bool                `json:"all_complete"`
+	ProgramStatus string              `json:"program_status"` // running | awaiting_release | blocked | delivered
+	Rollup        ProgramRollup       `json:"rollup"`
 	// Proposal provenance (sea-to-lake): the AI proposal and the
 	// human's multi-select counts, so route can show intent drift.
 	ProposalID       string `json:"proposal_id,omitempty"`
 	ProposalSelected int    `json:"proposal_selected,omitempty"`
 	ProposalRejected int    `json:"proposal_rejected,omitempty"`
+}
+
+// ProgramNextAction is one ordered, executable next step of a program
+// route.
+type ProgramNextAction struct {
+	Order   int    `json:"order"`
+	Lake    string `json:"lake"`
+	Action  string `json:"action"` // truth_package | truth_freeze | wait_dependency | admit | start_lake_run | drive | complete_lake
+	Command string `json:"command,omitempty"`
+	Reason  string `json:"reason,omitempty"`
 }
 
 // Lake route statuses.

@@ -1,0 +1,54 @@
+# delivery-paradigm task2: Step 0 truth change + refreeze (evidence paths) and the implementation ledger refreeze
+
+## Change 1 (Step 0): Intent Coverage evidence paths point at files that exist
+change: chg_4662b4340536
+rebase: chg_4662b4340536 (the edit had begun before the change was opened; base realigned to the frozen body)
+refreeze: ok -> frozen
+
+## Change 2 (implementation ledger): TASK-001..TASK-010 ticked with real evidence
+change: chg_ab8206016487
+refreeze: ok -> frozen (first attempt blocked: checkbox_checked_without_evidence_file for two paths that only exist on the branch; both repointed at canonical files)
+
+## Now (on fix/delivery-paradigm)
+
+$ beacon-go truth show --feature delivery-paradigm
+package:  delivery-paradigm (v2.0.0)
+status:   frozen
+dir:      docs/beacon/v2.0.0/features/delivery-paradigm
+lifecycle: Freeze/Completed
+branch:   check=mismatch current=fix/delivery-paradigm canonical=main
+baseline: uncommitted
+
+$ beacon-go truth list --project . | grep delivery-paradigm
+delivery-paradigm                          v2.0.0   frozen/Freeze
+
+--- truth.md Intent Coverage references ---
+57:| AC-001 | K1 观察：manual/external 执行器创建后永报未注册 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+58:| AC-002 | K1 期望：创建期直接拒绝并说明 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+59:| AC-003 | K2 观察：阶段在跑、门没评估 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+60:| AC-004 | K3 观察：外部完成没有回写入口 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+61:| AC-005 | K4 观察：route 只给 blocked 与 next batch | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+62:| AC-006 | K5 观察：ux_required=false 但正文有 UI 规格章节 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+63:| AC-007 | K6 观察：没有 conformance 自检 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/repro-k1-k6 |
+64:| AC-008 | DoD：端到端测试全过 | docs/beacon/v2.0.0/features/delivery-paradigm/evidence/go-test-main |
+
+--- tasks.md ledger ---
+## Task Ledger
+
+- [x] TASK-000 落 delivery-paradigm 四件套并冻结 truth（TASK-1） · ac=GATES · evidence=docs/beacon/v2.0.0/features/delivery-paradigm/evidence/freeze-log
+- [x] TASK-001 goal run 接受 manual 与 external 执行器，创建输出写明需 goal tick --by 记录完成 · ac=AC-001 · evidence=internal/cli/goal.go
+- [x] TASK-002 拒绝未知执行器并返回 stage_executor_unsupported · ac=AC-002 · evidence=internal/orchestrator/tick.go
+- [x] TASK-003 goal tick 离开阶段时持久化 evaluated=true 的出口判定，未评估则 park · ac=AC-003 · evidence=internal/orchestrator/tick.go
+- [x] TASK-004 goal receive-result 增加 --external，免除 delegation-id 并写回 artifact 指针 · ac=AC-004 · evidence=internal/cli/goal_p2c.go
+- [x] TASK-005 program route 输出 next actions 拓扑顺序与 truth freeze 建议 · ac=AC-005 · evidence=internal/orchestrator/program_route.go
+- [x] TASK-006 gate integrity 检查 ux_required 与正文 UI 章节的一致性 · ac=AC-006 · evidence=internal/gate/integrity.go
+- [x] TASK-007 新增 goal conformance 自检并给可判定退出码 · ac=AC-007 · evidence=internal/cli/goal.go
+- [x] TASK-008 新增六阶段端到端测试，五门加工 plan 出口全部 evaluated=true · ac=AC-008 · evidence=docs/beacon/v2.0.0/features/delivery-paradigm/evidence/task2-e2e
+- [x] TASK-009 AC-009 提案门回归测试原样通过 · ac=AC-009 · evidence=docs/beacon/v2.0.0/features/delivery-paradigm/evidence/task2-ac009
+- [x] TASK-010 全量 go test ./... 通过并落 evidence · ac=AC-008 · evidence=docs/beacon/v2.0.0/features/delivery-paradigm/evidence/task2-go-test
+
+## Boundary
+
+--- changes/ ---
+chg_4662b4340536.md
+chg_ab8206016487.md

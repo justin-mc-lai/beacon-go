@@ -1,0 +1,142 @@
+$ goal run --executor recording --ux
+run_b0b3f8497f7e4849d9041f39
+$ goal tick #1
+run:    run_b0b3f8497f7e4849d9041f39
+status: running (loop_stage truth_routing)
+stage:  truth
+blocked: false
+executor: recording
+next:   beacon-truth
+$ goal tick #2
+run:    run_b0b3f8497f7e4849d9041f39
+status: running (loop_stage review_routing)
+stage:  design
+blocked: false
+executor: recording
+next:   beacon-design
+$ goal design-stage bind
+bound: true primitives: beacon-design (1.0.0)
+$ gate evaluate design
+gate:      design
+feature:   demo4
+verdict:   pass
+run:       run_b0b3f8497f7e4849d9041f39
+evaluator: designer
+  [ok   ] design_required          run requires design (UX)
+  [ok   ] binding_present          design primitives bound: beacon-design
+  [ok   ] binding_version_match    binding version 1.0.0 consistent with the binding event
+$ goal tick #3
+run:    run_b0b3f8497f7e4849d9041f39
+status: running (loop_stage implement_routing)
+stage:  implement
+blocked: false
+executor: recording
+next:   beacon-implement
+$ goal tick #4
+run:    run_b0b3f8497f7e4849d9041f39
+status: blocked (loop_stage implement_routing)
+stage:  implement
+blocked: true
+executor: recording
+reason: standard_flow_verification_incomplete
+Error: goal: run run_b0b3f8497f7e4849d9041f39 is blocked (standard_flow_verification_incomplete)
+
+(truth refs repaired + refrozen; resuming delivery run)
+$ goal tick #4
+run:    run_b0b3f8497f7e4849d9041f39
+status: running (loop_stage qa_routing)
+stage:  qa
+blocked: false
+executor: recording
+next:   beacon-qa
+$ goal tick #5
+run:    run_b0b3f8497f7e4849d9041f39
+status: blocked (loop_stage qa_routing)
+stage:  qa
+blocked: true
+executor: recording
+reason: stage_exit_qa_evidence_missing
+Error: goal: run run_b0b3f8497f7e4849d9041f39 is blocked (stage_exit_qa_evidence_missing)
+$ goal artifacts register
+artifact: art_3a22bc3f742820fd51e84b33
+kind:     qa_evidence
+path:     /tmp/dp-demo4/qa-report.md
+hash:     1b9a48e62a3635c6ab838098e6cdee624dfa29cf40f7880b79db385097880d94
+size:     28
+$ goal tick #6
+run:    run_b0b3f8497f7e4849d9041f39
+status: blocked (loop_stage qa_routing)
+stage:  qa
+blocked: true
+executor: recording
+reason: stage_exit_qa_evidence_missing
+Error: goal: run run_b0b3f8497f7e4849d9041f39 is blocked (stage_exit_qa_evidence_missing)
+$ goal attach-verifier
+run:    run_b0b3f8497f7e4849d9041f39
+status: running (loop_stage qa_routing)
+stage:  qa
+blocked: false
+executor: recording
+$ goal complete --human-confirmed
+run:    run_b0b3f8497f7e4849d9041f39
+status: running (loop_stage qa_routing)
+stage:  qa
+blocked: false
+executor: recording
+reason: not_at_release_gate
+Error: goal.Complete: current loop stage is qa_routing (not_at_release_gate)
+$ gate evaluate release
+gate:      release
+feature:   demo4
+verdict:   blocked
+run:       run_b0b3f8497f7e4849d9041f39
+evaluator: release-audit
+  [ok   ] gate_truth_freeze_passed latest truth_freeze verdict is pass
+  [ok   ] gate_design_passed       latest design verdict is pass
+  [ok   ] gate_implement_passed    latest implement verdict is pass
+  [BLOCK] gate_qa_passed           gate qa has never been evaluated; run `beacon gate evaluate qa` first
+  [ok   ] truth_materials_fresh    no package material is marked stale
+Error: gate evaluate: gate release blocked for feature demo4 (gate_not_evaluated)
+$ goal continue (artifact is new evidence)
+run:    run_b0b3f8497f7e4849d9041f39
+status: running (loop_stage release_gate)
+stage:  release
+blocked: false
+executor: recording
+next:   beacon-release
+$ goal complete --human-confirmed
+run:    run_b0b3f8497f7e4849d9041f39
+status: completed (loop_stage done)
+stage:  release
+blocked: false
+executor: recording
+next:   beacon-release
+$ gate evaluate release
+gate:      release
+feature:   demo4
+verdict:   pass
+run:       run_b0b3f8497f7e4849d9041f39
+evaluator: release-audit
+  [ok   ] gate_truth_freeze_passed latest truth_freeze verdict is pass
+  [ok   ] gate_design_passed       latest design verdict is pass
+  [ok   ] gate_implement_passed    latest implement verdict is pass
+  [ok   ] gate_qa_passed           latest qa verdict is pass
+  [ok   ] truth_materials_fresh    no package material is marked stale
+  [ok   ] human_confirmation       human release confirmation on record (by owner)
+recorded:  gate_9277cf0405dff81d4bb11c17 (2026-11-08T15:24:22.649872000Z)
+=== RUN   TestDeliveryParadigmEndToEnd
+--- PASS: TestDeliveryParadigmEndToEnd (0.53s)
+=== RUN   TestConformanceRejectsUnevaluatedExternalResult
+--- PASS: TestConformanceRejectsUnevaluatedExternalResult (0.07s)
+=== RUN   TestManualImplementEntryEvaluatesAdmissionBundle
+--- PASS: TestManualImplementEntryEvaluatesAdmissionBundle (2.28s)
+=== RUN   TestManualImplementEntryBlocksOnAdmission
+--- PASS: TestManualImplementEntryBlocksOnAdmission (2.16s)
+=== RUN   TestGateFactsAreRunScoped
+--- PASS: TestGateFactsAreRunScoped (0.94s)
+=== RUN   TestConformanceStateExportedAcceptsRecordOnly
+--- PASS: TestConformanceStateExportedAcceptsRecordOnly (1.01s)
+=== RUN   TestStageExitRecordCarriesAttribution
+--- PASS: TestStageExitRecordCarriesAttribution (0.07s)
+PASS
+ok  	beacon-go/internal/orchestrator	7.823s

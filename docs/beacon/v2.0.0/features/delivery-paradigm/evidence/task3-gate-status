@@ -1,0 +1,8 @@
+$ gate status --feature demo4
+plan             pass       [stage_exit_ok] (2026-11-08T15:23:55.128065000Z)
+truth_freeze     pass       [stage_exit_ok] (2026-11-08T15:23:55.185149000Z)
+design           pass       [stage_exit_ok] (2026-11-08T15:23:55.277190000Z)
+implement        pass       [stage_exit_ok] (2026-11-08T15:24:16.889289000Z)
+qa               pass       [stage_exit_ok] (2026-11-08T15:24:22.612951000Z)
+release          pass       [] (2026-11-08T15:24:22.649872000Z)
+truth_integrity  pass       [] (2026-11-08T15:24:13.752730000Z)

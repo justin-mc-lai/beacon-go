@@ -1,0 +1,61 @@
+TASK-3 (r1 BLOCKED -> 返修) 复跑对照
+项目：/Users/apple/Developer/Personal/products/beacon-go
+分支：fix/delivery-paradigm
+真实 CLI 项目：/tmp/dp-demo4（feature demo4，非 git，frontmatter 冻结口径）
+二进制：go build -o /tmp/beacon-go-dp ./cmd/beacon（v2.0.0-go.15）
+
+B1 · conformance 假阳性（验收员 evidence/qa-r1-conformance-false-positive）
+  复现：external run -> attach-verifier -> receive-result --external -> 零 tick -> conformance
+  修后输出（task3-conformance-neg，run_ba7ac81fd530e91ed4ea7a1b）：
+    conformance: fail
+      [ok  ] truth_frozen       frozen source: frontmatter
+      [FAIL] gates_evaluated    plan: stage exit not evaluated by this run; ... release: no release gate verdict bound to this run
+      [ok  ] verifier_attached
+      [FAIL] state_exported
+    exit=1
+  结论：fixed。gates_evaluated 只认本 run 的 stage_exit_evaluated（并解析 gate_result_id 到真实 gate 行）；
+  ReceiveExternalResult 不再把 StagePlan 全标 done；正向往返仍 pass（task3-state-export）。
+
+B2 · AC-142 入口闸被 manual 绕过（验收员 evidence/qa-r1-admission-bypass）
+  复现：--executor manual run 从 plan 走到 implement
+  修后输出（task3-admission，run_75592c366cf9ce1bda17f664）：
+    stage_exit_evaluated / stage_advanced ×2
+    admission_bundle_evaluated（payload gate_type=admission_bundle）
+    stage_exit_evaluated / stage_advanced（implement 出口）
+  结论：fixed。Tick 的 admissionBundleForEntry 移到 manual/external 分支之前，所有执行器同闸；
+  负向 TestManualImplementEntryBlocksOnAdmission 证明 bundle 不过时 manual run park。
+
+B3 · run 级读数（验收员 evidence/qa-r1-run-scope, qa-r1-k1-default-path）
+  复现：同一 feature 已有 run A 的 design pass，再建 run B 推到 design 看 goal status
+  修后输出（task3-run-scope，run_9b716e562c702da2ed339343）：
+    gate status: design pass（A 的 feature 级记录仍在，gate status 是 feature 读面）
+    goal status run B: gate: design evaluated=false (this stage has no recorded verdict)
+  结论：fixed。stageGateView 与 buildExitInput 的 LatestGates 只来自本 run 的事件；
+   artifact 计数按 run 归因；feature 级 fallback 仅保留正式 verdict，并排除兄弟 run 的 stage exit 行
+   （TestGateFactsAreRunScoped：B 到 qa 没有自己的 artifact 时判 stage_exit_qa_evidence_missing）。
+
+B4 · K1 原始路径（验收员 evidence/qa-r1-k1-default-path）
+  复现：goal run --project ... --feature demo4 --executor-id renlink-dev-room（无 --executor/--exec-cmd）
+  修后输出（task3-k1-default，run_d83becb4fe36820f26ae8fcf）：
+    创建：executor: manual；no --executor given: defaulted to executor manual. This run does NOT auto-drive;
+          beacon goal tick --run-id ... --by <identity>
+    首次 tick：reason: stage_manual_tick_required（exit=1）
+  结论：fixed。创建期就写明默认 manual 与 tick 契约；不再出现“静默创建、首次 tick 才报 stage_executor_not_registered”。
+  recording/subprocess/subprocess:<profile>/ralph 既有路径由 TestGoalCLIFullChain、TestGoalP3CRealChain、
+  go test ./... 覆盖，未回归。
+
+B5 · state_exported 口径（验收员 evidence/qa-r1-state-export-q5）
+  复现：export-state 后删除 .beacon/state/project-state.json，只保留 state_snapshot_exported 记录
+  修后输出（task3-state-export，run_b0b3f8497f7e4849d9041f39）：
+    未导出：state_exported FAIL（exit=1）
+    导出后：state_exported pass（snapshot ...，exit=0）
+    删快照留记录：state_exported pass（export record 2026-11-08T15:24:28Z，exit=0）
+  结论：fixed。快照或导出记录任一存在即 pass，两者都缺失才 fail。
+
+六阶段交付（同一 run）
+  gate status（task3-gate-status）：
+    plan pass / truth_freeze pass / design pass / implement pass / qa pass / release pass / truth_integrity pass
+  conformance（task3-state-export）：四项全 pass，exit=0。
+
+P2 · 未冻结细节文案：Conformance 在 truth 未冻结时输出
+  "truth package is not frozen (status source: ...)"（原先打印 frozen source: frontmatter）。

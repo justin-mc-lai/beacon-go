@@ -1,0 +1,34 @@
+# qa-r2 B3: gate facts are run-scoped (no cross-run green)
+date: 2026-11-08T15:39:06Z
+
+Project /tmp/qa-r2-demo, feature qa-r2-feat.
+Run A run_107a0de4076c7ef602238719 recorded its plan exit. Run C run_34c7e0eb8339e4294a19bf20 was created but never ticked.
+
+$ beacon goal status --run-id run_34c7e0eb8339e4294a19bf20
+run:    run_34c7e0eb8339e4294a19bf20
+status: running (loop_stage governance_precheck)
+stage:  plan
+executor: manual
+gate:   plan evaluated=false (this stage has no recorded verdict)
+## run C events
+goal_run_created
+
+## design cross-run: run_595d0fe07a38274b33f1c4ee carries a design pass; sibling run_b3b472aaf3f27e196f394d6c has none.
+$ beacon goal status --run-id run_b3b472aaf3f27e196f394d6c
+stage:  design
+gate:   design evaluated=false (this stage has no recorded verdict)
+$ beacon goal tick --run-id run_b3b472aaf3f27e196f394d6c --by maker2
+(tick refused the design exit: the sibling's design pass is not this run's evidence)
+$ beacon goal status --run-id run_b3b472aaf3f27e196f394d6c
+status: blocked (loop_stage review_routing)
+stage:  design
+blocked: true
+reason: stage_exit_design_incomplete
+gate:   design evaluated=false (this stage has no recorded verdict)
+status: blocked (loop_stage review_routing)
+stage:  design
+blocked: true
+reason: stage_exit_design_incomplete
+
+## code: stageGateView and buildExitInput read this run's events (delivery_paradigm.go:101, exitgates.go:341);
+## design/implement exits use runVerdictOf only (exitgates.go:153); sibling stage exits are excluded from the feature fallback (exitgates.go:395-415).

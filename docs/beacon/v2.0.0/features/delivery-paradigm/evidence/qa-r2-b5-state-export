@@ -1,0 +1,27 @@
+# qa-r2 B5: state_exported accepts the export record OR the snapshot (truth Q5)
+date: 2026-11-08T15:38:55Z
+
+## A. record only (snapshot file deleted, state_snapshot_exported event kept)
+feature qa-r2-feat has 1 state_snapshot_exported event; .beacon/state/project-state.json removed.
+ls: /tmp/qa-r2-demo/.beacon/state/project-state.json: No such file or directory
+$ beacon goal conformance --run-id run_9409ede0582b51581b85fbd5
+run:         run_9409ede0582b51581b85fbd5
+feature:     qa-r2-feat
+conformance: fail
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [FAIL] gates_evaluated    plan: stage exit not evaluated by this run; truth: stage exit not evaluated by this run; implement: stage exit not evaluated by this run; qa: stage exit not evaluated by this run; release: no release gate verdict bound to this run
+  [ok  ] verifier_attached  verifier qa-r2-verifier with /tmp/qa-r2-verifier.md
+  [ok  ] state_exported     export record 2026-11-08T15:38:52Z (snapshot file absent at /private/tmp/qa-r2-demo/.beacon/state/project-state.json)
+Error: goal conformance: delivery not recognised; failed: gates_evaluated (goal_conformance_failed)
+
+## B. snapshot present again (projects export-state)
+state snapshot: /private/tmp/qa-r2-demo/.beacon/state/project-state.json (1 versions, 7 features)
+$ beacon goal conformance --run-id run_595d0fe07a38274b33f1c4ee
+run:         run_595d0fe07a38274b33f1c4ee
+feature:     qa-r2-feat
+conformance: pass
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [ok  ] gates_evaluated    every stage gate carries a recorded pass
+  [ok  ] verifier_attached  verifier qa-r2-verifier with /tmp/qa-r2-verifier2.md
+  [ok  ] state_exported     snapshot /private/tmp/qa-r2-demo/.beacon/state/project-state.json
+exit=0

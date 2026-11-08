@@ -1,0 +1,45 @@
+# delivery-paradigm task2: K4 program route next actions (real program)
+
+$ beacon-go goal program route --run-id run_3b9c28cddb5484a8e6460f9d
+program: sea-lp_1794149508957804000 (frozen=true, all_complete=false)
+proposal: lp_1794149508957804000 selected=3 rejected=0
+  demo             completed  
+  demo-b           ready      
+    drive: beacon goal program admit --run-id run_3b9c28cddb5484a8e6460f9d --lake demo-b; then beacon goal run --feature demo-b (then: beacon goal driver start --run-id <lake run>)
+  demo-c           blocked    program_truth_not_frozen
+next batch: demo-b
+next actions:
+  1. admit demo-b
+     beacon goal program admit --run-id run_3b9c28cddb5484a8e6460f9d --lake demo-b
+     lake demo-b is ready; admit it before starting its run
+  2. start_lake_run demo-b
+     beacon goal run --project . --feature demo-b
+     create the lake's goal run after admission
+  3. truth_freeze demo-c
+     beacon truth freeze --project . --feature demo-c
+     lake demo-c truth is not frozen (fill != freeze): freeze it before admission
+
+--- route --json next_actions ---
+[
+  {
+    "order": 1,
+    "lake": "demo-b",
+    "action": "admit",
+    "command": "beacon goal program admit --run-id run_3b9c28cddb5484a8e6460f9d --lake demo-b",
+    "reason": "lake demo-b is ready; admit it before starting its run"
+  },
+  {
+    "order": 2,
+    "lake": "demo-b",
+    "action": "start_lake_run",
+    "command": "beacon goal run --project . --feature demo-b",
+    "reason": "create the lake's goal run after admission"
+  },
+  {
+    "order": 3,
+    "lake": "demo-c",
+    "action": "truth_freeze",
+    "command": "beacon truth freeze --project . --feature demo-c",
+    "reason": "lake demo-c truth is not frozen (fill != freeze): freeze it before admission"
+  }
+]

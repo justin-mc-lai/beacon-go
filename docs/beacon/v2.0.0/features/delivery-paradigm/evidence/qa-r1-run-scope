@@ -1,0 +1,20 @@
+# qa-r1 K2/AC-003: gate facts are feature-scoped, not run-scoped
+date: 2026-11-08T15:09:37Z
+
+Project /tmp/qa-r1-prog, feature lake-c.
+Run A (run_2ddbd0e9c22f3643b1bfef51) was ticked once (plan exit recorded).
+Run B (run_0dad959a4fabb6edbdbc7b78) was created but never ticked.
+
+$ beacon goal status --run-id run_0dad959a4fabb6edbdbc7b78
+run:    run_0dad959a4fabb6edbdbc7b78
+status: running (loop_stage governance_precheck)
+stage:  plan
+blocked: false
+gate:   plan evaluated=true verdict=pass
+next:   beacon-plan
+
+## run B events (only creation)
+goal_run_created
+
+## conclusion: status reports 'plan evaluated=true verdict=pass' borrowed from run A's
+## feature-level gate_results row; this run itself never evaluated plan.

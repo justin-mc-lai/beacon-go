@@ -1,0 +1,12 @@
+# delivery-paradigm task2: AC-009 regression (three named tests, unmodified)
+
+=== RUN   TestProgramPlanRequiresProposal
+--- PASS: TestProgramPlanRequiresProposal (0.03s)
+PASS
+ok  	beacon-go/internal/cli	0.380s
+=== RUN   TestProgramSelectRecordsDecision
+--- PASS: TestProgramSelectRecordsDecision (0.12s)
+=== RUN   TestProgramPlanFreezeChange
+--- PASS: TestProgramPlanFreezeChange (0.03s)
+PASS
+ok  	beacon-go/internal/orchestrator	0.480s

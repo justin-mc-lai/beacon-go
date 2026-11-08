@@ -68,6 +68,13 @@ func scanGate(row interface{ Scan(...any) error }) (GateResult, error) {
 
 const gateCols = `id, feature_id, gate_type, verdict, reason_codes_json, evaluated_at`
 
+// GetByID returns one gate_results row by id (the run-scoped readers
+// resolve the gate_result_id an exit event points at, so a verdict is
+// never trusted from a payload alone).
+func (d *GateDao) GetByID(id string) (GateResult, error) {
+	return scanGate(d.q.QueryRow(`SELECT `+gateCols+` FROM gate_results WHERE id = ?`, id))
+}
+
 // Latest returns the newest evaluation of (feature, gate_type).
 func (d *GateDao) Latest(featureID, gateType string) (GateResult, error) {
 	return scanGate(d.q.QueryRow(`SELECT `+gateCols+` FROM gate_results WHERE feature_id = ? AND gate_type = ? ORDER BY evaluated_at DESC, rowid DESC LIMIT 1`, featureID, gateType))

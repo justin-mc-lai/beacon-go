@@ -1,0 +1,18 @@
+# delivery-paradigm task2: full go test ./... -count=1 (fresh, final HEAD)
+# 2026-11-08T14:56:38Z branch=fix/delivery-paradigm head=231801b
+
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.488s
+ok  	beacon-go/internal/agentapi	5.627s
+ok  	beacon-go/internal/benchgate	0.802s
+ok  	beacon-go/internal/cli	17.779s
+ok  	beacon-go/internal/core	1.948s
+ok  	beacon-go/internal/gate	2.716s
+ok  	beacon-go/internal/harness	12.330s
+ok  	beacon-go/internal/llm	4.381s
+ok  	beacon-go/internal/migration	3.293s
+ok  	beacon-go/internal/orchestrator	87.780s
+ok  	beacon-go/internal/session	4.432s
+ok  	beacon-go/internal/store	4.727s
+ok  	beacon-go/internal/workspace	5.198s
+ok  	beacon-go/skills	3.567s

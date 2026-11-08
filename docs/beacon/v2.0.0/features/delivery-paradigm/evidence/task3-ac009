@@ -1,0 +1,13 @@
+$ git diff --stat main..HEAD -- internal/cli/goal_proposal_gate_test.go internal/orchestrator/p2d_program_test.go internal/orchestrator/lake_proposal_test.go
+
+$ go test ./internal/cli ./internal/orchestrator -run TestProgramPlanRequiresProposal|TestProgramPlanFreezeChange|TestProgramSelectRecordsDecision -count=1 -v
+=== RUN   TestProgramPlanRequiresProposal
+--- PASS: TestProgramPlanRequiresProposal (0.03s)
+PASS
+ok  	beacon-go/internal/cli	0.887s
+=== RUN   TestProgramSelectRecordsDecision
+--- PASS: TestProgramSelectRecordsDecision (0.09s)
+=== RUN   TestProgramPlanFreezeChange
+--- PASS: TestProgramPlanFreezeChange (0.03s)
+PASS
+ok  	beacon-go/internal/orchestrator	0.452s

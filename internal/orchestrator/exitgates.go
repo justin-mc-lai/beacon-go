@@ -18,6 +18,8 @@
 package orchestrator
 
 import (
+	"encoding/json"
+
 	"beacon-go/internal/core"
 	"beacon-go/internal/store"
 )
@@ -40,6 +42,13 @@ const (
 type GateFact struct {
 	Verdict     string
 	ReasonCodes []string
+	EvaluatedAt string
+	Evaluator   string
+	// Source names the attribution of the fact. Run-scoped facts are
+	// "run_stage_exit" / "run_formal_gate"; a feature-level row read
+	// as a fallback is "feature_gate" and is never treated as this
+	// run's own stage-exit evidence.
+	Source string
 }
 
 // ExitInput is everything an exit decision may consult (DB-first).
@@ -75,8 +84,16 @@ type ExitInput struct {
 	// Lifecycle snapshot of the feature ("" when none recorded).
 	LifecycleStage  string
 	LifecycleStatus string
-	// LatestGates maps gate_type -> latest fact.
+	// LatestGates maps gate_type -> the latest fact THIS RUN produced
+	// (stage exits + formal evaluations bound to the run). Another
+	// run's verdict on the same feature must not appear here (review
+	// B3).
 	LatestGates map[string]GateFact
+	// FeatureGates maps gate_type -> the feature-level latest fact.
+	// Only consulted where the gate is genuinely feature-scoped (the
+	// plan veto gates, and the formal QA/release verdicts); every use
+	// is labelled with Source="feature_gate" on the verdict.
+	FeatureGates map[string]GateFact
 	// ArtifactCount is the number of artifact pointers across the
 	// feature's runs (QA evidence presence signal).
 	ArtifactCount int
@@ -92,12 +109,20 @@ type ExitInput struct {
 // verdict (P3a); FormalVerdict carries the deciding (or, for the
 // still-derived stages, the latest recorded) formal verdict.
 type ExitVerdict struct {
-	Allowed       bool   `json:"allowed"`
+	Allowed bool `json:"allowed"`
+	// Evaluated marks that a real judgement was established from the
+	// stage's facts. false means no gate covers the stage (or none of
+	// its facts could be read): the run must park with
+	// stage_gate_not_evaluated instead of advancing on a guess.
+	Evaluated     bool   `json:"evaluated"`
 	ReasonCode    string `json:"reason_code"`
 	ResumeAction  string `json:"resume_action"`
 	FillSkill     string `json:"fill_skill,omitempty"`
 	Derived       bool   `json:"derived"`
 	FormalVerdict string `json:"formal_verdict,omitempty"`
+	// FormalSource labels which fact decided (or informed) the
+	// formal verdict: run-scoped evidence or the feature-level row.
+	FormalSource string `json:"formal_source,omitempty"`
 	// FrozenSource (truth exit only): which source of the shared
 	// FrozenFact determination decided frozenness.
 	FrozenSource string `json:"frozen_source,omitempty"`
@@ -115,20 +140,49 @@ func firstCode(codes []string, fallback string) string {
 func blockedVerdict(reason, resume, fill string) ExitVerdict {
 	// Default is Derived=true; callers that were decided by a formal
 	// gate verdict override it (and set FormalVerdict).
-	return ExitVerdict{Allowed: false, ReasonCode: reason, ResumeAction: resume, FillSkill: fill, Derived: true}
+	return ExitVerdict{Allowed: false, Evaluated: true, ReasonCode: reason, ResumeAction: resume, FillSkill: fill, Derived: true}
 }
 
 func passVerdict() ExitVerdict {
-	return ExitVerdict{Allowed: true, ReasonCode: ReasonStageExitOK, ResumeAction: core.ResumeNone, Derived: true}
+	return ExitVerdict{Allowed: true, Evaluated: true, ReasonCode: ReasonStageExitOK, ResumeAction: core.ResumeNone, Derived: true}
 }
 
-// formalVerdictOf returns the latest formal verdict recorded for a
-// gate type ("" when never evaluated).
-func formalVerdictOf(in ExitInput, gateType string) string {
+// runVerdictOf returns the latest verdict recorded BY THIS RUN for a
+// gate type ("" when this run never evaluated it). Design and implement
+// exits use only this: a sibling run's pass is not this run's evidence.
+func runVerdictOf(in ExitInput, gateType string) string {
 	if g, ok := in.LatestGates[gateType]; ok {
 		return g.Verdict
 	}
 	return ""
+}
+
+// gateFactOf resolves the fact a feature-scoped decision consults: the
+// run's own fact first, then the feature-level latest (explicitly
+// labelled feature_gate so the caller can surface the source).
+func gateFactOf(in ExitInput, gateType string) (GateFact, bool) {
+	if g, ok := in.LatestGates[gateType]; ok {
+		return g, true
+	}
+	if g, ok := in.FeatureGates[gateType]; ok {
+		return g, true
+	}
+	return GateFact{}, false
+}
+
+// setFormal records the fact that informed a verdict, with its
+// attribution (run-scoped or feature-level).
+func setFormal(v *ExitVerdict, in ExitInput, gateType string) {
+	if g, ok := gateFactOf(in, gateType); ok {
+		v.FormalVerdict, v.FormalSource = g.Verdict, g.Source
+	}
+}
+
+// setRunFormal is setFormal restricted to facts THIS RUN recorded.
+func setRunFormal(v *ExitVerdict, in ExitInput, gateType string) {
+	if g, ok := in.LatestGates[gateType]; ok {
+		v.FormalVerdict, v.FormalSource = g.Verdict, g.Source
+	}
 }
 
 // EvaluateStageExit decides whether the current product stage may be
@@ -140,10 +194,11 @@ func EvaluateStageExit(in ExitInput) ExitVerdict {
 	case StagePlan:
 		// plan_to_truth_gate / truth_readiness may veto leaving plan.
 		for _, gt := range []string{"plan_to_truth", "truth_readiness"} {
-			if g, ok := in.LatestGates[gt]; ok && g.Verdict == "blocked" {
+			if g, ok := gateFactOf(in, gt); ok && g.Verdict == "blocked" {
 				v := blockedVerdict(firstCode(g.ReasonCodes, ReasonStageExitPlanIncompl),
 					core.ResumeLoadNextSkill, "beacon-gen-truth")
 				v.Derived, v.FormalVerdict = false, g.Verdict
+				v.FormalSource = g.Source
 				return v
 			}
 		}
@@ -157,7 +212,7 @@ func EvaluateStageExit(in ExitInput) ExitVerdict {
 			// means the frozen text is under authorised edit —
 			// the truth stage cannot be left until the refreeze.
 			v := blockedVerdict(core.ReasonTruthChangePending, core.ResumeAwaitFreezeAck, "beacon-gen-truth")
-			v.FormalVerdict = formalVerdictOf(in, "truth_freeze")
+			setFormal(&v, in, "truth_freeze")
 			v.FrozenSource = FrozenSourceChangePending
 			return v
 		}
@@ -168,7 +223,7 @@ func EvaluateStageExit(in ExitInput) ExitVerdict {
 			// Non-git projects never set this field (P4b caliber:
 			// frontmatter is the authority there).
 			v := blockedVerdict(core.ReasonCanonicalRefreezeNotCommitted, core.ResumeAwaitFreezeAck, "beacon-gen-truth")
-			v.FormalVerdict = formalVerdictOf(in, "truth_freeze")
+			setFormal(&v, in, "truth_freeze")
 			v.FrozenSource = in.FrozenSource
 			return v
 		}
@@ -179,7 +234,7 @@ func EvaluateStageExit(in ExitInput) ExitVerdict {
 			// (formal_gate); a frontmatter-decided pass is the
 			// document read live — still a derivation, marked so.
 			v.Derived = !in.TruthFrozenFormal
-			v.FormalVerdict = formalVerdictOf(in, "truth_freeze")
+			setFormal(&v, in, "truth_freeze")
 			v.FrozenSource = in.FrozenSource
 			return v
 		}
@@ -200,11 +255,11 @@ func EvaluateStageExit(in ExitInput) ExitVerdict {
 		if in.DesignEvidence {
 			v := passVerdict()
 			v.Derived = !in.DesignEvidenceFormal
-			v.FormalVerdict = formalVerdictOf(in, "design")
+			setRunFormal(&v, in, "design")
 			return v
 		}
 		v := blockedVerdict(ReasonStageExitDesignIncompl, core.ResumeLoadNextSkill, "beacon-design")
-		v.FormalVerdict = formalVerdictOf(in, "design")
+		setRunFormal(&v, in, "design")
 		return v
 	case StageImplement:
 		if g, ok := in.LatestGates["implement_admission"]; ok && g.Verdict == "blocked" {
@@ -223,15 +278,17 @@ func EvaluateStageExit(in ExitInput) ExitVerdict {
 		// reason codes, regardless of raw artifact counts. Only
 		// when no qa evaluation exists does the derived judgement
 		// (artifact presence) run, marked Derived.
-		if g, ok := in.LatestGates["qa"]; ok {
+		if g, ok := gateFactOf(in, "qa"); ok {
 			if g.Verdict == "pass" {
 				v := passVerdict()
 				v.Derived, v.FormalVerdict = false, g.Verdict
+				v.FormalSource = g.Source
 				return v
 			}
 			v := blockedVerdict(firstCode(g.ReasonCodes, ReasonStageExitQAEvidence),
 				core.ResumeLoadNextSkill, "beacon-qa")
 			v.Derived, v.FormalVerdict = false, g.Verdict
+			v.FormalSource = g.Source
 			return v
 		}
 		if in.ArtifactCount > 0 {
@@ -245,40 +302,57 @@ func EvaluateStageExit(in ExitInput) ExitVerdict {
 		// completion is Engine.Complete's human act (source-exact).
 		// A formal pass therefore reports release_awaiting_complete
 		// instead of the derived human-confirmation block.
-		if g, ok := in.LatestGates["release"]; ok {
+		if g, ok := gateFactOf(in, "release"); ok {
 			if g.Verdict == "pass" {
 				v := blockedVerdict(core.ReasonReleaseAwaitingComplete, core.ResumeAwaitHumanRelease, "beacon-release")
 				v.Derived, v.FormalVerdict = false, g.Verdict
+				v.FormalSource = g.Source
 				return v
 			}
 			v := blockedVerdict(firstCode(g.ReasonCodes, core.ReasonReleaseRequiresHuman),
 				core.ResumeAwaitHumanRelease, "beacon-release")
 			v.Derived, v.FormalVerdict = false, g.Verdict
+			v.FormalSource = g.Source
 			return v
 		}
 		// Source-exact: release never auto-exits on tick.
 		return blockedVerdict(core.ReasonReleaseRequiresHuman, core.ResumeAwaitHumanRelease, "beacon-release")
 	default:
-		// Unknown stage: fail closed, never default-pass.
-		return blockedVerdict(ReasonStageExitPlanIncompl, core.ResumeNone, "")
+		// Unknown stage: no gate covers it, so there is nothing to
+		// evaluate. Fail closed and name the real defect — the run may
+		// not advance on a stage the kernel cannot judge.
+		return ExitVerdict{Allowed: false, Evaluated: false, ReasonCode: core.ReasonStageGateNotEvaluated,
+			ResumeAction: core.ResumeNone, Derived: true}
 	}
 }
 
 // buildExitInput reads the store facts for one run's current stage.
 func (e *Engine) buildExitInput(run store.Run, m *runMeta) (ExitInput, error) {
-	in := ExitInput{Stage: m.currentStage(), HasFeature: run.FeatureID != "", LatestGates: map[string]GateFact{}}
+	in := ExitInput{Stage: m.currentStage(), HasFeature: run.FeatureID != "",
+		LatestGates: map[string]GateFact{}, FeatureGates: map[string]GateFact{}}
 	feat, err := e.store.Features().GetByID(run.FeatureID)
 	if err == nil {
 		in.TruthPackagePresent = feat.TruthPath != ""
 		in.TruthDraftPresent = feat.Status == "draft"
 	}
-	gates, err := e.store.Gates().LatestByType(run.FeatureID)
+	// Run-scoped facts first (review B3): only this run's own exit
+	// judgements and run-bound formal evaluations. Sibling runs of the
+	// same feature never leak in here.
+	byGate, _, err := e.runGateFacts(run.ID)
 	if err != nil {
 		return in, err
 	}
-	for _, g := range gates {
-		in.LatestGates[g.GateType] = GateFact{Verdict: g.Verdict, ReasonCodes: g.ReasonCodes}
+	for gt, rec := range byGate {
+		in.LatestGates[gt] = GateFact{
+			Verdict: rec.Verdict, ReasonCodes: rec.ReasonCodes,
+			EvaluatedAt: rec.EvaluatedAt, Evaluator: rec.Evaluator, Source: rec.Source,
+		}
 	}
+	gates, err := e.featureGateFallback(run.FeatureID, run.ID)
+	if err != nil {
+		return in, err
+	}
+	in.FeatureGates = gates
 	if lc, err := e.store.Features().GetLifecycle(run.FeatureID); err == nil {
 		in.LifecycleStage = string(lc.Stage)
 		in.LifecycleStatus = string(lc.Status)
@@ -295,22 +369,66 @@ func (e *Engine) buildExitInput(run store.Run, m *runMeta) (ExitInput, error) {
 		in.FrozenSource = ff.Source
 		in.TruthBaselineUncommitted = ff.BaselineStatus == BaselineUncommitted
 	}
+	// Design evidence is run-scoped: another run's design gate pass is
+	// not this run's evidence (review B3).
 	if g, ok := in.LatestGates["design"]; ok && g.Verdict == "pass" {
 		in.DesignEvidence = true
 		in.DesignEvidenceFormal = true
 	}
-	runs, err := e.store.Runs().ListByFeature(run.FeatureID)
+	// Artifact presence is this run's evidence, not the feature's
+	// pooled pointer count (review B3).
+	arts, err := e.store.Artifacts().ListByRun(run.ID)
 	if err != nil {
 		return in, err
 	}
-	for _, r := range runs {
-		arts, err := e.store.Artifacts().ListByRun(r.ID)
-		if err != nil {
-			return in, err
-		}
-		in.ArtifactCount += len(arts)
-	}
+	in.ArtifactCount = len(arts)
 	return in, nil
+}
+
+// featureGateFallback reads the feature-level formal verdicts a stage may
+// legitimately consult (plan vetoes, formal QA/release verdicts). Rows
+// that are a SIBLING RUN's stage exit are excluded: `gate_results` has no
+// run column, but every stage exit also lands a run-scoped
+// stage_exit_evaluated event pointing at its gate_result_id, so the
+// sibling's exit rows are identifiable and must not become this run's
+// formal evidence (review B3).
+func (e *Engine) featureGateFallback(featureID, runID string) (map[string]GateFact, error) {
+	out := map[string]GateFact{}
+	events, err := e.store.ListEvents(featureID)
+	if err != nil {
+		return out, err
+	}
+	siblingExit := map[string]bool{}
+	for _, ev := range events {
+		if ev.EventType != "stage_exit_evaluated" {
+			continue
+		}
+		if ev.RunID.Valid && ev.RunID.String == runID {
+			continue
+		}
+		var p struct {
+			GateResultID string `json:"gate_result_id"`
+		}
+		if len(ev.Payload) > 0 && json.Unmarshal(ev.Payload, &p) == nil && p.GateResultID != "" {
+			siblingExit[p.GateResultID] = true
+		}
+	}
+	all, err := e.store.Gates().ListByFeature(featureID)
+	if err != nil {
+		return out, err
+	}
+	seen := map[string]bool{}
+	for _, g := range all {
+		if seen[g.GateType] || siblingExit[g.ID] {
+			continue
+		}
+		seen[g.GateType] = true
+		out[g.GateType] = GateFact{
+			Verdict: g.Verdict, ReasonCodes: g.ReasonCodes,
+			EvaluatedAt: g.EvaluatedAt, Source: "feature_gate",
+		}
+	}
+	return out, nil
 }
 
 // ExitGate evaluates the exit gate of the run's current stage from

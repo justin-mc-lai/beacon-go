@@ -77,7 +77,16 @@ func (e *Engine) applyBlockOn(w writeSet, run store.Run, m *runMeta, reasonCode,
 // either advance (transition + event) or stop with a recorded blocker.
 // Repeating a tick over an unchanged state returns UpToDate without
 // re-executing or re-advancing (AC-143).
+//
+// TickBy is the same step with the actor identity recorded on the exit
+// judgement. Manual / external runs require it: the identity IS the
+// stage completion ("this room says the stage is done"), and without it
+// the tick parks honestly instead of pretending nothing drives it.
 func (e *Engine) Tick(ctx context.Context, runID string) (RunView, error) {
+	return e.TickBy(ctx, runID, "")
+}
+
+func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) {
 	run, m, slug, err := e.loadRun(runID)
 	if err != nil {
 		return RunView{}, err
@@ -101,6 +110,13 @@ func (e *Engine) Tick(ctx context.Context, runID string) (RunView, error) {
 		return v, nil
 	}
 	key := e.tickKey(run, m)
+	if m.isManualExecutor() {
+		// For a manual/external run the tick identity IS the new
+		// evidence: the same state ticked by a different (or first)
+		// identity must re-arm, while repeating the same identity
+		// stays idempotent.
+		key += "|by=" + strings.TrimSpace(by)
+	}
 	if m.LastTickKey != "" && m.LastTickKey == key {
 		v := viewOf(run, m, slug)
 		v.UpToDate = true
@@ -118,14 +134,11 @@ func (e *Engine) Tick(ctx context.Context, runID string) (RunView, error) {
 	}
 	// Release never executes or exits on tick (human gate).
 	if stage != StageRelease {
-		// Implement entry is gated by the AC-142 admission bundle
-		// (S2): the superset verdict whose fifth item IS the one
-		// shared admission checker (G-04) — the same bundle
-		// DelegateRalph packs under. The evaluation is persisted
-		// (gate_type=admission_bundle + admission_bundle_evaluated
-		// event) as the entry evidence. A blocked bundle blocks
-		// the tick before any executor runs — no lane gets a
-		// second judgement.
+		// AC-142 (review B2): the implement-entry admission bundle is the
+		// ONE shared judgement. It runs for EVERY executor before any
+		// stage execution — manual/external runs included. A manual run
+		// that enters implement without the bundle would skip the frozen
+		// entry gate that the delegate lanes also obey.
 		if stage == StageImplement {
 			bundle, admErr := e.admissionBundleForEntry(run, m)
 			if admErr != nil {
@@ -133,43 +146,59 @@ func (e *Engine) Tick(ctx context.Context, runID string) (RunView, error) {
 			}
 			if !bundle.AllowImplement {
 				m.LastTickKey = key
-				// applyBlock already persists m (with LastTickKey);
-				// the extra saveRun this branch used to do rewrote
-				// the identical snapshot — dropped in the batching
-				// pass, final state unchanged.
 				if err := e.applyBlockBatched(run, m, bundle.ReasonCode, "implement_admission_blocked"); err != nil {
 					return RunView{}, err
 				}
 				return viewOf(run, m, slug), nil
 			}
 		}
-		var ex StageExecutor
-		var ok bool
-		if stage == StageImplement {
-			ex, ok = e.implementExecutor(m)
+		manual := m.isManualExecutor()
+		if manual && m.ExecutorDefaulted && strings.TrimSpace(by) == "" {
+			// B4: a run created without an executor selector defaults to
+			// manual (the CLI prints that contract). When a tick supplies a
+			// real executor (e.g. `goal tick --executor recording`), that
+			// registered executor drives the stage instead of the manual
+			// completion contract.
+			if _, ok := e.tickExecutor(m, stage); ok {
+				manual = false
+			}
+		}
+		if manual {
+			// K1: a manual/external run has no stage executor by
+			// design. The tick identity records the completion; with
+			// no identity there is nothing to record, so the run
+			// parks with a reason that names the fix.
+			if strings.TrimSpace(by) == "" {
+				m.LastTickKey = key
+				if err := e.applyBlockBatched(run, m, core.ReasonManualTickRequired, "goal_blocked"); err != nil {
+					return RunView{}, err
+				}
+				return viewOf(run, m, slug), nil
+			}
+			by = strings.TrimSpace(by)
 		} else {
-			ex, ok = e.executors[stage]
-		}
-		if !ok {
-			// LastTickKey is set before the block so the batched
-			// save inside applyBlock persists it (previously a
-			// second saveRun after applyBlock did that).
-			m.LastTickKey = key
-			if err := e.applyBlockBatched(run, m, ReasonExecutorNotReg, "goal_blocked"); err != nil {
-				return RunView{}, err
+			ex, ok := e.tickExecutor(m, stage)
+			if !ok {
+				// LastTickKey is set before the block so the batched
+				// save inside applyBlock persists it (previously a
+				// second saveRun after applyBlock did that).
+				m.LastTickKey = key
+				if err := e.applyBlockBatched(run, m, ReasonExecutorNotReg, "goal_blocked"); err != nil {
+					return RunView{}, err
+				}
+				return viewOf(run, m, slug), nil
 			}
-			return viewOf(run, m, slug), nil
-		}
-		outcome, exErr := ex.ExecuteStage(ctx, viewOf(run, m, slug), stage)
-		if exErr != nil {
-			outcome = StageOutcome{Status: "failed", ReasonCode: ReasonExecutorError, Summary: exErr.Error()}
-		}
-		if outcome.Status != "done" {
-			reason := outcome.ReasonCode
-			if reason == "" {
-				reason = ReasonStageExecutionFailed
+			outcome, exErr := ex.ExecuteStage(ctx, viewOf(run, m, slug), stage)
+			if exErr != nil {
+				outcome = StageOutcome{Status: "failed", ReasonCode: ReasonExecutorError, Summary: exErr.Error()}
 			}
-			return e.handleStageFailure(run, m, slug, stage, reason, key)
+			if outcome.Status != "done" {
+				reason := outcome.ReasonCode
+				if reason == "" {
+					reason = ReasonStageExecutionFailed
+				}
+				return e.handleStageFailure(run, m, slug, stage, reason, key)
+			}
 		}
 	}
 	// Exit gate judgement over store state.
@@ -178,6 +207,15 @@ func (e *Engine) Tick(ctx context.Context, runID string) (RunView, error) {
 		return RunView{}, err
 	}
 	verdict := EvaluateStageExit(in)
+	if !verdict.Evaluated {
+		// K2: the stage has no gate verdict and no judgement could be
+		// established — refuse to advance and say exactly that.
+		m.LastTickKey = key
+		if err := e.applyBlockBatched(run, m, core.ReasonStageGateNotEvaluated, "stage_exit_blocked"); err != nil {
+			return RunView{}, err
+		}
+		return viewOf(run, m, slug), nil
+	}
 	if !verdict.Allowed {
 		m.LastTickKey = key
 		// As in the admission branch, applyBlock's own save
@@ -209,6 +247,12 @@ func (e *Engine) Tick(ctx context.Context, runID string) (RunView, error) {
 		}
 	}
 	if err := e.store.WithTx(func(tx *store.Tx) error {
+		// AC-003: the exit judgement is persisted BEFORE the advance
+		// event in the same transaction — leaving a stage always
+		// leaves a queryable verdict behind.
+		if err := e.recordStageExit(tx, run, m, stage, verdict, by); err != nil {
+			return err
+		}
 		_ = updateLifecycleMonotonic(tx.Features(), store.Lifecycle{
 			FeatureID: run.FeatureID, Stage: workflowStageForProductStage(stage),
 			Status: core.StatusCompleted,
@@ -271,10 +315,23 @@ func (e *Engine) handleStageFailure(run store.Run, m *runMeta, slug, stage, reas
 	return viewOf(run, m, slug), nil
 }
 
+// tickExecutor resolves the executor a tick would drive the stage with.
+func (e *Engine) tickExecutor(m *runMeta, stage string) (StageExecutor, bool) {
+	if stage == StageImplement {
+		return e.implementExecutor(m)
+	}
+	ex, ok := e.executors[stage]
+	return ex, ok
+}
+
 // Continue mirrors goal_continue_run + the v1 resume unblock: a blocked
 // run with streak < 3 is unblocked and ticked; a hard-blocked run
 // (streak >= 3) stays blocked with product_goal_blocked_streak.
 func (e *Engine) Continue(ctx context.Context, runID string) (RunView, error) {
+	return e.ContinueBy(ctx, runID, "")
+}
+
+func (e *Engine) ContinueBy(ctx context.Context, runID, by string) (RunView, error) {
 	run, m, slug, err := e.loadRun(runID)
 	if err != nil {
 		return RunView{}, err
@@ -309,5 +366,5 @@ func (e *Engine) Continue(ctx context.Context, runID string) (RunView, error) {
 			return RunView{}, err
 		}
 	}
-	return e.Tick(ctx, runID)
+	return e.TickBy(ctx, runID, by)
 }

@@ -1,0 +1,21 @@
+# qa-r2 executor regression: recording / subprocess still drive when selected
+date: 2026-11-08T15:41:02Z
+
+## branch: recording run run_0fc1a596036cdf8b5671ee95 (created --executor recording), first tick --executor recording
+status: running (loop_stage truth_routing)
+stage:  truth
+executor: recording
+
+## branch: subprocess run run_4122d471b56f9a68a00b65bd (--exec-cmd /bin/true), tick --executor subprocess
+status: blocked (loop_stage governance_precheck)
+stage:  plan
+executor: subprocess
+reason: stage_executor_error
+
+## main baseline run run_5b694da43b878bf719f822b2, tick --executor subprocess --exec-cmd /bin/true
+status: blocked (loop_stage governance_precheck)
+stage:  plan
+reason: stage_executor_error
+
+## /bin/true emits no stage outcome JSON, so both main and the branch stop at stage_executor_error —
+## the executor is resolved and executed in both. No not-registered regression.

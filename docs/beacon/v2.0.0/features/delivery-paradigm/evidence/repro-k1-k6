@@ -1,0 +1,66 @@
+# Delivery Paradigm reproduction — 2026-11-08
+# beacon-go v2.0.0-go.15, branch main@5ab05f5, project /Users/apple/Developer/Personal/renlink
+
+## K1: goal run executor facts and plan exit
+$ beacon-go goal status --run-id run_1084fcb4301353f56601ec48
+run:    run_1084fcb4301353f56601ec48
+status: blocked (loop_stage governance_precheck)
+stage:  plan
+blocked: true
+reason: stage_executor_not_registered
+next:   beacon-plan
+
+$ beacon-go goal status --run-id run_1084fcb4301353f56601ec48 --json | grep -E "executor|blocked|reason_code|current_stage"
+  "status": "blocked",
+  "blocked": true,
+  "reason_code": "stage_executor_not_registered",
+  "current_stage": "plan",
+      "status": "blocked",
+  "blocked_streak": 2,
+
+$ beacon-go goal run --help | sed -n "/executor/,+4p"
+      --exec-cmd string            real executor command: ONE program path (argv execution, never a shell string)
+      --exec-timeout-sec int       per-stage/iteration timeout seconds (default 3600)
+      --executor-id string         identity of the executing agent (maker, for maker!=checker)
+  -f, --feature string             feature slug (default: first of the project)
+  -h, --help                       help for run
+
+## K2: gate status for l1-parser-core
+$ beacon-go gate status --feature l1-parser-core --project .
+truth_freeze     not_evaluated
+design           not_evaluated
+implement        not_evaluated
+qa               not_evaluated
+release          not_evaluated
+truth_integrity  audit      [truth_integrity_audit_only truth_integrity_evidence_artifact_unregistered truth_integrity_evidence_artifact_missing feature_package_validation_failed] (2026-11-08T13:16:08.845562000Z)
+
+## K3: no external writeback surface
+$ beacon-go goal program --help | grep -i complete
+  complete    One program-level human confirmation: release every lake at its gate together
+  drive       Advance one ready lake to its release gate (never auto-completes, never releases)
+$ beacon-go goal receive-result --run-id run_bde3174e4fdc3edd7710c87b
+Error: required flag(s) "delegation-id" not set
+
+## K4: program route
+$ beacon-go goal program route --run-id run_1084fcb4301353f56601ec48
+program: sea-lp_renlink_v1 (frozen=true, all_complete=false)
+proposal: lp_renlink_v1 selected=7 rejected=0
+  l1-parser-core   admitted   
+    drive: beacon goal driver start --run-id run_bde3174e4fdc3edd7710c87b
+  l2-xhs-images    blocked    program_truth_not_frozen
+  l3-media-delivery blocked    program_truth_not_frozen
+  l4-session-egress blocked    program_truth_not_frozen
+  l5-miniprogram-pages blocked    program_truth_not_frozen
+  l6-zip-export    blocked    program_truth_not_frozen
+  l7-risk-compliance blocked    program_truth_not_frozen
+next batch: l1-parser-core
+
+## K5: l5 ux declaration vs UI section
+$ rg -n "ux_required|UI 规格" docs/beacon/v0.1.0/features/l5-miniprogram-pages/truth.md
+8:ux_required: false
+42:goal: "交付微信小程序主页与个人中心两页完整 UI 规格、交互逻辑与真机验收标准：主页支持剪贴板识别、链接粘贴、调用 l1 /parse 解析展示结果、串行调用 l3 /stage 逐项转存至 COS 并保存到手机相册；个人中心通过云开发数据库端侧 SDK 直读直写当前用户 openid 隔离的历史记录"
+80:## UI 规格说明书（前端实现手册级）
+
+## K6: no conformance command
+$ beacon-go goal --help | grep -i conform
+no conformance command

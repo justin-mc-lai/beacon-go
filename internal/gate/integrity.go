@@ -321,6 +321,63 @@ func scanFakeDelivery(file string, text string) []Finding {
 
 var evidenceRefRe = regexp.MustCompile(`[^\s|]+/[^\s|]*`)
 
+// uxSectionRe matches a markdown heading that declares a UI / design
+// section. The K5 defect: a truth body with a whole "## UI 规格说明书"
+// chapter while the frontmatter still says `ux_required: false` — the
+// design stage is silently skipped although the requirement asks for
+// interface work. The vocabulary is deliberately heading-first: inline
+// mentions of the words (an AC that talks about "UI 一致性") are not
+// a design chapter.
+var uxSectionRe = regexp.MustCompile(`(?mi)^#{1,6}\s*(?:\d+(?:\.\d+)*[、.．)）]?\s*)?(?:ux|ui)(?:\b|[\s:：/]|规格)|^#{1,6}\s*(?:ui\s*规格|界面设计|交互设计|视觉设计|设计规格|原型设计|原型稿|视觉稿|线框|wireframe|mockup)`)
+
+// truthBodyAfterFrontmatter returns the body below the YAML frontmatter and
+// the number of leading lines the body starts at (so findings can
+// carry the document's own line numbers).
+func truthBodyAfterFrontmatter(text string) (string, int) {
+	if !strings.HasPrefix(text, "---\n") {
+		return text, 0
+	}
+	end := strings.Index(text[4:], "\n---")
+	if end < 0 {
+		return text, 0
+	}
+	bodyStart := 4 + end + len("\n---")
+	if nl := strings.Index(text[bodyStart:], "\n"); nl >= 0 {
+		bodyStart += nl + 1
+	} else {
+		bodyStart = len(text)
+	}
+	return text[bodyStart:], strings.Count(text[:bodyStart], "\n")
+}
+
+// scanUxRequirementMismatch is the K5 consistency check: a truth that
+// declares ux_required: false must not carry a UI/design chapter.
+func scanUxRequirementMismatch(file, text string) []Finding {
+	scalars, _, ok := ParseFrontmatter(text)
+	if !ok {
+		return nil
+	}
+	ux, declared := scalars["ux_required"]
+	if !declared || strings.ToLower(strings.TrimSpace(ux)) != "false" {
+		return nil
+	}
+	body, offset := truthBodyAfterFrontmatter(text)
+	var out []Finding
+	for i, line := range strings.Split(body, "\n") {
+		if !uxSectionRe.MatchString(line) {
+			continue
+		}
+		out = append(out, Finding{
+			Kind: "truth_ux_requirement_mismatch", ReasonCode: core.ReasonIntegrityUxMismatch,
+			File: file, Line: offset + i + 1,
+			Detail: "truth declares ux_required: false but the body carries a UI/design section: " +
+				strings.TrimSpace(line) + " (set ux_required: true or remove the design section)",
+			RepairRoute: DefaultRepairRoute,
+		})
+	}
+	return out
+}
+
 // EvidenceRefs extracts the artifact references of an evidence
 // document: path-like tokens (containing a slash, ending in a file
 // extension or slash) from code spans and table cells. conversation:
@@ -386,6 +443,12 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 		if _, _, ok := ParseFrontmatter(in.Pkg.Truth.Text); !ok {
 			add(Finding{Kind: "frontmatter_invalid", ReasonCode: core.ReasonIntegrityPackageIncomplete,
 				File: in.Pkg.Truth.Path, Detail: "truth.md frontmatter is missing or unclosed"})
+		}
+		// K5: a UI/design chapter under ux_required: false is a
+		// requirement-level inconsistency (audit by default, blocking
+		// under gate integrity --strict).
+		for _, f := range scanUxRequirementMismatch(in.Pkg.Truth.Path, in.Pkg.Truth.Text) {
+			add(f)
 		}
 	}
 	if in.Pkg.Tasks.Present {

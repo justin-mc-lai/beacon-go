@@ -1,0 +1,27 @@
+package:  delivery-paradigm (v2.0.0)
+status:   draft
+dir:      docs/beacon/v2.0.0/features/delivery-paradigm
+lifecycle: Think/NotStarted
+branch:   check=ok current=main canonical=main
+
+## truth freeze (2026-11-08, by justin-mc-lai)
+$ beacon-go truth freeze --feature delivery-paradigm --project . --by justin-mc-lai
+package:  delivery-paradigm (v2.0.0)
+status:   frozen
+dir:      docs/beacon/v2.0.0/features/delivery-paradigm
+lifecycle: Freeze/Completed
+branch:   check=ok current=main canonical=main
+baseline: uncommitted
+
+## truth status after freeze
+$ beacon-go truth show --feature delivery-paradigm --project .
+package:  delivery-paradigm (v2.0.0)
+status:   frozen
+dir:      docs/beacon/v2.0.0/features/delivery-paradigm
+lifecycle: Freeze/Completed
+branch:   check=ok current=main canonical=main
+baseline: uncommitted
+
+## truth list (delivery-paradigm row)
+$ beacon-go truth list --project .
+delivery-paradigm                          v2.0.0   frozen/Freeze

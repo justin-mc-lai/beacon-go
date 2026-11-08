@@ -1,0 +1,37 @@
+# delivery-paradigm task2: K1-K6 after the fix
+
+Date: 2026-11-08. Branch fix/delivery-paradigm. Kernel v2.0.0-go.15.
+Every row below was re-run on a real project (/tmp/dp-demo) with the fixed binary,
+not asserted from the tests alone; the raw transcripts are the task2-* files named here.
+
+| K | Classification | Status | What changed | Evidence |
+|---|----------------|--------|--------------|----------|
+| K1 | kernel defect | fixed | `goal run --executor manual` / `--executor external` creates knowingly (creation output + `goal status` say it is not auto-driven and name `goal tick --by <identity>`); ticking without an identity parks with `stage_manual_tick_required`; an unknown selector is refused before any run row with `stage_executor_unsupported` | task2-k1-k3-real |
+| K2 | kernel defect | fixed | every successful stage exit now writes its own `gate_results` row on the stage's gate axis (plan/truth_freeze/design/implement/qa) plus a `stage_exit_evaluated` trail event, in the same transaction as the advance; a stage no gate covers parks with `stage_gate_not_evaluated`; `goal status` shows `gate: <type> evaluated=true/false` | task2-gate-status, task2-e2e |
+| K3 | kernel defect | fixed | `goal receive-result --external --by <id> --summary <text> --artifact <abs>` needs no delegation id, registers the artifact pointers and closes the run; the lake then reads `completed` in `program route`; no human-release flag is claimed (source=external on the trail) | task2-k1-k3-real |
+| K4 | kernel defect | fixed | `program route` emits `next actions` in topological order: admit/start per ready lake, wait per blocked dependency, and `truth freeze --feature <lake>` naming the lake whose truth is not frozen | task2-route |
+| K5 | kernel defect | fixed | `gate integrity` reports `truth_ux_requirement_mismatch` when the truth body has a UI/design chapter under `ux_required: false`; default verdict audit, `--strict` blocked | task2-ux-integrity |
+| K6 | kernel defect | fixed | new `goal conformance --run-id <id>`: truth_frozen / gates_evaluated / verifier_attached / state_exported, exit 0 only when all four pass, failed items listed otherwise | task2-conformance |
+
+Caller-process gap (not a kernel defect, unchanged): renlink advanced stages in the room without
+calling `gate evaluate` / `goal tick` / `receive-result`, so its run stayed at plan. The kernel now
+records whatever is actually done; it still cannot invent a stage that was never ticked.
+
+## The six gates on a real run
+
+task2-gate-status is `gate status` on run run_b9c6b5ce3cc0c4baafc92364 after
+plan -> truth -> design -> implement -> qa -> release:
+plan pass, truth_freeze pass, design pass, implement pass, qa pass, release pass,
+truth_integrity pass — every row evaluated with its own timestamp.
+
+## End-to-end test
+
+`go test ./internal/orchestrator -run TestDeliveryParadigmEndToEnd -count=1` passes: create run,
+walk plan/truth/design/implement/qa/release, assert the plan exit record plus the five gate
+verdicts are evaluated/pass, export state, conformance passes, then removing the verifier makes
+conformance fail naming `verifier_attached`. Output: task2-e2e.
+
+## Regression
+
+AC-009's three tests are untouched and pass: TestProgramPlanRequiresProposal,
+TestProgramPlanFreezeChange, TestProgramSelectRecordsDecision (task2-ac009).

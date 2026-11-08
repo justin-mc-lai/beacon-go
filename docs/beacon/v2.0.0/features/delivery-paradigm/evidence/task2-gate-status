@@ -1,0 +1,29 @@
+# delivery-paradigm task2: real run gate status
+
+$ beacon-go gate status --project /tmp/dp-demo --version v2.0.0 --feature demo
+plan             pass       [stage_exit_ok] (2026-11-08T14:50:36.310407000Z)
+truth_freeze     pass       [stage_exit_ok] (2026-11-08T14:50:36.525625000Z)
+design           pass       [stage_exit_ok] (2026-11-08T14:50:41.919682000Z)
+implement        pass       [stage_exit_ok] (2026-11-08T14:50:42.442985000Z)
+qa               pass       [stage_exit_ok] (2026-11-08T14:50:45.641729000Z)
+release          pass       [] (2026-11-08T14:50:48.833611000Z)
+truth_integrity  pass       [] (2026-11-08T14:50:30.482271000Z)
+
+$ beacon-go goal status --run-id run_b9c6b5ce3cc0c4baafc92364
+run:    run_b9c6b5ce3cc0c4baafc92364
+status: completed (loop_stage done)
+stage:  release
+blocked: false
+executor: recording
+gate:   release evaluated=true verdict=pass
+next:   beacon-release
+
+--- AC-003 display: a stage with no recorded verdict says so ---
+$ beacon-go goal status --run-id run_6c2f43dacbfad2c278a17732   # feature demo-ui, never ticked
+run:    run_6c2f43dacbfad2c278a17732
+status: running (loop_stage governance_precheck)
+stage:  plan
+blocked: false
+executor: recording
+gate:   plan evaluated=false (this stage has no recorded verdict)
+next:   beacon-plan

@@ -1,0 +1,35 @@
+# qa-r2 AC-008/AC-007: one real six-stage delivery recognised by conformance
+date: 2026-11-08T15:39:58Z
+
+Project /tmp/qa-r2-demo, feature qa-r2-feat, run run_595d0fe07a38274b33f1c4ee (manual executor, --ux).
+Walked with goal tick --by from plan to release; design gate evaluated for this run;
+release formal gate evaluated for this run; human-confirmed complete; state exported.
+
+$ beacon gate status --feature qa-r2-feat
+plan             pass       [stage_exit_ok] (2026-11-08T15:36:51.033452000Z)
+truth_freeze     pass       [stage_exit_ok] (2026-11-08T15:36:51.092589000Z)
+design           pass       [stage_exit_ok] (2026-11-08T15:36:30.734327000Z)
+implement        pass       [stage_exit_ok] (2026-11-08T15:36:31.049896000Z)
+qa               pass       [stage_exit_ok] (2026-11-08T15:36:40.558383000Z)
+release          pass       [] (2026-11-08T15:36:47.194203000Z)
+truth_integrity  not_evaluated
+
+## stage_exit_evaluated events of this run
+plan|plan|pass|maker|gate_5752ccf1ef3dfd2e015059bb
+truth|truth_freeze|pass|maker|gate_abe7b3b80de6743b915ec14a
+design|design|pass|maker|gate_fae9f3cf6b9a87cf132fc597
+implement|implement|pass|maker|gate_dd8084d98df447d700dc44c9
+qa|qa|pass|maker|gate_cab526c89af3931c1c890d8b
+## formal gate evaluations bound to this run
+design|pass
+release|pass
+
+$ beacon goal conformance --run-id run_595d0fe07a38274b33f1c4ee
+run:         run_595d0fe07a38274b33f1c4ee
+feature:     qa-r2-feat
+conformance: pass
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [ok  ] gates_evaluated    every stage gate carries a recorded pass
+  [ok  ] verifier_attached  verifier qa-r2-verifier with /tmp/qa-r2-verifier2.md
+  [ok  ] state_exported     snapshot /private/tmp/qa-r2-demo/.beacon/state/project-state.json
+exit=0

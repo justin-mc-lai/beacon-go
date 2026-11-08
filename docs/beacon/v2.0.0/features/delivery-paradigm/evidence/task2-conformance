@@ -1,0 +1,24 @@
+# delivery-paradigm task2: conformance (positive + negative)
+
+$ beacon-go goal conformance --run-id run_b9c6b5ce3cc0c4baafc92364
+run:         run_b9c6b5ce3cc0c4baafc92364
+feature:     demo
+conformance: pass
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [ok  ] gates_evaluated    every stage gate carries a recorded pass
+  [ok  ] verifier_attached  verifier independent-verifier with /tmp/dp-demo/verifier.md
+  [ok  ] state_exported     snapshot /private/tmp/dp-demo/.beacon/state/project-state.json
+exit=0
+
+--- negative: a fresh run that never left plan and has no verifier ---
+$ beacon-go goal conformance --run-id run_4025245a1672fbd49570e066
+run:         run_4025245a1672fbd49570e066
+feature:     demo
+conformance: fail
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [FAIL] gates_evaluated    plan: stage not completed (active); truth: stage not completed (pending); implement: stage not completed (pending); qa: stage not completed (pending); release: stage not completed (pending)
+  [FAIL] verifier_attached  no independent verifier attached
+  [ok  ] state_exported     snapshot /private/tmp/dp-demo/.beacon/state/project-state.json
+Error: goal conformance: delivery not recognised; failed: gates_evaluated, verifier_attached (goal_conformance_failed)
+exit status 1
+exit=1

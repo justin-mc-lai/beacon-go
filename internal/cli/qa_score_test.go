@@ -88,15 +88,16 @@ func TestQAScoreAndHistoryCLI(t *testing.T) {
 	if strField(t, doc, "grade") != "A" {
 		t.Fatalf("grade = %v, want A (doc %v)", doc["grade"], doc)
 	}
-	// gate status must NOT list the score among the six gate types.
+	// gate status must NOT list the score among the gate types (seven
+	// since delivery-paradigm AC-005 added the plan exit gate).
 	out, err = runCLI(t, "gate", "status", "--project", root, "--feature", "feat-gate", "--json")
 	if err != nil {
 		t.Fatalf("gate status: %v", err)
 	}
 	gdoc := parseDoc(t, out)
 	gates, _ := gdoc["gates"].([]any)
-	if len(gates) != 6 {
-		t.Fatalf("gate status must list exactly the six gate types, got %d", len(gates))
+	if len(gates) != 7 {
+		t.Fatalf("gate status must list exactly the seven gate types, got %d", len(gates))
 	}
 	for _, g := range gates {
 		if gm, _ := g.(map[string]any); gm["gate_type"] == "skill_score" {

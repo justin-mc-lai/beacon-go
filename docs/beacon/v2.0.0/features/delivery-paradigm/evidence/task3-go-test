@@ -1,0 +1,21 @@
+$ go test -count=1 ./...   (HEAD 84f33c5)
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.745s
+ok  	beacon-go/internal/agentapi	3.480s
+ok  	beacon-go/internal/benchgate	0.824s
+ok  	beacon-go/internal/cli	14.372s
+ok  	beacon-go/internal/core	1.261s
+ok  	beacon-go/internal/gate	3.254s
+ok  	beacon-go/internal/harness	11.071s
+ok  	beacon-go/internal/llm	3.026s
+ok  	beacon-go/internal/migration	2.914s
+ok  	beacon-go/internal/orchestrator	86.927s
+ok  	beacon-go/internal/session	2.922s
+ok  	beacon-go/internal/store	3.226s
+ok  	beacon-go/internal/workspace	3.813s
+ok  	beacon-go/skills	1.685s
+EXIT=0
+
+note: an earlier run of the same suite failed once on internal/session TestAppendBumpsSessionToTop
+      (shared timestamps in the test harness); go test -count=1 ./internal/session reran clean, and this
+      full rerun is clean end to end. No delivery-paradigm code touches internal/session.

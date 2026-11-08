@@ -1,0 +1,30 @@
+# qa-r2 B4: goal run without --executor/--exec-cmd no longer creates silently
+date: 2026-11-08T15:39:16Z
+
+$ beacon goal run --project /tmp/qa-r2-demo --feature qa-r2-feat --executor-id renlink-dev-room
+run:    run_2584ef9200a58748aba4fb2d
+status: running (loop_stage governance_precheck)
+stage:  plan
+blocked: false
+executor: manual
+hint:   not auto-driven: record each stage with `beacon goal tick --run-id run_2584ef9200a58748aba4fb2d --by <identity>`
+next:   beacon-plan
+no --executor given: defaulted to executor manual. This run does NOT auto-drive; record each stage's completion with:
+  beacon goal tick --run-id run_2584ef9200a58748aba4fb2d --by <identity>
+exit=0 (run created, but the manual contract is printed at creation time)
+
+$ beacon goal tick --run-id run_2584ef9200a58748aba4fb2d
+run:    run_2584ef9200a58748aba4fb2d
+status: blocked (loop_stage governance_precheck)
+stage:  plan
+blocked: true
+executor: manual
+reason: stage_manual_tick_required
+hint:   not auto-driven: record each stage with `beacon goal tick --run-id run_2584ef9200a58748aba4fb2d --by <identity>`
+next:   beacon-plan
+Error: goal: run run_2584ef9200a58748aba4fb2d is blocked (stage_manual_tick_required)
+exit=1
+
+## first tick now parks with stage_manual_tick_required, not stage_executor_not_registered.
+## code: internal/cli/goal.go:239-241 defaults an absent selector to manual + sets ExecutorDefaulted;
+##       internal/orchestrator/tick.go:171-177 parks with core.ReasonManualTickRequired.

@@ -1,0 +1,37 @@
+# qa-r2 hard gate
+date: 2026-11-08T15:39:37Z
+
+branch: fix/delivery-paradigm  HEAD: 6ce055d
+main: 5ab05f5 chore(release): bump runtime to v2.0.0-go.15
+origin/main: 5ab05f5 chore(release): bump runtime to v2.0.0-go.15
+remote branch: 0 refs (0 = not pushed)
+worktree: 0 non-qa-r2 changes
+
+$ git diff --stat main..HEAD | tail -1
+ 65 files changed, 3925 insertions(+), 156 deletions(-)
+
+$ go test -count=1 ./...
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.964s
+ok  	beacon-go/internal/agentapi	3.232s
+ok  	beacon-go/internal/benchgate	0.517s
+ok  	beacon-go/internal/cli	15.686s
+ok  	beacon-go/internal/core	0.877s
+ok  	beacon-go/internal/gate	2.377s
+ok  	beacon-go/internal/harness	10.971s
+ok  	beacon-go/internal/llm	1.931s
+ok  	beacon-go/internal/migration	1.801s
+ok  	beacon-go/internal/orchestrator	82.872s
+ok  	beacon-go/internal/session	2.913s
+ok  	beacon-go/internal/store	3.281s
+ok  	beacon-go/internal/workspace	4.984s
+ok  	beacon-go/skills	3.094s
+exit=0 (no FAIL lines)
+
+$ beacon truth show --feature delivery-paradigm --project .
+package:  delivery-paradigm (v2.0.0)
+status:   frozen
+dir:      docs/beacon/v2.0.0/features/delivery-paradigm
+lifecycle: Freeze/Completed
+branch:   check=mismatch current=fix/delivery-paradigm canonical=main
+baseline: uncommitted

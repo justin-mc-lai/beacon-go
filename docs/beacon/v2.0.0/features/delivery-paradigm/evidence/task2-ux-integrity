@@ -1,0 +1,21 @@
+# delivery-paradigm task2: K5 ux consistency (real package)
+
+$ beacon-go gate integrity --project /tmp/dp-demo --version v2.0.0 --feature demo-ui --evaluator qa-bot --mode audit_only
+gate:      truth_integrity (mode audit_only)
+feature:   demo-ui
+verdict:   audit
+  [truth_ux_requirement_mismatch] docs/beacon/v2.0.0/features/demo-ui/truth.md:67 — truth declares ux_required: false but the body carries a UI/design section: ## UI 规格说明书 (set ux_required: true or remove the design section) (repair: beacon-gen-truth)
+reasons:   truth_integrity_audit_only, truth_ux_requirement_mismatch
+recorded:  gate_0af07ebc07100c79680c60a8 (2026-11-08T14:51:56.459085000Z)
+exit=0
+
+$ beacon-go gate integrity --project /tmp/dp-demo --version v2.0.0 --feature demo-ui --evaluator qa-bot --strict
+gate:      truth_integrity (mode block)
+feature:   demo-ui
+verdict:   blocked
+  [truth_ux_requirement_mismatch] docs/beacon/v2.0.0/features/demo-ui/truth.md:67 — truth declares ux_required: false but the body carries a UI/design section: ## UI 规格说明书 (set ux_required: true or remove the design section) (repair: beacon-gen-truth)
+reasons:   truth_ux_requirement_mismatch
+recorded:  gate_c69e825f2eb0c0f3ce9c832a (2026-11-08T14:51:56.676579000Z)
+Error: gate integrity: truth integrity blocked for feature demo-ui (repair route: beacon-gen-truth) (truth_ux_requirement_mismatch)
+exit status 1
+exit=1
