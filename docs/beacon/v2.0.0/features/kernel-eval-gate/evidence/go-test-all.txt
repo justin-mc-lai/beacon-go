@@ -1,7 +1,16 @@
-# TC-012 Evidence: go-test-all.txt
-
-- Command: go test ./... -count=1
-- Assertion: whole repository exits 0 with no new failures
-- Status: planned
-- Producer: implementation round writes the real observed output over this file
-- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-012
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	1.725s
+ok  	beacon-go/internal/agentapi	4.677s
+ok  	beacon-go/internal/benchgate	0.761s
+ok  	beacon-go/internal/cli	19.012s
+ok  	beacon-go/internal/core	2.027s
+ok  	beacon-go/internal/evalgate	58.437s
+ok  	beacon-go/internal/gate	4.225s
+ok  	beacon-go/internal/harness	12.459s
+ok  	beacon-go/internal/llm	3.707s
+ok  	beacon-go/internal/migration	3.371s
+ok  	beacon-go/internal/orchestrator	97.935s
+ok  	beacon-go/internal/session	3.362s
+ok  	beacon-go/internal/store	3.677s
+ok  	beacon-go/internal/workspace	4.162s
+ok  	beacon-go/skills	3.027s

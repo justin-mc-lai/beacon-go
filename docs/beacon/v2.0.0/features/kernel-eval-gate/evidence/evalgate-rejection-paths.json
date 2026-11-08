@@ -1,7 +1,28 @@
-# TC-009 Evidence: evalgate-rejection-paths.json
-
-- Command: go test ./internal/evalgate -run TestEvalRejectionPaths -count=1
-- Assertion: unknown gate type, missing evaluator, unknown feature and unknown run reject with the expected reason codes
-- Status: planned
-- Producer: implementation round writes the real observed output over this file
-- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-009
+{
+  "command": "go test ./internal/evalgate -run TestEvalRejectionPaths -count=1",
+  "head": "suite",
+  "note": "test_result is the TC subtest; observed is what the kernel call actually returned",
+  "observed": {
+    "rejection/missing_evaluator": {
+      "exit_code": 1,
+      "reason_code": "gate_evaluator_required",
+      "detail": "gate.EvaluateGate: an evaluator identity is required (--evaluator); unattributed verdicts are not recorded (gate_evaluator_required)"
+    },
+    "rejection/unknown_feature": {
+      "exit_code": 1,
+      "reason_code": "feature_not_found",
+      "detail": "goal.CreateRun: feature no-such-feature not found under /private/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/TestEvalRejectionPaths3682686765/003/proj (feature_not_found)"
+    },
+    "rejection/unknown_gate_type": {
+      "exit_code": 1,
+      "reason_code": "gate_type_unknown",
+      "detail": "gate.EvaluateGate: gate type nonsense is not evaluable here (five stage gates; truth_integrity runs via `gate integrity`) (gate_type_unknown)"
+    },
+    "rejection/unknown_run_conformance": {
+      "exit_code": 1,
+      "reason_code": "product_goal_run_not_found",
+      "detail": "goal.loadRun: no such goal run: run_does_not_exist (product_goal_run_not_found)"
+    }
+  },
+  "test_result": "pass"
+}

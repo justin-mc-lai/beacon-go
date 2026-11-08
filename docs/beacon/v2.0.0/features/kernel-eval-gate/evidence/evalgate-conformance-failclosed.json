@@ -1,7 +1,34 @@
-# TC-006 Evidence: evalgate-conformance-failclosed.json
-
-- Command: go test ./internal/evalgate -run TestEvalConformanceFailClosed -count=1
-- Assertion: tests.md missing, unparseable matrix and no AC yield non-zero with reason code in text and JSON
-- Status: planned
-- Producer: implementation round writes the real observed output over this file
-- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-006
+{
+  "command": "go test ./internal/evalgate -run TestEvalConformanceFailClosed -count=1",
+  "head": "suite",
+  "note": "test_result is the TC subtest; observed is what the kernel call actually returned",
+  "observed": {
+    "conformance/failclosed_matrix_unparseable": {
+      "exit_code": 1,
+      "reason_code": "traceability_missing_tc",
+      "status": "fail",
+      "names": [
+        "AC-001",
+        "AC-002"
+      ],
+      "detail": "traceability_missing_tc: tests.md has no parseable AC ID coverage matrix; AC without TC: AC-001, AC-002"
+    },
+    "conformance/failclosed_no_ac": {
+      "exit_code": 1,
+      "reason_code": "traceability_missing_tc",
+      "status": "fail",
+      "detail": "traceability_missing_tc: truth defines no AC; coverage cannot be judged (fail-closed)"
+    },
+    "conformance/failclosed_tests_missing": {
+      "exit_code": 1,
+      "reason_code": "traceability_missing_tc",
+      "status": "fail",
+      "names": [
+        "AC-001",
+        "AC-002"
+      ],
+      "detail": "traceability_missing_tc: tests.md missing; AC without TC: AC-001, AC-002"
+    }
+  },
+  "test_result": "pass"
+}

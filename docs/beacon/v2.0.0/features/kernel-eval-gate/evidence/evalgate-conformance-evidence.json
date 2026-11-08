@@ -1,7 +1,36 @@
-# TC-005 Evidence: evalgate-conformance-evidence.json
-
-- Command: go test ./internal/evalgate -run TestEvalConformanceEvidence -count=1
-- Assertion: absent file, ../ escape and missing Evidence column yield traceability_missing_evidence naming AC/TC
-- Status: planned
-- Producer: implementation round writes the real observed output over this file
-- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-005
+{
+  "command": "go test ./internal/evalgate -run TestEvalConformanceEvidence -count=1",
+  "head": "suite",
+  "note": "test_result is the TC subtest; observed is what the kernel call actually returned",
+  "observed": {
+    "conformance/evidence_column_missing": {
+      "exit_code": 1,
+      "reason_code": "traceability_missing_evidence",
+      "status": "fail",
+      "names": [
+        "AC-001/TC-001",
+        "AC-002/TC-002"
+      ],
+      "detail": "traceability_missing_evidence: TC without in-package evidence: AC-001/TC-001 has no Evidence path; AC-002/TC-002 has no Evidence path"
+    },
+    "conformance/evidence_escape": {
+      "exit_code": 1,
+      "reason_code": "traceability_missing_evidence",
+      "status": "fail",
+      "names": [
+        "AC-001/TC-001"
+      ],
+      "detail": "traceability_missing_evidence: TC without in-package evidence: AC-001/TC-001 evidence ../escape.txt is outside the package evidence/ directory"
+    },
+    "conformance/missing_evidence_file": {
+      "exit_code": 1,
+      "reason_code": "traceability_missing_evidence",
+      "status": "fail",
+      "names": [
+        "AC-001/TC-001"
+      ],
+      "detail": "traceability_missing_evidence: TC without in-package evidence: AC-001/TC-001 evidence file does not exist: evidence/covered-001.txt"
+    }
+  },
+  "test_result": "pass"
+}
