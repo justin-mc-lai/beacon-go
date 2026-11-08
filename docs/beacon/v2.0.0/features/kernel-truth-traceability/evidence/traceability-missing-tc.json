@@ -1,0 +1,48 @@
+{
+  "command": "go test ./internal/orchestrator -run TestConformanceTraceabilityMissingTC -count=1",
+  "observed": {
+    "conformance": {
+      "run_id": "run_04197524d7f329771d8a3da6",
+      "feature_slug": "feat-a",
+      "pass": false,
+      "failed": [
+        "ac_tc_evidence_coverage:reason=traceability_missing_tc:missing=AC-002"
+      ],
+      "items": [
+        {
+          "check": "truth_frozen",
+          "status": "pass",
+          "detail": "frozen source: frontmatter"
+        },
+        {
+          "check": "gates_evaluated",
+          "status": "pass",
+          "detail": "every stage gate carries a recorded pass"
+        },
+        {
+          "check": "verifier_attached",
+          "status": "pass",
+          "detail": "verifier independent-verifier with /var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/TestConformanceTraceabilityMissingTC642806528/004/verifier.md"
+        },
+        {
+          "check": "state_exported",
+          "status": "pass",
+          "detail": "snapshot /private/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/TestConformanceTraceabilityMissingTC642806528/002/proj/.beacon/state/project-state.json"
+        },
+        {
+          "check": "ac_tc_evidence_coverage",
+          "status": "fail",
+          "detail": "traceability_missing_tc: AC without executable TC: AC-002",
+          "reason_codes": [
+            "traceability_missing_tc"
+          ],
+          "missing": [
+            "AC-002"
+          ]
+        }
+      ]
+    },
+    "exit_code": 0
+  },
+  "result": "pass"
+}

@@ -16,8 +16,10 @@ package orchestrator
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -333,8 +335,13 @@ func (e *Engine) ReceiveExternalResult(runID string, in ExternalResultInput) (Ru
 // ConformanceItem is one delivery-paradigm check.
 type ConformanceItem struct {
 	Check  string `json:"check"`
-	Status string `json:"status"` // pass | fail
+	Status string `json:"status"` // pass | fail | not_required
 	Detail string `json:"detail,omitempty"`
+	// ReasonCodes / Missing are the machine-readable half of a failed
+	// traceability item: the frozen reason code(s) and the AC/TC ids
+	// that are not covered.
+	ReasonCodes []string `json:"reason_codes,omitempty"`
+	Missing     []string `json:"missing,omitempty"`
 }
 
 // ConformanceView answers one question: is this run a delivery the
@@ -445,8 +452,195 @@ func (e *Engine) Conformance(runID string) (ConformanceView, error) {
 	exported, exportPath := e.stateExported(run.FeatureID)
 	add("state_exported", exported, exportPath)
 
+	// K7 (kernel-truth-traceability AC-001/002/003): a package that
+	// declares the traceability contract must prove AC -> TC ->
+	// in-package evidence. Undeclared historical packages report
+	// not_required and keep the four judgements above authoritative.
+	tv := e.conformanceTraceability(run)
+	v.Items = append(v.Items, ConformanceItem{
+		Check: conformanceTraceabilityCheck, Status: tv.Status, Detail: tv.Detail,
+		ReasonCodes: tv.ReasonCodes, Missing: tv.Missing,
+	})
+	if tv.Status == "fail" {
+		v.Failed = append(v.Failed, traceabilityFailureLabel(tv))
+	}
+
 	v.Pass = len(v.Failed) == 0
 	return v, nil
+}
+
+const conformanceTraceabilityCheck = "ac_tc_evidence_coverage"
+
+// traceabilityVerdict is the ac_tc_evidence_coverage judgement: the
+// item status (pass | fail | not_required), the reason codes that
+// failed, and the AC/TC ids the failure names.
+type traceabilityVerdict struct {
+	Status      string
+	Detail      string
+	ReasonCodes []string
+	Missing     []string
+}
+
+// traceabilityFailureLabel is the `failed` entry for a coverage
+// failure. It carries the check name, the reason code and the missing
+// ids so the JSON `failed` array is actionable on its own (AC-002).
+func traceabilityFailureLabel(tv traceabilityVerdict) string {
+	label := conformanceTraceabilityCheck
+	if len(tv.ReasonCodes) > 0 {
+		label += ":reason=" + strings.Join(tv.ReasonCodes, "+")
+	}
+	if len(tv.Missing) > 0 {
+		label += ":missing=" + strings.Join(tv.Missing, "|")
+	}
+	return label
+}
+
+// conformanceTraceability judges AC -> TC -> evidence for the run's
+// package. The contract is opt-in: only a package whose truth
+// frontmatter says `traceability_required: true` is hard-checked.
+// Missing tests.md, an unparseable matrix, no AC definition, a soft or
+// docs-only command, a missing Evidence column, an out-of-package
+// evidence path and a non-existent evidence file all fail closed.
+func (e *Engine) conformanceTraceability(run store.Run) traceabilityVerdict {
+	fail := func(codes, missing []string, detail string) traceabilityVerdict {
+		return traceabilityVerdict{
+			Status: "fail", ReasonCodes: codes, Missing: missing,
+			Detail: strings.Join(codes, "+") + ": " + detail,
+		}
+	}
+	ctx, err := e.featureContextByID(run.FeatureID)
+	if err != nil {
+		return fail([]string{core.ReasonTraceabilityMissingTC}, nil,
+			"feature package unreadable: "+err.Error())
+	}
+	pkg := e.packageFiles(ctx)
+	if !pkg.Truth.Present {
+		return fail([]string{core.ReasonTraceabilityMissingTC}, nil,
+			"truth.md missing; coverage cannot be judged (fail-closed)")
+	}
+	scalars, _, ok := gate.ParseFrontmatter(pkg.Truth.Text)
+	if !ok {
+		return fail([]string{core.ReasonTraceabilityMissingTC}, nil,
+			"truth.md frontmatter unreadable; coverage cannot be judged (fail-closed)")
+	}
+	if !strings.EqualFold(strings.TrimSpace(scalars["traceability_required"]), "true") {
+		return traceabilityVerdict{
+			Status: "not_required",
+			Detail: "package does not declare traceability_required: true; the four base judgements decide conformance",
+		}
+	}
+	defined := gate.DefinedACs(pkg.Truth.Text)
+	if len(defined) == 0 {
+		return fail([]string{core.ReasonTraceabilityMissingTC}, nil,
+			"truth defines no AC; coverage cannot be judged (fail-closed)")
+	}
+	ids := make([]string, 0, len(defined))
+	for id := range defined {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+	if !pkg.Tests.Present {
+		return fail([]string{core.ReasonTraceabilityMissingTC}, ids,
+			"tests.md missing; AC without TC: "+strings.Join(ids, ", "))
+	}
+	rows, hasEvidenceColumn, matrixOK := gate.ParseCoverageMatrix(pkg.Tests.Text)
+	if !matrixOK {
+		return fail([]string{core.ReasonTraceabilityMissingTC}, ids,
+			"tests.md has no parseable AC ID coverage matrix; AC without TC: "+strings.Join(ids, ", "))
+	}
+	root := ctx.Project.RootPath
+	pkgDir := filepath.Dir(resolvePkgPath(root, ctx.Feature.TruthPath))
+	evidenceDir := filepath.Join(pkgDir, "evidence")
+
+	byAC := map[string][]gate.TCRow{}
+	for _, row := range rows {
+		if !defined[row.AC] {
+			continue // unknown AC ids are the integrity gate's finding
+		}
+		if row.IsSoft() {
+			continue
+		}
+		if strings.TrimSpace(row.Command) == "" || gate.IsDocsOnlyCommand(row.Command) {
+			continue
+		}
+		byAC[row.AC] = append(byAC[row.AC], row)
+	}
+	var missingTC []string
+	for _, id := range ids {
+		if len(byAC[id]) == 0 {
+			missingTC = append(missingTC, id)
+		}
+	}
+	var missingEv, evDetail []string
+	for _, id := range ids {
+		for _, row := range byAC[id] {
+			tc := row.TC
+			if tc == "" {
+				tc = "(no TC ID)"
+			}
+			ref := strings.Trim(strings.TrimSpace(row.Evidence), "`")
+			if !hasEvidenceColumn || ref == "" {
+				missingEv = append(missingEv, id+"/"+tc)
+				evDetail = append(evDetail, id+"/"+tc+" has no Evidence path")
+				continue
+			}
+			abs, inside := traceabilityEvidencePath(root, pkgDir, evidenceDir, ref)
+			if !inside {
+				missingEv = append(missingEv, id+"/"+tc)
+				evDetail = append(evDetail, id+"/"+tc+" evidence "+ref+" is outside the package evidence/ directory")
+				continue
+			}
+			info, serr := os.Stat(abs)
+			if serr != nil || !info.Mode().IsRegular() {
+				missingEv = append(missingEv, id+"/"+tc)
+				evDetail = append(evDetail, id+"/"+tc+" evidence file does not exist: "+ref)
+			}
+		}
+	}
+	var codes, details, missing []string
+	if len(missingTC) > 0 {
+		codes = append(codes, core.ReasonTraceabilityMissingTC)
+		details = append(details, "AC without executable TC: "+strings.Join(missingTC, ", "))
+		missing = append(missing, missingTC...)
+	}
+	if len(missingEv) > 0 {
+		codes = append(codes, core.ReasonTraceabilityMissingEvidence)
+		details = append(details, "TC without in-package evidence: "+strings.Join(evDetail, "; "))
+		missing = append(missing, missingEv...)
+	}
+	if len(codes) > 0 {
+		return fail(codes, missing, strings.Join(details, "; "))
+	}
+	tcCount := 0
+	for _, trs := range byAC {
+		tcCount += len(trs)
+	}
+	return traceabilityVerdict{
+		Status: "pass",
+		Detail: fmt.Sprintf("%d AC covered by %d executable TC(s) with in-package evidence", len(ids), tcCount),
+	}
+}
+
+// traceabilityEvidencePath resolves one Evidence cell against the
+// package's evidence directory. Both the project-relative form
+// (docs/.../evidence/x.json) and the package-relative form
+// (evidence/x.json) are accepted; anything that resolves outside the
+// evidence directory is refused.
+func traceabilityEvidencePath(root, pkgDir, evidenceDir, ref string) (string, bool) {
+	clean := filepath.Clean(filepath.FromSlash(ref))
+	candidates := []string{filepath.Join(root, clean), filepath.Join(pkgDir, clean)}
+	if filepath.IsAbs(clean) {
+		candidates = []string{clean}
+	}
+	base := filepath.Clean(evidenceDir)
+	for _, cand := range candidates {
+		rel, err := filepath.Rel(base, filepath.Clean(cand))
+		if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			continue
+		}
+		return filepath.Clean(cand), true
+	}
+	return "", false
 }
 
 // stateExported reports whether the run's project carries the

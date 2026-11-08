@@ -1,0 +1,20 @@
+{
+  "command": "go test ./internal/cli -run TestTruthShowExposesChangeACDiff -count=1",
+  "observed": {
+    "change_doc_section": "## AC Diff\n\nadded:\n- AC-002\n\nchanged:\n- AC-001 (before 4ad0e8f603e6 → after e9ed1d5f8830)\n\nremoved:\n- (none)\n",
+    "truth_show_json": {
+      "added": [
+        "AC-002"
+      ],
+      "changed": [
+        {
+          "ac": "AC-001",
+          "after": "e9ed1d5f8830",
+          "before": "4ad0e8f603e6"
+        }
+      ],
+      "removed": []
+    }
+  },
+  "result": "pass"
+}

@@ -1,0 +1,9 @@
+# refreeze-ac-diff-failclosed.txt
+
+command: go test ./internal/orchestrator -run TestRefreezeACDiffFailClosed -count=1
+result: PASS
+
+refreeze error: truth.Refreeze: change document docs/beacon/v2.0.0/features/feat-diff-fail/changes/chg_9e1e8fb25c4c.md cannot be read for the AC Diff: read /private/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/TestRefreezeACDiffFailClosed1637869621/002/proj/docs/beacon/v2.0.0/features/feat-diff-fail/changes/chg_9e1e8fb25c4c.md: is a directory (truth_change_ac_diff_write_failed)
+package state: status=change_pending change_pending=true
+event scan: no truth_refrozen
+

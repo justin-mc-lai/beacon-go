@@ -1,0 +1,15 @@
+$ go test ./internal/cli -run 'TestProgramPlanRequiresProposal|TestProgramPlanFreezeChange|TestProgramSelectRecordsDecision' -count=1
+=== RUN   TestProgramPlanRequiresProposal
+--- PASS: TestProgramPlanRequiresProposal (0.02s)
+PASS
+ok  	beacon-go/internal/cli	0.382s
+
+$ go test ./internal/orchestrator -run 'TestProgramPlanFreezeChange|TestProgramSelectRecordsDecision' -count=1
+=== RUN   TestProgramSelectRecordsDecision
+--- PASS: TestProgramSelectRecordsDecision (0.09s)
+=== RUN   TestProgramPlanFreezeChange
+--- PASS: TestProgramPlanFreezeChange (0.02s)
+PASS
+ok  	beacon-go/internal/orchestrator	0.438s
+
+all three AC-009 proposal-gate tests passed

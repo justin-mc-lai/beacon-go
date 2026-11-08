@@ -161,12 +161,16 @@ func DefinedACs(truth string) map[string]bool {
 }
 
 // TCRow is one row of the tests coverage matrix (columns:
-// AC ID | TC ID | Layer | Command | Assertion).
+// AC ID | TC ID | Layer | Command | Assertion [| Evidence]). The
+// Evidence column is optional for the integrity gate (historical
+// packages omit it); `goal conformance` requires it for packages
+// that declare the traceability contract.
 type TCRow struct {
 	AC        string
 	TC        string
 	Command   string
 	Assertion string
+	Evidence  string
 	Line      int
 }
 
@@ -186,13 +190,14 @@ func (r TCRow) IsSoft() bool {
 		softCellValues[strings.ToLower(strings.TrimSpace(r.Assertion))]
 }
 
-// ParseCoverageRows extracts the coverage-matrix rows of a tests
-// document: tables whose header names an "AC ID" column. Other
-// tables (e.g. the phase TC index, TC-first) are not the coverage
-// authority and are ignored.
-func ParseCoverageRows(tests string) []TCRow {
-	var rows []TCRow
+// ParseCoverageMatrix extracts the coverage-matrix rows of a tests
+// document and reports two facts the conformance check needs: whether
+// ANY "AC ID" coverage matrix was found (ok) and whether its header
+// carries an Evidence column. Other tables (e.g. the phase TC index,
+// TC-first) are not the coverage authority and are ignored.
+func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok bool) {
 	inMatrix := false
+	evidenceCol := -1
 	for i, line := range strings.Split(tests, "\n") {
 		trimmed := strings.TrimSpace(line)
 		if !strings.HasPrefix(trimmed, "|") {
@@ -208,6 +213,16 @@ func ParseCoverageRows(tests string) []TCRow {
 		}
 		if containsCell(lowered, "ac id") {
 			inMatrix = true
+			ok = true
+			evidenceCol = -1
+			for j, c := range lowered {
+				if c == "evidence" {
+					evidenceCol = j
+				}
+			}
+			if evidenceCol >= 0 {
+				hasEvidenceColumn = true
+			}
 			continue
 		}
 		if !inMatrix || len(cells) == 0 {
@@ -229,13 +244,50 @@ func ParseCoverageRows(tests string) []TCRow {
 		if len(cells) > 4 {
 			row.Assertion = cells[4]
 		}
+		if evidenceCol >= 0 && evidenceCol < len(cells) {
+			row.Evidence = cells[evidenceCol]
+		}
 		rows = append(rows, row)
 	}
+	return rows, hasEvidenceColumn, ok
+}
+
+// ParseCoverageRows is the integrity gate's row-only view of
+// ParseCoverageMatrix (the AC-101 check does not consult Evidence).
+func ParseCoverageRows(tests string) []TCRow {
+	rows, _, _ := ParseCoverageMatrix(tests)
 	return rows
 }
 
+// IsDocsOnlyCommand reports whether a command only reads/prints files
+// (the existing docs_only_tc judgement), exported for the conformance
+// coverage check so both surfaces use ONE rule.
+func IsDocsOnlyCommand(command string) bool {
+	return docsOnlyCommandRe.MatchString(strings.Trim(strings.TrimSpace(command), "`"))
+}
+
 func splitCells(line string) []string {
-	parts := strings.Split(strings.Trim(line, "|"), "|")
+	// A coverage-row command may legitimately contain `|` (a go test
+	// -run alternation). A pipe inside a code span is content, not a
+	// column separator, or the Evidence column shifts and the
+	// conformance check reads the wrong cell.
+	trimmed := strings.Trim(line, "|")
+	var parts []string
+	var cur strings.Builder
+	inCode := false
+	for _, r := range trimmed {
+		switch {
+		case r == '`':
+			inCode = !inCode
+			cur.WriteRune(r)
+		case r == '|' && !inCode:
+			parts = append(parts, cur.String())
+			cur.Reset()
+		default:
+			cur.WriteRune(r)
+		}
+	}
+	parts = append(parts, cur.String())
 	for i := range parts {
 		parts[i] = strings.TrimSpace(parts[i])
 	}

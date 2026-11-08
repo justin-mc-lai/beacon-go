@@ -308,6 +308,19 @@ const (
 	ReasonIntegrityUxMismatch = "truth_ux_requirement_mismatch"
 )
 
+// ---- Conformance traceability family (kernel-truth-traceability
+// AC-001/AC-002) ----
+//
+// The coverage check on `goal conformance` is stricter than the
+// integrity gate: it judges a package that DECLARES
+// `traceability_required: true` and fails closed with one of these
+// two codes. The spellings are frozen-verbatim by the truth package.
+
+const (
+	ReasonTraceabilityMissingTC       = "traceability_missing_tc"
+	ReasonTraceabilityMissingEvidence = "traceability_missing_evidence"
+)
+
 // ---- Intent gate family (R1: ask before sign) ----
 //
 // The freeze gate's intent half: a package cannot be signed until the
@@ -674,7 +687,7 @@ func IsKnownReasonCode(code string) bool {
 	if _, ok := ReasonCatalog[code]; ok {
 		return true
 	}
-	for _, prefix := range []string{"stage_exit_", "goal_implement_", "implement_", "main_", "freeze_", "release_", "program_", "hotfix_", "multi_version_", "main_axis_", "gate_", "truth_integrity_", "design_binding_", "truth_change_", "truth_canonical_", "truth_", "canonical_", "empty_", "revision_", "stale_", "qa_", "executor_", "ralph_", "worktree_", "planner_", "acp_", "skill_", "standard_flow_", "truth_baseline_", "workspace_admission_", "unscoped_", "git_diff_", "topology_gate_", "topology_scope_", "gitscope_", "satellite_", "multi_git_", "monorepo_", "ac_vague_", "materials_", "feature_package_", "requirement_clarity_", "unapproved_", "scope_mode_", "domain_", "entity_", "illegal_", "orphan_", "placeholder_", "alignment_", "user_intent_", "TRUTH_DETERMINISM_", "health_", "operator_gate_", "evidence_wait", "focus_wait", "gate_unresolved", "already_resolved", "release_", "feature_package_", "machine_json_", "review_", "autotest_", "qa9_", "auto_test_", "tc_declared_", "skill_install_", "state_snapshot_", "archive_", "hook_", "invalid_project_mode", "agent_eval_", "boundary_", "route_probe_", "prompt_fixture_", "catalog_", "live_skill_", "brainstorm_", "decompose_", "code2truth_", "qa_strategy_"} {
+	for _, prefix := range []string{"stage_exit_", "goal_implement_", "implement_", "main_", "freeze_", "release_", "program_", "hotfix_", "multi_version_", "main_axis_", "gate_", "truth_integrity_", "traceability_", "design_binding_", "truth_change_", "truth_canonical_", "truth_", "canonical_", "empty_", "revision_", "stale_", "qa_", "executor_", "ralph_", "worktree_", "planner_", "acp_", "skill_", "standard_flow_", "truth_baseline_", "workspace_admission_", "unscoped_", "git_diff_", "topology_gate_", "topology_scope_", "gitscope_", "satellite_", "multi_git_", "monorepo_", "ac_vague_", "materials_", "feature_package_", "requirement_clarity_", "unapproved_", "scope_mode_", "domain_", "entity_", "illegal_", "orphan_", "placeholder_", "alignment_", "user_intent_", "TRUTH_DETERMINISM_", "health_", "operator_gate_", "evidence_wait", "focus_wait", "gate_unresolved", "already_resolved", "release_", "feature_package_", "machine_json_", "review_", "autotest_", "qa9_", "auto_test_", "tc_declared_", "skill_install_", "state_snapshot_", "archive_", "hook_", "invalid_project_mode", "agent_eval_", "boundary_", "route_probe_", "prompt_fixture_", "catalog_", "live_skill_", "brainstorm_", "decompose_", "code2truth_", "qa_strategy_"} {
 		if strings.HasPrefix(code, prefix) {
 			return true
 		}

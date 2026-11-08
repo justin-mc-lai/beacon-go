@@ -1,0 +1,39 @@
+{
+  "command": "go test ./internal/orchestrator -run TestConformanceTraceabilityAllCovered -count=1",
+  "observed": {
+    "conformance": {
+      "run_id": "run_ecbc5bdc8b7d12f388c62608",
+      "feature_slug": "feat-a",
+      "pass": true,
+      "items": [
+        {
+          "check": "truth_frozen",
+          "status": "pass",
+          "detail": "frozen source: frontmatter"
+        },
+        {
+          "check": "gates_evaluated",
+          "status": "pass",
+          "detail": "every stage gate carries a recorded pass"
+        },
+        {
+          "check": "verifier_attached",
+          "status": "pass",
+          "detail": "verifier independent-verifier with /var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/TestConformanceTraceabilityAllCovered3697246688/004/verifier.md"
+        },
+        {
+          "check": "state_exported",
+          "status": "pass",
+          "detail": "snapshot /private/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/TestConformanceTraceabilityAllCovered3697246688/002/proj/.beacon/state/project-state.json"
+        },
+        {
+          "check": "ac_tc_evidence_coverage",
+          "status": "pass",
+          "detail": "2 AC covered by 2 executable TC(s) with in-package evidence"
+        }
+      ]
+    },
+    "exit_code": 0
+  },
+  "result": "pass"
+}

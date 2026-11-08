@@ -1,0 +1,56 @@
+{
+  "command": "go test ./internal/orchestrator -run TestConformanceTraceabilityFailClosed -count=1",
+  "observed": {
+    "no AC defined": {
+      "failed": [
+        "ac_tc_evidence_coverage:reason=traceability_missing_tc"
+      ],
+      "item": {
+        "check": "ac_tc_evidence_coverage",
+        "status": "fail",
+        "detail": "traceability_missing_tc: truth defines no AC; coverage cannot be judged (fail-closed)",
+        "reason_codes": [
+          "traceability_missing_tc"
+        ]
+      },
+      "pass": false
+    },
+    "tests.md missing": {
+      "failed": [
+        "ac_tc_evidence_coverage:reason=traceability_missing_tc:missing=AC-001|AC-002"
+      ],
+      "item": {
+        "check": "ac_tc_evidence_coverage",
+        "status": "fail",
+        "detail": "traceability_missing_tc: tests.md missing; AC without TC: AC-001, AC-002",
+        "reason_codes": [
+          "traceability_missing_tc"
+        ],
+        "missing": [
+          "AC-001",
+          "AC-002"
+        ]
+      },
+      "pass": false
+    },
+    "unparseable matrix": {
+      "failed": [
+        "ac_tc_evidence_coverage:reason=traceability_missing_tc:missing=AC-001|AC-002"
+      ],
+      "item": {
+        "check": "ac_tc_evidence_coverage",
+        "status": "fail",
+        "detail": "traceability_missing_tc: tests.md has no parseable AC ID coverage matrix; AC without TC: AC-001, AC-002",
+        "reason_codes": [
+          "traceability_missing_tc"
+        ],
+        "missing": [
+          "AC-001",
+          "AC-002"
+        ]
+      },
+      "pass": false
+    }
+  },
+  "result": "pass"
+}

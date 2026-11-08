@@ -1,0 +1,15 @@
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	1.120s
+ok  	beacon-go/internal/agentapi	5.977s
+ok  	beacon-go/internal/benchgate	1.936s
+ok  	beacon-go/internal/cli	18.124s
+ok  	beacon-go/internal/core	3.506s
+ok  	beacon-go/internal/gate	2.148s
+ok  	beacon-go/internal/harness	13.036s
+ok  	beacon-go/internal/llm	3.977s
+ok  	beacon-go/internal/migration	2.716s
+ok  	beacon-go/internal/orchestrator	91.549s
+ok  	beacon-go/internal/session	4.374s
+ok  	beacon-go/internal/store	4.563s
+ok  	beacon-go/internal/workspace	5.704s
+ok  	beacon-go/skills	4.115s
