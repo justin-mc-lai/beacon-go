@@ -1,0 +1,24 @@
+# qa-r1 AC-009 regression
+date: 2026-11-08T15:09:51Z
+
+$ git diff main..HEAD -- internal/cli/goal_proposal_gate_test.go
+(empty above = unchanged)
+$ git diff main..HEAD -- internal/orchestrator/p2d_program_test.go
+(empty above = unchanged)
+$ git diff main..HEAD -- internal/orchestrator/lake_proposal_test.go
+(empty above = unchanged)
+
+$ go test ./internal/cli ./internal/orchestrator -run 'TestProgramPlanRequiresProposal|TestProgramPlanFreezeChange|TestProgramSelectRecordsDecision' -count=1 -v
+=== RUN   TestProgramPlanRequiresProposal
+--- PASS: TestProgramPlanRequiresProposal (0.03s)
+PASS
+ok  	beacon-go/internal/cli	0.584s
+=== RUN   TestProgramSelectRecordsDecision
+--- PASS: TestProgramSelectRecordsDecision (0.09s)
+=== RUN   TestProgramPlanFreezeChange
+--- PASS: TestProgramPlanFreezeChange (0.03s)
+PASS
+ok  	beacon-go/internal/orchestrator	1.190s
+
+$ beacon goal program plan --run-id run_1f455bd913a4402a60eaf812 --program p1 --lake lake-a  (no proposal)
+Error: goal program: a new program must start from a human-selected lake proposal: run `beacon goal program propose` then `beacon goal program select`, or pass --from-proposal (lake_proposal_required)

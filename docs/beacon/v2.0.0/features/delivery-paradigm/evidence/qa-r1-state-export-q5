@@ -1,0 +1,27 @@
+# qa-r1 focus 3: conformance state_exported ignores the export record (truth Q5)
+date: 2026-11-08T15:09:51Z
+
+Frozen truth Q5 answer: 'projects export-state 产物或 run 的 state_export 记录，两项任一存在即 pass'.
+Code stateExported (internal/orchestrator/delivery_paradigm.go:335-353) only os.Stat()s the snapshot file.
+
+## store has the export record
+state_snapshot_exported|2026-11-08T14:50:57.375514000Z
+state_snapshot_exported|2026-11-08T15:08:58.097631000Z
+state_snapshot_exported|2026-11-08T15:08:58.097899000Z
+state_snapshot_exported|2026-11-08T15:08:58.097988000Z
+state_snapshot_exported|2026-11-08T15:08:58.098052000Z
+
+## delete only the snapshot file, keep the record
+$ beacon goal conformance --run-id run_b9c6b5ce3cc0c4baafc92364
+run:         run_b9c6b5ce3cc0c4baafc92364
+feature:     demo
+conformance: fail
+  [ok  ] truth_frozen       frozen source: frontmatter
+  [ok  ] gates_evaluated    every stage gate carries a recorded pass
+  [ok  ] verifier_attached  verifier independent-verifier with /tmp/dp-demo/verifier.md
+  [FAIL] state_exported     no state snapshot at /private/tmp/dp-demo/.beacon/state/project-state.json (run `beacon-go projects export-state --project <root>`)
+Error: goal conformance: delivery not recognised; failed: state_exported (goal_conformance_failed)
+exit=1
+
+## conclusion: export record present + snapshot file absent -> conformance FAILS.
+## The 'record OR snapshot' branch of Q5 is unimplemented.

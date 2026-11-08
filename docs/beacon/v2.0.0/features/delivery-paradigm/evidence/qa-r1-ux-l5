@@ -1,0 +1,26 @@
+# qa-r1 focus 6 / K5: real renlink l5 package
+date: 2026-11-08T15:09:51Z
+project: /Users/apple/Developer/Personal/renlink
+
+$ sed -n '78,82p' .../l5-miniprogram-pages/truth.md
+本湖是任链接产品直接面向终端用户的交互表面，承担全部用户输入、视觉呈现、端侧保存与历史查看体验。上游消费 l1 的 /parse 解析清单、l3 的 /stage 媒体转存服务与 l6 的 /zip 打包服务；数据层直连微信云开发数据库。
+
+## UI 规格说明书（前端实现手册级）
+
+### 1. 全局设计规范
+
+$ beacon gate integrity --feature l5-miniprogram-pages --evaluator qa-r1
+gate:      truth_integrity (mode audit_only)
+feature:   l5-miniprogram-pages
+verdict:   audit
+  [truth_ux_requirement_mismatch] docs/beacon/v0.1.0/features/l5-miniprogram-pages/truth.md:80 — truth declares ux_required: false but the body carries a UI/design section: ## UI 规格说明书（前端实现手册级） (set ux_required: true or remove the design section) (repair: beacon-gen-truth)
+exit=0
+
+$ beacon gate integrity --feature l5-miniprogram-pages --evaluator qa-r1 --strict
+exit=1
+gate:      truth_integrity (mode block)
+feature:   l5-miniprogram-pages
+verdict:   blocked
+  [truth_ux_requirement_mismatch] docs/beacon/v0.1.0/features/l5-miniprogram-pages/truth.md:80 — truth declares ux_required: false but the body carries a UI/design section: ## UI 规格说明书（前端实现手册级） (set ux_required: true or remove the design section) (repair: beacon-gen-truth)
+
+## row in l5 truth.md: line 80 is the real heading '## UI 规格说明书（前端实现手册级）'

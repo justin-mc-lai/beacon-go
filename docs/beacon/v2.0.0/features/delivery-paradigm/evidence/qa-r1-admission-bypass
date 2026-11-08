@@ -1,0 +1,37 @@
+# qa-r1 focus 2: manual/external runs bypass the AC-142 admission bundle
+date: 2026-11-08T15:09:43Z
+
+Project /tmp/dp-demo, feature demo. Manual run run_6d1b7f6cb4e8eef20a831987 ticked plan->truth->design->implement->qa.
+
+## events (no admission_bundle_evaluated anywhere)
+event_type            n
+--------------------  -
+goal_run_created      1
+stage_advanced        4
+stage_exit_evaluated  4
+
+## stage_exit_evaluated payloads
+{"completed_by":"qa-probe","derived":true,"evaluator":"qa-probe","executor":"manual","formal_verdict":"","frozen_source":"","gate_result_id":"gate_f9df4d2164b143aa993f33ce","gate_type":"plan","stage":"plan","verdict":"pass"}
+{"completed_by":"qa-probe","derived":true,"evaluator":"qa-probe","executor":"manual","formal_verdict":"pass","frozen_source":"frontmatter","gate_result_id":"gate_d3f93d62949d6aa802164cc6","gate_type":"truth_freeze","stage":"truth","verdict":"pass"}
+{"completed_by":"qa-probe","derived":false,"evaluator":"qa-probe","executor":"manual","formal_verdict":"pass","frozen_source":"","gate_result_id":"gate_0d65c70a7b8b66ef7962c504","gate_type":"design","stage":"design","verdict":"pass"}
+{"completed_by":"qa-probe","derived":true,"evaluator":"qa-probe","executor":"manual","formal_verdict":"","frozen_source":"","gate_result_id":"gate_dfc1b6560aaa1397598db22b","gate_type":"implement","stage":"implement","verdict":"pass"}
+
+## code: internal/orchestrator/tick.go:137-160 — the manual branch returns before
+## admissionBundleForEntry, which sits inside the non-manual else branch.
+
+## related: the manual run's design exit was decided by ANOTHER run's design gate
+## (run_6d1b7f6cb4e8eef20a831987 never called design-stage/bind)
+sqlite3 ~/.beacon/beacon-go.db "select gate_type,verdict,evaluated_at from gate_results where feature_id=(select id from feature_packages where slug='demo') and gate_type='design' order by evaluated_at;"
+echo '--- stage_exit design payload for the manual run ---'
+sqlite3 ~/.beacon/beacon-go.db "select payload_json from lifecycle_events where run_id='run_6d1b7f6cb4e8eef20a831987' and event_type='stage_exit_evaluated' and payload_json like '%design%';"
+echo '--- buildExitInput reads feature-level LatestByType (internal/orchestrator/exitgates.go:283-289)'
+echo '--- and sums artifacts over every run of the feature (exitgates.go:310-320) ---'
+
+--- actual outputs ---
+gate_type  verdict  evaluated_at                  
+---------  -------  ------------------------------
+design     pass     2026-11-08T14:50:39.128496000Z
+design     pass     2026-11-08T14:50:41.919682000Z
+design     pass     2026-11-08T15:05:53.548096000Z
+
+{"completed_by":"qa-probe","derived":false,"evaluator":"qa-probe","executor":"manual","formal_verdict":"pass","frozen_source":"","gate_result_id":"gate_0d65c70a7b8b66ef7962c504","gate_type":"design","stage":"design","verdict":"pass"}

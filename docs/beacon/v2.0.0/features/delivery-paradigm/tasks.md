@@ -23,5 +23,5 @@ task_source: acceptance_criteria
 
 ## Boundary
 
-Checkboxes are AC-bound ledgers. `[x]» is valid only when the bound evidence file exists (completion ≠ self-tick). TASK-000 covers this truth package only; TASK-001 至 TASK-010 belong to the implementation round on the same branch.
+Checkboxes are AC-bound ledgers. `[x]` is valid only when the bound evidence file exists (completion ≠ self-tick). TASK-000 covers this truth package only; TASK-001 至 TASK-010 belong to the implementation round on the same branch.
 

@@ -1,0 +1,36 @@
+# qa-r1 K1: original repro path (only --executor-id, no --executor, no --exec-cmd)
+date: 2026-11-08T15:09:30Z
+project: /tmp/dp-demo feature: demo
+
+$ beacon goal run --project /tmp/dp-demo --feature demo --executor-id renlink-dev-room "qa repro 2"
+run:    run_25f82c1f5e0eb033a44a550c
+status: running (loop_stage governance_precheck)
+stage:  plan
+blocked: false
+next:   beacon-plan
+-> exit 0, no creation-time warning, no executor field: run created silently
+
+$ beacon goal tick --run-id run_25f82c1f5e0eb033a44a550c
+run:    run_25f82c1f5e0eb033a44a550c
+status: blocked (loop_stage governance_precheck)
+stage:  plan
+blocked: true
+reason: stage_executor_not_registered
+next:   beacon-plan
+Error: goal: run run_25f82c1f5e0eb033a44a550c is blocked (stage_executor_not_registered)
+
+$ beacon goal status --run-id run_25f82c1f5e0eb033a44a550c
+run:    run_25f82c1f5e0eb033a44a550c
+status: blocked (loop_stage governance_precheck)
+stage:  plan
+blocked: true
+reason: stage_executor_not_registered
+gate:   plan evaluated=true verdict=pass
+next:   beacon-plan
+
+## events on this run
+goal_run_created
+goal_blocked
+
+## explicit mode works for comparison (run_6d1b7f6cb4e8eef20a831987)
+goal run --executor manual printed the tick contract; goal tick --by qa-probe advanced plan->truth->design->implement->qa

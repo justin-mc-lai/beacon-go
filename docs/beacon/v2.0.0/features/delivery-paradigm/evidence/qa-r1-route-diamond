@@ -1,0 +1,75 @@
+# qa-r1 focus 5 / K4: diamond program ordering
+date: 2026-11-08T15:09:51Z
+project: /tmp/qa-r1-prog, program sea-lp_1794150405917087000
+graph: lake-a -> lake-b, lake-a -> lake-c, lake-b+lake-c -> lake-d (diamond)
+
+$ beacon goal program route --run-id run_8a46b794080ff07efec68445
+program: sea-lp_1794150405917087000 (frozen=true, all_complete=false)
+proposal: lp_1794150405917087000 selected=4 rejected=0
+  lake-a           completed  
+  lake-b           blocked    program_truth_not_frozen
+  lake-c           blocked    program_truth_not_frozen
+  lake-d           blocked    program_truth_not_frozen
+next batch: 
+next actions:
+  1. truth_freeze lake-b
+     beacon truth freeze --project . --feature lake-b
+     lake lake-b truth is not frozen (fill != freeze): freeze it before admission
+  2. truth_freeze lake-c
+     beacon truth freeze --project . --feature lake-c
+     lake lake-c truth is not frozen (fill != freeze): freeze it before admission
+  3. truth_freeze lake-d
+     beacon truth freeze --project . --feature lake-d
+     lake lake-d truth is not frozen (fill != freeze): freeze it before admission
+
+--- after lake-a is externally completed ---
+program: sea-lp_1794150405917087000 (frozen=true, all_complete=false)
+proposal: lp_1794150405917087000 selected=4 rejected=0
+  lake-a           completed  
+  lake-b           blocked    program_truth_not_frozen
+  lake-c           blocked    program_truth_not_frozen
+  lake-d           blocked    program_truth_not_frozen
+next batch: 
+next actions:
+  1. truth_freeze lake-b
+     beacon truth freeze --project . --feature lake-b
+     lake lake-b truth is not frozen (fill != freeze): freeze it before admission
+  2. truth_freeze lake-c
+     beacon truth freeze --project . --feature lake-c
+     lake lake-c truth is not frozen (fill != freeze): freeze it before admission
+  3. truth_freeze lake-d
+     beacon truth freeze --project . --feature lake-d
+     lake lake-d truth is not frozen (fill != freeze): freeze it before admission
+
+## renlink 7-lake program (real)
+program: sea-lp_renlink_v1 (frozen=true, all_complete=false)
+proposal: lp_renlink_v1 selected=7 rejected=0
+  l1-parser-core   admitted   
+    drive: beacon goal driver start --run-id run_bde3174e4fdc3edd7710c87b
+  l2-xhs-images    blocked    program_truth_not_frozen
+  l3-media-delivery blocked    program_truth_not_frozen
+  l4-session-egress blocked    program_truth_not_frozen
+  l5-miniprogram-pages waiting    program_dependency_unclosed
+  l6-zip-export    blocked    program_truth_not_frozen
+  l7-risk-compliance blocked    program_truth_not_frozen
+next batch: l1-parser-core
+next actions:
+  1. drive l1-parser-core
+     beacon goal driver start --run-id run_bde3174e4fdc3edd7710c87b
+     advance the lake run to its release gate
+  2. truth_freeze l2-xhs-images
+     beacon truth freeze --project . --feature l2-xhs-images
+     lake l2-xhs-images truth is not frozen (fill != freeze): freeze it before admission
+  3. truth_freeze l3-media-delivery
+     beacon truth freeze --project . --feature l3-media-delivery
+     lake l3-media-delivery truth is not frozen (fill != freeze): freeze it before admission
+  4. truth_freeze l4-session-egress
+     beacon truth freeze --project . --feature l4-session-egress
+     lake l4-session-egress truth is not frozen (fill != freeze): freeze it before admission
+  5. wait_dependency l5-miniprogram-pages — waiting for dependencies to complete: l1-parser-core, l3-media-delivery
+  6. truth_freeze l6-zip-export
+     beacon truth freeze --project . --feature l6-zip-export
+     lake l6-zip-export truth is not frozen (fill != freeze): freeze it before admission
+  7. truth_freeze l7-risk-compliance
+     beacon truth freeze --project . --feature l7-risk-compliance
+     lake l7-risk-compliance truth is not frozen (fill != freeze): freeze it before admission
