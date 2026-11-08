@@ -10,7 +10,10 @@
 // (progressive disclosure: the first entry is the stage's root skill).
 package orchestrator
 
-import "beacon-go/internal/core"
+import (
+	"beacon-go/internal/core"
+	"beacon-go/internal/stride"
+)
 
 // Product stages of a goal run (product_goal_runtime stage axis). These
 // are the plan stages; the loop axis (core.LoopStage) tracks routing.
@@ -141,14 +144,19 @@ type runMeta struct {
 	ReleaseShadow *ReleaseShadowView `json:"release_shadow,omitempty"`
 	// LakeProposal is the AI's sea-to-lake proposal plus the human's
 	// multi-select decision; it is folded into a frozen program plan.
-	LakeProposal         *LakeProposal `json:"lake_proposal,omitempty"`
-	Blocked              bool          `json:"blocked"`
-	BlockedStreak        int           `json:"blocked_streak"`
-	LastBlockReason      string        `json:"last_block_reason,omitempty"`
-	RepairLoopCount      int           `json:"repair_loop_count"`
-	StopWhen             string        `json:"stop_when,omitempty"`
-	LastHeartbeatAt      string        `json:"last_heartbeat_at,omitempty"`
-	HeartbeatSummary     string        `json:"heartbeat_summary,omitempty"`
+	LakeProposal     *LakeProposal `json:"lake_proposal,omitempty"`
+	Blocked          bool          `json:"blocked"`
+	BlockedStreak    int           `json:"blocked_streak"`
+	LastBlockReason  string        `json:"last_block_reason,omitempty"`
+	RepairLoopCount  int           `json:"repair_loop_count"`
+	StopWhen         string        `json:"stop_when,omitempty"`
+	LastHeartbeatAt  string        `json:"last_heartbeat_at,omitempty"`
+	HeartbeatSummary string        `json:"heartbeat_summary,omitempty"`
+	// StrideTurns is the run's append-only per-turn stride fact
+	// (kernel-stride-control). It lives in the run snapshot so a turn's
+	// record commits with the stage advance it describes, without
+	// perturbing the lifecycle event order.
+	StrideTurns          []stride.Turn `json:"stride_turns,omitempty"`
 	LastSubstep          string        `json:"last_substep,omitempty"`
 	LastCheckpointAction string        `json:"last_checkpoint_next_action,omitempty"`
 	InterruptPending     bool          `json:"interrupt_pending"`

@@ -132,6 +132,19 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 		v.ReasonCode = ReasonUpToDate
 		return v, nil
 	}
+	// AC-003: the outer loop may not continue past a turn that left no
+	// settlement. The previous stride fact is the evidence; without it the
+	// tick blocks and writes neither progress nor a completion verdict.
+	if err := e.ContinueOuterTurn(run.ID); err != nil {
+		rc, ok := core.ReasonCodeOf(err)
+		if !ok {
+			return RunView{}, err
+		}
+		if blockErr := e.applyBlockBatched(run, m, rc, "settlement_boundary_blocked"); blockErr != nil {
+			return RunView{}, blockErr
+		}
+		return viewOf(run, m, slug), nil
+	}
 	// Release never executes or exits on tick (human gate).
 	if stage != StageRelease {
 		// AC-142 (review B2): the implement-entry admission bundle is the
@@ -260,6 +273,11 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 		if err := e.appendEventOn(tx, run, "stage_advanced", map[string]any{
 			"from_stage": stage, "to_stage": nextStage, "loop_stage": m.LoopStage,
 		}); err != nil {
+			return err
+		}
+		// AC-001: the settled turn leaves its stride fact on the run
+		// snapshot saved by this same transaction.
+		if err := e.settleStageAdvance(m, run, stage, key, by); err != nil {
 			return err
 		}
 		return e.saveRunOn(tx, run, m)
