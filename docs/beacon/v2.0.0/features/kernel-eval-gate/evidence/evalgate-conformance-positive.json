@@ -1,7 +1,11 @@
-# TC-003 Evidence: evalgate-conformance-positive.json
-
-- Command: go test ./internal/evalgate -run TestEvalConformancePositive -count=1
-- Assertion: complete fixture conforms, ac_tc_evidence_coverage pass, exit 0
-- Status: planned
-- Producer: implementation round writes the real observed output over this file
-- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-003
+{
+  "command": "go test ./internal/evalgate -run TestEvalConformancePositive -count=1",
+  "head": "suite",
+  "note": "test_result is the TC subtest; observed is what the kernel call actually returned",
+  "observed": {
+    "exit_code": 0,
+    "status": "pass",
+    "detail": "2 AC covered by 2 executable TC(s) with in-package evidence"
+  },
+  "test_result": "pass"
+}

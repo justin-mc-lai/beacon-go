@@ -1,7 +1,19 @@
-# TC-008 Evidence: evalgate-stage-gate.json
-
-- Command: go test ./internal/evalgate -run TestEvalStageGate -count=1
-- Assertion: unfrozen truth blocks implement with stage_exit_truth_not_frozen; complete facts pass
-- Status: planned
-- Producer: implementation round writes the real observed output over this file
-- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-008
+{
+  "command": "go test ./internal/evalgate -run TestEvalStageGate -count=1",
+  "head": "suite",
+  "note": "test_result is the TC subtest; observed is what the kernel call actually returned",
+  "observed": {
+    "stage_gate/implement_blocked_unfrozen_truth": {
+      "exit_code": 1,
+      "reason_code": "stage_exit_truth_not_frozen",
+      "status": "blocked",
+      "detail": "run run_3fd17a5c10118cf3d9e4edfb truth-\u003eimplement exit blocked: next_stage=truth reason=stage_exit_truth_not_frozen"
+    },
+    "stage_gate/implement_pass_complete": {
+      "exit_code": 0,
+      "status": "pass",
+      "detail": "run run_172f44ee200dc9be13e1ec19 truth-\u003eimplement exit passed: next_stage=implement"
+    }
+  },
+  "test_result": "pass"
+}

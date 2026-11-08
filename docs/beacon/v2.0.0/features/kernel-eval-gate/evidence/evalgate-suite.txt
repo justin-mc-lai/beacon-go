@@ -1,7 +1,62 @@
-# TC-001 Evidence: evalgate-suite.txt
-
-- Command: go test ./internal/evalgate -count=1
-- Assertion: four case classes execute, no skips, suite exit 0
-- Status: planned
-- Producer: implementation round writes the real observed output over this file
-- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-001
+=== RUN   TestEvalSuite
+=== RUN   TestEvalSuite/stage_gate/implement_blocked_unfrozen_truth
+=== RUN   TestEvalSuite/stage_gate/implement_pass_complete
+=== RUN   TestEvalSuite/conformance/all_covered
+=== RUN   TestEvalSuite/conformance/missing_tc
+=== RUN   TestEvalSuite/conformance/missing_evidence_file
+=== RUN   TestEvalSuite/conformance/evidence_escape
+=== RUN   TestEvalSuite/conformance/evidence_column_missing
+=== RUN   TestEvalSuite/conformance/failclosed_tests_missing
+=== RUN   TestEvalSuite/conformance/failclosed_matrix_unparseable
+=== RUN   TestEvalSuite/conformance/failclosed_no_ac
+=== RUN   TestEvalSuite/conformance/not_required_compat
+=== RUN   TestEvalSuite/rejection/unknown_gate_type
+=== RUN   TestEvalSuite/rejection/missing_evaluator
+=== RUN   TestEvalSuite/rejection/unknown_feature
+=== RUN   TestEvalSuite/rejection/unknown_run_conformance
+=== RUN   TestEvalSuite/no_degradation/expectation_mismatch_detected
+=== RUN   TestEvalSuite/no_degradation/deterministic_twice
+=== RUN   TestEvalSuite/no_degradation/offline_loopback_blocked
+--- PASS: TestEvalSuite (26.53s)
+    --- PASS: TestEvalSuite/stage_gate/implement_blocked_unfrozen_truth (0.03s)
+    --- PASS: TestEvalSuite/stage_gate/implement_pass_complete (0.11s)
+    --- PASS: TestEvalSuite/conformance/all_covered (0.48s)
+    --- PASS: TestEvalSuite/conformance/missing_tc (0.59s)
+    --- PASS: TestEvalSuite/conformance/missing_evidence_file (0.48s)
+    --- PASS: TestEvalSuite/conformance/evidence_escape (0.48s)
+    --- PASS: TestEvalSuite/conformance/evidence_column_missing (0.48s)
+    --- PASS: TestEvalSuite/conformance/failclosed_tests_missing (0.57s)
+    --- PASS: TestEvalSuite/conformance/failclosed_matrix_unparseable (0.50s)
+    --- PASS: TestEvalSuite/conformance/failclosed_no_ac (0.49s)
+    --- PASS: TestEvalSuite/conformance/not_required_compat (0.51s)
+    --- PASS: TestEvalSuite/rejection/unknown_gate_type (0.01s)
+    --- PASS: TestEvalSuite/rejection/missing_evaluator (0.01s)
+    --- PASS: TestEvalSuite/rejection/unknown_feature (0.01s)
+    --- PASS: TestEvalSuite/rejection/unknown_run_conformance (0.01s)
+    --- PASS: TestEvalSuite/no_degradation/expectation_mismatch_detected (1.79s)
+    --- PASS: TestEvalSuite/no_degradation/deterministic_twice (13.13s)
+    --- PASS: TestEvalSuite/no_degradation/offline_loopback_blocked (6.88s)
+=== RUN   TestEvalRegistryCoverage
+--- PASS: TestEvalRegistryCoverage (0.00s)
+=== RUN   TestEvalConformancePositive
+--- PASS: TestEvalConformancePositive (0.48s)
+=== RUN   TestEvalConformanceMissingTC
+--- PASS: TestEvalConformanceMissingTC (0.57s)
+=== RUN   TestEvalConformanceEvidence
+--- PASS: TestEvalConformanceEvidence (1.45s)
+=== RUN   TestEvalConformanceFailClosed
+--- PASS: TestEvalConformanceFailClosed (1.54s)
+=== RUN   TestEvalConformanceNotRequiredCompat
+--- PASS: TestEvalConformanceNotRequiredCompat (0.49s)
+=== RUN   TestEvalStageGate
+--- PASS: TestEvalStageGate (0.22s)
+=== RUN   TestEvalRejectionPaths
+--- PASS: TestEvalRejectionPaths (0.02s)
+=== RUN   TestEvalMismatchFailsLoudly
+--- PASS: TestEvalMismatchFailsLoudly (1.61s)
+=== RUN   TestEvalDeterministicOffline
+    suite_test.go:845: determinism: two runs over 16 cases normalized to 6273 identical bytes (volatile run ids: 2)
+    suite_test.go:846: offline: 16 cases passed with HTTP(S)_PROXY/ALL_PROXY at 127.0.0.1:1 (16 report entries)
+--- PASS: TestEvalDeterministicOffline (20.44s)
+PASS
+ok  	beacon-go/internal/evalgate	53.913s

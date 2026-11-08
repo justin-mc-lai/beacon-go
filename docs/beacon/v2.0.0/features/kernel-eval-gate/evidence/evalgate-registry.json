@@ -1,7 +1,20 @@
-# TC-002 Evidence: evalgate-registry.json
-
-- Command: go test ./internal/evalgate -run TestEvalRegistryCoverage -count=1
-- Assertion: registry covers stage_gate, conformance, rejection, no_degradation and rejects duplicate IDs and missing expectations
-- Status: planned
-- Producer: implementation round writes the real observed output over this file
-- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-002
+{
+  "command": "go test ./internal/evalgate -run TestEvalRegistryCoverage -count=1",
+  "head": "suite",
+  "note": "test_result is the TC subtest; observed is what the kernel call actually returned",
+  "observed": {
+    "cases": 18,
+    "classes": {
+      "conformance": 9,
+      "no_degradation": 3,
+      "rejection": 4,
+      "stage_gate": 2
+    },
+    "rejected": [
+      "unknown class",
+      "duplicate id",
+      "missing expectation"
+    ]
+  },
+  "test_result": "pass"
+}
