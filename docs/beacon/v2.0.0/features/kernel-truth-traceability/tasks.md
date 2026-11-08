@@ -20,7 +20,7 @@ task_source: acceptance_criteria
 - [x] TASK-008 truth show --json 返回最近 change_ac_diff · ac=AC-004 · evidence=docs/beacon/v2.0.0/features/kernel-truth-traceability/evidence/truth-show-change-ac-diff.json
 - [x] TASK-009 AC-009 三个提案门测试与 delivery-paradigm 端到端测试原样通过 · ac=AC-005 · evidence=docs/beacon/v2.0.0/features/kernel-truth-traceability/evidence/ac009-regression.txt
 - [x] TASK-010 全量 go test ./... 通过并落 evidence · ac=AC-005 · evidence=docs/beacon/v2.0.0/features/kernel-truth-traceability/evidence/go-test-all.txt
-- [x] TASK-011 三份独立 QA verdict 落到 evidence/qa（spec-ac.md 指定，runtime.md / regression.md 同目录），并更新 evidence 索引 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-truth-traceability/evidence/qa/spec-ac.md
+- [ ] TASK-011 三份独立 QA verdict 落到 evidence/qa，并更新 evidence 索引 · ac=GATES
 
 ## Boundary
 
