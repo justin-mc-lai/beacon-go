@@ -21,9 +21,9 @@
 | determinism offline | support_advisory | evalgate-deterministic-offline.txt | recorded | qa |
 | full suite | acceptance_truth | go-test-all.txt | recorded | qa |
 | AC-009 regression | acceptance_truth | ac009-regression.txt | recorded | qa |
-| QA verdict spec | acceptance_truth | qa/spec-ac.md | planned | qa |
-| QA verdict runtime | acceptance_truth | qa/runtime.md | planned | qa |
-| QA verdict regression | acceptance_truth | qa/regression.md | planned | qa |
+| QA verdict spec | acceptance_truth | qa/spec-ac.md | recorded | qa |
+| QA verdict runtime | acceptance_truth | qa/runtime.md | recorded | qa |
+| QA verdict regression | acceptance_truth | qa/regression.md | recorded | qa |
 
 ## Coverage Plan
 

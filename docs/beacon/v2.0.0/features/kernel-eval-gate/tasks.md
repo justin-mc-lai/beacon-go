@@ -23,7 +23,7 @@ task_source: acceptance_criteria
 - [x] TASK-011 实现不降级判定：期望不符时评测集非 0、打印 case=<ID> 与 expected/actual，禁止吞错与 skip · ac=AC-004 · evidence=docs/beacon/v2.0.0/features/kernel-eval-gate/evidence/evalgate-mismatch-fails.json
 - [x] TASK-012 实现确定性离线校验：归一化随机 ID 与时间戳，两次报告逐字节一致，出网代理指向 127.0.0.1:1 仍通过 · ac=AC-004 · evidence=docs/beacon/v2.0.0/features/kernel-eval-gate/evidence/evalgate-deterministic-offline.txt
 - [x] TASK-013 逐条跑 13 条 TC 并落包内 evidence，跑 go test ./... 与 AC-009 提案门、delivery-paradigm 端到端 · ac=AC-005 · evidence=docs/beacon/v2.0.0/features/kernel-eval-gate/evidence/go-test-all.txt
-- [ ] TASK-014 三份独立 QA verdict 落到 evidence/qa，并更新 evidence 索引 · ac=GATES
+- [x] TASK-014 三份独立 QA verdict 落到 evidence/qa，并更新 evidence 索引 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-eval-gate/evidence.md
 
 ## Boundary
 
