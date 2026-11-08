@@ -1,0 +1,7 @@
+# TC-004 Evidence: evalgate-conformance-missing-tc.json
+
+- Command: go test ./internal/evalgate -run TestEvalConformanceMissingTC -count=1
+- Assertion: missing TC yields traceability_missing_tc naming the AC
+- Status: planned
+- Producer: implementation round writes the real observed output over this file
+- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-004

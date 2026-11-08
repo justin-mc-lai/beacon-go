@@ -1,0 +1,7 @@
+# TC-001 Evidence: evalgate-suite.txt
+
+- Command: go test ./internal/evalgate -count=1
+- Assertion: four case classes execute, no skips, suite exit 0
+- Status: planned
+- Producer: implementation round writes the real observed output over this file
+- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-001

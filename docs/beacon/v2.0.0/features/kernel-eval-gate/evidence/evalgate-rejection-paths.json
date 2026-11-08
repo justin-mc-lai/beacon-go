@@ -1,0 +1,7 @@
+# TC-009 Evidence: evalgate-rejection-paths.json
+
+- Command: go test ./internal/evalgate -run TestEvalRejectionPaths -count=1
+- Assertion: unknown gate type, missing evaluator, unknown feature and unknown run reject with the expected reason codes
+- Status: planned
+- Producer: implementation round writes the real observed output over this file
+- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-009

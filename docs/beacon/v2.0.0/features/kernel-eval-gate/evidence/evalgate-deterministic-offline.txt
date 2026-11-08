@@ -1,0 +1,7 @@
+# TC-011 Evidence: evalgate-deterministic-offline.txt
+
+- Command: go test ./internal/evalgate -run TestEvalDeterministicOffline -count=1
+- Assertion: two normalized reports are identical and the suite passes with outbound proxies pointed at 127.0.0.1:1
+- Status: planned
+- Producer: implementation round writes the real observed output over this file
+- Contract: kernel-eval-gate AC-001 .. AC-005, tests.md TC-011
