@@ -17,7 +17,7 @@ task_source: acceptance_criteria
 - [x] TASK-005 receive-result 外部完成事实加已注册且 hash 校验通过的 QA artifacts 作为 qa_stage_executed 等价证据，payload 标 source=external · ac=AC-003 · evidence=docs/beacon/v2.0.0/features/kernel-external-stage-evidence/evidence/ac-e3-external-completion.md
 - [x] TASK-006 unresolved 阻断不得仅靠 attach-verifier 清除，streak 达到 3 后 continue 拒绝，原因消除后显式恢复清零 streak · ac=AC-004 · evidence=docs/beacon/v2.0.0/features/kernel-external-stage-evidence/evidence/ac-e4-streak-verifier.md
 - [x] TASK-007 逐条跑 8 条 TC 并落包内证据，跑全量 go test ./... -count=1 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-external-stage-evidence/evidence/go-test-all.txt
-- [ ] TASK-008 三份独立 QA verdict 按 evidence/qa-contract.md 契约落盘，maker 不自签 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-external-stage-evidence/evidence/qa-contract.md
+- [x] TASK-008 三份独立 QA verdict 按 evidence/qa-contract.md 契约落盘，maker 不自签 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-external-stage-evidence/evidence/qa/spec-ac.md · verdicts=docs/beacon/v2.0.0/features/kernel-external-stage-evidence/evidence/qa/spec-ac.md docs/beacon/v2.0.0/features/kernel-external-stage-evidence/evidence/qa/runtime.md docs/beacon/v2.0.0/features/kernel-external-stage-evidence/evidence/qa/regression.md
 
 ## Boundary
 
