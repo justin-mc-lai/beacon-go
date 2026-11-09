@@ -140,9 +140,14 @@ type RunView struct {
 	ReleaseShadow   *ReleaseShadowView `json:"release_shadow,omitempty"`
 	RepairLoopCount int                `json:"repair_loop_count"`
 	BlockedStreak   int                `json:"blocked_streak"`
-	UpToDate        bool               `json:"up_to_date,omitempty"`
-	LastHeartbeatAt string             `json:"last_heartbeat_at,omitempty"`
-	StartedAt       string             `json:"started_at"`
+	// LastBlockReason is the blocker the status read reports. It is
+	// usually the snapshot's reason; when a historical recover erased
+	// an unresolved human gate from the snapshot, Status reconstructs
+	// it from the event trail (kernel-recover-guard-scope AC-004).
+	LastBlockReason string `json:"last_block_reason,omitempty"`
+	UpToDate        bool   `json:"up_to_date,omitempty"`
+	LastHeartbeatAt string `json:"last_heartbeat_at,omitempty"`
+	StartedAt       string `json:"started_at"`
 	// P2b long-run care surfaces (present only when the corresponding
 	// subsystem has state on the run).
 	Driver          *DriverState     `json:"driver,omitempty"`
@@ -299,6 +304,7 @@ func viewOf(run store.Run, m *runMeta, slug string) RunView {
 	}
 	if m.LastBlockReason != "" && m.Blocked {
 		v.ReasonCode = m.LastBlockReason
+		v.LastBlockReason = m.LastBlockReason
 	}
 	if m.isManualExecutor() && m.LoopStage != string(core.LoopDone) {
 		v.TickHint = "not auto-driven: record each stage with `beacon goal tick --run-id " +
@@ -319,6 +325,7 @@ func (e *Engine) Status(runID string) (RunView, error) {
 		return RunView{}, err
 	}
 	v := viewOf(run, m, slug)
+	applyBlockView(&v, e.effectiveBlockView(run, m))
 	// AC-003: status says whether the current stage's gate has a
 	// recorded verdict — a run stuck before its gate must not look
 	// like it is merely "in progress".
@@ -326,6 +333,80 @@ func (e *Engine) Status(runID string) (RunView, error) {
 		v.StageGate = e.stageGateView(run.ID, v.CurrentStage)
 	}
 	return v, nil
+}
+
+// blockView is the authoritative answer to "is this run blocked, and
+// for what": the snapshot when it holds a block, otherwise the latest
+// unconfirmed human-gate stage_exit_blocked event.
+type blockView struct {
+	Blocked bool
+	Streak  int
+	Reason  string
+}
+
+// effectiveBlockView keeps the snapshot as the primary truth. A
+// historical recover could erase a human gate from that snapshot (the
+// defect this package fixes); the event trail still holds the
+// stage_exit_blocked, so status reconstruction reads it unless a later
+// release_confirmed supersedes it. goal_recovered and
+// verifier_attached deliberately do not clear the human gate.
+func (e *Engine) effectiveBlockView(run store.Run, m *runMeta) blockView {
+	// Terminal facts win: once the run reached done (Complete or an
+	// external result closed it), it is no longer waiting on a human.
+	// The release gate may have recorded a human-gate block earlier in
+	// the same run; that block is history, not a current state. Without
+	// this check `goal status` rebuilt a completed external run as
+	// blocked because receive-result intentionally does not fabricate a
+	// human release.
+	if m.LoopStage == string(core.LoopDone) {
+		return blockView{}
+	}
+	if m.Blocked {
+		return blockView{Blocked: true, Streak: m.BlockedStreak, Reason: m.LastBlockReason}
+	}
+	events, err := e.store.ListEventsByRun(run.ID)
+	if err != nil {
+		return blockView{}
+	}
+	lastHumanGate, lastConfirmed, lastTerminal := -1, -1, -1
+	var reason string
+	var streak int
+	for i, ev := range events {
+		switch ev.EventType {
+		case "stage_exit_blocked":
+			var p struct {
+				ReasonCode    string `json:"reason_code"`
+				BlockedStreak int    `json:"blocked_streak"`
+			}
+			if json.Unmarshal(ev.Payload, &p) == nil && core.IsHumanGateReason(p.ReasonCode) {
+				lastHumanGate, reason, streak = i, p.ReasonCode, p.BlockedStreak
+			}
+		case "release_confirmed":
+			lastConfirmed = i
+		case "goal_completed", "external_result_received":
+			// A completion event later than the human gate is the
+			// terminal fact for this run; it supersedes the gate even
+			// when the closing path (external delivery) records no
+			// release_confirmed by design.
+			lastTerminal = i
+		}
+	}
+	if lastHumanGate >= 0 && lastHumanGate > lastConfirmed && lastHumanGate > lastTerminal {
+		return blockView{Blocked: true, Streak: streak, Reason: reason}
+	}
+	return blockView{}
+}
+
+// applyBlockView overlays the authoritative block truth on a view.
+func applyBlockView(v *RunView, b blockView) {
+	v.Blocked = b.Blocked
+	v.BlockedStreak = b.Streak
+	v.LastBlockReason = b.Reason
+	if b.Blocked {
+		v.Status = "blocked"
+		v.RunStatus = string(core.RunPaused)
+		v.ReasonCode = b.Reason
+	}
 }
 
 // ---- CreateRun (G-01) ----

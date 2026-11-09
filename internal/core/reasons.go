@@ -26,19 +26,21 @@ const (
 	// executor selector it cannot drive at creation, requires every
 	// stage exit to be a recorded judgement, and names the manual /
 	// external executor's tick obligation explicitly.
-	ReasonExecutorUnsupported      = "stage_executor_unsupported"
-	ReasonStageGateNotEvaluated    = "stage_gate_not_evaluated"
-	ReasonManualTickRequired       = "stage_manual_tick_required"
-	ReasonExternalActorRequired    = "external_result_actor_required"
-	ReasonExternalSummRequired     = "external_result_summary_required"
-	ReasonConformanceFailed        = "goal_conformance_failed"
-	ReasonFreezeAckRequired        = "freeze_ack_required"
-	ReasonGoalImplementFeatReq     = "goal_implement_feature_required"
-	ReasonGoalImplementAdmissBlock = "goal_implement_admission_blocked"
-	ReasonGoalImplementAdmissOK    = "goal_implement_admission_ok"
-	ReasonMainImplementForbidden   = "main_implement_forbidden"
-	ReasonMainDocsPolicyForbidden  = "main_docs_policy_forbidden"
-	ReasonMainImplementExcAllowed  = "main_implement_exception_allowed"
+	ReasonExecutorUnsupported        = "stage_executor_unsupported"
+	ReasonStageGateNotEvaluated      = "stage_gate_not_evaluated"
+	ReasonManualTickRequired         = "stage_manual_tick_required"
+	ReasonExternalActorRequired      = "external_result_actor_required"
+	ReasonExternalSummRequired       = "external_result_summary_required"
+	ReasonRecoveryHumanGateForbidden = "goal_recovery_human_gate_forbidden"
+	ReasonReleaseConfirmIDRequired   = "release_confirmation_identity_required"
+	ReasonConformanceFailed          = "goal_conformance_failed"
+	ReasonFreezeAckRequired          = "freeze_ack_required"
+	ReasonGoalImplementFeatReq       = "goal_implement_feature_required"
+	ReasonGoalImplementAdmissBlock   = "goal_implement_admission_blocked"
+	ReasonGoalImplementAdmissOK      = "goal_implement_admission_ok"
+	ReasonMainImplementForbidden     = "main_implement_forbidden"
+	ReasonMainDocsPolicyForbidden    = "main_docs_policy_forbidden"
+	ReasonMainImplementExcAllowed    = "main_implement_exception_allowed"
 )
 
 // ReasonCatalog maps the stage-exit / admission family to the
@@ -61,6 +63,25 @@ var ReasonCatalog = map[string]string{
 	ReasonFreezeAckRequired:       "Freeze ack required before implement (fill ≠ self-sign)",
 	ReasonMainImplementForbidden:  "Business path commit on main/master forbidden",
 	ReasonMainDocsPolicyForbidden: "Docs path outside allowed main docs policy",
+}
+
+// HumanGateReasonCodes is the closed set of blocker reason codes whose
+// cause only a human can resolve. `beacon goal recover` must refuse
+// these: recovery is for evidence defects, not for the human gate
+// itself. Adding a member is a truth change, never a local string.
+var HumanGateReasonCodes = map[string]string{
+	ReasonReleaseRequiresHuman:     "Release is waiting for explicit human confirmation",
+	ReasonReleaseAwaitingComplete:  "Release gate passed; a human must run the completion action",
+	ReasonDriverAwaitingHuman:      "The agent driver is waiting for a human reply",
+	ReasonSelfHealNeedsHuman:       "A self-heal plan is waiting for human confirmation",
+	ReasonPlannerReviewHumanGateP1: "Planner review has a P1 human gate",
+}
+
+// IsHumanGateReason reports whether code belongs to the closed human
+// gate set.
+func IsHumanGateReason(code string) bool {
+	_, ok := HumanGateReasonCodes[code]
+	return ok
 }
 
 // ---- Driver family (goal_agent_driver.py) ----

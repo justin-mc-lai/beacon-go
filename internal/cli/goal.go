@@ -179,6 +179,10 @@ func printGoalView(cmd *cobra.Command, v orchestrator.RunView, asJSON bool) erro
 	}
 	fmt.Fprintf(cmd.OutOrStdout(), "run:    %s\nstatus: %s (loop_stage %s)\nstage:  %s\nblocked: %v",
 		v.RunID, v.Status, v.LoopStage, v.CurrentStage, v.Blocked)
+	if v.Blocked {
+		fmt.Fprintf(cmd.OutOrStdout(), "\nrun_status: %s\nblocked_streak: %d\nlast_block_reason: %s",
+			v.RunStatus, v.BlockedStreak, v.LastBlockReason)
+	}
 	if v.ExecutorMode != "" {
 		fmt.Fprintf(cmd.OutOrStdout(), "\nexecutor: %s", v.ExecutorMode)
 	}
