@@ -35,4 +35,20 @@
 - requirement_fingerprints（reqfp-v1）：AC-001 9752f2d1f658680b14edfb5d6d45f22eac1908c1c68db06814fecf981d6d4d9f；AC-002 7e9f35f562d2b91c2cbfc3e8e86ecf53080157b45aadfda009af51fada8a380a；AC-003 dcd242a871ef52749c9968fff85a25ee8faec97e139bdec6f2a450fd416eb977；AC-004 810186c6a6c64d3c27084f6b32e13d50eb98b9a9ef707db77e5b34d77c94a758
 - baseline_status：uncommitted（冻结瞬间未提交）
 - drift：clean=true，body_drift=false，frozen_truth_sha256 与 current_truth_sha256 同为 fdc99c15...e27，open_questions=0，base_diverged=false
-- 回归：go test ./... -count=1 exit 0，2026-11-09T11:51:17Z 起跑，耗时 97s，17 个包 ok、1 个包无测试文件，零 FAIL，输出见 go-test-all.txt
+ - 回归：go test ./... -count=1 exit 0，2026-11-09T11:51:17Z 起跑，耗时 97s，17 个包 ok、1 个包无测试文件，零 FAIL，输出见 go-test-all.txt
+
+ ## 变更与再冻结（spec/AC QA 返修 · 2026-11-09 20:33 +0800）
+
+ - 触发：spec/AC 面独立 verdict FAIL（验收员，bind 分支 `21047a4`），阻塞项一条——第二次人类确认只写 `human_gate_cleared` 不写 `release_confirmed`，status 重建把已完成 run 报成 blocked（AC-002/AC-004 实质违反）。
+ - 实现修复：`83e4c8d fix(orchestrator): record every human release confirmation`，`complete.go` 去掉 `writeConfirmation := !m.ReleaseHumanConfirmed` 门槛，每次确认都在同一事务写 `release_confirmed`；仅在清除有效人类门禁时追加 `human_gate_cleared`。`engine.go` 的 `effectiveBlockView` 未改。
+ - 新增 TC-009 `TestRepeatedHumanConfirmationAfterReblockKeepsStatusUnblocked`：6 步复现（首次确认 → 挂 verifier → 换身份 tick 重新阻断 → 二次确认 → complete → 读 status），断言 `completed / blocked=false / last_block_reason 空 / run_status=Succeeded`，`release_confirmed` 与 `human_gate_cleared` 各 2 条。修复前 EXIT=1，修复后 EXIT=0。
+ - change 命令：`~/.local/opt/beacon-go/beacon truth change --project . --feature kernel-recover-guard-scope --by "BeaconGo 内核" --summary "spec/AC QA 返修：补 TC-009 覆盖重复人类确认后 status 不得误报 blocked"`，exit 0，2026-11-09T12:33:06.356518Z，change_id `chg_5d96b6d33709`，materials_marked_stale = tests.md、tasks.md
+ - 变更内容：tests.md 增 TC-009 行（AC-002 主映射，命令可直接跑）并把回归段从 8 条改为 9 条；tasks.md TASK-008 文案 8 条改 9 条；truth.md 未改（AC 原文不动；AC-002 本来就要求写 `release_confirmed`）；changes/chg_5d96b6d33709.md 记录本次请求
+ - refreeze 命令：`~/.local/opt/beacon-go/beacon truth refreeze --project . --feature kernel-recover-guard-scope --by "BeaconGo 内核"`，exit 0；truth_integrity_evaluated verdict=pass findings=0（2026-11-09T12:33:18.253992Z，gate_142e738b046cbf8323f92f49）；truth_refrozen 2026-11-09T12:33:18.327329Z
+ - truth SHA256：before `fdc99c155b0516539657ac30fda0a95c65c0d4762a0f6df37c2eafa1c6939e27` → after `fdc99c155b0516539657ac30fda0a95c65c0d4762a0f6df37c2eafa1c6939e27`（正文零改动）
+ - package_fingerprint：`e8fec0159a88c4da3ec02d61ff44c7c0e03f936fe3f2ceb1b68203283a82bc57` → `ceb53b42862cb32bc0af8edf80d43eeed122afc95e96f4bae4bbb1af787f57cd`；surface_fingerprint：`08de87517f9e4b3f2d0c5aaee876f3d04d96f66a9a627b503ff1c3b1344640ff` → `edaf77b37508019893b6b1bab31d189f1947fc5e32413c2386814b1add6ea0a5`；四条 requirement_fingerprints 未变
+ - change_ac_diff：added/changed/removed 全为空；status=frozen，change_pending=false，branch_check=ok（current=main，canonical=main）
+ - drift：`beacon truth drift` clean=true，body_drift=false，frozen 与 current truth SHA 同为 `fdc99c15...39e27`，open_questions=0，base_diverged=false
+ - 9 条 TC 逐条 `-count=1 -v`：全部 `--- PASS`，逐条退出码 0（2026-11-09 20:34:23–20:34:32 +0800）
+ - 全量回归：`go test ./... -count=1` EXIT=0（2026-11-09 20:37:32 起跑，20:39:08 结束，96s，17 包 ok、1 包无测试文件），全文覆盖 evidence/go-test-all.txt
+ - 基线：返修的实现与文档在分支 `feat/kernel-recover-guard-scope`，未 merge、未 push、未重装；`main` 仍 `ffdfced`

@@ -1,20 +1,22 @@
-# go test ./... -count=1  branch feat/kernel-recover-guard-scope  commit 8ad7fed  2026-11-09T20:04:10+0800
+# go test ./... -count=1 (kernel-recover-guard-scope, branch feat/kernel-recover-guard-scope @ 83e4c8d)
+START=2026-11-09 20:37:32 +0800
 ?   	beacon-go/cmd/beacon	[no test files]
-ok  	beacon-go/desktop	0.585s
-ok  	beacon-go/internal/agentapi	3.652s
-ok  	beacon-go/internal/benchgate	0.614s
-ok  	beacon-go/internal/cli	16.892s
-ok  	beacon-go/internal/core	0.963s
-ok  	beacon-go/internal/evalgate	62.400s
-ok  	beacon-go/internal/gate	2.300s
-ok  	beacon-go/internal/harness	10.422s
-ok  	beacon-go/internal/llm	1.851s
-ok  	beacon-go/internal/migration	2.735s
-ok  	beacon-go/internal/orchestrator	107.177s
-ok  	beacon-go/internal/progressreview	2.811s
-ok  	beacon-go/internal/session	2.748s
-ok  	beacon-go/internal/store	2.320s
-ok  	beacon-go/internal/stride	2.061s
-ok  	beacon-go/internal/workspace	2.740s
-ok  	beacon-go/skills	1.649s
+ok  	beacon-go/desktop	0.524s
+ok  	beacon-go/internal/agentapi	3.212s
+ok  	beacon-go/internal/benchgate	1.383s
+ok  	beacon-go/internal/cli	16.164s
+ok  	beacon-go/internal/core	1.174s
+ok  	beacon-go/internal/evalgate	54.386s
+ok  	beacon-go/internal/gate	1.606s
+ok  	beacon-go/internal/harness	8.215s
+ok  	beacon-go/internal/llm	2.646s
+ok  	beacon-go/internal/migration	2.506s
+ok  	beacon-go/internal/orchestrator	94.848s
+ok  	beacon-go/internal/progressreview	2.118s
+ok  	beacon-go/internal/session	2.185s
+ok  	beacon-go/internal/store	2.353s
+ok  	beacon-go/internal/stride	1.658s
+ok  	beacon-go/internal/workspace	2.766s
+ok  	beacon-go/skills	1.701s
 EXIT=0
+END=2026-11-09 20:39:08 +0800

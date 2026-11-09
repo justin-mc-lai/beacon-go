@@ -31,4 +31,13 @@ release 等待人类时，`beacon goal status` 输出 blocked=true、run_status=
 - `go test ./internal/orchestrator -run '^TestStatusShowsHumanGateBlockTruthfully$' -count=1 -v` → `--- PASS` (0.48s)，`ok beacon-go/internal/orchestrator 0.802s`，`EXIT=0`。
 - `go test ./internal/orchestrator -run '^TestRecoverAndAttachVerifierDoNotHideHumanGateBlock$' -count=1 -v` → `--- PASS` (0.48s)，`ok beacon-go/internal/orchestrator 0.802s`，`EXIT=0`。
 - 断言落点：TC-007 在 release 门阻断下断言 status 为 `blocked=true`、`run_status=paused`、`blocked_streak=1`、`last_block_reason=release_requires_human_confirmation`；随后模拟历史缺陷把快照三个字段清零并保存，再读 status，断言仍还原出同样的 blocked/paused/streak/reason 且 `reason_code` 一致。TC-008 记录拒绝 recover 前的 status，再执行被拒 recover + `attach-verifier`，断言 blocked、streak、last_block_reason、run_status 四项前后完全相同且仍如实报告人类门禁。
-- 全量回归：`go test ./... -count=1` → `EXIT=0`（`2026-11-09T20:04:10+0800`，17 包 ok、1 包无测试文件），全文见 `evidence/go-test-all.txt`。
+ - 全量回归（实现轮）：`go test ./... -count=1` → `EXIT=0`（`2026-11-09T20:04:10+0800`，17 包 ok、1 包无测试文件）。
+
+ ## 执行记录（spec/AC QA 返修轮 · 重复确认后 status 不得误报）
+
+ - 触发：spec/AC 面独立 verdict FAIL（验收员，bind `21047a4`），实测路径 external run → 首次确认 → 挂 verifier → 换身份 tick 重新阻断 → 二次确认 complete 成功 → status 报 `blocked=true / Paused`，违反 AC-004「status 不得误报阻断」。
+ - 修复点：`complete.go` 去掉 `writeConfirmation := !m.ReleaseHumanConfirmed` 门槛后，每次确认都写 `release_confirmed`，status 重建时旧的 `stage_exit_blocked` 会被最新确认事实覆盖；`effectiveBlockView` 逻辑未改。
+ - 返修提交 `83e4c8d`，实跑时间 `2026-11-09T20:34:32+0800`（Asia/Shanghai）。
+ - TC-009 `go test ./internal/orchestrator -run '^TestRepeatedHumanConfirmationAfterReblockKeepsStatusUnblocked$' -count=1 -v` → `--- PASS` (0.52s)，`ok beacon-go/internal/orchestrator 0.819s`，`EXIT=0`。
+ - 断言落点：完整 6 步复现后断言 `status=completed`、`blocked=false`、`last_block_reason` 为空、`run_status=Succeeded`，并要求 `release_confirmed` 与 `human_gate_cleared` 各 2 条；修复前同一 TC `EXIT=1`，报 `completed run reported as blocked`。
+ - 全量回归（返修后重跑）：`go test ./... -count=1` → `EXIT=0`（`2026-11-09T20:37:32+0800` 起跑，`2026-11-09T20:39:08+0800` 结束，96s，17 包 ok、1 包无测试文件），全文见 `evidence/go-test-all.txt`。

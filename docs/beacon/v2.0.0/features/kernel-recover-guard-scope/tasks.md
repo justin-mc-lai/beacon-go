@@ -17,7 +17,7 @@ task_source: acceptance_criteria
 - [x] TASK-005 goal_recovered 补齐 before/after 字段与 decision，保留 by、note、stage、prior_reason_code、prior_blocked_streak · ac=AC-003 · evidence=docs/beacon/v2.0.0/features/kernel-recover-guard-scope/evidence/ac-r3-recover-trail.md
 - [x] TASK-006 被拒绝的 recover 追加 goal_recover_rejected，含 attempted_reason_code、refusal_reason_code、before/after 与 human_confirmation_required · ac=AC-003 · evidence=docs/beacon/v2.0.0/features/kernel-recover-guard-scope/evidence/ac-r3-recover-trail.md
 - [x] TASK-007 status 输出 last_block_reason，并在快照被擦除时从最新人类门禁 stage_exit_blocked 还原 blocked、paused、reason、streak · ac=AC-004 · evidence=docs/beacon/v2.0.0/features/kernel-recover-guard-scope/evidence/ac-r4-status-truth.md
-- [ ] TASK-008 逐条跑 8 条 TC 并落包内证据，跑全量 go test ./... -count=1；三份独立 QA verdict 由三个独立验收方落盘 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-recover-guard-scope/evidence/go-test-all.txt
+- [ ] TASK-008 逐条跑 9 条 TC 并落包内证据，跑全量 go test ./... -count=1；三份独立 QA verdict 由三个独立验收方落盘 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-recover-guard-scope/evidence/go-test-all.txt
 
 ## Boundary
 
