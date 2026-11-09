@@ -8,7 +8,6 @@
 package orchestrator
 
 import (
-	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -174,9 +173,7 @@ func TestRegisterArtifactQAGateFlow(t *testing.T) {
 	run := env.createRun(t)
 	// The qa stage executed (evidence event), but nothing registered:
 	// the gate must still block on missing QA artifacts.
-	if _, err := env.rec.ExecuteStage(context.Background(), RunView{RunID: run.RunID, FeatureID: env.feature.ID}, StageQA); err != nil {
-		t.Fatal(err)
-	}
+	appendRealStageExecuted(t, env.testEnv, run.RunID, StageQA)
 	ev, err := env.eng.EvaluateGate(env.ctx, "qa", "", "qa-bot")
 	if err != nil {
 		t.Fatal(err)

@@ -22,7 +22,12 @@ package orchestrator
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
+	"io"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"beacon-go/internal/core"
@@ -211,9 +216,36 @@ func (e *Engine) registerArtifacts(runID string, inputs []ArtifactInput) ([]stri
 		if kind == "" {
 			kind = "implement_artifact"
 		}
+		abs := a.AbsPath
+		hash, size := a.ContentHash, a.SizeBytes
+		// AC-003 (kernel-external-stage-evidence): a received
+		// result may hand in bare paths. The store re-hashes the
+		// file at gate time, so an empty hash here would mark a
+		// perfectly good artifact stale and silently disable the
+		// QA equivalence path. Compute the real digest from disk
+		// when the caller did not supply one; missing files keep
+		// the empty hash and stay stale (fail-closed).
+		if strings.TrimSpace(hash) == "" {
+			if !filepath.IsAbs(abs) {
+				if p, err := filepath.Abs(abs); err == nil {
+					abs = p
+				}
+			}
+			if info, err := os.Stat(abs); err == nil && info.Mode().IsRegular() {
+				if f, err := os.Open(abs); err == nil {
+					h := sha256.New()
+					n, copyErr := io.Copy(h, f)
+					f.Close()
+					if copyErr == nil {
+						hash = hex.EncodeToString(h.Sum(nil))
+						size = n
+					}
+				}
+			}
+		}
 		ref, err := e.store.Artifacts().Add(store.ArtifactRef{
-			RunID: runID, Kind: kind, AbsPath: a.AbsPath,
-			ContentHash: a.ContentHash, SizeBytes: a.SizeBytes,
+			RunID: runID, Kind: kind, AbsPath: abs,
+			ContentHash: hash, SizeBytes: size,
 		})
 		if err != nil {
 			return ids, err

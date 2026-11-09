@@ -462,7 +462,7 @@ func TestHarnessVerifyJSON(t *testing.T) {
 	}
 	if _, err := st.AppendEvent(store.LifecycleEvent{
 		FeatureID: seed.feature.ID, RunID: sql.NullString{String: seed.run.ID, Valid: true}, EventType: "stage_executed",
-		Payload: []byte(`{"stage":"qa","outcome":"succeeded"}`),
+		Payload: []byte(`{"stage":"qa","outcome":"succeeded","placeholder":false,"recording":false}`),
 	}); err != nil {
 		t.Fatal(err)
 	}
