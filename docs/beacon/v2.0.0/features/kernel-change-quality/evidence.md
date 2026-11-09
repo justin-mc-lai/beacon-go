@@ -4,15 +4,15 @@
 
 | Surface | Authority | Canonical Artifact | Status | Route |
 |---------|-----------|--------------------|--------|-------|
-| truth | requirement_truth | truth.md | draft | truth |
-| tests | test_truth | tests.md | draft | qa |
+| truth | requirement_truth | truth.md | frozen | truth |
+| tests | test_truth | tests.md | frozen | qa |
 | tasks | support_advisory | tasks.md | present | truth |
 | policy modes | support_advisory | ac-q1-policy-modes.md | recorded | qa |
 | diff SHA receipt | support_advisory | ac-q2-diff-sha-receipt.md | recorded | qa |
 | bounded fix | support_advisory | ac-q3-bounded-fix.md | recorded | qa |
-| source anchors | support_advisory | source-anchors.md | pending | qa |
-| freeze | acceptance_truth | freeze-log.md | pending | truth |
-| full suite | acceptance_truth | go-test-all.txt | pending | qa |
+| source anchors | support_advisory | source-anchors.md | recorded | qa |
+| freeze | acceptance_truth | freeze-log.md | recorded | truth |
+| full suite | acceptance_truth | go-test-all.txt | recorded | qa |
 | QA contract | acceptance_truth | qa-contract.md | recorded | qa |
 
 ## Coverage Plan
@@ -24,4 +24,3 @@
 ## Boundary
 
 `evidence.md` is an index/read model. It must not contain final verdict, gate truth, or release readiness authority fields. 状态在底层文件真实存在后才从 planned 变成 recorded；没有底层 artifact 的 verdict 行不算证据。
-
