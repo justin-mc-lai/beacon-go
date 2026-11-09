@@ -1,7 +1,7 @@
 ---
 slug: kernel-effect-journal
 version: v2.0.0
-status: draft
+status: frozen
 language: zh
 domain_required: false
 ux_required: false
@@ -85,13 +85,13 @@ journal 文件缺失、不可解析或版本不识别时，resume 一律 fail-cl
 
 ## 源锚点
 
-上游参考仓 loopx；锚点文件 `evidence/source-anchors.md` 由 BeaconGo 研究 从只读上游提取并逐条对应 AC。
+上游参考仓 loopx，commit `c9c0644be428bbb0ab10726637f5b36602972912`（2.3.0 发布窗口 HEAD）。派单中的 `91d8ed06` 为历史快照，尚未建立 TS 控制面与 Python 结算适配体系（`effect_runtime.py`、`settlement_driver.py` 在该 commit 下不存在），取舍依据见 `evidence/source-anchors.md`。本包只引用文件与小节，行号与摘录留在包内证据文件。
 
 | AC ID | 上游文件 | 小节 / 行号 |
 |-------|----------|-------------|
-| AC-001 | `loopx/control_plane/effect_runtime*` | 见 evidence/source-anchors.md |
-| AC-002 | `loopx/control_plane/effect_runtime*`；`loopx/control_plane/settlement_driver.py` | 见 evidence/source-anchors.md |
-| AC-003 | `loopx/control_plane/effect_runtime*`；`loopx/control_plane/settlement_driver.py` | 见 evidence/source-anchors.md |
+| AC-001 | `loopx/control_plane/turn_driver/turn_journal_effects.ts`；`loopx/control_plane/settlement_driver.py`；`loopx/control_plane/effect_program.ts` | `turn_journal_effects.ts` L47-L53、L140-L165（`journalEffectId` 幂等键与原子写 journal）；`settlement_driver.py` L1-L8、L49-L65（`effect_ids_match`）；`effect_program.ts` L683-L730（`settlementReceipt` 携带强类型 `effect_id`） |
+| AC-002 | `loopx/control_plane/turn_driver/turn_journal_effects.ts`；`loopx/control_plane/turn_driver/turn_journal.ts`；`loopx/control_plane/turn_driver/recovery.py` | `turn_journal_effects.ts` L185-L195（`replayed: true, appended: false` 跳过副作用）、L39-L41、L80-L92（`legalPhaseAdvances`）；`turn_journal.ts` L132-L146、L623-L630（`completed_phases` 严格有序前缀）；`recovery.py` L105-L125（`build_turn_recovery_audit` 输出 `completed_phases`） |
+| AC-003 | `loopx/control_plane/turn_driver/recovery.py`；`loopx/control_plane/turn_driver/turn_journal.ts`；`loopx/control_plane/turn_driver/turn_journal_effects.ts` | `recovery.py` L19-L25、L85-L103（`TurnRecoveryBlockedError` 与 `require_turn_recovery_continuation`）；`turn_journal.ts` L355-L380（`action: "blocked", reason: "journal_inconsistent", reinvoke_host: false`）；`turn_journal_effects.ts` L165-L178（`EffectRuntimeConflictError`） |
 
 ## Non-Goals
 
@@ -105,4 +105,3 @@ journal 文件缺失、不可解析或版本不识别时，resume 一律 fail-cl
 | Capability | Item | Reason | Status | Approved By |
 |------------|------|--------|--------|-------------|
 | none | none | none | dropped | n/a |
-
