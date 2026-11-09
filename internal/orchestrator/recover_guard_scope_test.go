@@ -354,3 +354,76 @@ func TestRecoverAndAttachVerifierDoNotHideHumanGateBlock(t *testing.T) {
 		t.Fatalf("human gate hidden: %+v", after)
 	}
 }
+
+// ---- AC-002 / AC-004 / TC-009 ----
+
+// A second human confirmation after the release gate re-blocked the
+// run must leave the confirmation fact the status reconstruction
+// compares against (release_confirmed). Writing that fact only on the
+// first confirmation let the later human_gate_cleared go unseen and
+// rebuilt a completed run as blocked (spec/AC QA finding on 21047a4).
+func TestRepeatedHumanConfirmationAfterReblockKeepsStatusUnblocked(t *testing.T) {
+	env := newGateEnv(t, frozenTruthDoc)
+	run := createExternalRun(t, env.testEnv, ExecutorModeExternal)
+	ctx := context.Background()
+	env.seedQAPass(t)
+	for i := 0; i < 4; i++ {
+		v, err := env.eng.TickBy(ctx, run.RunID, "room-first")
+		if err != nil {
+			t.Fatalf("tick %d: %v", i, err)
+		}
+		if v.Blocked {
+			t.Fatalf("tick %d blocked: %+v", i, v)
+		}
+	}
+	v, err := env.eng.TickBy(ctx, run.RunID, "room-first")
+	if err != nil {
+		t.Fatalf("release tick: %v", err)
+	}
+	if !v.Blocked || v.ReasonCode != core.ReasonReleaseRequiresHuman {
+		t.Fatalf("release tick = %+v, want the human gate block", v)
+	}
+	// First confirmation clears the gate; Complete still fails on the
+	// missing verifier, but the confirmation fact is on the trail.
+	if _, err := env.eng.Complete(run.RunID, CompleteOptions{HumanConfirmed: true, ConfirmedBy: "owner-1"}); err == nil {
+		t.Fatal("complete without a verifier must be refused")
+	} else if rc, ok := core.ReasonCodeOf(err); !ok || rc != ReasonVerifierRequired {
+		t.Fatalf("first completion reason = %v, want verifier required", err)
+	}
+	verifier := filepath.Join(t.TempDir(), "verifier.md")
+	if err := os.WriteFile(verifier, []byte("# independent verification\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.AttachVerifier(run.RunID, []string{verifier}, "independent-verifier", ""); err != nil {
+		t.Fatal(err)
+	}
+	// A different tick identity is new evidence: the release gate
+	// judges again and records a second human-gate block.
+	v, err = env.eng.TickBy(ctx, run.RunID, "room-second")
+	if err != nil {
+		t.Fatalf("reblock tick: %v", err)
+	}
+	if !v.Blocked || v.ReasonCode != core.ReasonReleaseRequiresHuman {
+		t.Fatalf("reblock tick = %+v, want the human gate block again", v)
+	}
+	v, err = env.eng.Complete(run.RunID, CompleteOptions{HumanConfirmed: true, ConfirmedBy: "owner-2"})
+	if err != nil {
+		t.Fatalf("second Complete: %v", err)
+	}
+	if v.Status != "completed" {
+		t.Fatalf("complete status = %s, want completed", v.Status)
+	}
+	st, err := env.eng.Status(run.RunID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if st.Status != "completed" || st.Blocked || st.LastBlockReason != "" || st.RunStatus != string(core.RunSucceeded) {
+		t.Fatalf("completed run reported as blocked: %+v", st)
+	}
+	if got := payloadsOf(t, env.st, run.RunID, "release_confirmed"); len(got) != 2 {
+		t.Fatalf("release_confirmed events = %d, want 2 (one per confirmation)", len(got))
+	}
+	if got := payloadsOf(t, env.st, run.RunID, "human_gate_cleared"); len(got) != 2 {
+		t.Fatalf("human_gate_cleared events = %d, want 2", len(got))
+	}
+}

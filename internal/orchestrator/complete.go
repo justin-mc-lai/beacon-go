@@ -182,41 +182,41 @@ func (e *Engine) Complete(runID string, opts CompleteOptions) (RunView, error) {
 		// effective blocker is a human gate, clear it in the same
 		// transaction as the confirmation fact, and leave an audit
 		// event for the cleared gate.
+		//
+		// Every confirmation writes release_confirmed, not only the
+		// first one: status reconstruction compares the latest human
+		// gate block against the latest release_confirmed, so a second
+		// confirmation that only wrote human_gate_cleared would let an
+		// older stage_exit_blocked resurrect a completed run as blocked
+		// (spec/AC QA finding on 21047a4).
 		effective := e.effectiveBlockView(run, m)
 		clearHumanGate := effective.Blocked && core.IsHumanGateReason(effective.Reason)
-		writeConfirmation := !m.ReleaseHumanConfirmed
-		if writeConfirmation || clearHumanGate {
-			if writeConfirmation {
-				m.ReleaseHumanConfirmed = true
-				m.HumanConfirmedBy = confirmedBy
+		m.ReleaseHumanConfirmed = true
+		m.HumanConfirmedBy = confirmedBy
+		if clearHumanGate {
+			m.Blocked = false
+			m.BlockedStreak = 0
+			m.LastBlockReason = ""
+			if idx := m.CurrentStageIdx; idx >= 0 && idx < len(m.StagePlan) && m.StagePlan[idx].Status == "blocked" {
+				m.StagePlan[idx].Status = "active"
+			}
+		}
+		if err := e.store.WithTx(func(tx *store.Tx) error {
+			if err := e.appendEventOn(tx, run, "release_confirmed", map[string]any{"by": confirmedBy}); err != nil {
+				return err
 			}
 			if clearHumanGate {
-				m.Blocked = false
-				m.BlockedStreak = 0
-				m.LastBlockReason = ""
-				if idx := m.CurrentStageIdx; idx >= 0 && idx < len(m.StagePlan) && m.StagePlan[idx].Status == "blocked" {
-					m.StagePlan[idx].Status = "active"
+				if err := e.appendEventOn(tx, run, "human_gate_cleared", map[string]any{
+					"by": confirmedBy, "stage": m.currentStage(),
+					"prior_reason_code":    effective.Reason,
+					"prior_blocked_streak": effective.Streak,
+				}); err != nil {
+					return err
 				}
 			}
-			if err := e.store.WithTx(func(tx *store.Tx) error {
-				if writeConfirmation {
-					if err := e.appendEventOn(tx, run, "release_confirmed", map[string]any{"by": confirmedBy}); err != nil {
-						return err
-					}
-				}
-				if clearHumanGate {
-					if err := e.appendEventOn(tx, run, "human_gate_cleared", map[string]any{
-						"by": confirmedBy, "stage": m.currentStage(),
-						"prior_reason_code":    effective.Reason,
-						"prior_blocked_streak": effective.Streak,
-					}); err != nil {
-						return err
-					}
-				}
-				return e.saveRunOn(tx, run, m)
-			}); err != nil {
-				return RunView{}, err
-			}
+			return e.saveRunOn(tx, run, m)
+		}); err != nil {
+			return RunView{}, err
 		}
 	}
 	if !m.ReleaseHumanConfirmed {
