@@ -19,7 +19,8 @@ materials_status: current
 | AC-004 | TC-007 | behavior | go test ./internal/orchestrator -run '^TestStatusShowsHumanGateBlockTruthfully$' -count=1 | 快照阻断时 status 输出 blocked=true、paused、last_block_reason；快照被历史 recover 擦掉时从最新人类门禁 stage_exit_blocked 还原同样的 blocked、paused、reason、streak | docs/beacon/v2.0.0/features/kernel-recover-guard-scope/evidence/ac-r4-status-truth.md |
 | AC-004 | TC-008 | negative | go test ./internal/orchestrator -run '^TestRecoverAndAttachVerifierDoNotHideHumanGateBlock$' -count=1 | 被拒绝的 recover 与 attach-verifier 之后，status 的 blocked、blocked_streak、last_block_reason、run_status 与调用前一致 | docs/beacon/v2.0.0/features/kernel-recover-guard-scope/evidence/ac-r4-status-truth.md |
 | AC-002 | TC-009 | behavior | go test ./internal/orchestrator -run '^TestRepeatedHumanConfirmationAfterReblockKeepsStatusUnblocked$' -count=1 | 重复人类确认路径：首次确认后挂 verifier、换身份 tick 重新阻断、再次确认并 complete 成功，status 必须 completed、blocked=false、last_block_reason 为空；每次确认都留 release_confirmed 与 human_gate_cleared | docs/beacon/v2.0.0/features/kernel-recover-guard-scope/evidence/ac-r2-human-confirmation.md |
+| AC-004 | TC-010 | negative | go test ./internal/orchestrator -run '^TestExternalReceiveResultAfterHumanGateKeepsStatusCompleted$' -count=1 | external run 在 release 被人类门禁阻断后由 receive-result --external 收尾，status 必须 completed、blocked=false、last_block_reason 为空、run_status=Succeeded；终止事件晚于人类门禁，不得重建 blocked | docs/beacon/v2.0.0/features/kernel-recover-guard-scope/evidence/ac-r4-status-truth.md |
 
 ## 回归与门禁
 
-实现轮除上述 9 条 TC 外，还需跑全量 go test ./... -count=1 并落包内证据；三份独立 QA verdict 由三个独立验收方各自写入 evidence/qa，maker 不自签。
+实现轮除上述 10 条 TC 外，还需跑全量 go test ./... -count=1 并落包内证据；三份独立 QA verdict 由三个独立验收方各自写入 evidence/qa，maker 不自签。

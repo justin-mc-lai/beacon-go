@@ -41,3 +41,15 @@ release 等待人类时，`beacon goal status` 输出 blocked=true、run_status=
  - TC-009 `go test ./internal/orchestrator -run '^TestRepeatedHumanConfirmationAfterReblockKeepsStatusUnblocked$' -count=1 -v` → `--- PASS` (0.52s)，`ok beacon-go/internal/orchestrator 0.819s`，`EXIT=0`。
  - 断言落点：完整 6 步复现后断言 `status=completed`、`blocked=false`、`last_block_reason` 为空、`run_status=Succeeded`，并要求 `release_confirmed` 与 `human_gate_cleared` 各 2 条；修复前同一 TC `EXIT=1`，报 `completed run reported as blocked`。
  - 全量回归（返修后重跑）：`go test ./... -count=1` → `EXIT=0`（`2026-11-09T20:37:32+0800` 起跑，`2026-11-09T20:39:08+0800` 结束，96s，17 包 ok、1 包无测试文件），全文见 `evidence/go-test-all.txt`。
+
+## 执行记录（负向回归 QA 返修轮 · external 收尾后 status 不得重建 blocked）
+
+- 触发：负向回归面独立 verdict FAIL（QA 验收 · 回归，bind `d1f08c4`）。真实业务路径：external run 在 release 被人类门禁拦 → `goal receive-result --external` 收尾成功 → `goal status` 由事件流重建，把已 done 的 run 重报成 `blocked / Paused`。
+- 根因：`effectiveBlockView` 只让 `release_confirmed` 覆盖人类门禁 `stage_exit_blocked`，而 external 交付按设计不写 `release_confirmed`；终止事实 `goal_completed` / `external_result_received` 没有参与重建判定。
+- 修复点：`internal/orchestrator/engine.go` 的 `effectiveBlockView` 改为终止事实优先——LoopStage 为 done 时直接返回未阻断；事件流重建时，晚于最新人类门禁的 `goal_completed` / `external_result_received` 覆盖该门禁。`ReceiveExternalResult` 语义未改，仍不伪造人类 release。
+- 返修提交 `15c8133`，实跑时间 `2026-11-09 21:18:50–21:19:00 +0800`（Asia/Shanghai）。
+- TC-010 `go test ./internal/orchestrator -run '^TestExternalReceiveResultAfterHumanGateKeepsStatusCompleted$' -count=1 -v` → `--- PASS` (0.50s)，`ok beacon-go/internal/orchestrator 1.001s`，`EXIT=0`。
+- 修复前对照：同一 TC 在 `d1f08c4` 的 `engine.go` 上实跑 `EXIT=1`，报 `externally completed run reported as blocked`，status 为 `blocked=true / Paused / release_requires_human_confirmation`；换回修复后同一命令 `EXIT=0`。
+- 断言落点：release tick 记录人类门禁阻断后调用 `ReceiveExternalResult`，再读 `goal status`，断言 `status=completed`、`blocked=false`、`last_block_reason` 为空、`run_status=Succeeded`，且 `external_result_received` 与 `goal_completed` 各 1 条。
+- 10 条冻结 TC 逐条 `-count=1 -v`：全部 `--- PASS`，逐条退出码 0（2026-11-09 21:18:50–21:19:00 +0800）。
+- 全量回归（返修后重跑）：`go test ./... -count=1` → `EXIT=0`（`2026-11-09T21:19:06+0800` 起跑，`2026-11-09T21:20:48+0800` 结束，17 包 ok、1 包无测试文件），全文见 `evidence/go-test-all.txt`。

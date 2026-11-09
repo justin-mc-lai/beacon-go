@@ -112,6 +112,8 @@ Every AC must trace to the intent or evidence it serves.
 
 `beacon goal status` 在 RunView 中输出 `last_block_reason` 字段，取值规则如下。
 
+**终止事实优先**：run 的 LoopStage 为 done，或事件流中存在晚于最新人类门禁 `stage_exit_blocked` 的 `goal_completed` / `external_result_received` 时，status 输出 completed、blocked=false、last_block_reason 为空，不把历史人类门禁重建为当前阻断。external 交付收尾按设计不写 `release_confirmed`，不因此被误判为仍在等待人类。
+
 1. 快照 blocked=true 时，last_block_reason 取快照的 LastBlockReason；blocked_streak 取快照值；run_status 为 paused。
 2. 快照 blocked=false 时，扫描该 run 的事件流。取最新一条人类门禁 `stage_exit_blocked` 与最新一条 `release_confirmed`；前者晚于后者时，status 输出 blocked=true、run_status=paused、last_block_reason 为该事件的原因码、blocked_streak 为该事件的 blocked_streak。
 3. 历史 `goal_recovered` 不解除人类门禁事件。attach-verifier 与 verifier_attached 同样不改变上述判定。

@@ -52,3 +52,20 @@
  - 9 条 TC 逐条 `-count=1 -v`：全部 `--- PASS`，逐条退出码 0（2026-11-09 20:34:23–20:34:32 +0800）
  - 全量回归：`go test ./... -count=1` EXIT=0（2026-11-09 20:37:32 起跑，20:39:08 结束，96s，17 包 ok、1 包无测试文件），全文覆盖 evidence/go-test-all.txt
  - 基线：返修的实现与文档在分支 `feat/kernel-recover-guard-scope`，未 merge、未 push、未重装；`main` 仍 `ffdfced`
+
+## 变更与再冻结（负向回归 QA 返修 · 2026-11-09 21:18 +0800）
+
+- 触发：负向回归面独立 verdict FAIL（QA 验收 · 回归，bind `d1f08c4`），阻塞项一条——external run 在 release 被人类门禁拦后由 `receive-result --external` 收尾，`goal status` 由事件流重建把已 done 的 run 重报成 `blocked / Paused`；根因是 `effectiveBlockView` 只认 `release_confirmed`，终止事件 `goal_completed` / `external_result_received` 未参与判定。
+- 实现修复：`15c8133 fix(orchestrator): let terminal facts win over historical human-gate blocks`。`engine.go` 的 `effectiveBlockView` 改为终止事实优先：LoopStage 为 done 时直接未阻断；事件流重建时晚于最新人类门禁的 `goal_completed` / `external_result_received` 覆盖门禁。`ReceiveExternalResult` 仍按设计不写 `release_confirmed`。
+- 新增 TC-010 `TestExternalReceiveResultAfterHumanGateKeepsStatusCompleted`：release tick 阻断 → `ReceiveExternalResult` 收尾 → status 断言 `completed / blocked=false / last_block_reason 空 / run_status=Succeeded`。修复前同一 TC `EXIT=1`，修复后 `EXIT=0`。
+- change 命令：`~/.local/opt/beacon-go/beacon truth change --project . --feature kernel-recover-guard-scope --by "BeaconGo 内核" --summary "负向回归返修：终止事实优先，补 TC-010 覆盖 external receive-result 完成后 status 不得重建 blocked"`，exit 0，2026-11-09T13:17:03Z，change_id `chg_862ad81a9133`，materials_marked_stale = tests.md、tasks.md
+- 变更内容：truth.md 的 status 呈现规则补「终止事实优先」一段（AC 判据原文未动）；tests.md 增 TC-010 行（AC-004 负向映射，命令可直接跑）并把回归段 9 条改 10 条；tasks.md TASK-008 文案 9 条改 10 条；changes/chg_862ad81a9133.md 记录本次请求
+- AC-137 过程如实记录：本轮 change 在正文编辑之后才注册，首次 refreeze 被 `revision_authority_drift` 拦截（fingerprint at open != frozen body）。按工具给出的恢复路径执行 `beacon truth rebase --change chg_862ad81a9133 --accept-current --by "BeaconGo 内核"`，把变更基准确认为冻结的 `d1f08c4` 正文，exit 0；随后 refreeze exit 0。
+- refreeze 命令：`~/.local/opt/beacon-go/beacon truth refreeze --project . --feature kernel-recover-guard-scope --by "BeaconGo 内核"`，exit 0，package 回到 status=frozen、change_pending=false，branch_check=ok（current=main，canonical=main）
+- change_ac_diff：added/changed/removed 全为空；四条 requirement_fingerprints 未变（AC 判据原文未改）
+- truth SHA256：`fdc99c155b0516539657ac30fda0a95c65c0d4762a0f6df37c2eafa1c6939e27` → `93adff7b5422ac2915c34c600744df908cb44403ff523dcd274045c2e06292d7`（status 规则新增一段）
+- package_fingerprint：`ceb53b42862cb32bc0af8edf80d43eeed122afc95e96f4bae4bbb1af787f57cd` → `d91129fcf24c9c09004cd3495b378706f0ae9733e3616267eaf71391e2dba201`；surface_fingerprint：`edaf77b37508019893b6b1bab31d189f1947fc5e32413c2386814b1add6ea0a5` → `3540c8864d6cb79bff09ec90d751377c0a3d6b7d030ef4b16ebbbf05d52e7939`
+- drift：`beacon truth drift` exit 0，clean=true，body_drift=false，open_questions=0，base_diverged=false
+- 10 条 TC 逐条 `-count=1 -v`：全部 `--- PASS`，逐条退出码 0（2026-11-09 21:18:50–21:19:00 +0800）
+- 全量回归：`go test ./... -count=1` EXIT=0（2026-11-09T21:19:06+0800 起跑，21:20:48+0800 结束，17 包 ok、1 包无测试文件），全文覆盖 evidence/go-test-all.txt
+- 基线：返修实现与文档在分支 `feat/kernel-recover-guard-scope`，未 merge、未 push、未重装；`main` 仍 `ffdfced`
