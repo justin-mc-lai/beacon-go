@@ -204,7 +204,14 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 	// so the last row seen for a key wins and the older rows simply
 	// never reach the staleness check.
 	latest := map[string]store.ArtifactRef{}
-	var keys []string
+	seen := map[string]bool{}
+	keys := []string{}
+	// externalCompleted remembers runs whose receive-result record says
+	// the lake finished in an external room (AC-003).
+	externalCompleted := map[string]bool{}
+	// liveQA remembers runs with at least one QA-kind artifact whose
+	// file still hashes to its registered content.
+	liveQA := map[string]bool{}
 	for _, run := range runs {
 		arts, err := e.store.Artifacts().ListByRun(run.ID)
 		if err != nil {
@@ -215,7 +222,8 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 				continue
 			}
 			key := run.ID + "\x00" + a.AbsPath
-			if _, seen := latest[key]; !seen {
+			if !seen[key] {
+				seen[key] = true
 				keys = append(keys, key)
 			}
 			latest[key] = a
@@ -225,18 +233,33 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 			return gate.Evaluation{}, err
 		}
 		for _, ev := range events {
-			if ev.EventType != "stage_executed" {
-				continue
-			}
 			var p struct {
-				Stage   string `json:"stage"`
-				Outcome string `json:"outcome"`
+				Stage       string `json:"stage"`
+				Outcome     string `json:"outcome"`
+				Source      string `json:"source"`
+				Placeholder *bool  `json:"placeholder"`
+				Recording   *bool  `json:"recording"`
 			}
 			if len(ev.Payload) > 0 {
 				_ = json.Unmarshal(ev.Payload, &p)
 			}
-			if p.Stage == StageQA && p.Outcome != "failed" {
-				f.QAStageExecuted = true
+			switch ev.EventType {
+			case "stage_executed":
+				// AC-002: only a real event counts. The recording marker
+				// must be present AND false; a missing marker is treated
+				// as recording state, and a true marker (placeholder or
+				// recording) is refused outright.
+				real := p.Placeholder != nil && !*p.Placeholder &&
+					(p.Recording == nil || !*p.Recording)
+				if real && p.Stage == StageQA && p.Outcome != "failed" {
+					f.QAStageExecuted = true
+				}
+			case "goal_completed":
+				// AC-003: the external completion record is the
+				// whole-lake path; the source field is required.
+				if p.Source == ExecutorModeExternal {
+					externalCompleted[run.ID] = true
+				}
 			}
 		}
 	}
@@ -245,6 +268,20 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 		f.QAArtifactCount++
 		if stale, reason := store.ArtifactStaleness(a); stale {
 			f.StaleArtifacts = append(f.StaleArtifacts, gate.StaleRef{Kind: a.Kind, Path: a.AbsPath, Reason: reason})
+		} else {
+			liveQA[a.RunID] = true
+		}
+	}
+	// AC-003: an external completion record plus at least one registered
+	// QA artifact whose hash still matches is equivalent to a real qa
+	// stage_executed event. It never substitutes for the per-stage path
+	// when that path exists; it is the whole-lake fallback.
+	if !f.QAStageExecuted {
+		for runID := range externalCompleted {
+			if liveQA[runID] {
+				f.QAStageExecuted = true
+				break
+			}
 		}
 	}
 	return gate.EvaluateQA(f, evaluator), nil

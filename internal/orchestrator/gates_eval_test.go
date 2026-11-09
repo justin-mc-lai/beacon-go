@@ -263,9 +263,7 @@ func TestQAGateEvidenceFlow(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.rec.ExecuteStage(context.Background(), RunView{RunID: run.RunID, FeatureID: env.feature.ID}, StageQA); err != nil {
-		t.Fatal(err)
-	}
+	appendRealStageExecuted(t, env.testEnv, run.RunID, StageQA)
 	ev, err = env.eng.EvaluateGate(env.ctx, "qa", "", "qa-bot")
 	if err != nil {
 		t.Fatal(err)
@@ -319,9 +317,7 @@ func TestReleaseGateComposition(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.rec.ExecuteStage(context.Background(), RunView{RunID: run.RunID, FeatureID: env.feature.ID}, StageQA); err != nil {
-		t.Fatal(err)
-	}
+	appendRealStageExecuted(t, env.testEnv, run.RunID, StageQA)
 	if _, err := env.eng.EvaluateGate(env.ctx, "qa", "", "release-bot"); err != nil {
 		t.Fatal(err)
 	}

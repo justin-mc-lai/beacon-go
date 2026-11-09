@@ -6,7 +6,6 @@
 package orchestrator
 
 import (
-	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"os"
@@ -42,9 +41,7 @@ func qaFixture(t *testing.T) (testEnv, RunView, string) {
 	t.Helper()
 	env := newTestEnv(t, "active")
 	run := env.createRun(t)
-	if _, err := env.rec.ExecuteStage(context.Background(), run, StageQA); err != nil {
-		t.Fatalf("ExecuteStage(qa): %v", err)
-	}
+	appendRealStageExecuted(t, env, run.RunID, StageQA)
 	dir := t.TempDir()
 	reportPath := filepath.Join(dir, "qa", "report.json")
 	if err := os.MkdirAll(filepath.Dir(reportPath), 0o755); err != nil {

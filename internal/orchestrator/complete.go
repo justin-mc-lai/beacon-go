@@ -3,6 +3,8 @@
 package orchestrator
 
 import (
+	"strings"
+
 	"beacon-go/internal/core"
 	"beacon-go/internal/store"
 )
@@ -53,12 +55,53 @@ func (e *Engine) AttachVerifier(runID string, refs []string, source, executorID 
 	}
 	m.Verifier = &VerifierInfo{RequiredForComplete: true, Present: true, Refs: refs, Source: source}
 	wasBlocked := m.Blocked
-	if wasBlocked {
-		m.Blocked = false // v1: attaching evidence clears the block
-	}
+	// AC-004: attaching a verifier records the independent checker. It
+	// does not prove that the blocker's cause is gone, so it never
+	// clears the block (v1 cleared it unconditionally, which let this
+	// command bypass an unresolved product_goal_blocked_streak).
+	// Recovery is the explicit Engine.Recover path.
 	if err := e.store.WithTx(func(tx *store.Tx) error {
 		if err := e.appendEventOn(tx, run, "verifier_attached", map[string]any{
-			"refs": refs, "source": source, "cleared_block": wasBlocked,
+			"refs": refs, "source": source, "cleared_block": false,
+			"block_pending": wasBlocked,
+		}); err != nil {
+			return err
+		}
+		return e.saveRunOn(tx, run, m)
+	}); err != nil {
+		return RunView{}, err
+	}
+	return viewOf(run, m, slug), nil
+}
+
+// Recover explicitly clears a recorded blocker after new evidence has
+// resolved its cause (AC-004). Continue refuses a hard block at
+// streak >= 3; this is the one explicit path that resets the snapshot,
+// and it records who asserted the cause is gone. Attaching a verifier
+// is not this path: it cannot clear an unresolved block.
+func (e *Engine) Recover(runID, by, note string) (RunView, error) {
+	run, m, slug, err := e.loadRun(runID)
+	if err != nil {
+		return RunView{}, err
+	}
+	by = strings.TrimSpace(by)
+	if by == "" {
+		return viewOf(run, m, slug), core.NewError(ReasonRecoveryIdentityRequired,
+			"goal.Recover", "explicit recovery requires the identity asserting the cause is gone (--by)")
+	}
+	priorBlocked, priorStreak, priorReason := m.Blocked, m.BlockedStreak, m.LastBlockReason
+	m.Blocked = false
+	m.BlockedStreak = 0
+	m.LastBlockReason = ""
+	m.LastTickKey = ""
+	if stage := m.currentStage(); stage != "" && m.CurrentStageIdx < len(m.StagePlan) {
+		m.StagePlan[m.CurrentStageIdx].Status = "active"
+	}
+	if err := e.store.WithTx(func(tx *store.Tx) error {
+		if err := e.appendEventOn(tx, run, "goal_recovered", map[string]any{
+			"by": by, "note": note, "stage": m.currentStage(),
+			"prior_blocked": priorBlocked, "prior_blocked_streak": priorStreak,
+			"prior_reason_code": priorReason,
 		}); err != nil {
 			return err
 		}

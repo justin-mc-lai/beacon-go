@@ -1,0 +1,26 @@
+# go test ./... -count=1
+# started: 2026-11-09 18:57:17 +0800
+# commit: 794433f
+# go: go version go1.27.3 darwin/arm64
+
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.485s
+ok  	beacon-go/internal/agentapi	3.065s
+ok  	beacon-go/internal/benchgate	0.777s
+ok  	beacon-go/internal/cli	16.179s
+ok  	beacon-go/internal/core	1.506s
+ok  	beacon-go/internal/evalgate	56.802s
+ok  	beacon-go/internal/gate	1.729s
+ok  	beacon-go/internal/harness	10.517s
+ok  	beacon-go/internal/llm	2.438s
+ok  	beacon-go/internal/migration	2.330s
+ok  	beacon-go/internal/orchestrator	98.905s
+ok  	beacon-go/internal/progressreview	2.415s
+ok  	beacon-go/internal/session	1.877s
+ok  	beacon-go/internal/store	2.053s
+ok  	beacon-go/internal/stride	1.649s
+ok  	beacon-go/internal/workspace	2.649s
+ok  	beacon-go/skills	1.763s
+
+EXIT=0
+# finished: 2026-11-09 18:58:58 +0800

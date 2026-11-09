@@ -18,16 +18,17 @@ import (
 // Engine reason codes. Values reuse the source runtime's constants
 // where they exist; the rest are documented in docs/p2a-implementation.md.
 const (
-	ReasonRunNotFound          = "product_goal_run_not_found"
-	ReasonFeatureNotFound      = "feature_not_found"
-	ReasonProjectNotRegistered = "project_not_registered"
-	ReasonUpToDate             = "up_to_date"
-	ReasonExecutorNotReg       = "stage_executor_not_registered"
-	ReasonStageExecutionFailed = "stage_execution_failed"
-	ReasonBlockedStreak        = "product_goal_blocked_streak"
-	ReasonVerifierRequired     = "product_goal_complete_requires_verifier"
-	ReasonQAGateNotPassed      = "qa_gate_not_passed"
-	ReasonExecutorError        = "stage_executor_error"
+	ReasonRunNotFound              = "product_goal_run_not_found"
+	ReasonFeatureNotFound          = "feature_not_found"
+	ReasonProjectNotRegistered     = "project_not_registered"
+	ReasonUpToDate                 = "up_to_date"
+	ReasonExecutorNotReg           = "stage_executor_not_registered"
+	ReasonStageExecutionFailed     = "stage_execution_failed"
+	ReasonBlockedStreak            = "product_goal_blocked_streak"
+	ReasonVerifierRequired         = "product_goal_complete_requires_verifier"
+	ReasonQAGateNotPassed          = "qa_gate_not_passed"
+	ReasonExecutorError            = "stage_executor_error"
+	ReasonRecoveryIdentityRequired = "goal_recovery_identity_required"
 )
 
 // StageOutcome is what a StageExecutor reports for one stage attempt.

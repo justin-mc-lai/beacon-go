@@ -145,6 +145,11 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 		}
 		return viewOf(run, m, slug), nil
 	}
+	// manualCompletion records that this tick completed the stage on
+	// the manual/external contract (the identity was the completion).
+	// The advance transaction then writes the kernel-authored
+	// stage_executed event for it (AC-001).
+	var manualCompletion bool
 	// Release never executes or exits on tick (human gate).
 	if stage != StageRelease {
 		// AC-142 (review B2): the implement-entry admission bundle is the
@@ -189,6 +194,7 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 				return viewOf(run, m, slug), nil
 			}
 			by = strings.TrimSpace(by)
+			manualCompletion = true
 		} else {
 			ex, ok := e.tickExecutor(m, stage)
 			if !ok {
@@ -260,6 +266,15 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 		}
 	}
 	if err := e.store.WithTx(func(tx *store.Tx) error {
+		// AC-001: a manual/external stage completion leaves the same
+		// real stage_executed evidence a real executor leaves. The
+		// fields are kernel-authored; only the identity comes from the
+		// caller (TickBy's --by).
+		if manualCompletion {
+			if err := e.recordManualStageExecuted(tx, run, stage, by); err != nil {
+				return err
+			}
+		}
 		// AC-003: the exit judgement is persisted BEFORE the advance
 		// event in the same transaction — leaving a stage always
 		// leaves a queryable verdict behind.

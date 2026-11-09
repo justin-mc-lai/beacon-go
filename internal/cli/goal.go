@@ -32,7 +32,7 @@ func newGoalCmd() *cobra.Command {
 	}
 	c.AddCommand(
 		newGoalRunCmd(), newGoalStatusCmd(), newGoalTickCmd(false), newGoalTickCmd(true),
-		newGoalBlockCmd(), newGoalAttachVerifierCmd(), newGoalCompleteCmd(),
+		newGoalBlockCmd(), newGoalRecoverCmd(), newGoalAttachVerifierCmd(), newGoalCompleteCmd(),
 		newGoalCheckpointCmd(), newGoalHeartbeatCmd(), newGoalResumeCmd(), newGoalTraceCmd(),
 		// P4a debt clearance: entry-contract (G-01) + resume-pack
 		// (G-08) — the two P2 sub-surfaces that had no commands of
@@ -388,6 +388,42 @@ func newGoalBlockCmd() *cobra.Command {
 	c.Flags().StringVarP(&project, "project", "p", "", "project root path (accepted for v1 parity)")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("run-id")
+	return c
+}
+
+func newGoalRecoverCmd() *cobra.Command {
+	var runID, project, by, note string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "recover",
+		Short: "Explicitly clear a blocker after its cause is resolved (--by required)",
+		Long: "Clear a recorded blocker and reset blocked_streak after new evidence " +
+			"has resolved its cause. A verifier attachment does not clear a blocker " +
+			"by itself, and continue refuses a hard block at streak >= 3; this is " +
+			"the explicit recovery path.",
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			eng, closeFn, err := goalEngine("")
+			if err != nil {
+				return err
+			}
+			defer closeFn()
+			v, err := eng.Recover(runID, by, note)
+			if v.RunID != "" {
+				if perr := printGoalView(cmd, v, asJSON); perr != nil {
+					return perr
+				}
+			}
+			return err
+		},
+	}
+	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
+	c.Flags().StringVar(&by, "by", "", "who asserts the blocking cause is resolved (required)")
+	c.Flags().StringVar(&note, "note", "", "what new evidence resolved the cause")
+	c.Flags().StringVarP(&project, "project", "p", "", "project root path (accepted for v1 parity)")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("run-id")
+	_ = c.MarkFlagRequired("by")
 	return c
 }
 
