@@ -1,0 +1,25 @@
+# go test ./... -count=1 (kernel-progress-drift implementation round)
+# repo: /Users/apple/Developer/Personal/products/beacon-go
+# branch: feat/kernel-progress-drift  base: main@db36ee0
+# at: 2026-11-09 08:41 +0800
+# note: implementation round adds internal/progressreview only; frozen package text untouched
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.703s
+ok  	beacon-go/internal/agentapi	3.326s
+ok  	beacon-go/internal/benchgate	0.248s
+ok  	beacon-go/internal/cli	18.201s
+ok  	beacon-go/internal/core	1.022s
+ok  	beacon-go/internal/evalgate	57.373s
+ok  	beacon-go/internal/gate	1.841s
+ok  	beacon-go/internal/harness	11.517s
+ok  	beacon-go/internal/llm	2.327s
+ok  	beacon-go/internal/migration	2.210s
+ok  	beacon-go/internal/orchestrator	99.792s
+ok  	beacon-go/internal/progressreview	2.373s
+ok  	beacon-go/internal/session	2.488s
+ok  	beacon-go/internal/store	2.056s
+ok  	beacon-go/internal/stride	1.747s
+ok  	beacon-go/internal/workspace	2.987s
+ok  	beacon-go/skills	1.829s
+EXIT=0
+
