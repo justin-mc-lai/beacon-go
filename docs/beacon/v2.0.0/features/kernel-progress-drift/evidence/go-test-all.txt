@@ -1,0 +1,24 @@
+# go test ./... -count=1 (kernel-progress-drift freeze round)
+# repo: /Users/apple/Developer/Personal/products/beacon-go
+# branch: main  head: 6f7f6d7
+# at: 2026-11-09T08:27:49+0800
+# note: truth-only round, zero implementation code changes
+
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.498s
+ok  	beacon-go/internal/agentapi	3.374s
+ok  	beacon-go/internal/benchgate	0.866s
+ok  	beacon-go/internal/cli	17.186s
+ok  	beacon-go/internal/core	0.906s
+ok  	beacon-go/internal/evalgate	55.285s
+ok  	beacon-go/internal/gate	1.737s
+ok  	beacon-go/internal/harness	8.493s
+ok  	beacon-go/internal/llm	1.972s
+ok  	beacon-go/internal/migration	2.359s
+ok  	beacon-go/internal/orchestrator	112.436s
+ok  	beacon-go/internal/session	2.706s
+ok  	beacon-go/internal/store	2.935s
+ok  	beacon-go/internal/stride	2.336s
+ok  	beacon-go/internal/workspace	3.409s
+ok  	beacon-go/skills	2.294s
+EXIT=0
