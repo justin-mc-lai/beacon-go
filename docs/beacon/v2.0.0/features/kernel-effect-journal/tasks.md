@@ -17,7 +17,7 @@ task_source: acceptance_criteria
 - [x] TASK-005 resume 有有效 journal 时从证明继续，不重跑已证明阶段 · ac=AC-003 · evidence=docs/beacon/v2.0.0/features/kernel-effect-journal/evidence/ac-j3-missing-journal.md
 - [x] TASK-006 journal 缺失、不可解析或版本不识别时 resume fail-closed，不静默重跑 · ac=AC-003 · evidence=docs/beacon/v2.0.0/features/kernel-effect-journal/evidence/ac-j3-missing-journal.md
 - [x] TASK-007 逐条跑 6 条 TC 并落包内证据，跑全量 go test ./... -count=1 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-effect-journal/evidence/go-test-all.txt
-- [ ] TASK-008 三份独立 QA verdict 按 evidence/qa-contract.md 契约落盘，maker 不自签 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-effect-journal/evidence/qa-contract.md
+- [x] TASK-008 三份独立 QA verdict 按 evidence/qa-contract.md 契约落盘，maker 不自签 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-effect-journal/evidence/qa/spec-ac.md · verdicts=docs/beacon/v2.0.0/features/kernel-effect-journal/evidence/qa/spec-ac.md docs/beacon/v2.0.0/features/kernel-effect-journal/evidence/qa/runtime.md docs/beacon/v2.0.0/features/kernel-effect-journal/evidence/qa/regression.md
 
 ## Boundary
 
