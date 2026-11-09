@@ -21,3 +21,30 @@ ok  	beacon-go/internal/workspace	5.375s
 ok  	beacon-go/skills	3.091s
 # finished: 2026-11-09T13:20:48Z (21:20:48 +0800)
 EXIT=0
+
+# --- post-merge main verification (收口轮) ---
+# merge commit: 33e6cde2a65e9243299bc589929391d371786367
+# installed binary: 在 main HEAD 重建并安装（vcs.revision 与 main HEAD 相同，vcs.modified=false）；beacon --version = Beacon CLI v2.0.0-go.15
+# 二进制 sha256 与 vcs.revision 实测值见交付回执。
+# started: 2026-11-09T21:55:31+0800
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	2.551s
+ok  	beacon-go/internal/agentapi	7.000s
+ok  	beacon-go/internal/benchgate	0.470s
+ok  	beacon-go/internal/cli	22.475s
+ok  	beacon-go/internal/core	1.887s
+ok  	beacon-go/internal/evalgate	54.891s
+ok  	beacon-go/internal/gate	4.410s
+ok  	beacon-go/internal/harness	15.171s
+ok  	beacon-go/internal/llm	3.969s
+ok  	beacon-go/internal/migration	3.621s
+ok  	beacon-go/internal/orchestrator	100.390s
+ok  	beacon-go/internal/progressreview	3.808s
+ok  	beacon-go/internal/session	3.639s
+ok  	beacon-go/internal/store	3.933s
+ok  	beacon-go/internal/stride	3.861s
+ok  	beacon-go/internal/workspace	5.580s
+ok  	beacon-go/skills	3.185s
+# finished: 2026-11-09T21:57:13+0800
+# EXIT=0
+# 10 条冻结 TC 逐条 -count=1 -v 在 main 上复跑：TC-001..TC-010 全部 EXIT=0（并入 main 后实测，逐条 --- PASS）
