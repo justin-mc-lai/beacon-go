@@ -1,0 +1,25 @@
+# go test ./... -count=1
+- date: 2026-11-09T04:17:16Z
+- branch: feat/kernel-effect-journal
+- HEAD: e7fd1ba3376cf9ca68cce72d6994b33e680a2bba
+
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.676s
+ok  	beacon-go/internal/agentapi	3.288s
+ok  	beacon-go/internal/benchgate	0.233s
+ok  	beacon-go/internal/cli	15.813s
+ok  	beacon-go/internal/core	1.244s
+ok  	beacon-go/internal/effectjournal	1.460s
+ok  	beacon-go/internal/evalgate	54.255s
+ok  	beacon-go/internal/gate	1.964s
+ok  	beacon-go/internal/harness	10.932s
+ok  	beacon-go/internal/llm	2.411s
+ok  	beacon-go/internal/migration	2.675s
+ok  	beacon-go/internal/orchestrator	93.225s
+ok  	beacon-go/internal/progressreview	2.082s
+ok  	beacon-go/internal/session	2.141s
+ok  	beacon-go/internal/store	2.036s
+ok  	beacon-go/internal/stride	1.802s
+ok  	beacon-go/internal/workspace	2.526s
+ok  	beacon-go/skills	1.811s
+EXIT=0

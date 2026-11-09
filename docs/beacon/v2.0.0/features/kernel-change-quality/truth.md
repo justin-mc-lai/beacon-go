@@ -1,7 +1,7 @@
 ---
 slug: kernel-change-quality
 version: v2.0.0
-status: draft
+status: frozen
 language: zh
 domain_required: false
 ux_required: false
@@ -87,13 +87,13 @@ Every AC must trace to the intent or evidence it serves.
 
 ## 源锚点
 
-上游参考仓 loopx；锚点文件 `evidence/source-anchors.md` 由 BeaconGo 研究 从只读上游提取并逐条对应 AC。本包只引用文件与小节，摘录留在包内证据文件。
+上游参考仓 loopx，commit `c9c0644be428bbb0ab10726637f5b36602972912`（2.3.0 发布窗口 HEAD）。派单中的 `91d8ed06` 为历史快照，缺 `change_quality/README.md` 与完整 premerge 约定，取舍依据见 `evidence/source-anchors.md`。本包只引用文件与小节，行号与摘录留在包内证据文件。
 
 | AC ID | 上游文件 | 小节 / 行号 |
 |-------|----------|-------------|
-| AC-001 | `loopx/capabilities/change_quality/` | 见 evidence/source-anchors.md |
-| AC-002 | `loopx/capabilities/change_quality/` | 见 evidence/source-anchors.md |
-| AC-003 | `loopx/capabilities/change_quality/` | 见 evidence/source-anchors.md |
+| AC-001 | `loopx/capabilities/change_quality/policy.py`；`loopx/capabilities/change_quality/goal_configuration.py`；`loopx/capabilities/change_quality/README.md` | `policy.py` L10-L26（缺省即 off，`safe_fix` / `strict_receipt` 独立布尔）；`goal_configuration.py` L43-L64（Goal 级控制面合并）；`README.md` L3-L15（默认 off 与两档语义） |
+| AC-002 | `loopx/capabilities/change_quality/scope.py`；`loopx/capabilities/change_quality/receipt.py`；`loopx/capabilities/change_quality/README.md` | `scope.py` L190-L215（`scope_fingerprint` 精确 diff SHA）；`receipt.py` L42-L73、L505-L520（`stale_receipt` / `receipt_missing`，`ok = receipt_valid or not strict`）；`README.md` L87-L91（premerge 强制 strict 回执） |
+| AC-003 | `loopx/capabilities/change_quality/receipt.py`；`loopx/capabilities/change_quality/result.py`；`loopx/capabilities/change_quality/README.md`；`loopx/control_plane/capabilities/change_quality_validation.ts` | `receipt.py` L202-L205、L225-L229（`max_safe_fix_passes: 1`）；`result.py` L355-L368（未授权即 `ValueError`）；`README.md` L13-L15、L195-L207（不赋予写权限、限已有授权）；`change_quality_validation.ts` L15-L85（越界 `fail(...)`） |
 
 ## Non-Goals
 

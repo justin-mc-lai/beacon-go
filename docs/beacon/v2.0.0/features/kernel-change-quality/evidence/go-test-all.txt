@@ -1,0 +1,25 @@
+# go test ./... -count=1
+- date: 2026-11-09T04:14:53Z
+- branch: feat/kernel-change-quality
+- HEAD: 1f5375216f6d97822c907b463090274f3aaade24
+
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.697s
+ok  	beacon-go/internal/agentapi	6.523s
+ok  	beacon-go/internal/benchgate	1.016s
+ok  	beacon-go/internal/changequality	1.177s
+ok  	beacon-go/internal/cli	20.643s
+ok  	beacon-go/internal/core	4.148s
+ok  	beacon-go/internal/evalgate	55.364s
+ok  	beacon-go/internal/gate	2.804s
+ok  	beacon-go/internal/harness	15.373s
+ok  	beacon-go/internal/llm	4.614s
+ok  	beacon-go/internal/migration	4.579s
+ok  	beacon-go/internal/orchestrator	96.943s
+ok  	beacon-go/internal/progressreview	4.895s
+ok  	beacon-go/internal/session	4.097s
+ok  	beacon-go/internal/store	3.712s
+ok  	beacon-go/internal/stride	3.524s
+ok  	beacon-go/internal/workspace	5.056s
+ok  	beacon-go/skills	3.502s
+EXIT=0
