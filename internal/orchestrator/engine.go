@@ -351,6 +351,16 @@ type blockView struct {
 // release_confirmed supersedes it. goal_recovered and
 // verifier_attached deliberately do not clear the human gate.
 func (e *Engine) effectiveBlockView(run store.Run, m *runMeta) blockView {
+	// Terminal facts win: once the run reached done (Complete or an
+	// external result closed it), it is no longer waiting on a human.
+	// The release gate may have recorded a human-gate block earlier in
+	// the same run; that block is history, not a current state. Without
+	// this check `goal status` rebuilt a completed external run as
+	// blocked because receive-result intentionally does not fabricate a
+	// human release.
+	if m.LoopStage == string(core.LoopDone) {
+		return blockView{}
+	}
 	if m.Blocked {
 		return blockView{Blocked: true, Streak: m.BlockedStreak, Reason: m.LastBlockReason}
 	}
@@ -358,7 +368,7 @@ func (e *Engine) effectiveBlockView(run store.Run, m *runMeta) blockView {
 	if err != nil {
 		return blockView{}
 	}
-	lastHumanGate, lastConfirmed := -1, -1
+	lastHumanGate, lastConfirmed, lastTerminal := -1, -1, -1
 	var reason string
 	var streak int
 	for i, ev := range events {
@@ -373,9 +383,15 @@ func (e *Engine) effectiveBlockView(run store.Run, m *runMeta) blockView {
 			}
 		case "release_confirmed":
 			lastConfirmed = i
+		case "goal_completed", "external_result_received":
+			// A completion event later than the human gate is the
+			// terminal fact for this run; it supersedes the gate even
+			// when the closing path (external delivery) records no
+			// release_confirmed by design.
+			lastTerminal = i
 		}
 	}
-	if lastHumanGate >= 0 && lastHumanGate > lastConfirmed {
+	if lastHumanGate >= 0 && lastHumanGate > lastConfirmed && lastHumanGate > lastTerminal {
 		return blockView{Blocked: true, Streak: streak, Reason: reason}
 	}
 	return blockView{}

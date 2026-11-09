@@ -427,3 +427,61 @@ func TestRepeatedHumanConfirmationAfterReblockKeepsStatusUnblocked(t *testing.T)
 		t.Fatalf("human_gate_cleared events = %d, want 2", len(got))
 	}
 }
+
+// ---- AC-004 / TC-010 ----
+
+// An external room closing a lake at the release gate is the other
+// completion path. It deliberately records no release_confirmed (it is
+// not a human release), so the event-trail reconstruction must let the
+// terminal goal_completed/external_result_received fact win over the
+// earlier human-gate stage_exit_blocked. Before the fix, status rebuilt
+// the run as blocked/Paused after receive-result had already closed it.
+func TestExternalReceiveResultAfterHumanGateKeepsStatusCompleted(t *testing.T) {
+	env := newGateEnv(t, frozenTruthDoc)
+	run := createExternalRun(t, env.testEnv, ExecutorModeExternal)
+	ctx := context.Background()
+	env.seedQAPass(t)
+	for i := 0; i < 4; i++ {
+		v, err := env.eng.TickBy(ctx, run.RunID, "room-first")
+		if err != nil {
+			t.Fatalf("tick %d: %v", i, err)
+		}
+		if v.Blocked {
+			t.Fatalf("tick %d blocked: %+v", i, v)
+		}
+	}
+	v, err := env.eng.TickBy(ctx, run.RunID, "room-first")
+	if err != nil {
+		t.Fatalf("release tick: %v", err)
+	}
+	if !v.Blocked || v.ReasonCode != core.ReasonReleaseRequiresHuman {
+		t.Fatalf("release tick = %+v, want the human gate block", v)
+	}
+	blob := filepath.Join(env.root, "external-delivery.md")
+	if err := os.WriteFile(blob, []byte("# external delivery\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	v, err = env.eng.ReceiveExternalResult(run.RunID, ExternalResultInput{
+		By: "room-actor", Summary: "lake finished in the external room",
+		Artifacts: []ArtifactInput{{Kind: "delivery_report", AbsPath: blob}},
+	})
+	if err != nil {
+		t.Fatalf("ReceiveExternalResult: %v", err)
+	}
+	if v.Status != "completed" || v.Blocked {
+		t.Fatalf("receive-result view = %+v, want completed/unblocked", v)
+	}
+	st, err := env.eng.Status(run.RunID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if st.Status != "completed" || st.Blocked || st.LastBlockReason != "" || st.RunStatus != string(core.RunSucceeded) {
+		t.Fatalf("externally completed run reported as blocked: %+v", st)
+	}
+	if got := payloadsOf(t, env.st, run.RunID, "external_result_received"); len(got) != 1 {
+		t.Fatalf("external_result_received events = %d, want 1", len(got))
+	}
+	if got := payloadsOf(t, env.st, run.RunID, "goal_completed"); len(got) != 1 {
+		t.Fatalf("goal_completed events = %d, want 1", len(got))
+	}
+}
