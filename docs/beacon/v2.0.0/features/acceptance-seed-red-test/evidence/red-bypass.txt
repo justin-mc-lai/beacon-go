@@ -1,0 +1,9 @@
+=== RUN   TestHarvestRejectsEmptyReturnAfterTestOnlyRejection
+    acceptance_seed_bypass_test.go:38: empty retry harvested stale artifacts ({RunID:run_eeb73b81d05c8887f93ba35d Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[] EvidenceFound:true Simulated:false}); want a refusal
+--- FAIL: TestHarvestRejectsEmptyReturnAfterTestOnlyRejection (0.15s)
+=== RUN   TestReceiveRejectsEmptyReturnAfterTestOnlyRejection
+    acceptance_seed_bypass_test.go:85: empty retry harvested stale artifacts; want a refusal
+--- FAIL: TestReceiveRejectsEmptyReturnAfterTestOnlyRejection (0.26s)
+FAIL
+FAIL	beacon-go/internal/orchestrator	0.945s
+FAIL

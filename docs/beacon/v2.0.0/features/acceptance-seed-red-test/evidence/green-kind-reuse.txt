@@ -1,0 +1,22 @@
+=== RUN   TestHarvestRejectsKindReusedOnOnePath
+=== RUN   TestHarvestRejectsKindReusedOnOnePath/red_and_implement_share_a_path
+=== RUN   TestHarvestRejectsKindReusedOnOnePath/implement_and_acceptance_test_share_a_path
+=== RUN   TestHarvestRejectsKindReusedOnOnePath/all_three_kinds_share_a_path
+--- PASS: TestHarvestRejectsKindReusedOnOnePath (0.45s)
+    --- PASS: TestHarvestRejectsKindReusedOnOnePath/red_and_implement_share_a_path (0.15s)
+    --- PASS: TestHarvestRejectsKindReusedOnOnePath/implement_and_acceptance_test_share_a_path (0.15s)
+    --- PASS: TestHarvestRejectsKindReusedOnOnePath/all_three_kinds_share_a_path (0.15s)
+=== RUN   TestReceiveRejectsKindReusedOnOnePath
+--- PASS: TestReceiveRejectsKindReusedOnOnePath (0.27s)
+=== RUN   TestHarvestRejectsUncanonicalArtifactKind
+--- PASS: TestHarvestRejectsUncanonicalArtifactKind (0.15s)
+=== RUN   TestHarvestAcceptsThreeSeparateKinds
+--- PASS: TestHarvestAcceptsThreeSeparateKinds (0.14s)
+=== RUN   TestHarvestRejectsRelativeAliasOfSamePath
+=== RUN   TestHarvestRejectsRelativeAliasOfSamePath/absolute_red,_relative_implement
+=== RUN   TestHarvestRejectsRelativeAliasOfSamePath/relative_red,_absolute_implement
+--- PASS: TestHarvestRejectsRelativeAliasOfSamePath (0.29s)
+    --- PASS: TestHarvestRejectsRelativeAliasOfSamePath/absolute_red,_relative_implement (0.15s)
+    --- PASS: TestHarvestRejectsRelativeAliasOfSamePath/relative_red,_absolute_implement (0.15s)
+PASS
+ok  	beacon-go/internal/orchestrator	1.636s

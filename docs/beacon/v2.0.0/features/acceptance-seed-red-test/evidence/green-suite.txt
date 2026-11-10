@@ -1,22 +1,25 @@
-$ go test ./... -count=1
+# full suite green (main tree @ 0fabeb5 + implement delta, includes CLI lane entry test)
+# command: go test ./... -count=1
+# date: 2026-11-10T22:19:08Z
+# exit: 0
+
 ?   	beacon-go/cmd/beacon	[no test files]
-ok  	beacon-go/desktop	2.352s
-ok  	beacon-go/internal/agentapi	5.404s
-ok  	beacon-go/internal/benchgate	0.887s
-ok  	beacon-go/internal/changequality	3.620s
-ok  	beacon-go/internal/cli	20.459s
-ok  	beacon-go/internal/core	0.456s
-ok  	beacon-go/internal/effectjournal	4.087s
-ok  	beacon-go/internal/evalgate	57.764s
-ok  	beacon-go/internal/gate	2.875s
-ok  	beacon-go/internal/harness	12.627s
-ok  	beacon-go/internal/llm	4.104s
-ok  	beacon-go/internal/migration	4.283s
-ok  	beacon-go/internal/orchestrator	105.275s
-ok  	beacon-go/internal/progressreview	3.148s
-ok  	beacon-go/internal/session	2.887s
-ok  	beacon-go/internal/store	3.013s
-ok  	beacon-go/internal/stride	2.961s
-ok  	beacon-go/internal/workspace	4.121s
-ok  	beacon-go/skills	3.227s
-exit=0
+ok  	beacon-go/desktop	0.520s
+ok  	beacon-go/internal/agentapi	4.360s
+ok  	beacon-go/internal/benchgate	1.013s
+ok  	beacon-go/internal/changequality	1.238s
+ok  	beacon-go/internal/cli	18.685s
+ok  	beacon-go/internal/core	2.605s
+ok  	beacon-go/internal/effectjournal	1.640s
+ok  	beacon-go/internal/evalgate	54.296s
+ok  	beacon-go/internal/gate	2.114s
+ok  	beacon-go/internal/harness	12.322s
+ok  	beacon-go/internal/llm	3.427s
+ok  	beacon-go/internal/migration	3.852s
+ok  	beacon-go/internal/orchestrator	113.392s
+ok  	beacon-go/internal/progressreview	3.701s
+ok  	beacon-go/internal/session	3.701s
+ok  	beacon-go/internal/store	3.579s
+ok  	beacon-go/internal/stride	3.321s
+ok  	beacon-go/internal/workspace	4.132s
+ok  	beacon-go/skills	2.917s

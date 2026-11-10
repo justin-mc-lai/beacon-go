@@ -229,24 +229,28 @@ func (e *Engine) ReceiveRalphResult(runID, delegationID string, in LaneResultInp
 		}
 		return view(), nil
 	}
-	ids, err := e.registerArtifacts(runID, in.Artifacts)
-	if err != nil {
-		return DelegationView{}, err
-	}
 	anchor, err := e.delegationAnchor(runID, delegationID)
 	if err != nil {
 		return DelegationView{}, err
 	}
-	_, codes, err := e.validateHarvest(runID, anchor, len(in.Artifacts) > 0)
+	// Validate BEFORE registering: a rejected return must not leave
+	// pointers behind that a later empty return could harvest.
+	arts, kindCodes := normalizeArtifacts(in.Artifacts)
+	_, codes, err := e.validateHarvest(runID, anchor, arts, in.CapturesRegistered)
 	if err != nil {
 		return DelegationView{}, err
 	}
+	codes = append(kindCodes, codes...)
 	if len(codes) > 0 {
 		_ = e.appendEvent(run, "implement_result_rejected", map[string]any{
 			"delegation_id": delegationID, "reason_codes": codes, "simulated": d.Simulated,
 		})
 		return view(), core.NewError(codes[0], "goal.ReceiveRalphResult",
 			"delegation return harvest incomplete: "+strings.Join(codes, ", "))
+	}
+	ids, err := e.registerArtifacts(runID, arts)
+	if err != nil {
+		return DelegationView{}, err
 	}
 	d.Status = DelegationReturned
 	d.ReturnedAt = nowISO()

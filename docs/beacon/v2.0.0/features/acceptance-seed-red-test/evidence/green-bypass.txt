@@ -1,0 +1,6 @@
+=== RUN   TestHarvestRejectsEmptyReturnAfterTestOnlyRejection
+--- PASS: TestHarvestRejectsEmptyReturnAfterTestOnlyRejection (0.15s)
+=== RUN   TestReceiveRejectsEmptyReturnAfterTestOnlyRejection
+--- PASS: TestReceiveRejectsEmptyReturnAfterTestOnlyRejection (0.27s)
+PASS
+ok  	beacon-go/internal/orchestrator	0.738s

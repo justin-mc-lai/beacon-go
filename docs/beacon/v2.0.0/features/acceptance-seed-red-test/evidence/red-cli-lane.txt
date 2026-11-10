@@ -1,0 +1,19 @@
+# CLI lane entry red probe (parent 0fabeb5 + new test file only)
+# repo: /Users/apple/Developer/Personal/products/beacon-go
+# worktree: /tmp/beacon-red-cli-lane.B9EPO6 (detached 0fabeb5)
+# command: go test ./internal/orchestrator -run 'TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection|TestProbeOldCLILaneEmptyRetryAccepted' -count=1 -v
+# date: 2026-11-10T22:16:47Z
+
+=== RUN   TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection
+    acceptance_seed_bypass_test.go:34: refused CLI lane return left artifact_refs behind: [{ID:art_29d6ae208c91bd8c02c10efd RunID:run_8a086bfcaeecd9ad3f251b74 Kind:acceptance_test AbsPath:/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection1726842833/003/acceptance_seed_test.go ContentHash:5c854b0e861ee46b52d32ad087ea703579f53d000870d77a2802ccf90616858c SizeBytes:21 CreatedAt:2026-11-10T22:16:48.679065000Z}]
+--- FAIL: TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection (0.15s)
+=== RUN   TestProbeOldCLILaneEmptyRetryAccepted
+    acceptance_seed_bypass_test.go:69: first refusal: goal.HarvestLaneResult: lane result harvest incomplete: result_implement_artifact_missing, result_acceptance_seed_red_missing (result_implement_artifact_missing)
+    acceptance_seed_bypass_test.go:71: empty retry: accepted=true err=<nil>
+    acceptance_seed_bypass_test.go:73: reproduced: empty retry harvested the stale test artifact
+--- FAIL: TestProbeOldCLILaneEmptyRetryAccepted (0.15s)
+FAIL
+FAIL	beacon-go/internal/orchestrator	0.625s
+FAIL
+
+exit: 1

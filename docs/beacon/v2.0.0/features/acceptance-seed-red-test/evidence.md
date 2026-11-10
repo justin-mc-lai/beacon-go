@@ -15,6 +15,10 @@
 | green seed | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac001.txt | PASS | qa |
 | green seed | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac002.txt | PASS | qa |
 | green seed | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac003.txt | PASS | qa |
+| same-path kinds red | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-kind-reuse.txt | FAIL, bypass reproduced | qa |
+| same-path kinds green | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-kind-reuse.txt | PASS | qa |
+| CLI lane entry red | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-cli-lane.txt | FAIL, bypass reproduced on 0fabeb5 | qa |
+| CLI lane entry green | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-cli-lane.txt | PASS, all three entries | qa |
 | full green run | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-suite.txt | exit=0 | qa |
 | hash manifest | support_advisory | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/sha256.txt | recorded | qa |
 
@@ -54,6 +58,23 @@ Every row below comes from a real command run on 2026-11-11 against beacon-go ma
 |-------|---------|------|--------|----------|
 | bypass red（改前 197c514+旧实现） | `go test ./internal/orchestrator -run 'TestHarvestRejectsEmptyReturnAfterTestOnlyRejection|TestReceiveRejectsEmptyReturnAfterTestOnlyRejection' -count=1 -v` | 1 | 两条均 FAIL：空回报收割了历史 test-only 产物 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-bypass.txt |
 | bypass green（返工后） | 同上 | 0 | 两条均 PASS：test-only 被拒后空回报仍被拒（`result_artifacts_missing`），随后完整回报仍可收割 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-bypass.txt |
+| CLI lane entry red（父提交 `0fabeb5` + 新用例） | `go test ./internal/orchestrator -run 'TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection|TestProbeOldCLILaneEmptyRetryAccepted' -count=1 -v` | 1 | 新用例 FAIL：被拒回报在 `artifact_refs` 残留 `acceptance_test`；探针实测后续空回报 `accepted=true` | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-cli-lane.txt |
+| CLI lane entry green（当前实现） | `go test ./internal/orchestrator -run 'TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection|TestHarvestRejectsEmptyReturnAfterTestOnlyRejection|TestReceiveRejectsEmptyReturnAfterTestOnlyRejection' -count=1 -v` | 0 | 三入口（`HarvestLaneResult` / `Harvest` / `ReceiveRalphResult`）全部 PASS | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-cli-lane.txt |
 | full green after rework | `go test ./... -count=1` | 0 | 全包 ok | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-suite.txt |
 
-回归用例在 `internal/orchestrator/acceptance_seed_bypass_test.go`，同时覆盖 `HarvestLaneResult` 与 `ReceiveRalphResult` 两条入口。三条既有 seed 的断言、helper 与 `acceptance_seed_test.go` 均未改动。
+回归用例在 `internal/orchestrator/acceptance_seed_bypass_test.go`，覆盖 `HarvestLaneResult`（CLI 车道入口）、`ReceiveRalphResult`（ralph 回报）以及共同的 `validateHarvest` 收敛点；CLI 车道入口另有独立命名的 `TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection`，含“被拒后 `artifact_refs` 为空”断言。三条既有 seed 的断言、helper 与 `acceptance_seed_test.go` 均未改动。
+
+## 返工证据（implement 轮第 3 次：同一路径多 kind / 空白 kind 绕过）
+
+两方独立验收复现：校验按 `strings.TrimSpace(kind)` 建集合，登记却用未 trim 的 kind；`artifact_refs` 又按 `(run_id, abs_path)` 去重并保留库里首个 kind。于是 `[red=X, test, impl=X]` 校验看到三类齐备、登记后 X 只剩 red，`Accepted=true` 但落库缺 `implement_artifact`。
+
+修复路线：新增 `normalizeArtifacts` 作为唯一规范化入口，`validateHarvest` 的三类判定与 `registerArtifacts` 的登记共用同一份结果；kind 去空白后若非原样（含仅空白 kind）直接拒绝并给 `result_artifact_kind_invalid`，按 `abs_path` 折叠时首次声明胜出。折叠键沿用登记语义：相对路径先用 `filepath.Abs` 解析成绝对路径再比较，所以同一文件的相对/绝对别名也不能冒充两个 kind。先校验后登记的顺序保持。
+
+| probe | command | exit | result | evidence |
+|-------|---------|------|--------|----------|
+| 同路径 kind red（改为规范化前的第 2 轮状态） | `go test ./internal/orchestrator -run 'TestHarvestRejectsKindReusedOnOnePath|TestReceiveRejectsKindReusedOnOnePath|TestHarvestRejectsUncanonicalArtifactKind|TestHarvestAcceptsThreeSeparateKinds|TestHarvestRejectsRelativeAliasOfSamePath' -count=1 -v` | 1 | 五个拒绝用例均 FAIL，`Accepted:true`（red/impl 同路径、test/impl 同路径、三类同路径、相对/绝对别名、空白 kind）；对照组 PASS | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-kind-reuse.txt |
+| 同路径 kind green（修复后） | 同上 | 0 | 五个拒绝用例与对照组全部 PASS；被拒回报 `artifacts_after=[]`，正常三类分开路径仍被接受且三类均落库 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-kind-reuse.txt |
+| 三条既有 seed + 上轮两条空回报回归 | `go test ./internal/orchestrator -run '<三条 seed>|<两条 bypass>' -count=1 -v` | 0 | 9 条全部 PASS | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac00{1,2,3}.txt、green-bypass.txt |
+| full green after rework | `go test ./... -count=1` | 0 | 19 个有测试的包全部 ok，无 FAIL | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-suite.txt |
+
+回归用例仍集中在新文件 `internal/orchestrator/acceptance_seed_bypass_test.go`。`acceptance_seed_test.go` 的 sha256 仍为 `58a5a998894496caeb8eda6e6ad2c51833e4b4599c857c331ec2812227483cf9`，`git diff` 为空。

@@ -1,3 +1,4 @@
-$ go test ./internal/orchestrator -run TestHarvestRejectsTestOnlyArtifacts -count=1
-ok  	beacon-go/internal/orchestrator	0.489s
-exit=0
+=== RUN   TestHarvestRejectsTestOnlyArtifacts
+--- PASS: TestHarvestRejectsTestOnlyArtifacts (0.15s)
+PASS
+ok  	beacon-go/internal/orchestrator	0.465s

@@ -150,6 +150,7 @@ const (
 	ReasonResultImplementArtifactMissing = "result_implement_artifact_missing"
 	ReasonResultAcceptanceTestMissing    = "result_acceptance_test_missing"
 	ReasonResultSeedRedMissing           = "result_acceptance_seed_red_missing"
+	ReasonResultArtifactKindInvalid      = "result_artifact_kind_invalid"
 	ReasonExecutorNotRegistered          = "stage_executor_not_registered"
 	ReasonAdmissionWorktreeMiss          = "goal_implement_worktree_missing"
 	ReasonAdmissionWorktreeMism          = "goal_implement_worktree_mismatch"

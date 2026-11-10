@@ -1,0 +1,30 @@
+=== RUN   TestHarvestRejectsKindReusedOnOnePath
+=== RUN   TestHarvestRejectsKindReusedOnOnePath/red_and_implement_share_a_path
+    acceptance_seed_bypass_test.go:158: red and implement share a path was accepted ({RunID:run_08b6e5fe10731e0a27702140 Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[art_937c65a0d46c5f25085e546e art_102bb26ff923a86c81a4a332 art_937c65a0d46c5f25085e546e] EvidenceFound:true Simulated:false}); want a refusal
+=== RUN   TestHarvestRejectsKindReusedOnOnePath/implement_and_acceptance_test_share_a_path
+    acceptance_seed_bypass_test.go:158: implement and acceptance test share a path was accepted ({RunID:run_41d7d76ae4d150e06ce9f5f5 Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[art_6d427218c724beba78946f1a art_83ce4dda0f1650a717952b04 art_83ce4dda0f1650a717952b04] EvidenceFound:true Simulated:false}); want a refusal
+=== RUN   TestHarvestRejectsKindReusedOnOnePath/all_three_kinds_share_a_path
+    acceptance_seed_bypass_test.go:158: all three kinds share a path was accepted ({RunID:run_cc48641eca67a63649deeaf3 Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[art_6b79328465b5a8bce5b4a8a4 art_6b79328465b5a8bce5b4a8a4 art_6b79328465b5a8bce5b4a8a4] EvidenceFound:true Simulated:false}); want a refusal
+--- FAIL: TestHarvestRejectsKindReusedOnOnePath (0.44s)
+    --- FAIL: TestHarvestRejectsKindReusedOnOnePath/red_and_implement_share_a_path (0.15s)
+    --- FAIL: TestHarvestRejectsKindReusedOnOnePath/implement_and_acceptance_test_share_a_path (0.15s)
+    --- FAIL: TestHarvestRejectsKindReusedOnOnePath/all_three_kinds_share_a_path (0.15s)
+=== RUN   TestReceiveRejectsKindReusedOnOnePath
+    acceptance_seed_bypass_test.go:195: one path posing as red and implement was accepted; want a refusal
+--- FAIL: TestReceiveRejectsKindReusedOnOnePath (0.27s)
+=== RUN   TestHarvestRejectsUncanonicalArtifactKind
+    acceptance_seed_bypass_test.go:232: padded artifact kind was accepted ({RunID:run_5c4038a00ab8ac428775901b Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[art_c496e78b175b89197f29deb1 art_ac7b289bb0e00fae6105191c art_77abbb0498c2f055bcfc5359] EvidenceFound:true Simulated:false}); want a refusal
+--- FAIL: TestHarvestRejectsUncanonicalArtifactKind (0.15s)
+=== RUN   TestHarvestAcceptsThreeSeparateKinds
+--- PASS: TestHarvestAcceptsThreeSeparateKinds (0.14s)
+=== RUN   TestHarvestRejectsRelativeAliasOfSamePath
+=== RUN   TestHarvestRejectsRelativeAliasOfSamePath/absolute_red,_relative_implement
+    acceptance_seed_bypass_test.go:321: absolute red, relative implement was accepted ({RunID:run_5c9d1f5f33ff0c0d3413294a Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[art_bbca569e489a00d9e6ff27ca art_5ac8913f3c5e228f2325e8e1 art_bbca569e489a00d9e6ff27ca] EvidenceFound:true Simulated:false}); want a refusal
+=== RUN   TestHarvestRejectsRelativeAliasOfSamePath/relative_red,_absolute_implement
+    acceptance_seed_bypass_test.go:321: relative red, absolute implement was accepted ({RunID:run_9711b26ac6654f92eb3db125 Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[art_38799edd73993228369dd38c art_8a39b62c793062a78d98f052 art_38799edd73993228369dd38c] EvidenceFound:true Simulated:false}); want a refusal
+--- FAIL: TestHarvestRejectsRelativeAliasOfSamePath (0.29s)
+    --- FAIL: TestHarvestRejectsRelativeAliasOfSamePath/absolute_red,_relative_implement (0.14s)
+    --- FAIL: TestHarvestRejectsRelativeAliasOfSamePath/relative_red,_absolute_implement (0.14s)
+FAIL
+FAIL	beacon-go/internal/orchestrator	1.812s
+FAIL

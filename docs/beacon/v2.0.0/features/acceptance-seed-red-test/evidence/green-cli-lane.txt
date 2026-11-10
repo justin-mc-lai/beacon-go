@@ -1,0 +1,15 @@
+# CLI lane entry green probe (main tree @ 0fabeb5 + implement delta, new test included)
+# repo: /Users/apple/Developer/Personal/products/beacon-go
+# command: go test ./internal/orchestrator -run 'TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection|TestHarvestRejectsEmptyReturnAfterTestOnlyRejection|TestReceiveRejectsEmptyReturnAfterTestOnlyRejection' -count=1 -v
+# date: 2026-11-10T22:16:52Z
+
+=== RUN   TestHarvestRejectsEmptyReturnAfterTestOnlyRejection
+--- PASS: TestHarvestRejectsEmptyReturnAfterTestOnlyRejection (0.16s)
+=== RUN   TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection
+--- PASS: TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection (0.15s)
+=== RUN   TestReceiveRejectsEmptyReturnAfterTestOnlyRejection
+--- PASS: TestReceiveRejectsEmptyReturnAfterTestOnlyRejection (0.27s)
+PASS
+ok  	beacon-go/internal/orchestrator	0.913s
+
+exit: 0

@@ -120,7 +120,7 @@ func (e *Engine) DelegateRalphReal(ctx context.Context, runID string, argv []str
 	// validateHarvest judges exactly those captures plus the
 	// post-delegation implement evidence, like any external return.
 	return e.ReceiveRalphResult(runID, d.ID, LaneResultInput{
-		Status: "done", Summary: outcome.Summary,
+		Status: "done", Summary: outcome.Summary, CapturesRegistered: true,
 	})
 }
 

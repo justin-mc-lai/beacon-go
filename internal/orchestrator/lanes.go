@@ -219,14 +219,65 @@ func (e *Engine) ExecuteLaneStage(ctx context.Context, runID, lane string) (Stag
 
 // ---- shared harvest (collection) machinery ----
 
+// normalizeArtifacts is the one place artifact pointers are made
+// canonical before they are judged or stored. It trims each kind
+// (an empty kind means implement_artifact), rejects kinds that only
+// look canonical because of surrounding whitespace, and folds repeated
+// paths onto their first declaration. Folding mirrors the store:
+// artifact_refs is keyed on (run_id, abs_path), registration turns a
+// relative path into the same absolute path filepath.Abs would, and a
+// second Add of the same path keeps the kind already on record. Judging
+// the declared kinds while storing a deduped set let [red=X, test,
+// impl=X] pass the three-kind check and then land only red for X, so
+// validate and register now share this exact slice. The fold key is
+// canonical (absolute and clean) so "x.go" and "/cwd/x.go" cannot pose
+// as two kinds either.
+func normalizeArtifacts(inputs []ArtifactInput) ([]ArtifactInput, []string) {
+	if len(inputs) == 0 {
+		return nil, nil
+	}
+	out := make([]ArtifactInput, 0, len(inputs))
+	seen := make(map[string]struct{}, len(inputs))
+	var codes []string
+	for _, a := range inputs {
+		kind := strings.TrimSpace(a.Kind)
+		if kind != a.Kind {
+			// Padded or whitespace-only kinds are malformed input: they
+			// must never be stored under a name the frozen three-kind
+			// vocabulary would not recognise.
+			codes = append(codes, core.ReasonResultArtifactKindInvalid)
+		}
+		if kind == "" {
+			kind = ArtifactKindImplement
+		}
+		a.Kind = kind
+		key := a.AbsPath
+		if key != "" && !filepath.IsAbs(key) {
+			// Registration turns the same relative path into this
+			// absolute one; fold on the key the store will see.
+			if p, err := filepath.Abs(key); err == nil {
+				key = p
+			}
+		}
+		if _, dup := seen[key]; dup {
+			continue
+		}
+		seen[key] = struct{}{}
+		out = append(out, a)
+	}
+	return out, codes
+}
+
 // registerArtifacts lands result artifact pointers in artifact_refs.
 func (e *Engine) registerArtifacts(runID string, inputs []ArtifactInput) ([]string, error) {
+	inputs, kindCodes := normalizeArtifacts(inputs)
+	if len(kindCodes) > 0 {
+		return nil, core.NewError(kindCodes[0], "goal.registerArtifacts",
+			"artifact kind is not canonical: trim it before handing the return in")
+	}
 	var ids []string
 	for _, a := range inputs {
 		kind := a.Kind
-		if kind == "" {
-			kind = "implement_artifact"
-		}
 		abs := a.AbsPath
 		hash, size := a.ContentHash, a.SizeBytes
 		// AC-003 (kernel-external-stage-evidence): a received
@@ -311,16 +362,32 @@ func (e *Engine) delegationAnchor(runID, delegationID string) (int, error) {
 }
 
 // validateHarvest is THE collection rule for all three lanes and for
-// delegation returns: artifact pointers present on the run, and
+// delegation returns: the artifact pointers THIS return brings, and
 // implement-stage evidence after the anchor. It reports what is
 // missing instead of guessing.
-func (e *Engine) validateHarvest(runID string, anchorIdx int, requireAcceptanceKinds bool) (evidence bool, codes []string, err error) {
-	arts, err := e.store.Artifacts().ListByRun(runID)
-	if err != nil {
-		return false, nil, err
-	}
-	if len(arts) == 0 {
-		codes = append(codes, core.ReasonResultArtifactsMissing)
+//
+// The three-kind rule is judged on the return's own artifact set, never
+// on whatever happens to already sit on the run: a rejected return must
+// not be able to pay for a later empty one. Callers pass the slice
+// normalizeArtifacts returned, so the kinds judged here are exactly the
+// kinds registerArtifacts will store (same paths folded once, same
+// trimmed names). capturesRegistered is set explicitly by the real
+// ralph executor, whose per-iteration captures are already in
+// artifact_refs before the return is collected; that path keeps the
+// capture + evidence rule and is exempt from the three-kind rule.
+func (e *Engine) validateHarvest(runID string, anchorIdx int, inputs []ArtifactInput, capturesRegistered bool) (evidence bool, codes []string, err error) {
+	if capturesRegistered {
+		arts, listErr := e.store.Artifacts().ListByRun(runID)
+		if listErr != nil {
+			return false, nil, listErr
+		}
+		if len(arts) == 0 {
+			codes = append(codes, core.ReasonResultArtifactsMissing)
+		}
+	} else {
+		if len(inputs) == 0 {
+			codes = append(codes, core.ReasonResultArtifactsMissing)
+		}
 	}
 	evidence, err = e.stageExecutedAfter(runID, StageImplement, anchorIdx)
 	if err != nil {
@@ -329,32 +396,32 @@ func (e *Engine) validateHarvest(runID string, anchorIdx int, requireAcceptanceK
 	if !evidence {
 		codes = append(codes, core.ReasonResultEvidenceMissing)
 	}
-	// The three-kind rule applies to a lane return that brings its own
-	// artifact set. A real ralph loop hands its captures in directly
-	// (no return set), so its collection keeps the capture + evidence
-	// rule above.
-	if requireAcceptanceKinds {
-		position := map[string]int{}
-		for i, a := range arts {
-			kind := strings.TrimSpace(a.Kind)
-			if _, seen := position[kind]; !seen {
-				position[kind] = i
-			}
+	if capturesRegistered {
+		return evidence, codes, nil
+	}
+	// inputs is already normalized: kinds trimmed, duplicates folded by
+	// abs_path with the first declaration winning. Position therefore
+	// reflects the set that will actually be stored.
+	position := map[string]int{}
+	for i, a := range inputs {
+		kind := a.Kind
+		if _, seen := position[kind]; !seen {
+			position[kind] = i
 		}
-		implIdx, hasImpl := position[ArtifactKindImplement]
-		if !hasImpl {
-			codes = append(codes, core.ReasonResultImplementArtifactMissing)
-		}
-		if _, ok := position[ArtifactKindAcceptanceTest]; !ok {
-			codes = append(codes, core.ReasonResultAcceptanceTestMissing)
-		}
-		// ListByRun is ordered by created_at then rowid, so the
-		// recorded baseline must come first. A red record that lands
-		// with (or after) the implementation cannot prove red->green.
-		redIdx, hasRed := position[ArtifactKindAcceptanceSeedRed]
-		if !hasRed || (hasImpl && redIdx > implIdx) {
-			codes = append(codes, core.ReasonResultSeedRedMissing)
-		}
+	}
+	implIdx, hasImpl := position[ArtifactKindImplement]
+	if !hasImpl {
+		codes = append(codes, core.ReasonResultImplementArtifactMissing)
+	}
+	if _, ok := position[ArtifactKindAcceptanceTest]; !ok {
+		codes = append(codes, core.ReasonResultAcceptanceTestMissing)
+	}
+	// The recorded baseline must come before the implementation in the
+	// return's own order. A red record handed in with (or after) the
+	// implementation cannot prove red->green.
+	redIdx, hasRed := position[ArtifactKindAcceptanceSeedRed]
+	if !hasRed || (hasImpl && redIdx > implIdx) {
+		codes = append(codes, core.ReasonResultSeedRedMissing)
 	}
 	return evidence, codes, nil
 }
@@ -395,15 +462,14 @@ func (e *Engine) HarvestLaneResult(runID, lane string, in LaneResultInput) (Harv
 				"team handoff missing: "+strings.Join(missing, ", "))
 		}
 	}
-	ids, err := e.registerArtifacts(runID, in.Artifacts)
+	// Validate BEFORE registering: a rejected return must not leave
+	// pointers behind that a later empty return could harvest.
+	arts, kindCodes := normalizeArtifacts(in.Artifacts)
+	evidence, codes, err := e.validateHarvest(runID, -1, arts, in.CapturesRegistered)
 	if err != nil {
 		return v, err
 	}
-	v.ArtifactIDs = ids
-	evidence, codes, err := e.validateHarvest(runID, -1, len(in.Artifacts) > 0)
-	if err != nil {
-		return v, err
-	}
+	codes = append(kindCodes, codes...)
 	v.EvidenceFound = evidence
 	if len(codes) > 0 {
 		v.ReasonCodes = codes
@@ -414,6 +480,11 @@ func (e *Engine) HarvestLaneResult(runID, lane string, in LaneResultInput) (Harv
 		return v, core.NewError(codes[0], "goal.HarvestLaneResult",
 			"lane result harvest incomplete: "+strings.Join(codes, ", "))
 	}
+	ids, err := e.registerArtifacts(runID, arts)
+	if err != nil {
+		return v, err
+	}
+	v.ArtifactIDs = ids
 	v.Accepted = true
 	payload := map[string]any{"lane": lane, "artifact_ids": ids, "summary": in.Summary}
 	if in.Handoff != nil {

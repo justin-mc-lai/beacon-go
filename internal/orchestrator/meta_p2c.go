@@ -137,6 +137,12 @@ type LaneResultInput struct {
 	Summary   string          `json:"summary,omitempty"`
 	Artifacts []ArtifactInput `json:"artifacts,omitempty"`
 	Handoff   *TeamHandoff    `json:"handoff,omitempty"`
+	// CapturesRegistered marks the one caller whose executor already
+	// registered this return's captures on the run: the real ralph
+	// loop. It is set explicitly, never inferred from an empty
+	// artifact set, and it is the only exemption from the three-kind
+	// harvest rule.
+	CapturesRegistered bool `json:"captures_registered,omitempty"`
 }
 
 // HarvestView is the verdict of the shared collection rule: a lane
