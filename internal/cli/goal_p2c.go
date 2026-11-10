@@ -192,8 +192,17 @@ func newGoalReceiveResultCmd() *cobra.Command {
 			}
 			defer closeFn()
 			var inputs []orchestrator.ArtifactInput
-			for _, p := range artifacts {
-				inputs = append(inputs, orchestrator.ArtifactInput{Kind: kind, AbsPath: p})
+			for _, raw := range artifacts {
+				// One --artifact may name its own kind as
+				// "kind=/abs/path"; the --kind flag stays the
+				// default for bare paths. A returned implement
+				// result needs three different kinds, which a
+				// single shared flag cannot express.
+				artKind, path := kind, raw
+				if i := strings.Index(raw, "="); i > 0 && !strings.ContainsAny(raw[:i], "/\\") {
+					artKind, path = raw[:i], raw[i+1:]
+				}
+				inputs = append(inputs, orchestrator.ArtifactInput{Kind: artKind, AbsPath: path})
 			}
 			if external {
 				v, err := eng.ReceiveExternalResult(runID, orchestrator.ExternalResultInput{

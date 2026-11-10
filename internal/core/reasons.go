@@ -141,16 +141,19 @@ const (
 // ---- Lane family (P2c, G-22: implement single/team/ralph) ----
 
 const (
-	ReasonLaneUnknown            = "lane_unknown"
-	ReasonLaneStageMismatch      = "lane_stage_not_implement"
-	ReasonTeamHandoffIncomplete  = "team_handoff_incomplete"
-	ReasonLaneResultFailed       = "lane_result_failed"
-	ReasonResultArtifactsMissing = "result_artifacts_missing"
-	ReasonResultEvidenceMissing  = "result_evidence_missing"
-	ReasonExecutorNotRegistered  = "stage_executor_not_registered"
-	ReasonAdmissionWorktreeMiss  = "goal_implement_worktree_missing"
-	ReasonAdmissionWorktreeMism  = "goal_implement_worktree_mismatch"
-	ReasonSteeringUnacknowledged = "steering_unacknowledged"
+	ReasonLaneUnknown                    = "lane_unknown"
+	ReasonLaneStageMismatch              = "lane_stage_not_implement"
+	ReasonTeamHandoffIncomplete          = "team_handoff_incomplete"
+	ReasonLaneResultFailed               = "lane_result_failed"
+	ReasonResultArtifactsMissing         = "result_artifacts_missing"
+	ReasonResultEvidenceMissing          = "result_evidence_missing"
+	ReasonResultImplementArtifactMissing = "result_implement_artifact_missing"
+	ReasonResultAcceptanceTestMissing    = "result_acceptance_test_missing"
+	ReasonResultSeedRedMissing           = "result_acceptance_seed_red_missing"
+	ReasonExecutorNotRegistered          = "stage_executor_not_registered"
+	ReasonAdmissionWorktreeMiss          = "goal_implement_worktree_missing"
+	ReasonAdmissionWorktreeMism          = "goal_implement_worktree_mismatch"
+	ReasonSteeringUnacknowledged         = "steering_unacknowledged"
 )
 
 // ---- Delegation family (P2c, G-10: delegate-ralph) ----

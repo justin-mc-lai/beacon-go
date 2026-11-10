@@ -237,7 +237,7 @@ func (e *Engine) ReceiveRalphResult(runID, delegationID string, in LaneResultInp
 	if err != nil {
 		return DelegationView{}, err
 	}
-	_, codes, err := e.validateHarvest(runID, anchor)
+	_, codes, err := e.validateHarvest(runID, anchor, len(in.Artifacts) > 0)
 	if err != nil {
 		return DelegationView{}, err
 	}

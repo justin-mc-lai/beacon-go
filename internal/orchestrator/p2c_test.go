@@ -98,8 +98,13 @@ func TestLaneHarvestSharedRule(t *testing.T) {
 			if err != nil || out.Status != "done" {
 				t.Fatalf("ExecuteLaneStage: %+v %v", out, err)
 			}
-			art := filepath.Join(t.TempDir(), "out.go")
-			in := LaneResultInput{Status: "done", Artifacts: []ArtifactInput{{AbsPath: art}}}
+			dir := t.TempDir()
+			art := filepath.Join(dir, "out.go")
+			in := LaneResultInput{Status: "done", Artifacts: []ArtifactInput{
+				{Kind: ArtifactKindAcceptanceSeedRed, AbsPath: filepath.Join(dir, "red-ac.txt")},
+				{Kind: ArtifactKindAcceptanceTest, AbsPath: filepath.Join(dir, "acceptance_seed_test.go")},
+				{Kind: ArtifactKindImplement, AbsPath: art},
+			}}
 			if lane == LaneTeam {
 				in.Handoff = &TeamHandoff{From: "impl", To: "qa", ArtifactRefs: []string{art}}
 			}
@@ -203,9 +208,14 @@ func TestDelegateRalphSimulatedFullFlow(t *testing.T) {
 		t.Errorf("reason = %s", rc)
 	}
 	// Whole return -> returned; receiving never completes the run.
-	art := filepath.Join(t.TempDir(), "impl.go")
+	dir := t.TempDir()
+	art := filepath.Join(dir, "impl.go")
 	dv, err = env.eng.ReceiveRalphResult(run.RunID, d.ID, LaneResultInput{
-		Status: "done", Summary: "did it", Artifacts: []ArtifactInput{{AbsPath: art}},
+		Status: "done", Summary: "did it", Artifacts: []ArtifactInput{
+			{Kind: ArtifactKindAcceptanceSeedRed, AbsPath: filepath.Join(dir, "red-ac.txt")},
+			{Kind: ArtifactKindAcceptanceTest, AbsPath: filepath.Join(dir, "acceptance_seed_test.go")},
+			{Kind: ArtifactKindImplement, AbsPath: art},
+		},
 	})
 	if err != nil {
 		t.Fatalf("ReceiveRalphResult: %v", err)

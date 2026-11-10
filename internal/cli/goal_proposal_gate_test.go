@@ -15,9 +15,9 @@ func p2dProposalFile(t *testing.T) string {
   "schema": "lake-proposal.v1",
   "utterance": "ship the platform",
   "lakes": [
-    {"slug":"lake-a","outcome":"a","value":"v","metric":"m","operable":"o","size":"S","acceptance_seed":"s"},
-    {"slug":"lake-b","outcome":"b","value":"v","metric":"m","operable":"o","size":"S","acceptance_seed":"s","depends_on":["lake-a"]},
-    {"slug":"lake-c","outcome":"c","value":"v","metric":"m","operable":"o","size":"S","acceptance_seed":"s","depends_on":["lake-b"]}
+    {"slug":"lake-a","outcome":"a","value":"v","metric":"m","operable":"o","size":"S","acceptance_seed":"go test ./internal/cli -run TestProgramProposalGate -count=1"},
+    {"slug":"lake-b","outcome":"b","value":"v","metric":"m","operable":"o","size":"S","acceptance_seed":"go test ./internal/cli -run TestProgramProposalGate -count=1","depends_on":["lake-a"]},
+    {"slug":"lake-c","outcome":"c","value":"v","metric":"m","operable":"o","size":"S","acceptance_seed":"go test ./internal/cli -run TestProgramProposalGate -count=1","depends_on":["lake-b"]}
   ],
   "not_proposed": [{"slug":"extra","reason":"later"}]
 }`

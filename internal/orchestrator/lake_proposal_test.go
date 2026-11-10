@@ -13,9 +13,9 @@ func validProposal() LakeProposal {
 		Schema:    LakeProposalSchema,
 		Utterance: "sell a habit tracker to busy parents",
 		Lakes: []LakeProposalLake{
-			{Slug: "feat-a", Outcome: "parents can join the waitlist", Value: "validated demand", Metric: ">=10 signups", Operable: "landing page + waitlist", Size: "S", AcceptanceSeed: "a visitor joins"},
-			{Slug: "feat-b", Outcome: "parents get a daily nudge", Value: "habit loop", Metric: "D7 >= 20%", Operable: "email digest", Size: "M", AcceptanceSeed: "digest arrives", DependsOn: []string{"feat-a"}},
-			{Slug: "feat-c", Outcome: "parents pay for premium", Value: "first revenue", Metric: ">=1 paid", Operable: "stripe checkout", Size: "M", AcceptanceSeed: "checkout completes", DependsOn: []string{"feat-b"}},
+			{Slug: "feat-a", Outcome: "parents can join the waitlist", Value: "validated demand", Metric: ">=10 signups", Operable: "landing page + waitlist", Size: "S", AcceptanceSeed: "go test ./internal/orchestrator -run TestValidateLakeProposal -count=1"},
+			{Slug: "feat-b", Outcome: "parents get a daily nudge", Value: "habit loop", Metric: "D7 >= 20%", Operable: "email digest", Size: "M", AcceptanceSeed: "go test ./internal/orchestrator -run TestProgramPropose -count=1", DependsOn: []string{"feat-a"}},
+			{Slug: "feat-c", Outcome: "parents pay for premium", Value: "first revenue", Metric: ">=1 paid", Operable: "stripe checkout", Size: "M", AcceptanceSeed: "go test ./internal/orchestrator -run TestProgramSelect -count=1", DependsOn: []string{"feat-b"}},
 		},
 		NotProposed: []NotProposedLake{{Slug: "mobile-app", Reason: "no demand evidence yet"}},
 	}

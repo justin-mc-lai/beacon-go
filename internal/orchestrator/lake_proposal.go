@@ -6,6 +6,7 @@ package orchestrator
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -81,6 +82,11 @@ func ValidateLakeProposal(p LakeProposal) error {
 					"lake "+slug+" is missing "+name)
 			}
 		}
+		if !isExecutableAcceptanceSeed(l.AcceptanceSeed) {
+			return core.NewError(core.ReasonLakeProposalInvalid, "program.propose",
+				"lake "+slug+" acceptance_seed must be a runnable go test command "+
+					"(go test ./<pkg> -run <TestName> -count=1), got "+strconv.Quote(strings.TrimSpace(l.AcceptanceSeed)))
+		}
 		switch strings.ToUpper(strings.TrimSpace(l.Size)) {
 		case "S", "M", "L":
 		default:
@@ -106,6 +112,49 @@ func ValidateLakeProposal(p LakeProposal) error {
 		return core.NewError(core.ReasonLakeProposalInvalid, "program.propose", problems[0].Detail)
 	}
 	return nil
+}
+
+// isExecutableAcceptanceSeed reports whether seed is the fixed seed
+// shape from the frozen truth: a go test command that picks one test
+// in a repository-relative package with -count=1. The check is pure
+// syntax; ValidateLakeProposal never runs the command.
+func isExecutableAcceptanceSeed(seed string) bool {
+	fields := strings.Fields(strings.TrimSpace(seed))
+	if len(fields) < 5 || fields[0] != "go" || fields[1] != "test" {
+		return false
+	}
+	pkg, runName, count := "", "", ""
+	for i := 2; i < len(fields); i++ {
+		f := fields[i]
+		switch {
+		case f == "-run":
+			if i+1 >= len(fields) {
+				return false
+			}
+			runName = fields[i+1]
+			i++
+		case strings.HasPrefix(f, "-run="):
+			runName = strings.TrimPrefix(f, "-run=")
+		case f == "-count":
+			if i+1 >= len(fields) {
+				return false
+			}
+			count = fields[i+1]
+			i++
+		case strings.HasPrefix(f, "-count="):
+			count = strings.TrimPrefix(f, "-count=")
+		case strings.HasPrefix(f, "-"):
+			// Other flags are allowed; they do not change the shape.
+		default:
+			if pkg == "" {
+				pkg = f
+			}
+		}
+	}
+	if !strings.HasPrefix(pkg, "./") || strings.TrimSpace(runName) == "" || count != "1" {
+		return false
+	}
+	return true
 }
 
 func (e *Engine) ProgramPropose(runID string, p LakeProposal) (LakeProposal, error) {

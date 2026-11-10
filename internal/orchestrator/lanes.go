@@ -112,9 +112,20 @@ type ImplementPlanView struct {
 var HarvestRuleText = []string{
 	"artifact pointers must land in artifact_refs (absolute paths)",
 	"a stage_executed evidence event for the implement stage must exist on the run",
+	"a returned implement result carries implement_artifact, acceptance_test and acceptance_seed_red separately",
+	"the acceptance_seed_red baseline must be on record before the implementation artifact",
 	"team lane additionally requires a whole handoff (from + to + artifact refs)",
 	"a collected result never completes the run by itself (release still needs human confirmation, verifier and qa pass)",
 }
+
+// Acceptance artifact kinds (frozen vocabulary, acceptance-seed-red-test
+// Q2). A returned implement result must bring all three separately;
+// test-only returns and returns without a red baseline are refused.
+const (
+	ArtifactKindImplement         = "implement_artifact"
+	ArtifactKindAcceptanceTest    = "acceptance_test"
+	ArtifactKindAcceptanceSeedRed = "acceptance_seed_red"
+)
 
 // PlanImplement computes the lane routing + admission for a run
 // without persisting anything (the plan surface is read-only; the
@@ -303,7 +314,7 @@ func (e *Engine) delegationAnchor(runID, delegationID string) (int, error) {
 // delegation returns: artifact pointers present on the run, and
 // implement-stage evidence after the anchor. It reports what is
 // missing instead of guessing.
-func (e *Engine) validateHarvest(runID string, anchorIdx int) (evidence bool, codes []string, err error) {
+func (e *Engine) validateHarvest(runID string, anchorIdx int, requireAcceptanceKinds bool) (evidence bool, codes []string, err error) {
 	arts, err := e.store.Artifacts().ListByRun(runID)
 	if err != nil {
 		return false, nil, err
@@ -317,6 +328,33 @@ func (e *Engine) validateHarvest(runID string, anchorIdx int) (evidence bool, co
 	}
 	if !evidence {
 		codes = append(codes, core.ReasonResultEvidenceMissing)
+	}
+	// The three-kind rule applies to a lane return that brings its own
+	// artifact set. A real ralph loop hands its captures in directly
+	// (no return set), so its collection keeps the capture + evidence
+	// rule above.
+	if requireAcceptanceKinds {
+		position := map[string]int{}
+		for i, a := range arts {
+			kind := strings.TrimSpace(a.Kind)
+			if _, seen := position[kind]; !seen {
+				position[kind] = i
+			}
+		}
+		implIdx, hasImpl := position[ArtifactKindImplement]
+		if !hasImpl {
+			codes = append(codes, core.ReasonResultImplementArtifactMissing)
+		}
+		if _, ok := position[ArtifactKindAcceptanceTest]; !ok {
+			codes = append(codes, core.ReasonResultAcceptanceTestMissing)
+		}
+		// ListByRun is ordered by created_at then rowid, so the
+		// recorded baseline must come first. A red record that lands
+		// with (or after) the implementation cannot prove red->green.
+		redIdx, hasRed := position[ArtifactKindAcceptanceSeedRed]
+		if !hasRed || (hasImpl && redIdx > implIdx) {
+			codes = append(codes, core.ReasonResultSeedRedMissing)
+		}
 	}
 	return evidence, codes, nil
 }
@@ -362,7 +400,7 @@ func (e *Engine) HarvestLaneResult(runID, lane string, in LaneResultInput) (Harv
 		return v, err
 	}
 	v.ArtifactIDs = ids
-	evidence, codes, err := e.validateHarvest(runID, -1)
+	evidence, codes, err := e.validateHarvest(runID, -1, len(in.Artifacts) > 0)
 	if err != nil {
 		return v, err
 	}

@@ -97,10 +97,15 @@ func TestGoalP2CChain(t *testing.T) {
 	if err == nil {
 		t.Fatalf("receive without artifacts must fail (out %s)", out)
 	}
-	// receive with an artifact -> returned.
-	art := filepath.Join(t.TempDir(), "impl.go")
+	// receive with the three separated artifact kinds -> returned.
+	dir := t.TempDir()
+	art := filepath.Join(dir, "impl.go")
 	out, err = runCLI(t, "goal", "receive-result", "--run-id", runID,
-		"--delegation-id", delegationID, "--artifact", art, "--summary", "done", "--json")
+		"--delegation-id", delegationID,
+		"--artifact", "acceptance_seed_red="+filepath.Join(dir, "red-ac.txt"),
+		"--artifact", "acceptance_test="+filepath.Join(dir, "acceptance_seed_test.go"),
+		"--artifact", "implement_artifact="+art,
+		"--summary", "done", "--json")
 	if err != nil {
 		t.Fatalf("receive-result: %v (out %s)", err, out)
 	}
