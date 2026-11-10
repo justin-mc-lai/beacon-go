@@ -12,11 +12,15 @@
 | red seed | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-ac002.txt | FAIL | qa |
 | red seed | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-ac003.txt | FAIL | qa |
 | package red run | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-orchestrator-pkg.txt | FAIL, only the three seeds | qa |
+| green seed | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac001.txt | PASS | qa |
+| green seed | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac002.txt | PASS | qa |
+| green seed | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac003.txt | PASS | qa |
+| full green run | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-suite.txt | exit=0 | qa |
 | hash manifest | support_advisory | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/sha256.txt | recorded | qa |
 
 ## Reproduction Log
 
-Every row below comes from a real command run on 2026-11-11 against beacon-go main @ ea2a566, working tree clean before this package. Full output is in the evidence files named here.
+Every row below comes from a real command run on 2026-11-11 against beacon-go main. The red rows were captured at the design baseline ea2a566; the green rows were captured after the plan package was frozen on main @ 8d73258, with the implement changes present in the working tree (uncommitted). Full output is in the evidence files named here.
 
 | AC | Command | Exit | Result |
 |----|---------|------|--------|
@@ -36,6 +40,8 @@ Every row below comes from a real command run on 2026-11-11 against beacon-go ma
 
 | AC | green command exit | green evidence file | independent verifier |
 |----|-------------------|---------------------|----------------------|
-| AC-001 | 待填（implement 轮） | 待填（implement 轮） | 待填 |
-| AC-002 | 待填（implement 轮） | 待填（implement 轮） | 待填 |
-| AC-003 | 待填（implement 轮） | 待填（implement 轮） | 待填 |
+| AC-001 | 0 | evidence/green-ac001.txt | 待独立 QA |
+| AC-002 | 0 | evidence/green-ac002.txt | 待独立 QA |
+| AC-003 | 0 | evidence/green-ac003.txt | 待独立 QA |
+
+`go test ./... -count=1` 同样退出 0，完整原始输出见 evidence/green-suite.txt。三条 seed 与 helper 未改动，seed 文件 sha256 仍为测试包冻结值。
