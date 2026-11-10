@@ -1,0 +1,7 @@
+=== RUN   TestHarvestRejectsTestOnlyArtifacts
+    acceptance_seed_test.go:98: harvest accepted a test-only result ({RunID:run_8b4ceae2d4a311b2022f8534 Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[art_5984f7400f3a21a53d2794d6] EvidenceFound:true Simulated:false}); want a refusal because no implementation artifact was returned
+--- FAIL: TestHarvestRejectsTestOnlyArtifacts (0.15s)
+FAIL
+FAIL	beacon-go/internal/orchestrator	0.482s
+FAIL
+exit=1

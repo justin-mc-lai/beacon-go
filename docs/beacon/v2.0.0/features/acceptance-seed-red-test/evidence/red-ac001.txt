@@ -1,0 +1,7 @@
+=== RUN   TestValidateLakeProposalRejectsProseAcceptanceSeed
+    acceptance_seed_test.go:56: proposal accepted prose acceptance_seed "a visitor joins the waitlist"; want a refusal that says the seed is not an executable test command
+--- FAIL: TestValidateLakeProposalRejectsProseAcceptanceSeed (0.00s)
+FAIL
+FAIL	beacon-go/internal/orchestrator	0.532s
+FAIL
+exit=1

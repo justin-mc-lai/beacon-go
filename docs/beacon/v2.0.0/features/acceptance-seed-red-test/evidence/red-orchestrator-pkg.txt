@@ -1,0 +1,10 @@
+--- FAIL: TestValidateLakeProposalRejectsProseAcceptanceSeed (0.00s)
+    acceptance_seed_test.go:56: proposal accepted prose acceptance_seed "a visitor joins the waitlist"; want a refusal that says the seed is not an executable test command
+--- FAIL: TestHarvestRejectsTestOnlyArtifacts (0.14s)
+    acceptance_seed_test.go:98: harvest accepted a test-only result ({RunID:run_af9e2bbb4b03d36ff1a3337b Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[art_9ffa8ebd41f90f8ca0cd8cfe] EvidenceFound:true Simulated:false}); want a refusal because no implementation artifact was returned
+--- FAIL: TestHarvestRequiresSeedRedEvidence (0.14s)
+    acceptance_seed_test.go:120: harvest accepted a result without acceptance_seed_red evidence ({RunID:run_26fa988c17d72faa1bde93fa Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[art_b11b5d9660b5d9f5fc38bcd1 art_157552f1365faa469bee7ba8] EvidenceFound:true Simulated:false}); want a refusal because red->green is unproven
+FAIL
+FAIL	beacon-go/internal/orchestrator	90.826s
+FAIL
+exit=1

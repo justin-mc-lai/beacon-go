@@ -1,0 +1,7 @@
+=== RUN   TestHarvestRequiresSeedRedEvidence
+    acceptance_seed_test.go:120: harvest accepted a result without acceptance_seed_red evidence ({RunID:run_584bf8d3f7799971d7559c6b Lane:single Accepted:true ReasonCode: ReasonCodes:[] Missing:[] ArtifactIDs:[art_6d191a4434a31966986894e6 art_64b3fc04af815ffe60470d21] EvidenceFound:true Simulated:false}); want a refusal because red->green is unproven
+--- FAIL: TestHarvestRequiresSeedRedEvidence (0.15s)
+FAIL
+FAIL	beacon-go/internal/orchestrator	0.474s
+FAIL
+exit=1
