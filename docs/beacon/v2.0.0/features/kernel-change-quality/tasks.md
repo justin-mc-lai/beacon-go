@@ -17,7 +17,7 @@ task_source: acceptance_criteria
 - [x] TASK-005 safe_fix 每次调用至多一次修复尝试，第二次请求直接拒绝 · ac=AC-003 · evidence=docs/beacon/v2.0.0/features/kernel-change-quality/evidence/ac-q3-bounded-fix.md
 - [x] TASK-006 修复触碰的文件与 hunk 必须落在调用方授权清单内，越界 fail-closed 且不产生部分修改 · ac=AC-003 · evidence=docs/beacon/v2.0.0/features/kernel-change-quality/evidence/ac-q3-bounded-fix.md
 - [x] TASK-007 逐条跑 6 条 TC 并落包内证据，跑全量 go test ./... -count=1 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-change-quality/evidence/go-test-all.txt
-- [ ] TASK-008 三份独立 QA verdict 按 evidence/qa-contract.md 契约落盘，maker 不自签 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-change-quality/evidence/qa-contract.md
+- [x] TASK-008 三份独立 QA verdict 按 evidence/qa-contract.md 契约落盘，maker 不自签 · ac=GATES · evidence=docs/beacon/v2.0.0/features/kernel-change-quality/evidence/qa/spec-ac.md · verdicts=docs/beacon/v2.0.0/features/kernel-change-quality/evidence/qa/spec-ac.md docs/beacon/v2.0.0/features/kernel-change-quality/evidence/qa/runtime.md docs/beacon/v2.0.0/features/kernel-change-quality/evidence/qa/regression.md
 
 ## Boundary
 
