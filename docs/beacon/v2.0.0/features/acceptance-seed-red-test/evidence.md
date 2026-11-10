@@ -4,8 +4,8 @@
 
 | Surface | Authority | Canonical Artifact | Status | Route |
 |---------|-----------|--------------------|--------|-------|
-| truth | requirement_truth | truth.md | draft | truth |
-| tests | test_truth | tests.md | draft | qa |
+| truth | requirement_truth | truth.md | frozen | truth |
+| tests | test_truth | tests.md | frozen | qa |
 | tasks | support_advisory | tasks.md | present | truth |
 | build | support_advisory | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/build.txt | exit=0 | qa |
 | red seed | acceptance_truth | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-ac001.txt | FAIL | qa |
@@ -40,8 +40,20 @@ Every row below comes from a real command run on 2026-11-11 against beacon-go ma
 
 | AC | green command exit | green evidence file | independent verifier |
 |----|-------------------|---------------------|----------------------|
-| AC-001 | 0 | evidence/green-ac001.txt | 待独立 QA |
-| AC-002 | 0 | evidence/green-ac002.txt | 待独立 QA |
-| AC-003 | 0 | evidence/green-ac003.txt | 待独立 QA |
+| AC-001 | 0 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac001.txt | 待独立 QA |
+| AC-002 | 0 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac002.txt | 待独立 QA |
+| AC-003 | 0 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac003.txt | 待独立 QA |
 
-`go test ./... -count=1` 同样退出 0，完整原始输出见 evidence/green-suite.txt。三条 seed 与 helper 未改动，seed 文件 sha256 仍为测试包冻结值。
+`go test 全仓 -count=1` 同样退出 0，完整原始输出见 docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-suite.txt 。三条 seed 与 helper 未改动，seed 文件 sha256 仍为测试包冻结值。
+
+## 返工证据（implement 轮第 2 次：零产物回报绕过）
+
+独立验收（spec/AC 与负向回归）各自复现：先交只带 `acceptance_test` 的回报被拒，但其产物已落库；再交零产物 done 回报时 `len(in.Artifacts) > 0` 为假，三类规则整段跳过，`Accepted=true`。返工把三类规则改为按本次回报携带的产物判定，并在校验通过后才登记产物；ralph 真实捕获路径改用显式 `CapturesRegistered` 标记豁免，不再由空产物隐式放行。
+
+| probe | command | exit | result | evidence |
+|-------|---------|------|--------|----------|
+| bypass red（改前 197c514+旧实现） | `go test ./internal/orchestrator -run 'TestHarvestRejectsEmptyReturnAfterTestOnlyRejection|TestReceiveRejectsEmptyReturnAfterTestOnlyRejection' -count=1 -v` | 1 | 两条均 FAIL：空回报收割了历史 test-only 产物 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-bypass.txt |
+| bypass green（返工后） | 同上 | 0 | 两条均 PASS：test-only 被拒后空回报仍被拒（`result_artifacts_missing`），随后完整回报仍可收割 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-bypass.txt |
+| full green after rework | `go test ./... -count=1` | 0 | 全包 ok | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-suite.txt |
+
+回归用例在 `internal/orchestrator/acceptance_seed_bypass_test.go`，同时覆盖 `HarvestLaneResult` 与 `ReceiveRalphResult` 两条入口。三条既有 seed 的断言、helper 与 `acceptance_seed_test.go` 均未改动。

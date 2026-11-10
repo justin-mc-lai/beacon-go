@@ -13,7 +13,7 @@ task_source: acceptance_criteria
 - [x] TASK-001 proposal 校验拒收不可执行的 acceptance_seed，错误文案指出需 go test 命令 · ac=AC-001 · evidence=internal/orchestrator/lake_proposal.go
 - [x] TASK-002 harvest 要求实现产物与验收测试产物同时存在，只带测试产物即拒 · ac=AC-002 · evidence=internal/orchestrator/lanes.go
 - [x] TASK-003 harvest 要求 acceptance_seed_red 基线证据存在且早于实现产物 · ac=AC-003 · evidence=internal/orchestrator/lanes.go
-- [x] TASK-004 更新既有 fixture 的散文 seed 为可执行命令（只改测试数据） · ac=AC-001 · evidence=internal/orchestrator/lake_proposal_test.go、internal/cli/goal_p2d_test.go、internal/cli/goal_proposal_gate_test.go
+- [x] TASK-004 更新既有 fixture 的散文 seed 为可执行命令（只改测试数据；另动 internal/cli/goal_p2d_test.go 与 internal/cli/goal_proposal_gate_test.go） · ac=AC-001 · evidence=internal/orchestrator/lake_proposal_test.go
 - [x] TASK-005 复跑三条种子命令由 FAIL 转 PASS，`go test ./...` 全绿，落 red 与 green 双原始输出 · ac=AC-001..AC-003 · evidence=docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/
 - [ ] TASK-006 独立验收三方（spec/AC、运行时行为、负向回归）并行复核，三份 verdict 齐备后才可进入合入 · ac=GATES · evidence=docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/
 
