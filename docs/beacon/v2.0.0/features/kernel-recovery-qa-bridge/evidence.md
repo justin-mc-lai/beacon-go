@@ -93,4 +93,4 @@ RESULT: FAIL - run B reached release without its own qa evidence, borrowing run 
 
 ## implement 阶段（2026-11-11 17:15，HEAD 3f50e09）
 
-生产代码已落地：`complete.go` Recover 同步 lifecycle、`autotest.go` 全过时补真实 `stage_executed`、`exitgates.go` 回落只收未绑定任何 run 的 feature 级 gate 行；新增 `TestKernelRecoveryNegativeGuards` 与 `TestKernelRecoveryContractStable`。复跑证据见 `evidence/implement-rework-20261111T171500.txt`：三条 seed 均 `RESULT: PASS`、`exit=0`，`go test ./...` 全绿，seed 文件 sha256 与 tests.md 一致。上节「本包未做什么」是 plan 阶段的状态，已被本节取代；仍未 push、未发布、未写 QA verdict。
+生产代码已落地：`complete.go` Recover 同步 lifecycle、`autotest.go` 全过时补真实 `stage_executed`、`exitgates.go` 回落只收未绑定任何 run 的 feature 级 gate 行；新增 `TestKernelRecoveryNegativeGuards` 与 `TestKernelRecoveryContractStable`。复跑证据见 docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence/implement-rework-20261111T171500.txt ，三条 seed 均 `RESULT: PASS`、`exit=0`，全仓测试全绿，seed 文件 sha256 与 tests.md 一致。上节「本包未做什么」是 plan 阶段的状态，已被本节取代；仍未 push、未发布、未写 QA verdict。
