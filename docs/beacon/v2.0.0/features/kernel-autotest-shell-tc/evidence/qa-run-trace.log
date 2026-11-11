@@ -1,0 +1,29 @@
+# qa run trace 2026-11-11T13:29:16Z HEAD f9ce5c5
+# independent qa observed run already advanced qa -> release at 13:24:07Z
+2026-11-11T13:23:45.321064000Z	admission_bundle_evaluated	-	beacon-goal-admission	pass
+2026-11-11T13:23:47.935431000Z	stage_executed	implement	subprocess:go	done
+2026-11-11T13:23:48.028583000Z	stage_exit_evaluated	implement	apple(via opencode)	pass
+2026-11-11T13:23:48.029004000Z	stage_advanced	-	-	qa
+2026-11-11T13:23:49.231248000Z	artifact_registered	-	-	-
+2026-11-11T13:23:50.418131000Z	artifact_registered	-	-	-
+2026-11-11T13:23:51.599504000Z	artifact_registered	-	-	-
+2026-11-11T13:23:52.513840000Z	artifact_registered	-	-	-
+2026-11-11T13:23:53.603070000Z	artifact_registered	-	-	-
+2026-11-11T13:23:54.524571000Z	artifact_registered	-	-	-
+2026-11-11T13:23:55.673704000Z	artifact_registered	-	-	-
+2026-11-11T13:23:56.802392000Z	artifact_registered	-	-	-
+2026-11-11T13:23:56.803822000Z	artifact_registered	-	-	-
+2026-11-11T13:23:56.803908000Z	autotest_executed	-	-	-
+2026-11-11T13:23:56.803933000Z	stage_executed	qa	kernel_autotest	passed
+2026-11-11T13:24:02.778220000Z	gate_evaluated	-	QA 复核 · opencode	pass
+2026-11-11T13:24:07.746707000Z	stage_executed	qa	subprocess:go	done
+2026-11-11T13:24:07.835457000Z	stage_exit_evaluated	qa	apple(via opencode)	pass
+2026-11-11T13:24:07.835586000Z	stage_advanced	-	-	release
+--- status
+run:    run_20f1105d084aeabf99869983
+status: running (loop_stage release_gate)
+stage:  release
+blocked: false
+executor: subprocess
+gate:   release evaluated=false (this stage has no recorded verdict)
+next:   beacon-release

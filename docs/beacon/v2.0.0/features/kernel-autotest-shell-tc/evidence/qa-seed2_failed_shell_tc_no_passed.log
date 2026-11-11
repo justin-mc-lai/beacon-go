@@ -1,0 +1,15 @@
+# qa run seed2_failed_shell_tc_no_passed 2026-11-11T13:27:18Z
+autotest_rc=1
+autotest_total=1
+autotest_failed=1
+tc001_status=failed
+tc001_exit=7
+tc001_reason=auto_test_layer_failed
+tc001_stdout=partial-out
+tc001_stderr=boom-err
+qa_stage_executed_count=0
+autotest_executed_count=1
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.sr4yeNVARB/out/seed2.canon
+sha256=eb6f3d8a2c58bbe918e3e400a39b5e0f34009dbf6394b58636d7d827d0382469
+RESULT: PASS - failing shell TC kept exit 7 and its output, and wrote no passed qa evidence
+seed_rc=0

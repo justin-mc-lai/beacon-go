@@ -1,0 +1,19 @@
+# qa boundary probe 2026-11-11T13:28:28Z HEAD f9ce5c5
+# bare root filename (contract step 2 requires argv[0] to contain '/'), spaced path, explicit sh, PATH cmd, outside absolute path, pipe, BLOCKED
+autotest_rc=1 total=7 passed=4 failed=2 blocked=1
+tc[0]=TC-BARE cmd=root_ok.sh status=failed exit=-1 reason=executor_command_missing
+tc[1]=TC-SPACE cmd="scripts/dir space/space script.sh" status=passed exit=0 reason=None
+tc[2]=TC-EXPLICIT cmd=sh scripts/ok_shell.sh status=passed exit=0 reason=None
+tc[3]=TC-PATH cmd=echo path-ok status=passed exit=0 reason=None
+tc[4]=TC-ABS cmd=/bin/echo abs-ok status=passed exit=0 reason=None
+tc[5]=TC-PIPE cmd=echo hi | cat status=blocked exit=-1 reason=autotest_shell_syntax_unsupported
+tc[6]=TC-BLOCKED cmd=BLOCKED: human must run this status=blocked exit=0 reason=tc_declared_blocked
+bare_stdout=
+space_stdout=spaced-path
+explicit_stdout=explicit-ok
+path_stdout=path-ok
+abs_stdout=abs-ok
+qa_stage_executed=0
+--- stderr
+Error: qa.RunAutoTest: auto-test finished with failures or blocked TCs (see report) (autotest_failed)
+probe_rc=0
