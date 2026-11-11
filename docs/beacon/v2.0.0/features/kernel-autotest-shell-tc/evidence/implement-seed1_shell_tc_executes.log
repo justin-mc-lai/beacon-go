@@ -1,0 +1,17 @@
+autotest_rc=0
+autotest_total=2
+autotest_passed=2
+autotest_failed=0
+tc001_status=passed
+tc001_exit=0
+tc001_reason=None
+tc001_stdout=hello-from-shell
+tc002_status=passed
+tc002_exit=0
+tc002_stdout=hello-shebang
+qa_stage_executed_count=1
+autotest_executed_count=1
+--- stderr
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.4OpL5SDHi1/out/seed1.canon
+sha256=4c66f095ee3009817ca52d3af627eb07680d064b8f98c9024a6b17b4367e0cb9
+RESULT: PASS - both shell TC forms executed, exit codes and stdout recorded, qa evidence written

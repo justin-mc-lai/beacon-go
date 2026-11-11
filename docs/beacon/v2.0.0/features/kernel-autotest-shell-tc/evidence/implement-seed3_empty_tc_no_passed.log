@@ -1,0 +1,15 @@
+# shape=empty-matrix
+SEED_RC_empty=1
+SEED_QA_empty=0
+SEED_AT_empty=0
+SEED_REPORT_empty=absent
+SEED_ERR_empty=Error: qa.RunAutoTest: tests.md has no executable TC commands and no project test_command is configured (.beacon/config) — refusing to fake a run (autotest_no_executable_tests)
+# shape=blocked-only
+SEED_RC_blocked=1
+SEED_QA_blocked=0
+SEED_AT_blocked=0
+SEED_REPORT_blocked=absent
+SEED_ERR_blocked=Error: qa.RunAutoTest: tests.md has no executable TC commands and no project test_command is configured (.beacon/config) — refusing to fake a run (autotest_no_executable_tests)
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.cx37TFHZt1/out/seed3.canon
+sha256=3e0e989c1e408e9be36c246cd3b5825e74cb8b60d12f479d0154620e851d415e
+RESULT: PASS (guard) - empty and blocked-only TC sets stay refused with no passed evidence
