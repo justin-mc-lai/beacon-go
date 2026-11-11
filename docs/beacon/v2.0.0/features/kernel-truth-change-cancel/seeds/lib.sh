@@ -171,7 +171,9 @@ body_sha() {
 blank_change_base() {
   local doc="$1"
   sed -i '' -E 's/^base_truth_sha256:.*/base_truth_sha256:/' "$SEED_PROJECT/$doc"
-  sqlite3 "$BEACON_STORE_PATH" "update lifecycle_events set payload_json=json_set(payload_json,'\$.base_truth_sha256','') where event_type='truth_change_requested';"
+  # ponytail: the trail is append-only (DB trigger), so the legacy
+  # "no base" state is reproduced on the change document only; the
+  # kernel reads the base from the change doc, never by rewriting events.
 }
 
 emit_canon() {
