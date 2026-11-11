@@ -1,0 +1,47 @@
+# sha256 manifest: intent-contract-bridge (pre-freeze snapshot, 2026-11-11T04:01:42Z)
+
+0e12dcdb149f025146f30b6bcc527666bd58160c84e8855fad9338c711e0534a  docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md
+06c745e96faf694d886c1f9c96b848d73b47fc674dfe887707f1f5db43c0ca17  docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md
+46af963dae3f043a4b3691dd7a88e39e6e913a1682c1e1d9f5716ac59d8135f7  docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md
+5fa3135c94400d2433dc5df613bb985b67de53fd300fa4a81c848cf460f00224  docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md
+6ca7edfabce3e1a764c4af9c889e9a67b247eddc33068e348a905ece77043628  internal/cli/intent_contract_seed_test.go
+8555ee1e766fed32b2e11a80db65d1dedbae2f2ed37a1523ba26dd78bbacf8dc  internal/orchestrator/intent_contract_seed_test.go
+
+# post-freeze snapshot (2026-11-11T04:02:31Z) — truth.md status line flipped to frozen
+0bb6dba67c70422213bd8778071083d677b41646c4c3406db4fb47a29f3dda7d  docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md
+5f8d2df3c8bfe4a8188f27954c64bffb197403a3bcae979991c2c46b8901297a  docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md
+dd3905c57c7e9575a8e78ecc652f3703eb675182259ec352138596aade1ea5ed  docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md
+5fa3135c94400d2433dc5df613bb985b67de53fd300fa4a81c848cf460f00224  docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md
+
+# seed re-check (must be unchanged)
+6ca7edfabce3e1a764c4af9c889e9a67b247eddc33068e348a905ece77043628  internal/cli/intent_contract_seed_test.go
+8555ee1e766fed32b2e11a80db65d1dedbae2f2ed37a1523ba26dd78bbacf8dc  internal/orchestrator/intent_contract_seed_test.go
+
+# change chg_2735c16724e3 final pre-refreeze snapshot (2026-11-11, tests/evidence widened)
+0bb6dba67c70422213bd8778071083d677b41646c4c3406db4fb47a29f3dda7d  docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md
+93318ccfd3e4b1cb0669adb57e05adcd4b9c38d00e244823dfc743c6cff8ad01  docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md
+dd3905c57c7e9575a8e78ecc652f3703eb675182259ec352138596aade1ea5ed  docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md
+728594e029aba6f6b2523b9f0553f34f7cc5d4368440aff27473a5ad63c8f2dd  docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md
+7c8ef35ebb3cbaef296e9210d83e61e73c0a960a5f0ee0c2f85253689f588962  internal/cli/intent_contract_seed_test.go
+3ab6cb35695fccc95b456dc128e747f35f3d10158ff1a633e368512c795467c0  internal/orchestrator/intent_contract_seed_test.go
+
+# post-refreeze snapshot (2026-11-11, status frozen; refreeze cleared chg_2735c16724e3 from change_pending; its change doc keeps its original status field)
+0bb6dba67c70422213bd8778071083d677b41646c4c3406db4fb47a29f3dda7d  docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md
+93318ccfd3e4b1cb0669adb57e05adcd4b9c38d00e244823dfc743c6cff8ad01  docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md
+dd3905c57c7e9575a8e78ecc652f3703eb675182259ec352138596aade1ea5ed  docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md
+728594e029aba6f6b2523b9f0553f34f7cc5d4368440aff27473a5ad63c8f2dd  docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md
+7c8ef35ebb3cbaef296e9210d83e61e73c0a960a5f0ee0c2f85253689f588962  internal/cli/intent_contract_seed_test.go
+3ab6cb35695fccc95b456dc128e747f35f3d10158ff1a633e368512c795467c0  internal/orchestrator/intent_contract_seed_test.go
+
+# round 2 (chg_ebbeadee16f3): AC-001 run selection + confirmed mirroring, out-of-contract intent_path removed
+# seeds after the change (also recorded in tests.md and evidence.md)
+c1df802782f9352a15868b96f18b1bd98e246b0ceb588cc4bd9619dec588cbb0  internal/cli/intent_contract_seed_test.go
+b1a204f06163851ebf4f6f133a88142b591bdf51d15186c73a0f3d86694450b6  internal/orchestrator/intent_contract_seed_test.go
+
+# post-refreeze snapshot (2026-11-11, status frozen, change_pending false)
+0bb6dba67c70422213bd8778071083d677b41646c4c3406db4fb47a29f3dda7d  docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md
+c5921a0c6543f4a59a50c0a88acbfd84abb133175fc8ceabbbbc46c338a6fea3  docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md
+dd3905c57c7e9575a8e78ecc652f3703eb675182259ec352138596aade1ea5ed  docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md
+c80928454911d3eb5770b5b3a6ac213edf17c773fc994540039ef624a309bfe6  docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md
+c1df802782f9352a15868b96f18b1bd98e246b0ceb588cc4bd9619dec588cbb0  internal/cli/intent_contract_seed_test.go
+b1a204f06163851ebf4f6f133a88142b591bdf51d15186c73a0f3d86694450b6  internal/orchestrator/intent_contract_seed_test.go

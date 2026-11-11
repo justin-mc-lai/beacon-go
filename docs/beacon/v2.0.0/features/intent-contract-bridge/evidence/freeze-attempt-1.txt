@@ -1,0 +1,29 @@
+$ beacon-go truth freeze --project . --feature intent-contract-bridge --by beacon-go-kernel
+package:  intent-contract-bridge (v2.0.0)
+status:   draft
+dir:      docs/beacon/v2.0.0/features/intent-contract-bridge
+lifecycle: Prd/InProgress
+branch:   check=ok current=main canonical=main
+blocked:  truth_integrity_evidence_artifact_unregistered, truth_integrity_evidence_artifact_missing, feature_package_validation_failed
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md) which no artifact_refs row registers
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md) which no artifact_refs row registers
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md) which no artifact_refs row registers
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/red-ac001.txt (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/red-ac001.txt) which no artifact_refs row registers
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/red-ac002.txt (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/red-ac002.txt) which no artifact_refs row registers
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/red-ac003.txt (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/red-ac003.txt) which no artifact_refs row registers
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references internal/cli/intent_contract_seed_test.go (/Users/apple/Developer/Personal/products/beacon-go/internal/cli/intent_contract_seed_test.go) which no artifact_refs row registers
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references internal/orchestrator/intent_contract_seed_test.go (/Users/apple/Developer/Personal/products/beacon-go/internal/orchestrator/intent_contract_seed_test.go) which no artifact_refs row registers
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references evidence/red-ac001.txt (/Users/apple/Developer/Personal/products/beacon-go/evidence/red-ac001.txt) which no artifact_refs row registers
+  [evidence_artifact_missing   ] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references evidence/red-ac001.txt (/Users/apple/Developer/Personal/products/beacon-go/evidence/red-ac001.txt) which does not exist on disk
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references evidence/red-ac002.txt (/Users/apple/Developer/Personal/products/beacon-go/evidence/red-ac002.txt) which no artifact_refs row registers
+  [evidence_artifact_missing   ] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references evidence/red-ac002.txt (/Users/apple/Developer/Personal/products/beacon-go/evidence/red-ac002.txt) which does not exist on disk
+  [evidence_artifact_unregistered] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references evidence/red-ac003.txt (/Users/apple/Developer/Personal/products/beacon-go/evidence/red-ac003.txt) which no artifact_refs row registers
+  [evidence_artifact_missing   ] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md — evidence references evidence/red-ac003.txt (/Users/apple/Developer/Personal/products/beacon-go/evidence/red-ac003.txt) which does not exist on disk
+  [feature_package_validation  ] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md:1 — evidence_invalid_authority:task_ledger
+  [feature_package_validation  ] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md:1 — evidence_invalid_authority:test_evidence
+  [feature_package_validation  ] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md:1 — evidence_invalid_authority:test_evidence
+  [feature_package_validation  ] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md:1 — evidence_invalid_authority:test_evidence
+  [feature_package_validation  ] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md:1 — evidence_invalid_authority:test_source
+  [feature_package_validation  ] docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md:1 — evidence_invalid_authority:test_source
+Error: truth.Freeze: package intent-contract-bridge is blocked by the freeze precheck (20 finding(s)); first reasons: truth_integrity_evidence_artifact_unregistered, truth_integrity_evidence_artifact_missing, feature_package_validation_failed (truth_integrity_evidence_artifact_unregistered)
+EXIT=1

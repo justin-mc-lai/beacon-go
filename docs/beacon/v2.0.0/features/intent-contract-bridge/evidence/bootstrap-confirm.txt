@@ -1,0 +1,37 @@
+package:   intent-contract-bridge
+confirmed: true
+ready:     true
+goal:      意图对齐的结构化结果成为包内与 run 内的持久事实，并能阻止无意图的自动执行
+non-goals: 不改 AlignIntentStream 的 LLM 提示词与返回结构；不重写 resume 的决策表；不改 release/human gate 语义；不把 intent.json 当作 truth.md 的替代
+constraints: Go 1.27.3；v2.0.0；分支 fix/intent-contract-bridge；truth 未冻结前不写业务代码；maker != checker；不 push
+scope:     lake
+questions:
+  Q1 [answered] 结构化简报落到哪里，路径怎样在包迁移后仍可解析？
+  Q2 [answered] intent.json 用谁的形状？
+  Q3 [answered] “写入 run” 用元数据还是事件？
+  Q4 [answered] “没有 intent 不许自动跑” 的边界：哪些执行器算自动？
+  Q5 [answered] intent 存在的判定标准？
+  Q6 [answered] 没给 --run-id 时 intent 事件挂哪个 run？
+  Q7 [answered] 写入顺序与失败语义？
+  Q8 [answered] 旧 fixture 用自动执行器且没有 intent，会不会被新门挡死？
+EXIT=0
+
+--- rerun by kernel (honest actor; human gate for implement still pending) ---
+$ beacon-go truth confirm --project . --feature intent-contract-bridge --by beacon-go-kernel
+package:   intent-contract-bridge
+confirmed: true
+ready:     true
+goal:      意图对齐的结构化结果成为包内与 run 内的持久事实，并能阻止无意图的自动执行
+non-goals: 不改 AlignIntentStream 的 LLM 提示词与返回结构；不重写 resume 的决策表；不改 release/human gate 语义；不把 intent.json 当作 truth.md 的替代
+constraints: Go 1.27.3；v2.0.0；分支 fix/intent-contract-bridge；truth 未冻结前不写业务代码；maker != checker；不 push
+scope:     lake
+questions:
+  Q1 [answered] 结构化简报落到哪里，路径怎样在包迁移后仍可解析？
+  Q2 [answered] intent.json 用谁的形状？
+  Q3 [answered] “写入 run” 用元数据还是事件？
+  Q4 [answered] “没有 intent 不许自动跑” 的边界：哪些执行器算自动？
+  Q5 [answered] intent 存在的判定标准？
+  Q6 [answered] 没给 --run-id 时 intent 事件挂哪个 run？
+  Q7 [answered] 写入顺序与失败语义？
+  Q8 [answered] 旧 fixture 用自动执行器且没有 intent，会不会被新门挡死？
+EXIT=0

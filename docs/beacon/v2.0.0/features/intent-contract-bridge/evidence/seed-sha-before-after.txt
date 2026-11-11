@@ -1,0 +1,9 @@
+# seed sha256 before -> after chg_2735c16724e3 (2026-11-11)
+
+before (frozen at df0a8a5, as recorded in tests.md before this change):
+6ca7edfabce3e1a764c4af9c889e9a67b247eddc33068e348a905ece77043628  internal/cli/intent_contract_seed_test.go
+8555ee1e766fed32b2e11a80db65d1dedbae2f2ed37a1523ba26dd78bbacf8dc  internal/orchestrator/intent_contract_seed_test.go
+
+after (command: shasum -a 256 internal/cli/intent_contract_seed_test.go internal/orchestrator/intent_contract_seed_test.go; exit: 0):
+7c8ef35ebb3cbaef296e9210d83e61e73c0a960a5f0ee0c2f85253689f588962  internal/cli/intent_contract_seed_test.go
+3ab6cb35695fccc95b456dc128e747f35f3d10158ff1a633e368512c795467c0  internal/orchestrator/intent_contract_seed_test.go

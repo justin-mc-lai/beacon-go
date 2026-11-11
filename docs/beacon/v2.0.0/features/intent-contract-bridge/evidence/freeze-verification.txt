@@ -1,0 +1,51 @@
+=== 2026-11-11T04:04:27Z truth show --json ===
+{
+  "slug": "intent-contract-bridge",
+  "feature_id": "feat_486f57d5b28fdac486b30a36",
+  "project_root": "/Users/apple/Developer/Personal/products/beacon-go",
+  "version": "v2.0.0",
+  "status": "frozen",
+  "frozen": true,
+  "change_pending": false,
+  "package_dir": "docs/beacon/v2.0.0/features/intent-contract-bridge",
+  "truth_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md",
+  "tests_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md",
+  "tasks_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md",
+  "evidence_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+  "lifecycle_stage": "Freeze",
+  "lifecycle_status": "Completed",
+  "branch_check": "ok",
+  "current_branch": "main",
+  "canonical_branch": "main",
+  "baseline_status": "uncommitted"
+}
+
+=== truth drift ===
+package: intent-contract-bridge
+clean:   true
+body drift: false
+EXIT=0
+
+=== goal status ===
+run:    run_6e1eeb6c0613f1568234abf2
+status: running (loop_stage governance_precheck)
+stage:  plan
+blocked: false
+executor: external
+gate:   plan evaluated=false (this stage has no recorded verdict)
+hint:   not auto-driven: record each stage with `beacon goal tick --run-id run_6e1eeb6c0613f1568234abf2 --by <identity>`
+next:   beacon-plan
+
+=== git status --porcelain ===
+?? docs/beacon/v2.0.0/features/intent-contract-bridge/
+?? internal/cli/intent_contract_seed_test.go
+?? internal/orchestrator/intent_contract_seed_test.go
+
+=== git diff --stat (tracked) ===
+
+=== truth sha256 (must equal post-freeze 0bb6dba6...) ===
+0bb6dba67c70422213bd8778071083d677b41646c4c3406db4fb47a29f3dda7d  docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/../truth.md
+
+=== seeds sha256 ===
+6ca7edfabce3e1a764c4af9c889e9a67b247eddc33068e348a905ece77043628  internal/cli/intent_contract_seed_test.go
+8555ee1e766fed32b2e11a80db65d1dedbae2f2ed37a1523ba26dd78bbacf8dc  internal/orchestrator/intent_contract_seed_test.go

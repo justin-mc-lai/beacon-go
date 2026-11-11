@@ -1,0 +1,25 @@
+date: 2026-11-11
+baseline: main @ df0a8a5 + widened seeds in the working tree (untracked)
+command: go test ./internal/orchestrator -run 'TestKernelDrivenRunWithoutIntentIsRefused|TestResumeKeepsUtteranceInRunEvent' -count=1
+exit: 1
+
+--- FAIL: TestKernelDrivenRunWithoutIntentIsRefused (0.24s)
+    --- FAIL: TestKernelDrivenRunWithoutIntentIsRefused/refused_recording (0.03s)
+        intent_contract_seed_test.go:167: kernel-driven recording run created without a confirmed intent; want refusal goal_intent_missing before any run row exists
+    --- FAIL: TestKernelDrivenRunWithoutIntentIsRefused/refused_subprocess (0.03s)
+        intent_contract_seed_test.go:167: kernel-driven subprocess run created without a confirmed intent; want refusal goal_intent_missing before any run row exists
+    --- FAIL: TestKernelDrivenRunWithoutIntentIsRefused/refused_subprocess_profile (0.03s)
+        intent_contract_seed_test.go:167: kernel-driven subprocess_profile run created without a confirmed intent; want refusal goal_intent_missing before any run row exists
+    --- FAIL: TestKernelDrivenRunWithoutIntentIsRefused/refused_ralph (0.02s)
+        intent_contract_seed_test.go:167: kernel-driven ralph run created without a confirmed intent; want refusal goal_intent_missing before any run row exists
+    --- FAIL: TestKernelDrivenRunWithoutIntentIsRefused/refused_exec_config (0.03s)
+        intent_contract_seed_test.go:167: kernel-driven exec_config run created without a confirmed intent; want refusal goal_intent_missing before any run row exists
+    --- FAIL: TestKernelDrivenRunWithoutIntentIsRefused/refused_empty_restated_intent (0.03s)
+        intent_contract_seed_test.go:229: kernel-driven run created with empty_restated_intent; want refusal goal_intent_missing before any run row exists
+    --- FAIL: TestKernelDrivenRunWithoutIntentIsRefused/refused_unconfirmed_intent (0.03s)
+        intent_contract_seed_test.go:229: kernel-driven run created with unconfirmed_intent; want refusal goal_intent_missing before any run row exists
+--- FAIL: TestResumeKeepsUtteranceInRunEvent (0.03s)
+    intent_contract_seed_test.go:269: run run_f76794d43012859f3d6e1818 has 0 goal_resumed events after one Resume("继续：把 intent.json 写进 run 事件，别丢这句话"); want exactly one
+FAIL
+FAIL	beacon-go/internal/orchestrator	0.804s
+FAIL

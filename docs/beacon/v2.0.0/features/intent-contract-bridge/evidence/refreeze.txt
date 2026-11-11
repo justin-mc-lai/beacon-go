@@ -1,0 +1,144 @@
+# truth refreeze invocation (2026-11-11)
+command: beacon-go truth refreeze --project . --feature intent-contract-bridge --by beacon-go-kernel --json
+
+
+# attempt 1: 6 new evidence artifacts not yet registered in artifact_refs
+
+{
+  "slug": "intent-contract-bridge",
+  "feature_id": "feat_486f57d5b28fdac486b30a36",
+  "project_root": "/Users/apple/Developer/Personal/products/beacon-go",
+  "version": "v2.0.0",
+  "status": "change_pending",
+  "frozen": false,
+  "change_pending": true,
+  "pending_change_ids": [
+    "chg_2735c16724e3"
+  ],
+  "package_dir": "docs/beacon/v2.0.0/features/intent-contract-bridge",
+  "truth_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md",
+  "tests_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md",
+  "tasks_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md",
+  "evidence_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+  "lifecycle_stage": "Freeze",
+  "lifecycle_status": "Completed",
+  "blocked": true,
+  "block_reasons": [
+    "truth_integrity_evidence_artifact_unregistered"
+  ],
+  "integrity_findings": [
+    {
+      "kind": "evidence_artifact_unregistered",
+      "reason_code": "truth_integrity_evidence_artifact_unregistered",
+      "file": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+      "detail": "evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/red-ac001-seed-widen.txt (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/red-ac001-seed-widen.txt) which no artifact_refs row registers",
+      "repair_route": "beacon-gen-truth"
+    },
+    {
+      "kind": "evidence_artifact_unregistered",
+      "reason_code": "truth_integrity_evidence_artifact_unregistered",
+      "file": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+      "detail": "evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/red-ac002-ac003-seed-widen.txt (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/red-ac002-ac003-seed-widen.txt) which no artifact_refs row registers",
+      "repair_route": "beacon-gen-truth"
+    },
+    {
+      "kind": "evidence_artifact_unregistered",
+      "reason_code": "truth_integrity_evidence_artifact_unregistered",
+      "file": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+      "detail": "evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/seed-sha-before-after.txt (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/seed-sha-before-after.txt) which no artifact_refs row registers",
+      "repair_route": "beacon-gen-truth"
+    },
+    {
+      "kind": "evidence_artifact_unregistered",
+      "reason_code": "truth_integrity_evidence_artifact_unregistered",
+      "file": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+      "detail": "evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/changes/chg_2735c16724e3.md (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/changes/chg_2735c16724e3.md) which no artifact_refs row registers",
+      "repair_route": "beacon-gen-truth"
+    },
+    {
+      "kind": "evidence_artifact_unregistered",
+      "reason_code": "truth_integrity_evidence_artifact_unregistered",
+      "file": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+      "detail": "evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/change.txt (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/change.txt) which no artifact_refs row registers",
+      "repair_route": "beacon-gen-truth"
+    },
+    {
+      "kind": "evidence_artifact_unregistered",
+      "reason_code": "truth_integrity_evidence_artifact_unregistered",
+      "file": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+      "detail": "evidence references docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/refreeze.txt (/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/refreeze.txt) which no artifact_refs row registers",
+      "repair_route": "beacon-gen-truth"
+    }
+  ],
+  "branch_check": "ok",
+  "current_branch": "main",
+  "canonical_branch": "main"
+}
+Error: truth.Refreeze: package intent-contract-bridge is blocked by the freeze precheck (6 finding(s)); first reasons: truth_integrity_evidence_artifact_unregistered (truth_integrity_evidence_artifact_unregistered)
+
+exit: 1
+
+
+# attempt 2: after registering the 6 evidence artifacts on run run_6e1eeb6c0613f1568234abf2
+
+{
+  "slug": "intent-contract-bridge",
+  "feature_id": "feat_486f57d5b28fdac486b30a36",
+  "project_root": "/Users/apple/Developer/Personal/products/beacon-go",
+  "version": "v2.0.0",
+  "status": "frozen",
+  "frozen": true,
+  "change_pending": false,
+  "package_dir": "docs/beacon/v2.0.0/features/intent-contract-bridge",
+  "truth_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md",
+  "tests_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md",
+  "tasks_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md",
+  "evidence_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+  "lifecycle_stage": "Freeze",
+  "lifecycle_status": "Completed",
+  "change_ac_diff": {
+    "added": [],
+    "changed": [],
+    "removed": []
+  },
+  "truth_sha256": "0bb6dba67c70422213bd8778071083d677b41646c4c3406db4fb47a29f3dda7d",
+  "branch_check": "ok",
+  "current_branch": "main",
+  "canonical_branch": "main",
+  "baseline_status": "uncommitted"
+}
+
+exit: 0
+
+
+# attempt 3: re-run after attempt 2 (refreeze cleared change_pending; the change doc file keeps status: pending, so the DB trail is authoritative)
+
+{
+  "slug": "intent-contract-bridge",
+  "feature_id": "feat_486f57d5b28fdac486b30a36",
+  "project_root": "/Users/apple/Developer/Personal/products/beacon-go",
+  "version": "v2.0.0",
+  "status": "frozen",
+  "frozen": true,
+  "change_pending": false,
+  "pending_change_ids": [],
+  "package_dir": "docs/beacon/v2.0.0/features/intent-contract-bridge",
+  "truth_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md",
+  "tests_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md",
+  "tasks_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md",
+  "evidence_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+  "lifecycle_stage": "Freeze",
+  "lifecycle_status": "Completed",
+  "change_ac_diff": {
+    "added": [],
+    "changed": [],
+    "removed": []
+  },
+  "branch_check": "ok",
+  "current_branch": "main",
+  "canonical_branch": "main",
+  "baseline_status": "uncommitted"
+}
+Error: truth.Refreeze: package intent-contract-bridge has no pending change to refreeze (truth_no_change_pending)
+
+exit: 1

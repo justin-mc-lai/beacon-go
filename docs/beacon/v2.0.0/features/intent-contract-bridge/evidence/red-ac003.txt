@@ -1,0 +1,7 @@
+$ go test ./internal/orchestrator -run TestResumeKeepsUtteranceInRunEvent -count=1
+--- FAIL: TestResumeKeepsUtteranceInRunEvent (0.03s)
+    intent_contract_seed_test.go:152: no goal_resumed event on run run_20b93447c7794ff48b028590 after Resume("继续：把 intent.json 写进 run 事件，别丢这句话"); the utterance was dropped
+FAIL
+FAIL	beacon-go/internal/orchestrator	0.350s
+FAIL
+exit_code=1

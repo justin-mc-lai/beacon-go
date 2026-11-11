@@ -1,0 +1,7 @@
+$ go test ./internal/cli -run TestIntentRecordLandsBriefingInPackageAndRun -count=1
+--- FAIL: TestIntentRecordLandsBriefingInPackageAndRun (0.04s)
+    intent_contract_seed_test.go:137: truth intent record: unknown flag: --briefing (stdout ""); want the aligned briefing landed in the package and the run
+FAIL
+FAIL	beacon-go/internal/cli	0.709s
+FAIL
+exit_code=1

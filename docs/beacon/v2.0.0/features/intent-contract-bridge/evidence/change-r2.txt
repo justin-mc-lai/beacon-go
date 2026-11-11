@@ -1,0 +1,29 @@
+{
+  "slug": "intent-contract-bridge",
+  "feature_id": "feat_486f57d5b28fdac486b30a36",
+  "project_root": "/Users/apple/Developer/Personal/products/beacon-go",
+  "version": "v2.0.0",
+  "status": "change_pending",
+  "frozen": false,
+  "change_pending": true,
+  "pending_change_ids": [
+    "chg_ebbeadee16f3"
+  ],
+  "package_dir": "docs/beacon/v2.0.0/features/intent-contract-bridge",
+  "truth_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md",
+  "tests_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/tests.md",
+  "tasks_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/tasks.md",
+  "evidence_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence.md",
+  "lifecycle_stage": "Freeze",
+  "lifecycle_status": "Completed",
+  "change_id": "chg_ebbeadee16f3",
+  "change_doc": "docs/beacon/v2.0.0/features/intent-contract-bridge/changes/chg_ebbeadee16f3.md",
+  "change_ac_diff": {
+    "added": [],
+    "changed": [],
+    "removed": []
+  },
+  "branch_check": "ok",
+  "current_branch": "main",
+  "canonical_branch": "main"
+}

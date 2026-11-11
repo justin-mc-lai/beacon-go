@@ -1,0 +1,7 @@
+$ go test ./internal/orchestrator -run TestKernelDrivenRunWithoutIntentIsRefused -count=1
+--- FAIL: TestKernelDrivenRunWithoutIntentIsRefused (0.05s)
+    intent_contract_seed_test.go:89: kernel-driven run created without a confirmed intent; want refusal goal_intent_missing before any run row exists
+FAIL
+FAIL	beacon-go/internal/orchestrator	0.592s
+FAIL
+exit_code=1

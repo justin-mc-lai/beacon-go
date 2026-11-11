@@ -1,0 +1,8 @@
+$ beacon-go truth freeze --project . --feature intent-contract-bridge --by beacon-go-kernel
+package:  intent-contract-bridge (v2.0.0)
+status:   frozen
+dir:      docs/beacon/v2.0.0/features/intent-contract-bridge
+lifecycle: Freeze/Completed
+branch:   check=ok current=main canonical=main
+baseline: uncommitted
+EXIT=0
