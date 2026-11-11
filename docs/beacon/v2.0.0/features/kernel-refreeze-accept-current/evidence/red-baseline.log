@@ -1,0 +1,15 @@
+=== baseline /tmp/beacon-baseline (cb7805f) ===
+--- seed1_accept_current_heals_drift.sh
+RESULT: FAIL - accept-current did not heal (rc=1 status=change_pending pending=1): Error: unknown flag: --accept-current
+--- seed2_accept_current_requires_pending.sh
+RESULT: FAIL - refusal did not say no pending change: Error: unknown flag: --accept-current
+--- seed3_strict_refreeze_unchanged.sh
+RESULT: PASS (guard) - strict refreeze still works without --accept-current
+
+=== HEAD /tmp/beacon-final ===
+--- seed1_accept_current_heals_drift.sh
+RESULT: PASS - drift refusal kept the package pending; --accept-current healed it to frozen
+--- seed2_accept_current_requires_pending.sh
+RESULT: PASS - accept-current refuses without a pending change and writes no freeze event
+--- seed3_strict_refreeze_unchanged.sh
+RESULT: PASS (guard) - strict refreeze still works without --accept-current

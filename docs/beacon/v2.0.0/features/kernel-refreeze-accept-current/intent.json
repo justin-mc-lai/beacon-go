@@ -1,0 +1,28 @@
+{
+  "schema": "beacon-intent-v1",
+  "feature_slug": "kernel-refreeze-accept-current",
+  "version": "v2.0.0",
+  "truth_path": "docs/beacon/v2.0.0/features/kernel-refreeze-accept-current/truth.md",
+  "recorded_at": "2026-11-11T16:31:48Z",
+  "recorded_by": "apple(via opencode)",
+  "confirmed": true,
+  "briefing": {
+    "original_prompt": "把 refreeze --accept-current 补成正式 feature（含红 seed）",
+    "restated_intent": "为已实现的 refreeze --accept-current 建立正式需求包与红 seed：正文在 change 打开前已移动时显式 --accept-current 可收口并重建冻结指纹；无挂起变更时该标志拒绝且不写事件；严格 refreeze 路径不回退。",
+    "identified_risks": [
+      "标志被当成绕过审核的后门",
+      "收口后指纹未重建导致再次漂移",
+      "无挂起时误写冻结事件"
+    ],
+    "boundaries": [
+      "不放宽默认 drift 拒绝",
+      "不新增 reason code",
+      "不动 release 与 human gate",
+      "不 push 不发布"
+    ],
+    "proposed_slugs": [
+      "kernel-refreeze-accept-current"
+    ],
+    "confirmed": true
+  }
+}
