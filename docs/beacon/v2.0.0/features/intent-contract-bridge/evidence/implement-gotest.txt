@@ -1,25 +1,25 @@
-# intent-contract-bridge · go test ./... -count=1 (2026-11-11T07:55:55Z)
+# intent-contract-bridge · go test ./... -count=1 (2026-11-11T07:58:30Z)
 # command: go test ./... -count=1
 
 ?   	beacon-go/cmd/beacon	[no test files]
-ok  	beacon-go/desktop	0.597s
-ok  	beacon-go/internal/agentapi	4.057s
-ok  	beacon-go/internal/benchgate	0.848s
-ok  	beacon-go/internal/changequality	0.636s
-ok  	beacon-go/internal/cli	19.654s
-ok  	beacon-go/internal/core	1.289s
-ok  	beacon-go/internal/effectjournal	1.809s
-ok  	beacon-go/internal/evalgate	64.128s
-ok  	beacon-go/internal/gate	2.559s
-ok  	beacon-go/internal/harness	11.608s
-ok  	beacon-go/internal/llm	2.446s
-ok  	beacon-go/internal/migration	2.805s
-ok  	beacon-go/internal/orchestrator	111.705s
-ok  	beacon-go/internal/progressreview	2.849s
-ok  	beacon-go/internal/session	2.595s
-ok  	beacon-go/internal/store	2.242s
-ok  	beacon-go/internal/stride	2.011s
-ok  	beacon-go/internal/workspace	2.914s
-ok  	beacon-go/skills	1.943s
+ok  	beacon-go/desktop	0.700s
+ok  	beacon-go/internal/agentapi	4.459s
+ok  	beacon-go/internal/benchgate	0.969s
+ok  	beacon-go/internal/changequality	1.180s
+ok  	beacon-go/internal/cli	18.771s
+ok  	beacon-go/internal/core	2.405s
+ok  	beacon-go/internal/effectjournal	1.894s
+ok  	beacon-go/internal/evalgate	65.530s
+ok  	beacon-go/internal/gate	0.782s
+ok  	beacon-go/internal/harness	11.519s
+ok  	beacon-go/internal/llm	2.478s
+ok  	beacon-go/internal/migration	2.837s
+ok  	beacon-go/internal/orchestrator	113.670s
+ok  	beacon-go/internal/progressreview	2.756s
+ok  	beacon-go/internal/session	2.335s
+ok  	beacon-go/internal/store	2.403s
+ok  	beacon-go/internal/stride	1.813s
+ok  	beacon-go/internal/workspace	2.758s
+ok  	beacon-go/skills	1.884s
 
 EXIT_STATUS=0
