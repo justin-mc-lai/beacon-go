@@ -1,0 +1,41 @@
+# AC seed re-run @ 2026-11-11 16:14:24 CST HEAD=afd5cc7c7369d6ab0a61782e123c7658bd772d7f
+## AC-001
+=== RUN   TestIntentRecordLandsBriefingInPackageAndRun
+=== RUN   TestIntentRecordLandsBriefingInPackageAndRun/without_run_only_writes_file
+=== RUN   TestIntentRecordLandsBriefingInPackageAndRun/run_selection_prefers_flag_then_latest
+=== RUN   TestIntentRecordLandsBriefingInPackageAndRun/unconfirmed_briefing_mirrors_false
+--- PASS: TestIntentRecordLandsBriefingInPackageAndRun (0.16s)
+    --- PASS: TestIntentRecordLandsBriefingInPackageAndRun/without_run_only_writes_file (0.01s)
+    --- PASS: TestIntentRecordLandsBriefingInPackageAndRun/run_selection_prefers_flag_then_latest (0.07s)
+    --- PASS: TestIntentRecordLandsBriefingInPackageAndRun/unconfirmed_briefing_mirrors_false (0.04s)
+PASS
+ok  	beacon-go/internal/cli	0.513s
+AC001_EXIT=0
+## AC-002/AC-003
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_recording
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_subprocess
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_subprocess_profile
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_ralph
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_exec_config
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/control_manual_without_intent
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/control_external_without_intent
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_empty_restated_intent
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_unconfirmed_intent
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_malformed_json
+--- PASS: TestKernelDrivenRunWithoutIntentIsRefused (0.21s)
+    --- PASS: TestKernelDrivenRunWithoutIntentIsRefused/refused_recording (0.03s)
+    --- PASS: TestKernelDrivenRunWithoutIntentIsRefused/refused_subprocess (0.03s)
+    --- PASS: TestKernelDrivenRunWithoutIntentIsRefused/refused_subprocess_profile (0.03s)
+    --- PASS: TestKernelDrivenRunWithoutIntentIsRefused/refused_ralph (0.03s)
+    --- PASS: TestKernelDrivenRunWithoutIntentIsRefused/refused_exec_config (0.02s)
+    --- PASS: TestKernelDrivenRunWithoutIntentIsRefused/control_manual_without_intent (0.02s)
+    --- PASS: TestKernelDrivenRunWithoutIntentIsRefused/control_external_without_intent (0.03s)
+    --- PASS: TestKernelDrivenRunWithoutIntentIsRefused/refused_empty_restated_intent (0.01s)
+    --- PASS: TestKernelDrivenRunWithoutIntentIsRefused/refused_unconfirmed_intent (0.01s)
+    --- PASS: TestKernelDrivenRunWithoutIntentIsRefused/refused_malformed_json (0.00s)
+=== RUN   TestResumeKeepsUtteranceInRunEvent
+--- PASS: TestResumeKeepsUtteranceInRunEvent (0.03s)
+PASS
+ok  	beacon-go/internal/orchestrator	0.545s
+AC23_EXIT=0

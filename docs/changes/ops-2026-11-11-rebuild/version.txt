@@ -1,0 +1,38 @@
+HEAD: afd5cc7c7369d6ab0a61782e123c7658bd772d7f
+origin/main: af6dcd594729bddc3b149e25688174eeb41f4176
+ahead_of_origin: 1
+behind_origin: 0
+install_path: /Users/apple/.local/opt/beacon-go/beacon
+install_mtime: 2026-11-11 16:05:17 CST
+install_sha256: 935cf8156c5de14ec4e000f2b24c305a11ccc15af19fc54faf04a512204c225f
+bin_sha256: 935cf8156c5de14ec4e000f2b24c305a11ccc15af19fc54faf04a512204c225f
+--- beacon-go --version ---
+Beacon CLI v2.0.0-go.15
+VERSION_EXIT=0
+--- beacon-go doctor ---
+Diagnostics and projection maintenance
+
+Usage:
+  beacon doctor [command]
+
+Available Commands:
+  bench-gate  Compare a benchmark result document with its baseline (AC-095, default 10% regression blocks)
+  rebuild     Rebuild a project's store index from its on-disk MD + v1 JSON facts (AC-011)
+
+Flags:
+  -h, --help   help for doctor
+
+Use "beacon doctor [command] --help" for more information about a command.
+DOCTOR_EXIT=0
+--- goal status run_8d8efdf2c2a00a1f1b8e3778 ---
+run:    run_8d8efdf2c2a00a1f1b8e3778
+status: blocked (loop_stage qa_routing)
+stage:  qa
+blocked: true
+run_status: Paused
+blocked_streak: 1
+last_block_reason: qa_stage_not_executed
+executor: recording
+reason: qa_stage_not_executed
+gate:   qa evaluated=true verdict=blocked
+next:   beacon-qa

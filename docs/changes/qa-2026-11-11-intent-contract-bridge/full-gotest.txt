@@ -1,0 +1,23 @@
+# 验收员 go test ./... -count=1
+# 2026-11-11 16:15:55 CST HEAD=afd5cc7c7369d6ab0a61782e123c7658bd772d7f
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.555s
+ok  	beacon-go/internal/agentapi	3.195s
+ok  	beacon-go/internal/benchgate	0.424s
+ok  	beacon-go/internal/changequality	0.913s
+ok  	beacon-go/internal/cli	18.811s
+ok  	beacon-go/internal/core	1.001s
+ok  	beacon-go/internal/effectjournal	1.540s
+ok  	beacon-go/internal/evalgate	59.884s
+ok  	beacon-go/internal/gate	2.088s
+ok  	beacon-go/internal/harness	10.940s
+ok  	beacon-go/internal/llm	2.274s
+ok  	beacon-go/internal/migration	2.683s
+ok  	beacon-go/internal/orchestrator	106.013s
+ok  	beacon-go/internal/progressreview	2.455s
+ok  	beacon-go/internal/session	2.188s
+ok  	beacon-go/internal/store	2.149s
+ok  	beacon-go/internal/stride	1.836s
+ok  	beacon-go/internal/workspace	2.555s
+ok  	beacon-go/skills	1.941s
+EXIT_STATUS=0

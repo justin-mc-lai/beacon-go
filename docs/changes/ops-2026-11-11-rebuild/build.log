@@ -1,0 +1,8 @@
+# go build -o bin/beacon ./cmd/beacon
+# HEAD: afd5cc7c7369d6ab0a61782e123c7658bd772d7f
+# date: 2026-11-11 16:05:15 CST
+BUILD_EXIT=0
+816628fe95426ea8309b7e8c75ecc0cb6bb98db9  bin/beacon
+INSTALL_EXIT=0
+-rwxr-xr-x@ 1 apple  staff  20325362 Nov 11 16:05 /Users/apple/.local/opt/beacon-go/beacon
+816628fe95426ea8309b7e8c75ecc0cb6bb98db9  /Users/apple/.local/opt/beacon-go/beacon

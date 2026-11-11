@@ -1,0 +1,26 @@
+# QA 验收 · agy · go test ./... -count=1
+# date: 2026-11-11 16:16:59 CST
+# HEAD: afd5cc7c7369d6ab0a61782e123c7658bd772d7f
+# command: cd /Users/apple/Developer/Personal/products/beacon-go && go test ./... -count=1
+
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	1.640s
+ok  	beacon-go/internal/agentapi	5.013s
+ok  	beacon-go/internal/benchgate	1.912s
+ok  	beacon-go/internal/changequality	0.966s
+ok  	beacon-go/internal/cli	21.389s
+ok  	beacon-go/internal/core	3.932s
+ok  	beacon-go/internal/effectjournal	3.529s
+ok  	beacon-go/internal/evalgate	59.346s
+ok  	beacon-go/internal/gate	2.559s
+ok  	beacon-go/internal/harness	15.880s
+ok  	beacon-go/internal/llm	4.430s
+ok  	beacon-go/internal/migration	4.443s
+ok  	beacon-go/internal/orchestrator	108.869s
+ok  	beacon-go/internal/progressreview	3.939s
+ok  	beacon-go/internal/session	3.448s
+ok  	beacon-go/internal/store	4.032s
+ok  	beacon-go/internal/stride	3.312s
+ok  	beacon-go/internal/workspace	5.233s
+ok  	beacon-go/skills	3.235s
+EXIT_STATUS=0

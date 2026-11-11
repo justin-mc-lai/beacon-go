@@ -1,0 +1,11 @@
+# final qa evaluate after registering qa_report 2026-11-11 16:19:23 CST
+gate:      qa
+feature:   intent-contract-bridge
+verdict:   pass
+run:       run_8d8efdf2c2a00a1f1b8e3778
+evaluator: 验收员 · 独立验收
+  [ok   ] qa_artifacts_present     QA artifact pointers recorded
+  [ok   ] qa_stage_executed        a qa stage execution is on record (stage_executed)
+  [ok   ] qa_artifact_refs_valid   every QA artifact file exists and its hash matches
+recorded:  gate_d4bf696972bcab2084b9916b (2026-11-11T08:19:23.278171000Z)
+EXIT=0

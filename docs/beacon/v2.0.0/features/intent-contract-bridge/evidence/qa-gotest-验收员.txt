@@ -1,0 +1,27 @@
+# 验收员 · go test ./... -count=1
+# date: 2026-11-11 16:11:07 CST
+# HEAD: afd5cc7c7369d6ab0a61782e123c7658bd772d7f
+# command: go test ./... -count=1
+
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.688s
+ok  	beacon-go/internal/agentapi	5.789s
+ok  	beacon-go/internal/benchgate	0.971s
+ok  	beacon-go/internal/changequality	1.878s
+ok  	beacon-go/internal/cli	22.055s
+ok  	beacon-go/internal/core	2.306s
+ok  	beacon-go/internal/effectjournal	2.736s
+ok  	beacon-go/internal/evalgate	56.927s
+ok  	beacon-go/internal/gate	3.183s
+ok  	beacon-go/internal/harness	15.160s
+ok  	beacon-go/internal/llm	4.197s
+ok  	beacon-go/internal/migration	4.531s
+ok  	beacon-go/internal/orchestrator	102.059s
+ok  	beacon-go/internal/progressreview	4.274s
+ok  	beacon-go/internal/session	4.337s
+ok  	beacon-go/internal/store	4.506s
+ok  	beacon-go/internal/stride	3.054s
+ok  	beacon-go/internal/workspace	4.495s
+ok  	beacon-go/skills	3.504s
+
+EXIT_STATUS=0   # shell exit code 0 (19 packages ok, no FAIL)

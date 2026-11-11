@@ -1,0 +1,63 @@
+# qa-gotest-回归.txt — go test ./... -count=1 (独立回归验收)
+# date: 2026-11-11T08:27:50Z
+# HEAD: afd5cc7c7369d6ab0a61782e123c7658bd772d7f
+# EXIT_STATUS=0
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	0.736s
+ok  	beacon-go/internal/agentapi	5.847s
+ok  	beacon-go/internal/benchgate	3.377s
+ok  	beacon-go/internal/changequality	1.989s
+ok  	beacon-go/internal/cli	26.004s
+ok  	beacon-go/internal/core	1.524s
+ok  	beacon-go/internal/effectjournal	2.793s
+ok  	beacon-go/internal/evalgate	74.458s
+ok  	beacon-go/internal/gate	4.269s
+ok  	beacon-go/internal/harness	16.814s
+ok  	beacon-go/internal/llm	4.583s
+ok  	beacon-go/internal/migration	4.966s
+ok  	beacon-go/internal/orchestrator	132.008s
+ok  	beacon-go/internal/progressreview	4.157s
+ok  	beacon-go/internal/session	4.167s
+ok  	beacon-go/internal/store	4.029s
+ok  	beacon-go/internal/stride	3.218s
+ok  	beacon-go/internal/workspace	4.935s
+ok  	beacon-go/skills	3.091s
+
+===== seed 三例 (-count=1 -v) =====
+# QA 回归 · seed 三例 -count=1 -v
+# date: 2026-11-11T08:27:43Z
+# HEAD: afd5cc7c7369d6ab0a61782e123c7658bd772d7f
+=== RUN   TestIntentRecordLandsBriefingInPackageAndRun
+=== RUN   TestIntentRecordLandsBriefingInPackageAndRun/without_run_only_writes_file
+=== RUN   TestIntentRecordLandsBriefingInPackageAndRun/run_selection_prefers_flag_then_latest
+=== RUN   TestIntentRecordLandsBriefingInPackageAndRun/unconfirmed_briefing_mirrors_false
+--- PASS: TestIntentRecordLandsBriefingInPackageAndRun (0.21s)
+PASS
+ok  	beacon-go/internal/cli	0.587s
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_recording
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_subprocess
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_subprocess_profile
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_ralph
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_exec_config
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/control_manual_without_intent
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/control_external_without_intent
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_empty_restated_intent
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_unconfirmed_intent
+=== RUN   TestKernelDrivenRunWithoutIntentIsRefused/refused_malformed_json
+--- PASS: TestKernelDrivenRunWithoutIntentIsRefused (0.24s)
+=== RUN   TestResumeKeepsUtteranceInRunEvent
+--- PASS: TestResumeKeepsUtteranceInRunEvent (0.03s)
+=== RUN   TestIntentFreezeBlockedUntilConfirmed
+--- PASS: TestIntentFreezeBlockedUntilConfirmed (0.29s)
+=== RUN   TestIntentGateNamesMissingPieces
+--- PASS: TestIntentGateNamesMissingPieces (0.06s)
+=== RUN   TestIntentFSMRequiredWhenDomain
+--- PASS: TestIntentFSMRequiredWhenDomain (0.05s)
+=== RUN   TestUpdateIntentScopeModeValidation
+--- PASS: TestUpdateIntentScopeModeValidation (0.05s)
+=== RUN   TestIntentFSMGraphBlocksConfirm
+--- PASS: TestIntentFSMGraphBlocksConfirm (0.06s)
+PASS
+ok  	beacon-go/internal/orchestrator	1.471s
+EXIT=0
