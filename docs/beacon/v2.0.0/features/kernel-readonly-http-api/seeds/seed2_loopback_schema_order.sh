@@ -60,7 +60,21 @@ check_keys "/spine/runs" "$SEED_OUT/runs.json" "count,runs"
 check_jq "/spine/runs count == len(runs)" "$SEED_OUT/runs.json" '.count == (.runs | length)'
 check_jq "/spine/runs has both fixture runs" "$SEED_OUT/runs.json" '([.runs[].run_id] | sort) == (["'$RUN_A'", "'$RUN_B'"] | sort)'
 check_jq "/spine/runs run keys fixed" "$SEED_OUT/runs.json" 'all(.runs[]; (keys | sort | join(",")) == "blocked,current_stage,feature,run_id,status")'
-check_jq "/spine/runs order started_at desc, run_id asc" "$SEED_OUT/runs.json" '.runs as $r | ($r | length) >= 2 and all(range(0; ($r | length) - 1); . as $i | ($r[$i].started_at > $r[$i+1].started_at) or (($r[$i].started_at == $r[$i+1].started_at) and ($r[$i].run_id < $r[$i+1].run_id)))'
+# The list payload carries the five frozen fields; started_at is read per
+# run from /runs/{id} (AC-004) before the ordering check.
+ordered=ok
+prev_stamp=""; prev_id=""
+for rid in $(jq -r '.runs[].run_id' "$SEED_OUT/runs.json"); do
+  code=$(http_status "$BASE/runs/$rid" "$SEED_OUT/run-$rid.json")
+  [[ "$code" == "200" ]] || { ordered=no; break }
+  stamp=$(jq -r '.run.started_at' "$SEED_OUT/run-$rid.json")
+  if [[ -n "$prev_stamp" ]]; then
+    if [[ "$stamp" > "$prev_stamp" ]]; then ordered=no; fi
+    if [[ "$stamp" == "$prev_stamp" && ! "$rid" > "$prev_id" ]]; then ordered=no; fi
+  fi
+  prev_stamp=$stamp; prev_id=$rid
+done
+if [[ "$ordered" == "ok" ]]; then print -r -- "PASS: /spine/runs order started_at desc, run_id asc"; else bad "/spine/runs order started_at desc, run_id asc"; fi
 
 code=$(http_status "$BASE/spine/gates?feature=demo" "$SEED_OUT/gates.json")
 check_eq "GET /spine/gates status" "200" "$code"

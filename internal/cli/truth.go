@@ -132,7 +132,7 @@ func newTruthCreateCmd() *cobra.Command {
 // (refreeze=true): the same precheck + write path in the engine.
 func newTruthFreezeCmd(refreeze bool) *cobra.Command {
 	var project, feature, version, by string
-	var asJSON bool
+	var asJSON, acceptCurrent bool
 	use, short := "freeze", "Freeze a draft package (completeness + integrity precheck, then status: frozen)"
 	if refreeze {
 		use, short = "refreeze", "Refreeze a change-pending package, closing its pending change(s)"
@@ -154,7 +154,7 @@ func newTruthFreezeCmd(refreeze bool) *cobra.Command {
 			eng := orchestrator.NewEngine(st)
 			var v orchestrator.TruthPackageView
 			if refreeze {
-				v, err = eng.RefreezeTruthPackage(ctx, by)
+				v, err = eng.RefreezeTruthPackageAcceptCurrent(ctx, by, acceptCurrent)
 			} else {
 				v, err = eng.FreezeTruthPackage(ctx, by)
 			}
@@ -171,6 +171,7 @@ func newTruthFreezeCmd(refreeze bool) *cobra.Command {
 	c.Flags().StringVar(&version, "version", "", "docs version filter")
 	c.Flags().StringVar(&by, "by", "cli", "actor identity (recorded on the trail + the integrity evaluation)")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	c.Flags().BoolVar(&acceptCurrent, "accept-current", false, "refreeze: close the change when no base fingerprint is on record (explicit owner acknowledgement)")
 	_ = c.MarkFlagRequired("feature")
 	return c
 }

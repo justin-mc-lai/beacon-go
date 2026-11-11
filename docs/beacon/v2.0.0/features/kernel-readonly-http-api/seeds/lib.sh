@@ -29,6 +29,10 @@ SERVE_PID=""
 SERVE_LOG="$SEED_OUT/serve.log"
 
 goodbye() {
+  # ponytail: zsh runs EXIT traps in command-substitution subshells too;
+  # killing the server from there breaks every later request, so the
+  # teardown only runs in the top-level shell.
+  [ "${ZSH_SUBSHELL:-0}" -eq 0 ] || return 0
   stop_serve 2>/dev/null || true
 }
 trap goodbye EXIT INT TERM

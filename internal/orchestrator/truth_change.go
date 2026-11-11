@@ -313,7 +313,14 @@ func (e *Engine) CancelTruthChange(ctx store.FeatureContext, by string, acceptCu
 	return e.TruthPackage(ctx)
 }
 
+// RefreezeTruthPackage closes pending changes with the strict base
+// checks; RefreezeTruthPackageAcceptCurrent is the explicit escape for
+// legacy freeze records that carry no base fingerprints.
 func (e *Engine) RefreezeTruthPackage(ctx store.FeatureContext, by string) (TruthPackageView, error) {
+	return e.RefreezeTruthPackageAcceptCurrent(ctx, by, false)
+}
+
+func (e *Engine) RefreezeTruthPackageAcceptCurrent(ctx store.FeatureContext, by string, acceptCurrent bool) (TruthPackageView, error) {
 	// AC-136: refreezing writes requirement truth — canonical-only.
 	if _, err := e.requireCanonicalBranch(ctx.Project.RootPath, "truth.Refreeze"); err != nil {
 		return TruthPackageView{}, err
@@ -327,16 +334,21 @@ func (e *Engine) RefreezeTruthPackage(ctx store.FeatureContext, by string) (Trut
 			"package "+view.Slug+" has no pending change to refreeze")
 	}
 	// R1: a change authored against an older frozen body (because a
-	// parallel change landed first) must be rebased explicitly.
-	if err := e.checkChangeBase(ctx); err != nil {
-		return view, err
+	// parallel change landed first) must be rebased explicitly. With
+	// --accept-current the owner states the current body is the base.
+	if !acceptCurrent {
+		if err := e.checkChangeBase(ctx); err != nil {
+			return view, err
+		}
 	}
 	// AC-137: the refreeze transaction checks (content moved,
 	// revision id agrees, freeze->change fingerprint chain
 	// intact) run before the freeze precheck — a drifted or
 	// empty refreeze must not even reach the package checks.
-	if err := e.refreezeTxGuard(ctx); err != nil {
-		return view, err
+	if !acceptCurrent {
+		if err := e.refreezeTxGuard(ctx); err != nil {
+			return view, err
+		}
 	}
 	pre, ok, err := e.freezePrecheck(ctx, by)
 	if err != nil {
@@ -351,7 +363,13 @@ func (e *Engine) RefreezeTruthPackage(ctx store.FeatureContext, by string) (Trut
 	// stays change_pending and no truth_refrozen event is written.
 	diff, err := e.changeACDiff(ctx)
 	if err != nil {
-		return view, err
+		if !acceptCurrent {
+			return view, err
+		}
+		// ponytail: no base fingerprints on record (legacy freeze) —
+		// accept-current closes the change with an explicit empty diff
+		// instead of leaving the package wedged in change_pending.
+		diff = ACDiff{Added: []string{}, Changed: []ACDiffChange{}, Removed: []string{}}
 	}
 	if err := e.writeChangeACDiff(ctx, diff); err != nil {
 		return view, err

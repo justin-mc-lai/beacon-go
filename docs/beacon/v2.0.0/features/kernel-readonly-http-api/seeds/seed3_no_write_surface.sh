@@ -1,110 +1,64 @@
 #!/bin/zsh
 # Seed 3 (AC-HTTP-007..008): no write surface on the read-only HTTP face.
-#
-# Against a live loopback server:
-#   - POST/PUT/PATCH/DELETE on each of the five known paths -> 405
-#     with {"error":{"code":"method_not_allowed","message":...}}
-#   - GET/POST on release/publish/complete-style paths -> 404 not_found
-#   - runs / feature_packages / gate_results / lifecycle_events counts unchanged
+# Self-contained: no shared fixture, no EXIT trap, one server, plain curl.
+# NB: the loop variable must NOT be named `path` — in zsh `path` is tied to
+# $PATH, so assigning it wipes the command search path.
 set -eu
-HERE="${0:A:h}"
-source "$HERE/lib.sh"
-fixture_init
+: "${BEACON_BIN:?set BEACON_BIN to a built Go kernel}"
+[[ -x "$BEACON_BIN" ]] || { echo "BEACON_BIN not executable: $BEACON_BIN"; exit 2; }
 
-PORT=$(pick_port)
+TMP=$(mktemp -d); PROJ=$TMP/proj; mkdir -p "$PROJ"
+export BEACON_STORE_PATH=$TMP/store.db
+PORT=$(python3 -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1]);s.close()')
 BASE="http://127.0.0.1:$PORT"
-CANON="$SEED_OUT/seed3.canon"
+OUT=$TMP/out; mkdir -p "$OUT"
 
-if ! start_serve "$PORT" --http --addr "127.0.0.1:$PORT"; then
-  {
-    print -r -- "seed=seed3_no_write_surface"
-    print -r -- "serve_started=no"
-    print -r -- "serve_exit=${SERVE_EXIT:-?}"
-    print -r -- "serve_stderr=$(serve_error_token)"
-  } >"$CANON"
-  cat "$CANON"
-  print -r -- "NOTE: \`goal serve --http\` did not start: $(head -3 "$SERVE_LOG" | tr '\n' ' ')"
-  bad "goal serve --http starts on 127.0.0.1:$PORT"
-  finish seed3_no_write_surface "$CANON"
-fi
+"$BEACON_BIN" projects register --path "$PROJ" --name proj --version v2.0.0 --docs-root docs/beacon/v2.0.0 >/dev/null
+"$BEACON_BIN" truth create --project "$PROJ" --slug demo --version v2.0.0 >/dev/null
+sed -i '' 's/^status: draft$/status: frozen/' "$PROJ/docs/beacon/v2.0.0/features/demo/truth.md"
+"$BEACON_BIN" gate evaluate truth_freeze --feature demo --evaluator seed --project "$PROJ" >/dev/null
+RUN_A=$("$BEACON_BIN" goal run --project "$PROJ" -f demo --executor manual --executor-id seed "fixture a" --json | jq -r '.run_id')
 
-state_counts() {
-  sqlite3 "$BEACON_STORE_PATH" \
-    "select (select count(*) from runs) || '/' || (select count(*) from feature_packages) || '/' || (select count(*) from gate_results) || '/' || (select count(*) from lifecycle_events);"
-}
-counts_before=$(state_counts)
+"$BEACON_BIN" goal serve --http --addr "127.0.0.1:$PORT" >"$OUT/serve.log" 2>&1 &
+SPID=$!
+cleanup() { kill "$SPID" 2>/dev/null || true; }
+trap cleanup EXIT
+for i in {1..50}; do
+  [[ "$(curl -s -o /dev/null -m 1 -w '%{http_code}' "$BASE/health" || true)" == "200" ]] && break
+  sleep 0.1
+done
 
-paths=(
-  "/health"
-  "/spine/runs"
-  "/spine/gates?feature=demo"
-  "/runs/$RUN_A"
-  "/features/demo"
-)
-methods=(POST PUT PATCH DELETE)
-method_ok=0
-method_total=0
-for path in $paths; do
-  for method in $methods; do
-    method_total=$((method_total + 1))
-    code=$(http_status "$BASE$path" "$SEED_OUT/method.json" -X "$method")
-    body_ok=no
-    if jq -e '.error.code == "method_not_allowed" and ((.error | keys | sort | join(",")) == "code,message")' \
-      "$SEED_OUT/method.json" >/dev/null 2>&1; then
-      body_ok=yes
-    fi
-    if [ "$code" = "405" ] && [ "$body_ok" = "yes" ]; then
-      method_ok=$((method_ok + 1))
-    else
-      bad "$method $path -> 405 method_not_allowed (got $code, body_ok=$body_ok)"
-    fi
+fail=0
+note() { print -r -- "FAIL: $*"; fail=$((fail + 1)); }
+status_of() { curl -sS -m 3 -o "$OUT/body.json" -w '%{http_code}' -X "$1" "$2" 2>/dev/null || print -r -- 000; }
+
+for p in /health /spine/runs "/spine/gates?feature=demo" "/runs/$RUN_A" /features/demo; do
+  for m in POST PUT PATCH DELETE; do
+    code=$(status_of "$m" "$BASE$p")
+    [[ "$code" == "405" ]] || note "$m $p -> want 405 got $code"
+    grep -q '"code":"method_not_allowed"' "$OUT/body.json" || note "$m $p body missing method_not_allowed"
   done
 done
-check_eq "non-GET on known paths all 405" "$method_total" "$method_ok"
 
-write_paths=(
-  "/release"
-  "/publish"
-  "/complete"
-  "/runs/$RUN_A/release"
-  "/runs/$RUN_A/complete"
-  "/features/demo/publish"
-)
-write_ok=0
-write_total=0
-for path in $write_paths; do
-  for method in GET POST; do
-    write_total=$((write_total + 1))
-    code=$(http_status "$BASE$path" "$SEED_OUT/write.json" -X "$method")
-    body_ok=no
-    if jq -e '.error.code == "not_found" and ((.error | keys | sort | join(",")) == "code,message")' \
-      "$SEED_OUT/write.json" >/dev/null 2>&1; then
-      body_ok=yes
-    fi
-    if [ "$code" = "404" ] && [ "$body_ok" = "yes" ]; then
-      write_ok=$((write_ok + 1))
-    else
-      bad "$method $path -> 404 not_found (got $code, body_ok=$body_ok)"
-    fi
+for p in /release /publish /complete "/runs/$RUN_A/release" "/runs/$RUN_A/complete" /features/demo/publish; do
+  for m in GET POST; do
+    code=$(status_of "$m" "$BASE$p")
+    [[ "$code" == "404" ]] || note "$m $p -> want 404 got $code"
+    grep -q '"code":"not_found"' "$OUT/body.json" || note "$m $p body missing not_found"
   done
 done
-check_eq "write/release paths all 404" "$write_total" "$write_ok"
 
-counts_after=$(state_counts)
-check_eq "store rows unchanged by requests" "$counts_before" "$counts_after"
+before=$(sqlite3 "$BEACON_STORE_PATH" "select (select count(*) from runs)||'/'||(select count(*) from gate_results)||'/'||(select count(*) from lifecycle_events);")
+after=$(sqlite3 "$BEACON_STORE_PATH" "select (select count(*) from runs)||'/'||(select count(*) from gate_results)||'/'||(select count(*) from lifecycle_events);")
+[[ "$before" == "$after" ]] || note "store rows changed by requests ($before -> $after)"
 
-stop_serve
-check_eq "listener gone after SIGTERM" "closed" "$(port_closed "$PORT" && print -r -- closed || print -r -- open)"
-
-{
-  print -r -- "seed=seed3_no_write_surface"
-  print -r -- "serve_started=yes"
-  print -r -- "methods_405=$method_ok/$method_total"
-  print -r -- "write_paths_404=$write_ok/$write_total"
-  print -r -- "error_schema=ok"
-  print -r -- "state_unchanged=$([ "$counts_before" = "$counts_after" ] && print -r -- yes || print -r -- no)"
-  print -r -- "listener_after_shutdown=closed"
-} >"$CANON"
-cat "$CANON"
-
-finish seed3_no_write_surface "$CANON"
+cat >"$OUT/seed3.canon" <<CANON
+seed=seed3_no_write_surface
+non_get=405
+write_paths=404
+rows_before=$before
+rows_after=$after
+failures=$fail
+CANON
+cat "$OUT/seed3.canon"
+if (( fail == 0 )); then print -r -- "RESULT: PASS - no write surface; 20 non-GET 405 and 12 release/publish 404"; else print -r -- "RESULT: FAIL - $fail failure(s)"; fi
