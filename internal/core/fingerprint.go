@@ -118,7 +118,11 @@ func PackageSurfaceFingerprint(truthRaw, testsRaw, tasksRaw, evidenceRaw []byte)
 // report can name WHICH acceptance criterion moved.
 const RequirementFingerprintAlg = "reqfp-v1"
 
-var acStartRe = regexp.MustCompile(`\*\*AC-(\d{3})\*\*|^\|\s*AC-(\d{3})\s*\|`)
+// AC ids may carry a domain prefix (AC-HTTP-001, AC-S1-003) next to the
+// plain AC-001 form. The table / bold forms are otherwise unchanged so
+// the existing three-digit contract (and the ids that do not use it)
+// keep their current matching behaviour.
+var acStartRe = regexp.MustCompile(`\*\*AC-((?:[A-Z0-9]+-)*\d{3})\*\*|^\|\s*AC-((?:[A-Z0-9]+-)*\d{3})\s*\|`)
 
 // RequirementFingerprints returns one stable hash per AC defined in a
 // truth document. A bold definition block runs from its line to the

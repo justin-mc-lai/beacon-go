@@ -284,6 +284,12 @@ func (e *Engine) trailRecords(featureID string) (trailRecords, error) {
 					recs.pendingChanges[i].BaseTruthSHA256 = bs
 				}
 			}
+		case EventTruthChangeCancelled:
+			// A cancelled change is no longer pending: the same rule
+			// pendingChangeIDs already applies. Leaving it here makes a
+			// later refreeze read the cancelled change's (possibly
+			// absent) base instead of the live one.
+			recs.pendingChanges = nil
 		case EventTruthBaselineRecorded:
 			recs.baseline = &baselineRecord{Commit: str("baseline_commit"), TruthSHA256: str("truth_sha256")}
 		}

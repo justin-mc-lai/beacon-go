@@ -1,5 +1,6 @@
 ---
 slug: kernel-readonly-http-api
+materials_status: current
 version: v2.0.0
 status: draft
 revision_id: R2-draft

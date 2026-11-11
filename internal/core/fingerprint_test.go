@@ -30,3 +30,16 @@ status: draft
 		t.Fatal("editing AC-002 must move its fingerprint")
 	}
 }
+
+func TestRequirementFingerprintsAcceptPrefixedACIDs(t *testing.T) {
+	truth := "## Acceptance Criteria\n\n| AC ID | Description | Must |\n|---|---|---|\n| AC-HTTP-001 | health | Must |\n| AC-S1-003 | spine | Must |\n| AC-002 | plain | Must |\n"
+	fp := RequirementFingerprints([]byte(truth))
+	for _, id := range []string{"AC-HTTP-001", "AC-S1-003", "AC-002"} {
+		if fp[id] == "" {
+			t.Fatalf("fingerprints = %v, want %s", fp, id)
+		}
+	}
+	if len(fp) != 3 {
+		t.Fatalf("fingerprints = %v, want exactly 3", fp)
+	}
+}
