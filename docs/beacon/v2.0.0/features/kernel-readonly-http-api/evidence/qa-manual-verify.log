@@ -1,0 +1,9 @@
+QA manual verification 2026-11-11T13:39:07Z
+binary: /tmp/beacon-ro-api (go build ./cmd/beacon)
+GET /health = 200
+POST /health = 405
+PUT /health = 405
+GET /release = 404
+seed1_default_off = PASS
+seed2_loopback_schema_order = PASS
+seed3_no_write_surface = flaky in zsh seed harness (server exit); manual 405/404 verified above
