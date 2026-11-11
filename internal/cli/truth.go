@@ -177,7 +177,7 @@ func newTruthFreezeCmd(refreeze bool) *cobra.Command {
 
 func newTruthChangeCmd() *cobra.Command {
 	var project, feature, version, summary, by string
-	var asJSON bool
+	var asJSON, cancelChange, acceptCurrent bool
 	c := &cobra.Command{
 		Use:   "change",
 		Short: "Register a change against a frozen package (writes changes/<id>.md; the truth body is untouched)",
@@ -193,6 +193,15 @@ func newTruthChangeCmd() *cobra.Command {
 				return err
 			}
 			eng := orchestrator.NewEngine(st)
+			if cancelChange {
+				v, err := eng.CancelTruthChange(ctx, by, acceptCurrent)
+				if v.Slug != "" {
+					if perr := printTruthView(cmd, v, asJSON); perr != nil {
+						return perr
+					}
+				}
+				return err
+			}
 			v, err := eng.RequestTruthChange(ctx, summary, by)
 			if v.Slug != "" {
 				if perr := printTruthView(cmd, v, asJSON); perr != nil {
@@ -208,8 +217,9 @@ func newTruthChangeCmd() *cobra.Command {
 	c.Flags().StringVar(&summary, "summary", "", "what the change is (required)")
 	c.Flags().StringVar(&by, "by", "cli", "who requests the change")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	c.Flags().BoolVar(&cancelChange, "cancel", false, "cancel the pending change when its body never moved (returns the package to frozen)")
+	c.Flags().BoolVar(&acceptCurrent, "accept-current", false, "with --cancel: proceed when the change record has no base fingerprint")
 	_ = c.MarkFlagRequired("feature")
-	_ = c.MarkFlagRequired("summary")
 	return c
 }
 

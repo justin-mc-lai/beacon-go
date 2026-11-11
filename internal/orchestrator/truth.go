@@ -55,6 +55,7 @@ const (
 	EventTruthFrozen           = "truth_frozen"
 	EventTruthChangeRequested  = "truth_change_requested"
 	EventTruthRefrozen         = "truth_refrozen"
+	EventTruthChangeCancelled  = "truth_change_cancelled"
 	EventTruthFreezeReconciled = "truth_freeze_reconciled"
 	EventTruthIntentUpdated    = "truth_intent_updated"
 	EventTruthQuestionAsked    = "truth_question_asked"
@@ -142,7 +143,7 @@ func (e *Engine) pendingChangeIDs(featureID string) ([]string, error) {
 				_ = json.Unmarshal(ev.Payload, &p)
 			}
 			pending = append(pending, p.ChangeID)
-		case EventTruthRefrozen, EventTruthFrozen, "refreeze", "gen_refreeze":
+		case EventTruthRefrozen, EventTruthFrozen, EventTruthChangeCancelled, "refreeze", "gen_refreeze":
 			pending = nil
 		}
 	}

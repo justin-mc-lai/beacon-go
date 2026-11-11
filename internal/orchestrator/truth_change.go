@@ -235,6 +235,67 @@ Edit the package truth (and its tests/tasks/evidence as needed), then close this
 // same precheck as freeze, then the status line is set back to
 // frozen, the pending state cleared, and a truth_refrozen event
 // records exactly which change ids it closed.
+
+// CancelTruthChange closes a pending change when its body never moved:
+// the package returns to frozen without pretending a refreeze happened.
+// A body that actually changed must go through refreeze; a change whose
+// base record is missing needs the explicit acceptCurrent acknowledgement.
+func (e *Engine) CancelTruthChange(ctx store.FeatureContext, by string, acceptCurrent bool) (TruthPackageView, error) {
+	if _, err := e.requireCanonicalBranch(ctx.Project.RootPath, "truth.Cancel"); err != nil {
+		return TruthPackageView{}, err
+	}
+	view, err := e.TruthPackage(ctx)
+	if err != nil {
+		return TruthPackageView{}, err
+	}
+	if !view.ChangePending {
+		return view, nil // idempotent: nothing to cancel
+	}
+	pkgDir := filepath.Dir(ctx.Feature.TruthPath)
+	rawTruth, err := os.ReadFile(resolvePkgPath(ctx.Project.RootPath, ctx.Feature.TruthPath))
+	if err != nil {
+		return view, err
+	}
+	liveSHA := sha256HexOf(rawTruth)
+	baseMissing := false
+	for _, id := range view.PendingChangeIDs {
+		docAbs := filepath.Join(resolvePkgPath(ctx.Project.RootPath, pkgDir), "changes", id+".md")
+		baseSHA := ""
+		if raw, rerr := os.ReadFile(docAbs); rerr == nil {
+			if scalars, _, ok := gate.ParseFrontmatter(string(raw)); ok {
+				baseSHA = scalars["base_truth_sha256"]
+			}
+		}
+		if baseSHA == "" {
+			baseMissing = true
+			if !acceptCurrent {
+				return view, core.NewError(core.ReasonTruthRebaseNotAllowed, "truth.Cancel",
+					"change "+id+" has no base fingerprint; re-run with --accept-current only after confirming the body was never edited")
+			}
+			continue
+		}
+		if baseSHA != liveSHA {
+			return view, core.NewError(ReasonTruthChangePending, "truth.Cancel",
+				"change "+id+" has a modified body (base "+fingerprintPrefix(baseSHA)+" vs live "+fingerprintPrefix(liveSHA)+"); run `beacon truth refreeze` instead of cancelling")
+		}
+	}
+	ids := append([]string{}, view.PendingChangeIDs...)
+	for _, id := range ids {
+		docAbs := filepath.Join(resolvePkgPath(ctx.Project.RootPath, pkgDir), "changes", id+".md")
+		if raw, rerr := os.ReadFile(docAbs); rerr == nil {
+			updated := strings.Replace(string(raw), "status: pending", "status: cancelled", 1)
+			_ = os.WriteFile(docAbs, []byte(updated), 0o644)
+		}
+	}
+	if err := e.appendFeatureEvent(ctx.Feature.ID, EventTruthChangeCancelled, map[string]any{
+		"by": by, "change_ids": ids, "accepted_current": acceptCurrent,
+		"baseline_missing": baseMissing,
+	}); err != nil {
+		return view, err
+	}
+	return e.TruthPackage(ctx)
+}
+
 func (e *Engine) RefreezeTruthPackage(ctx store.FeatureContext, by string) (TruthPackageView, error) {
 	// AC-136: refreezing writes requirement truth — canonical-only.
 	if _, err := e.requireCanonicalBranch(ctx.Project.RootPath, "truth.Refreeze"); err != nil {

@@ -165,17 +165,31 @@ body_sha() {
 }
 
 # blank_change_base strips the recorded base fingerprint from the latest
-# pending change: both the change document frontmatter and the trail
-# event payload. This reproduces a legacy (pre-R1) change record whose
-# base body hash was never recorded.
+# pending change document. This reproduces a legacy (pre-R1) change record
+# whose base body hash was never recorded. The trail itself is left alone:
+# the ledger is append-only, and the kernel reads the base from the doc.
 blank_change_base() {
   local doc="$1"
   sed -i '' -E 's/^base_truth_sha256:.*/base_truth_sha256:/' "$SEED_PROJECT/$doc"
-  sqlite3 "$BEACON_STORE_PATH" "update lifecycle_events set payload_json=json_set(payload_json,'\$.base_truth_sha256','') where event_type='truth_change_requested';"
+  # ponytail: the trail is append-only (DB trigger), so the legacy
+  # "no base" state is reproduced on the document only; the kernel
+  # reads the base from the change doc, never by rewriting events.
 }
 
 emit_canon() {
-  local file="$1"
-  echo "canon=$file"
+  local file="$1" shown="$1"
+  case "$file" in
+    "$PWD"/*) shown="${file#"$PWD"/}" ;;
+  esac
+  echo "canon=$shown"
   echo "sha256=$(shasum -a 256 "$file" | awk '{print $1}')"
+}
+
+# normalize_change_ids rewrites the per-run generated change id in a canon
+# file to a stable token. The seeds assert on the real id in shell before
+# this runs, so coverage is unchanged while the canon bytes and their
+# sha256 stay reproducible across runs.
+normalize_change_ids() {
+  local file="$1" tmp="$1.tmp.$$"
+  sed -E 's/chg_[0-9a-f]{12}/chg_<id>/g' "$file" > "$tmp" && mv "$tmp" "$file"
 }
