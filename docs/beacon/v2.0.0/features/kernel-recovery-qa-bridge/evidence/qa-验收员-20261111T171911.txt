@@ -1,0 +1,162 @@
+# Independent QA evidence — kernel-recovery-qa-bridge
+
+verdict: PASS
+checker: 验收员（独立验收；maker = BeaconGo 内核，maker != checker）
+window: 2026-11-11 17:15–17:19 CST
+HEAD: 0e78397227629216e1cc7026ced4bb27230d1e05
+binary: /tmp/beacon-qa-accept2 (go build -o /tmp/beacon-qa-accept2 ./cmd/beacon, current HEAD)
+truth: frozen; truth.md / tests.md 在 cd47654..HEAD 零 diff（见 §6）
+
+本文件是本轮独立复跑的原始输出。上一份 qa-verdict-acceptance-20261111T170825.md 在
+同一 HEAD 上判定 PASS；本轮用全新二进制重跑三条 seed、定向测试与全量单测，结论不变。
+
+## 1. 生产代码 diff
+
+$ git diff --stat afd5cc7..HEAD -- internal/
+ internal/orchestrator/autotest.go                  |  35 ++++-
+ internal/orchestrator/complete.go                  |  17 ++-
+ internal/orchestrator/exitgates.go                 |  23 +--
+ .../orchestrator/kernel_recovery_qa_bridge_test.go | 157 +++++++++++++++++++++
+ 4 files changed, 216 insertions(+), 16 deletions(-)
+
+代码抽查（与 truth 的「三个缺口」逐条对齐）：
+- complete.go Recover：human gate 判定在状态变更之前；清 blocker 的同一事务里用
+  updateLifecycleMonotonic 回写 feature_lifecycle=当前 stage/InProgress、reason_codes=[]；
+  lifecycle.go:20-24 对已 Release/Completed 的快照直接 return，不降级。
+- autotest.go：allPassed := report.Total > 0 && report.Failed == 0 && report.Blocked == 0，
+  只有 allPassed 才在同一事务补写 stage_executed{stage:qa, placeholder:false,
+  recording:false, outcome:passed, executor:kernel_autotest}；失败/blocked/0 个可执行 TC
+  (jobs==0 提前返回) 都不写 passed。
+- exitgates.go featureGateFallback：排除所有被 stage_exit_evaluated 或 gate_evaluated
+  绑定到某个 run 的 gate 行；其余无 run 绑定的 feature 级行仍可按 AC-003 回落。
+
+## 2. 三条 seed（本轮真实输出）
+
+$ go build -o /tmp/beacon-qa-accept2 ./cmd/beacon
+BUILD_OK
+
+$ BEACON_BIN=/tmp/beacon-qa-accept2 zsh .../seeds/seed1_recover_lifecycle.sh
+after_block=Implement/Blocked
+after_recover=Implement/InProgress
+tick_stage=qa
+tick_blocked=False
+tick_reason=None
+sha256=488c496ebc2335ff223c8cfbdbb977c4005f07c392d7a2d1347b9e30ce2474fe
+RESULT: PASS - recover restored the lifecycle snapshot and implement advanced to qa
+exit=0
+
+$ .../seeds/seed2_autotest_stage_executed.sh
+autotest_total=1
+autotest_passed=1
+autotest_failed=0
+qa_verdict=pass
+qa_reason_codes=
+qa_checks=qa_artifacts_present=True,qa_stage_executed=True,qa_artifact_refs_valid=True
+qa_stage_executed_count=1
+sha256=7eacb12dd0b3ef5fc3ca248395b5ec869ae8a36011b870098d523f879e903833
+RESULT: PASS - autotest produced qa stage evidence and the qa gate passed
+exit=0
+
+$ .../seeds/seed3_cross_run_qa_verdict.sh
+run_a_qa_verdict=pass
+run_b_stage=qa
+run_b_blocked=True
+run_b_reason=stage_exit_qa_evidence_missing
+run_b_qa_stage_executed_before_exit_tick=0
+sha256=92cdec723e6c5d6ca3c6e7dc7a3012f2f7e77c257b31178541c5294ab6a93670
+RESULT: PASS - run B stayed at qa (blocked=True, reason=stage_exit_qa_evidence_missing) without its own qa evidence
+exit=0
+
+## 3. seed 断言未被改动（sha256 vs tests.md）
+
+$ shasum -a 256 seeds/*.sh
+2c6997bcf2212bb72f87095951a507f4e4544daae3b9384504e5815df71ae606  seeds/lib.sh
+a2476a47b08c24c24d2c6f6210501b535a6d1169b8e949df56812899869e680a  seeds/seed1_recover_lifecycle.sh
+e8285ff425202fc6aeec3fc965510659b0c9f227c5700eedffc946a1b1847c1b  seeds/seed2_autotest_stage_executed.sh
+744f187e55ad5b914c5158af15bac5a26acf64f92dffe792755b6f9d64eb0ce9  seeds/seed3_cross_run_qa_verdict.sh
+
+与 tests.md §「证据文件 sha256」表逐条一致；seed1-red/seed2-red/seed3-red 的 sha256
+(7b4fc7f3…/e5f78907…/6051a486…) 也与 tests.md 记录一致。断言与 lib.sh 未被改动。
+
+## 4. AC-004 / AC-005 定向测试
+
+$ go test ./internal/orchestrator -run 'TestKernelRecoveryNegativeGuards|TestKernelRecoveryContractStable' -count=1 -v
+--- PASS: TestKernelRecoveryNegativeGuards (0.15s)
+    --- PASS: .../human_gate_recover_refused_without_state_change (0.03s)
+    --- PASS: .../stage_executed_rejected:_executor_marker_true (0.03s)
+    --- PASS: .../stage_executed_rejected:_recording_true (0.03s)
+    --- PASS: .../stage_executed_rejected:_marker_missing (0.03s)
+    --- PASS: .../real_stage_executed_still_counts (0.03s)
+--- PASS: TestKernelRecoveryContractStable (0.00s)
+PASS
+ok  beacon-go/internal/orchestrator  0.750s
+
+说明：human gate 拒绝路径会补一条 goal_recover_rejected 审计事件（修复前既有行为），
+但测试断言 run metadata 与 lifecycle 快照逐字节不变、错误码为
+goal_recovery_human_gate_forbidden。快照语义满足 AC-004。
+
+## 5. 全量单测
+
+$ go test ./... > /tmp/qa-fulltest.log 2>&1; echo EXIT=$?
+EXIT=0
+?    beacon-go/cmd/beacon        [no test files]
+ok   beacon-go/desktop           0.702s
+ok   beacon-go/internal/agentapi 2.476s
+...
+ok   beacon-go/internal/cli      15.500s
+ok   beacon-go/internal/evalgate 54.244s
+ok   beacon-go/internal/orchestrator 99.869s
+ok   beacon-go/internal/store    (cached)
+ok   beacon-go/skills            (cached)
+--- FAIL count ---
+0
+
+## 6. truth / tests 无漂移
+
+$ git diff --stat cd47654..HEAD -- .../truth.md .../tests.md
+(空)
+
+## 7. 真实 run 的 qa → release：autotest 是否算独立验收
+
+goal status --run-id run_0e931985c7e20c51de10f590:
+  current_stage = release, blocked = false, loop_stage = release_gate
+  runs.metadata_json: release_human_confirmed = false, release_policy = human
+  feature_lifecycle = Qa/Completed
+
+该 run 的 qa 段事件（created_at，本地时间）：
+17:03:37 stage_advanced implement -> qa（implement exit derived pass）
+17:03:40 stage_executed qa（backend=subprocess, executor=subprocess:go, placeholder=false, real=true）
+17:03:40 stage_exit_blocked qa reason=qa_stage_not_executed（先被闸挡住）
+17:03:46 gate_evaluated qa verdict=pass, evaluator="QA 复核 · opencode", gate_result_id=gate_6a1c5b0d36c7174c9ad25a06
+17:03:54 goal_recovered qa（清 qa_stage_not_executed）
+17:03:57 stage_exit_evaluated qa verdict=pass, derived=false, formal_verdict=pass => stage_advanced qa -> release
+
+判定：
+1) 不是 autotest 把 run 推进到 release。autotest 只写 autotest_executed 与 qa stage_executed，
+   不写 gate verdict；qa 出口仍要求本 run 的 formal qa verdict 或 derived 证据。
+2) 该 run 的 qa 出口吃的是本 run 的 run-bound qa fact（17:03:46 gate_evaluated），
+   非跨 run 回落；seed3 已独立证明跨 run pass 不再泄漏。机制上 qa 出口合规。
+3) 但 autotest 不能当作独立验收：它只是证据生产者。该 run 的 qa pass 由
+   "QA 复核 · opencode" 签名，既不是 autotest，也不是本验收员；本验收员的独立结论
+   只在本文件与 qa-verdict-acceptance-20261111T170825.md 中。
+4) 该 run 的推进发生在 17:03，早于本轮验证，且本机默认 CLI (~/.local/opt/beacon-go/beacon)
+   是 16:05 构建的 afd5cc7+dirty 旧二进制；所以真实 run 的 release 位置只作状态漂移记录，
+   不作为本次修复的运行时证据。修复证据以 §1–§5（当前 HEAD 自建二进制）为准。
+5) release 未放行：release_human_confirmed=false，release gate 未评估通过，未打 tag。
+
+## 8. 只读边界
+
+- 未修改源码、truth、tests、seeds；唯一新增仓库文件是本证据文件。
+- 未 push、未打 tag、未发布、未写 release 结论。
+- 未在真实 store 写入 qa verdict；真实 store 的读取全部为 sqlite mode=ro。
+- git status 中的 .beacon/state/ 与 qa-verdict-acceptance-20261111T170825.md 为既有未跟踪文件。
+
+## 9. 结论
+
+PASS。AC-001 / AC-002 / AC-003 由三条 seed 独立复跑通过，AC-004 / AC-005 由定向测试
+通过，全量 go test ./... EXIT=0、0 FAIL。生产代码有实际 diff（4 文件 +216/-16），
+seed 断言与 truth/tests 冻结内容未被改动。
+
+无代码必改项。进程说明：真实 run 已由外部身份在 17:03 推进到 release，其中 qa pass
+来自 "QA 复核 · opencode"，不是 autotest，也不是本验收员；release_human_confirmed=false，
+放行仍须 human 确认。
