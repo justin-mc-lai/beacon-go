@@ -145,3 +145,24 @@ AC-001 text says status=active; the Go StageStatus vocabulary has no "active". T
 - seed files untouched (sha256 above equals tests.md).
 - frozen package docs (truth/tests/tasks/evidence.md) untouched.
 - unrelated ?? files (intent-contract-bridge evidence, docs/changes/) untouched.
+
+## 11. addendum — exact AC-004 / AC-005 commands from tests.md, run handoff
+# appended: 2026-11-11 16:57:17 CST
+
+$ go test ./internal/orchestrator -run TestKernelRecoveryNegativeGuards -count=1
+ok  	beacon-go/internal/orchestrator	0.556s
+exit=0
+
+$ go test ./internal/orchestrator ./internal/gate -run TestKernelRecoveryContractStable -count=1
+ok  	beacon-go/internal/orchestrator	0.732s
+ok  	beacon-go/internal/gate	0.446s [no tests to run]
+exit=0
+
+### run handoff (run_0e931985c7e20c51de10f590)
+- goal tick --by 内核: refused with reason_code=stage_executor_not_registered (this environment has no exec command registered for the subprocess executor); run went Paused/blocked, stage stayed implement, no stage exit was recorded, no verdict written.
+- goal recover --by 内核: status=running, blocked=false, current_stage=implement, loop_stage=implement_routing. This is the AC-001 path exercised on the live run store (lifecycle left Implement/InProgress, not Blocked); it did not advance a stage.
+- no qa verdict, no release, no push, no tag. Release stays with the human.
+
+### post-run re-verification
+- truth status=frozen, frozen=true, change_pending=false, baseline_commit=b0c9165 (re-checked after commit e3ff65e)
+- truth drift: clean=true, body drift=false
