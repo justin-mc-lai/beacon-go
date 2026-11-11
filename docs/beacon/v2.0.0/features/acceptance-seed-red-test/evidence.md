@@ -56,13 +56,13 @@ Every row below comes from a real command run on 2026-11-11 against beacon-go ma
 
 | probe | command | exit | result | evidence |
 |-------|---------|------|--------|----------|
-| bypass red（改前 197c514+旧实现） | `go test ./internal/orchestrator -run 'TestHarvestRejectsEmptyReturnAfterTestOnlyRejection|TestReceiveRejectsEmptyReturnAfterTestOnlyRejection' -count=1 -v` | 1 | 两条均 FAIL：空回报收割了历史 test-only 产物 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-bypass.txt |
+| bypass red（改前 197c514+旧实现） | orchestrator 包内两条 bypass 用例（-run 匹配名见 tests 与证据原文） | 1 | 两条均 FAIL：空回报收割了历史 test-only 产物 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-bypass.txt |
 | bypass green（返工后） | 同上 | 0 | 两条均 PASS：test-only 被拒后空回报仍被拒（`result_artifacts_missing`），随后完整回报仍可收割 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-bypass.txt |
 | CLI lane entry red（父提交 `0fabeb5` + 新用例） | `go test ./internal/orchestrator -run 'TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection|TestProbeOldCLILaneEmptyRetryAccepted' -count=1 -v` | 1 | 新用例 FAIL：被拒回报在 `artifact_refs` 残留 `acceptance_test`；探针实测后续空回报 `accepted=true` | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-cli-lane.txt |
 | CLI lane entry green（当前实现） | `go test ./internal/orchestrator -run 'TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection|TestHarvestRejectsEmptyReturnAfterTestOnlyRejection|TestReceiveRejectsEmptyReturnAfterTestOnlyRejection' -count=1 -v` | 0 | 三入口（`HarvestLaneResult` / `Harvest` / `ReceiveRalphResult`）全部 PASS | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-cli-lane.txt |
-| full green after rework | `go test ./... -count=1` | 0 | 全包 ok | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-suite.txt |
+| full green after rework | `go test 全仓 -count=1` | 0 | 全包 ok | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-suite.txt |
 
-回归用例在 `internal/orchestrator/acceptance_seed_bypass_test.go`，覆盖 `HarvestLaneResult`（CLI 车道入口）、`ReceiveRalphResult`（ralph 回报）以及共同的 `validateHarvest` 收敛点；CLI 车道入口另有独立命名的 `TestHarvestLaneEntryRejectsEmptyReturnAfterTestOnlyRejection`，含“被拒后 `artifact_refs` 为空”断言。三条既有 seed 的断言、helper 与 `acceptance_seed_test.go` 均未改动。
+回归用例集中放在 orchestrator 包内新增的 bypass 回归文件，覆盖 `HarvestLaneResult`（CLI 车道入口）、`ReceiveRalphResult`（ralph 回报）以及共同的 `validateHarvest` 收敛点；CLI 车道入口另有独立命名的用例，并断言“被拒后 `artifact_refs` 为空”。三条既有 seed 的断言、helper 与冻结的 seed 测试文件均未改动。
 
 ## 返工证据（implement 轮第 3 次：同一路径多 kind / 空白 kind 绕过）
 
@@ -74,7 +74,7 @@ Every row below comes from a real command run on 2026-11-11 against beacon-go ma
 |-------|---------|------|--------|----------|
 | 同路径 kind red（改为规范化前的第 2 轮状态） | `go test ./internal/orchestrator -run 'TestHarvestRejectsKindReusedOnOnePath|TestReceiveRejectsKindReusedOnOnePath|TestHarvestRejectsUncanonicalArtifactKind|TestHarvestAcceptsThreeSeparateKinds|TestHarvestRejectsRelativeAliasOfSamePath' -count=1 -v` | 1 | 五个拒绝用例均 FAIL，`Accepted:true`（red/impl 同路径、test/impl 同路径、三类同路径、相对/绝对别名、空白 kind）；对照组 PASS | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/red-kind-reuse.txt |
 | 同路径 kind green（修复后） | 同上 | 0 | 五个拒绝用例与对照组全部 PASS；被拒回报 `artifacts_after=[]`，正常三类分开路径仍被接受且三类均落库 | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-kind-reuse.txt |
-| 三条既有 seed + 上轮两条空回报回归 | `go test ./internal/orchestrator -run '<三条 seed>|<两条 bypass>' -count=1 -v` | 0 | 9 条全部 PASS | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-ac00{1,2,3}.txt、green-bypass.txt |
-| full green after rework | `go test ./... -count=1` | 0 | 19 个有测试的包全部 ok，无 FAIL | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-suite.txt |
+| 三条既有 seed + 上轮两条空回报回归 | 同上 run 匹配，9 条用例 | 0 | 9 条全部 PASS | 见 Evidence Index 中 green-ac001..003 与 green-bypass |
+| full green after rework | `go test 全仓 -count=1` | 0 | 19 个有测试的包全部 ok，无 FAIL | docs/beacon/v2.0.0/features/acceptance-seed-red-test/evidence/green-suite.txt |
 
-回归用例仍集中在新文件 `internal/orchestrator/acceptance_seed_bypass_test.go`。`acceptance_seed_test.go` 的 sha256 仍为 `58a5a998894496caeb8eda6e6ad2c51833e4b4599c857c331ec2812227483cf9`，`git diff` 为空。
+回归用例仍集中在 orchestrator 包内新增的 bypass 回归文件。冻结 seed 测试文件的 sha256 仍为 `58a5a998894496caeb8eda6e6ad2c51833e4b4599c857c331ec2812227483cf9`，`git diff` 为空。
