@@ -271,6 +271,35 @@ func (d *FeatureDao) GetByID(id string) (FeaturePackage, error) {
 		`SELECT id, project_version_id, slug, truth_path, tests_path, status FROM feature_packages WHERE id = ?`, id))
 }
 
+// ListAll returns every feature package, ordered by slug then id so the
+// read-only HTTP projection is deterministic across projects.
+func (d *FeatureDao) ListAll() ([]FeaturePackage, error) {
+	rows, err := d.q.Query(`SELECT id, project_version_id, slug, truth_path, tests_path, status
+		FROM feature_packages ORDER BY slug, id`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []FeaturePackage
+	for rows.Next() {
+		f, err := scanFeature(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, f)
+	}
+	return out, rows.Err()
+}
+
+// FindBySlug resolves a slug without a project version (the HTTP read
+// surface addresses features by slug alone). When several projects carry
+// the same slug the most recently registered package wins.
+func (d *FeatureDao) FindBySlug(slug string) (FeaturePackage, error) {
+	return scanFeature(d.q.QueryRow(
+		`SELECT id, project_version_id, slug, truth_path, tests_path, status
+		FROM feature_packages WHERE slug = ? ORDER BY rowid DESC LIMIT 1`, slug))
+}
+
 // UpdateLifecycle upserts the current lifecycle snapshot for a feature
 // (AC-070 + AC-012 snapshot semantics). Stage/status are validated through
 // core, including the Blocked/Skipped obligations (AC-028/029).

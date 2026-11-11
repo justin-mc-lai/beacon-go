@@ -147,6 +147,25 @@ func (d *RunDao) ListByFeature(featureID string) ([]Run, error) {
 	return out, rows.Err()
 }
 
+// ListAll returns every run, newest first; equal started_at values are
+// ordered by run id ascending so the read surface is deterministic.
+func (d *RunDao) ListAll() ([]Run, error) {
+	rows, err := d.q.Query(`SELECT ` + runCols + ` FROM runs ORDER BY started_at DESC, id ASC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []Run
+	for rows.Next() {
+		r, err := scanRun(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, r)
+	}
+	return out, rows.Err()
+}
+
 // AppendEvent appends one lifecycle event (AC-012/072). There is
 // deliberately no Update/Delete API for events; DB triggers also reject
 // direct UPDATE/DELETE (see schema.go).

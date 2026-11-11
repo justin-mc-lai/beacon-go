@@ -276,6 +276,21 @@ func (e *Engine) executeOneTC(ctx context.Context, runID, root, baseDir string, 
 		e.writeTCResult(root, tcDir, &res, "", "")
 		return res
 	}
+	// A project-relative shell script TC runs through its interpreter
+	// with the path resolved against the project root; everything else
+	// keeps the plain argv/exec.LookPath path.
+	argv, rerr := resolveShellTC(root, argv)
+	if rerr != nil {
+		res.Status = AutoTestFailed
+		if rc, ok := core.ReasonCodeOf(rerr); ok {
+			res.ReasonCode = rc
+		} else {
+			res.ReasonCode = core.ReasonAutoTestLayerFailed
+		}
+		res.Detail = rerr.Error()
+		e.writeTCResult(root, tcDir, &res, "", "")
+		return res
+	}
 	junitPath := filepath.Join(tcDir, "junit.xml")
 	env := harness.IterationEnv(harness.IterationRequest{RunID: runID, Stage: "qa"})
 	env = append(env,
