@@ -1,0 +1,28 @@
+{
+  "schema": "beacon-intent-v1",
+  "feature_slug": "kernel-truth-change-cancel",
+  "version": "v2.0.0",
+  "truth_path": "docs/beacon/v2.0.0/features/kernel-truth-change-cancel/truth.md",
+  "recorded_at": "2026-11-11T13:24:32Z",
+  "recorded_by": "apple(via opencode)",
+  "confirmed": true,
+  "briefing": {
+    "original_prompt": "补 truth change cancel，解开 change_pending 死锁",
+    "restated_intent": "给 truth 变更流程一条合法出口：当挂起变更的正文与冻结基线一致时，beacon truth change --cancel 关闭它并回到 frozen；正文确有改动时拒绝并提示 refreeze；基线指纹缺失时需显式 --accept-current。不得靠篡改账本或改正文绕过。",
+    "identified_risks": [
+      "cancel 被用来绕过真实变更审核",
+      "基线缺失时误判为一致",
+      "幂等重复调用报错"
+    ],
+    "boundaries": [
+      "不新增 reason code",
+      "不改 refreeze 语义",
+      "正文有改动必须拒绝",
+      "不 push 不发布"
+    ],
+    "proposed_slugs": [
+      "kernel-truth-change-cancel"
+    ],
+    "confirmed": true
+  }
+}

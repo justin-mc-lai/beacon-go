@@ -1,0 +1,17 @@
+change_rc=0
+change_pending_at_open=True
+cancel_rc=1
+cancel_stderr=Error: unknown flag: --cancel 
+status=change_pending
+change_pending=True
+pending_ids=['chg_2448dd989a43']
+cancel_events=0
+requested_events=1
+refrozen_events=0
+body_untouched=yes
+change_doc_present=yes
+--- cancel stderr
+Error: unknown flag: --cancel
+canon=/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/kernel-truth-change-cancel/evidence/seed2.canon
+sha256=a35b51227f220195efaef733afd6aa4a43bf62902ddee7d06f3016ca6a620e08
+RESULT: FAIL - refusal did not point at refreeze: Error: unknown flag: --cancel 

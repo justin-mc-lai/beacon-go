@@ -1,0 +1,35 @@
+change_a_rc=0
+change_a_pending=True
+change_a_id=chg_7e486e0b109b
+c1_cancel_rc=1
+c1_status=change_pending
+c1_change_pending=True
+c1_pending_ids=['chg_7e486e0b109b']
+c1_cancel_events=0
+c1_requested_events=1
+c1_body_unchanged=yes
+c1_stdout=
+c1_stderr=Error: unknown flag: --cancel 
+change_b_rc=1
+change_b_doc=None
+change_b_base_blanked=no
+c2_norefuse_rc=1
+c2_norefuse_err=Error: unknown flag: --cancel 
+c2_status_after_refusal=change_pending
+c2_accept_rc=1
+c2_status=change_pending
+c2_change_pending=True
+c2_cancel_events=0
+c2_requested_events=1
+c2_accepted_current=parse_error
+c2_baseline_missing=parse_error
+c2_body_unchanged=yes
+--- a-cancel stderr
+Error: unknown flag: --cancel
+--- b-norefuse stderr
+Error: unknown flag: --cancel
+--- b-accept stderr
+Error: unknown flag: --cancel
+canon=/Users/apple/Developer/Personal/products/beacon-go/docs/beacon/v2.0.0/features/kernel-truth-change-cancel/evidence/seed1.canon
+sha256=731e27a739945b1060e7d2e5dc5a89e4826bec192dd60168703af689c6a0b48b
+RESULT: FAIL - cancel --cancel exited 1: Error: unknown flag: --cancel 

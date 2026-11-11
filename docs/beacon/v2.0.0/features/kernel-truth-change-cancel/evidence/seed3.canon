@@ -1,0 +1,16 @@
+# run=first
+rc_first=1
+stderr_first=Error: unknown flag: --cancel 
+status_first=frozen
+change_pending_first=False
+cancel_events_first=0
+requested_events_first=0
+body_unchanged_first=yes
+# run=second
+rc_second=1
+stderr_second=Error: unknown flag: --cancel 
+status_second=frozen
+change_pending_second=False
+cancel_events_second=0
+requested_events_second=0
+body_unchanged_second=yes
