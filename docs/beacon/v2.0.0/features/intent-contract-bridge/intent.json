@@ -1,0 +1,27 @@
+{
+  "schema": "beacon-intent-v1",
+  "feature_slug": "intent-contract-bridge",
+  "version": "v2.0.0",
+  "truth_path": "docs/beacon/v2.0.0/features/intent-contract-bridge/truth.md",
+  "recorded_at": "2026-11-11T08:02:43Z",
+  "recorded_by": "apple(via opencode)",
+  "confirmed": true,
+  "briefing": {
+    "original_prompt": "让意图对齐真正落地：AlignIntentStream 的结构化结果写进包内 intent.json 与 run；goal run 无 intent 时禁止内核驱动；resume 不丢 utterance",
+    "restated_intent": "把已经存在的意图对齐产物（复述/风险/边界/建议 slug）从只在聊天卡里，改成可审计的 intent.json 落盘 + run 事件；任何内核驱动执行器在没有已确认 intent 时必须拒建 run；Resume 必须保留 utterance 并留事件。",
+    "identified_risks": [
+      "旧 fixture 用自动执行器且无 intent，可能被新门挡死",
+      "事件与文件写入顺序不当会留下半成品状态",
+      "resume 事件重复写入会破坏幂等"
+    ],
+    "boundaries": [
+      "不改三条 seed 断言与 helper",
+      "不改 release 语义",
+      "不 push、不打 tag、不发布"
+    ],
+    "proposed_slugs": [
+      "intent-contract-bridge"
+    ],
+    "confirmed": true
+  }
+}
