@@ -55,6 +55,7 @@ func seedGateProject(t *testing.T, frozen bool) (string, store.FeaturePackage) {
 	write("tests.md", "---\nslug: feat-gate\n---\n| AC ID | TC ID | Layer | Command | Assertion |\n|-------|-------|-------|---------|-----------|\n| AC-001 | TC-001 | unit | `go test ./...` | passes |\n")
 	write("tasks.md", "---\nslug: feat-gate\n---\n- [ ] the work\n")
 	write("evidence.md", "# Evidence\n\n(no artifacts referenced yet)\n")
+	writeConfirmedIntent(t, projRoot, "feat-gate")
 	return projRoot, f
 }
 

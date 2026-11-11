@@ -46,6 +46,10 @@ func seedGitGoalProject(t *testing.T) (string, string) {
 	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte("# proj\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	// intent-contract-bridge AC-002: the exec-config run is kernel
+	// driven; keep the intent committed so worktree creation sees a
+	// clean main.
+	writeConfirmedIntent(t, root, "feat-a")
 	git("add", ".")
 	git("commit", "-m", "init")
 

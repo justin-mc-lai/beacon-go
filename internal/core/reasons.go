@@ -50,6 +50,7 @@ var ReasonCatalog = map[string]string{
 	ReasonStageExitPlanIncomplete: "Plan/journey incomplete; cannot leave plan",
 	ReasonStageExitTruthNotFrozen: "Feature truth exists but status is not frozen",
 	ReasonStageExitTruthMissing:   "Feature truth package missing; fill then freeze",
+	ReasonIntentMissing:           "Kernel-driven run needs a confirmed intent recorded in the feature package",
 	ReasonStageExitDesignIncompl:  "Design stage lacks verifiable design evidence",
 	ReasonStageExitImplementBlock: "Implement admission failed",
 	ReasonStageExitQAEvidenceMiss: "QA lacks scorecard/evidence artifact",
@@ -356,6 +357,7 @@ const (
 // interaction (one question at a time) is the truth ask/answer flow.
 const (
 	ReasonIntentNotConfirmed     = "truth_intent_not_confirmed"
+	ReasonIntentMissing          = "goal_intent_missing"
 	ReasonIntentSnapshotIncomple = "truth_intent_snapshot_incomplete"
 	ReasonIntentQuestionOpen     = "truth_intent_question_open"
 	ReasonIntentCoverageMissing  = "truth_intent_coverage_missing"

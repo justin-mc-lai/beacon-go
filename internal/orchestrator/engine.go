@@ -471,6 +471,16 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 		}
 		return RunView{}, err
 	}
+	// Intent contract bridge (AC-002): a run the kernel drives itself
+	// needs a confirmed intent next to truth.md. The refusal lands
+	// before any run row is written, so a refused creation leaves no
+	// half-run behind. manual / external runs are advanced by an
+	// explicit tick and stay open.
+	if IsKernelDrivenExecutor(execMode, opts.Exec) && !e.readConfirmedIntent(ctx) {
+		return RunView{}, core.NewError(core.ReasonIntentMissing, "goal.CreateRun",
+			"kernel-driven run needs a confirmed intent at "+intentRelPath(ctx.Feature.TruthPath)+
+				"; record one with `beacon truth intent record --project <root> --feature "+ctx.Feature.Slug+" --briefing <briefing.json>`")
+	}
 	stages := BuildStageOrder(opts.UXRequired)
 	m := &runMeta{
 		Utterance:         opts.Utterance,

@@ -19,6 +19,19 @@ func runIDOf(t *testing.T, out string) string {
 	return id
 }
 
+// writeConfirmedIntent drops the intent.json the kernel reads before it
+// admits a kernel-driven run (intent-contract-bridge AC-002).
+func writeConfirmedIntent(t *testing.T, root, slug string) {
+	t.Helper()
+	doc := `{"schema":"beacon-intent-v1","feature_slug":"` + slug + `","version":"v2.0.0",` +
+		`"truth_path":"truth.md","recorded_at":"2026-11-11T00:00:00Z","recorded_by":"fixture",` +
+		`"confirmed":true,"briefing":{"original_prompt":"fixture","restated_intent":"drive the fixture",` +
+		`"identified_risks":[],"boundaries":[],"proposed_slugs":["` + slug + `"],"confirmed":true,"degraded":false}}`
+	if err := os.WriteFile(filepath.Join(root, "intent.json"), []byte(doc), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
 // seedDeliveryProject seeds a registered project whose package passes
 // the strict materials bundle (required frontmatter, AC coverage,
 // bound task rows) so a run can actually enter implement.
@@ -65,6 +78,7 @@ slug: feat-gate
 |---|---|---|
 | truth | requirement_truth | truth.md |
 `)
+	writeConfirmedIntent(t, root, "feat-gate")
 	return root
 }
 

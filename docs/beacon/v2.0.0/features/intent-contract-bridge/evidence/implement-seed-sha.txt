@@ -1,0 +1,13 @@
+# intent-contract-bridge · acceptance seed sha256 before/after
+# before = git show 2a61a25:<path> | shasum -a 256
+# after  = shasum -a 256 <path>
+
+internal/cli/intent_contract_seed_test.go
+  before: c1df802782f9352a15868b96f18b1bd98e246b0ceb588cc4bd9619dec588cbb0
+  after:  c1df802782f9352a15868b96f18b1bd98e246b0ceb588cc4bd9619dec588cbb0
+  match:  yes
+
+internal/orchestrator/intent_contract_seed_test.go
+  before: b1a204f06163851ebf4f6f133a88142b591bdf51d15186c73a0f3d86694450b6
+  after:  b1a204f06163851ebf4f6f133a88142b591bdf51d15186c73a0f3d86694450b6
+  match:  yes

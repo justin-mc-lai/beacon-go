@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"strings"
 	"time"
 
 	"beacon-go/internal/core"
@@ -214,16 +215,14 @@ func decideResume(runID string, m *runMeta) ResumeView {
 
 // Resume decides how a run continues and applies the decision's
 // side effects: a soft block (streak < 3) is cleared on resume,
-// mirroring the v1 goal resume command, and a replayed interrupt
-// is consumed (goal_resumed event + flag cleared) exactly once.
+// mirroring the v1 goal resume command, and every resume appends
+// exactly one goal_resumed event carrying the utterance (AC-003) —
+// a replayed interrupt also consumes its flag in the same write.
 func (e *Engine) Resume(runID, utterance string) (ResumeView, error) {
 	run, m, _, err := e.loadRun(runID)
 	if err != nil {
 		return ResumeView{}, err
 	}
-	// Short continue utterances (AC-035) and explicit resumes both
-	// map to load_next_skill; a long utterance is advisory only.
-	_ = utterance
 	// A review-routed block (H5) is NOT a soft block: it clears only
 	// when a later review decision routes onward, never by resume.
 	reviewHeld := m.ReviewDecision != nil && !m.ReviewDecision.Resolved && IsReviewBlockReason(m.LastBlockReason)
@@ -233,10 +232,29 @@ func (e *Engine) Resume(runID, utterance string) (ResumeView, error) {
 		_ = e.saveRun(run, m)
 	}
 	rv := decideResume(runID, m)
+	// AC-003: the resume text is contract data, not advice. It lands
+	// on the run event verbatim; whitespace-only is "not recorded"
+	// and carries no utterance key at all.
+	recorded := strings.TrimSpace(utterance) != ""
+	payload := map[string]any{
+		"resume_action":      rv.ResumeAction,
+		"utterance_recorded": recorded,
+		"stage":              rv.CurrentStage,
+		"loop_stage":         rv.LoopStage,
+	}
+	if recorded {
+		payload["utterance"] = utterance
+	}
 	if rv.ResumeAction == core.ResumeReplaySubstep && m.InterruptPending {
 		m.InterruptPending = false
-		_ = e.appendEvent(run, "goal_resumed", map[string]any{"resume_action": core.ResumeReplaySubstep})
-		_ = e.saveRun(run, m)
+	}
+	if err := e.store.WithTx(func(tx *store.Tx) error {
+		if err := e.appendEventOn(tx, run, EventGoalResumed, payload); err != nil {
+			return err
+		}
+		return e.saveRunOn(tx, run, m)
+	}); err != nil {
+		return ResumeView{}, err
 	}
 	return rv, nil
 }

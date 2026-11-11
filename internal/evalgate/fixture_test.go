@@ -134,6 +134,9 @@ func (f *fixture) writeBase(truthDoc string) {
 	f.write("tests.md", baseTestsDoc)
 	f.write("tasks.md", "---\nslug: feat-a\n---\n- [ ] the work · ac=AC-001\n")
 	f.write("evidence.md", "# Evidence\n\n| Surface | Authority | Artifact |\n|---|---|---|\n| truth | requirement_truth | truth.md |\n")
+	// intent-contract-bridge AC-002: the recording executor is kernel
+	// driven, so the package needs a confirmed intent to be admitted.
+	f.write("intent.json", `{"schema":"beacon-intent-v1","feature_slug":"feat-a","version":"v2.0.0","truth_path":"truth.md","recorded_at":"2026-11-11T00:00:00Z","recorded_by":"fixture","confirmed":true,"briefing":{"original_prompt":"eval fixture","restated_intent":"deliver the eval fixture","identified_risks":[],"boundaries":[],"proposed_slugs":["feat-a"],"confirmed":true,"degraded":false}}`)
 	if err := os.MkdirAll(filepath.Join(f.root, "evidence"), 0o755); err != nil {
 		f.t.Fatal(err)
 	}

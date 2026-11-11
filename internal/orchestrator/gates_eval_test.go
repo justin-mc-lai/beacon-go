@@ -44,6 +44,9 @@ func newGateEnv(t *testing.T, truthDoc string) gateTestEnv {
 	write("tests.md", frozenTestsDoc)
 	write("tasks.md", "---\nslug: feat-a\n---\n- [ ] the work · ac=AC-001\n")
 	write("evidence.md", "# Evidence\n\n| Surface | Authority | Artifact |\n|---|---|---|\n| qa | qa_verdict | qa-report.md |\n\n(no artifacts referenced yet)\n")
+	// intent-contract-bridge AC-002: recording-executor runs below are
+	// kernel driven and need this confirmed intent.
+	seedConfirmedIntent(t, env.root, "feat-a", "drive the gate fixture from a recorded intent")
 	ctx, err := env.st.ResolveFeature(env.root, "feat-a", "")
 	if err != nil {
 		t.Fatal(err)

@@ -193,6 +193,61 @@ func newTruthIntentCmd() *cobra.Command {
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("feature")
 	c.MarkFlagRequired("goal")
+	c.AddCommand(newTruthIntentRecordCmd())
+	return c
+}
+
+// newTruthIntentRecordCmd lands the aligned briefing in the package's
+// intent.json (AC-001): the file is written atomically next to
+// truth.md and, when the feature has a run, the same bytes are
+// reported in an intent_recorded run event. No run is created.
+func newTruthIntentRecordCmd() *cobra.Command {
+	var project, feature, version, briefing, runID, by string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "record",
+		Short: "Land the aligned briefing in <pkg>/intent.json and the run event",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			st, err := openWriteStore()
+			if err != nil {
+				return err
+			}
+			defer st.Close()
+			ctx, err := resolveGateFeature(st, project, feature, version)
+			if err != nil {
+				return err
+			}
+			res, err := orchestrator.NewEngine(st).RecordIntent(ctx, briefing, runID, by)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				return printJSON(cmd, res)
+			}
+			out := cmd.OutOrStdout()
+			fmt.Fprintf(out, "package:   %s\n", res.FeatureSlug)
+			fmt.Fprintf(out, "version:   %s\n", res.Version)
+			fmt.Fprintf(out, "intent:    %s\n", res.IntentPath)
+			fmt.Fprintf(out, "sha256:    %s\n", res.IntentSHA256)
+			fmt.Fprintf(out, "confirmed: %v\n", res.Confirmed)
+			if res.RunID == "" {
+				fmt.Fprintln(out, "run:       (none; file only)")
+			} else {
+				fmt.Fprintf(out, "run:       %s (intent_recorded)\n", res.RunID)
+			}
+			return nil
+		},
+	}
+	c.Flags().StringVar(&project, "project", ".", "project root path")
+	c.Flags().StringVar(&feature, "feature", "", "feature slug (required)")
+	c.Flags().StringVar(&version, "version", "", "docs version filter")
+	c.Flags().StringVar(&briefing, "briefing", "", "path to the aligned briefing JSON (required)")
+	c.Flags().StringVar(&runID, "run-id", "", "run to record the event on (default: the feature's latest run)")
+	c.Flags().StringVar(&by, "by", "cli", "who records the intent")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("feature")
+	_ = c.MarkFlagRequired("briefing")
 	return c
 }
 
