@@ -90,8 +90,9 @@ d15399e 的内容已 byte-identical 落回 main 工作树并在本提交中入�
 冻结事件 signer: apple(via opencode)（truth_frozen 事件 2026-11-11T08:33:37Z）；body 的 intent_confirmed: true 来自该次冻结。本次落库未新增 intent 签署事件。
 业务代码零改动：git status --short -- '*.go' 为空。
 
-## 6) 提交后复核
-landed_commit: 3007f91 3007f91af0eea159a951a7b67544353842c045fb
+## 6) 提交后复核（pre-amend 快照）
+landed_commit(pre-amend): 3007f91 3007f91af0eea159a951a7b67544353842c045fb
+注：本次落库提交随后被 amend 一次（把本证据文件并入），终态提交与 baseline 见 §7；下面段落的 3007f91 为 amend 前的过渡值。
 
 $ beacon-go truth baseline --feature kernel-recovery-qa-bridge --version v2.0.0 --json
 {
@@ -133,3 +134,13 @@ $ git status --short -- docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge
 
 $ go test ./...
 exit=0（全绿：internal/orchestrator 102.827s、internal/cli 15.585s、internal/evalgate 55.070s 等全部 ok）
+
+## 7) amend 后终态（权威结论）
+
+- 终态提交（含本证据）: b0c9165ee8469eb742e9981484111d4f57e389af（amend 后的 HEAD）。
+- truth.md 在 amend 前后 byte 不变：sha256 bfb60aeef632c4c4227741c0a80488746c76f55b0dd9a682501d210d1fe022b2。
+- amend 后重跑 truth baseline：baseline_status=committed，baseline_commit=b0c9165ee8469eb742e9981484111d4f57e389af，baseline_recorded=true。
+- 终态 truth show --json：status=frozen，frozen=true，lifecycle_stage=Freeze，lifecycle_status=Completed。
+- 终态 truth drift：clean=true / body drift=false / exit=0。
+- 终态 git status --short -- <pkg> 为空；git status --short -- *.go 为空。
+- 本 §7 以一次仅改证据文件的提交补入（不改 truth.md、不改 seeds、不动业务代码），因此 baseline 仍指向 b0c9165。
