@@ -387,30 +387,33 @@ func (e *Engine) buildExitInput(run store.Run, m *runMeta) (ExitInput, error) {
 
 // featureGateFallback reads the feature-level formal verdicts a stage may
 // legitimately consult (plan vetoes, formal QA/release verdicts). Rows
-// that are a SIBLING RUN's stage exit are excluded: `gate_results` has no
-// run column, but every stage exit also lands a run-scoped
-// stage_exit_evaluated event pointing at its gate_result_id, so the
-// sibling's exit rows are identifiable and must not become this run's
-// formal evidence (review B3).
+// bound to ANY run are excluded: `gate_results` has no run column, but
+// every run-scoped judgement (a stage exit or a formal `gate evaluate
+// --run`) lands a run-bound trail event naming its gate_result_id. Such a
+// row is that run's own evidence (read from LatestGates) and must never
+// fall back into a sibling run's exit input — otherwise run A's qa pass
+// lets a zero-evidence run B skip qa (AC-003). Only rows no run ever
+// claimed remain feature-level fallback.
 func (e *Engine) featureGateFallback(featureID, runID string) (map[string]GateFact, error) {
 	out := map[string]GateFact{}
 	events, err := e.store.ListEvents(featureID)
 	if err != nil {
 		return out, err
 	}
-	siblingExit := map[string]bool{}
+	runBound := map[string]bool{}
 	for _, ev := range events {
-		if ev.EventType != "stage_exit_evaluated" {
+		if ev.EventType != "stage_exit_evaluated" && ev.EventType != EventGateEvaluated {
 			continue
 		}
-		if ev.RunID.Valid && ev.RunID.String == runID {
+		// A feature-level evaluation carries no run and stays eligible.
+		if !ev.RunID.Valid {
 			continue
 		}
 		var p struct {
 			GateResultID string `json:"gate_result_id"`
 		}
 		if len(ev.Payload) > 0 && json.Unmarshal(ev.Payload, &p) == nil && p.GateResultID != "" {
-			siblingExit[p.GateResultID] = true
+			runBound[p.GateResultID] = true
 		}
 	}
 	all, err := e.store.Gates().ListByFeature(featureID)
@@ -419,7 +422,7 @@ func (e *Engine) featureGateFallback(featureID, runID string) (map[string]GateFa
 	}
 	seen := map[string]bool{}
 	for _, g := range all {
-		if seen[g.GateType] || siblingExit[g.ID] {
+		if seen[g.GateType] || runBound[g.ID] {
 			continue
 		}
 		seen[g.GateType] = true

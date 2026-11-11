@@ -115,7 +115,8 @@ func (e *Engine) Recover(runID, by, note string) (RunView, error) {
 	m.BlockedStreak = 0
 	m.LastBlockReason = ""
 	m.LastTickKey = ""
-	if stage := m.currentStage(); stage != "" && m.CurrentStageIdx < len(m.StagePlan) {
+	stage := m.currentStage()
+	if stage != "" && m.CurrentStageIdx < len(m.StagePlan) {
 		m.StagePlan[m.CurrentStageIdx].Status = "active"
 	}
 	if err := e.store.WithTx(func(tx *store.Tx) error {
@@ -126,6 +127,20 @@ func (e *Engine) Recover(runID, by, note string) (RunView, error) {
 			"blocked_after":     false, "blocked_streak_after": 0, "decision": "allowed",
 		}); err != nil {
 			return err
+		}
+		// AC-001: clearing the blocker and re-activating the feature
+		// snapshot are ONE fact. Before this, goal block left the
+		// lifecycle at Implement/Blocked while recover cleared only
+		// the run, so the implement exit gate (which reads the
+		// snapshot) self-locked the run forever. The monotonic guard
+		// keeps an already Release/Completed snapshot untouched.
+		if stage != "" {
+			if err := updateLifecycleMonotonic(tx.Features(), store.Lifecycle{
+				FeatureID: run.FeatureID, Stage: workflowStageForProductStage(stage),
+				Status: core.StatusInProgress,
+			}); err != nil {
+				return err
+			}
 		}
 		return e.saveRunOn(tx, run, m)
 	}); err != nil {

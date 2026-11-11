@@ -1,0 +1,147 @@
+# implement evidence — kernel-recovery-qa-bridge (v2.0.0)
+# generated: 2026-11-11 16:56:01 CST
+# run: run_0e931985c7e20c51de10f590
+# stage: implement (no push, no tag, no release, no qa verdict)
+# truth baseline: b0c9165 (status=frozen, drift clean, verified before this run)
+
+## 0. HEAD / branch
+cd4765480128a18d55a19c2dc9dc45d3ecf20e24
+main
+
+## 1. git status --short (baseline cwd)
+ M internal/orchestrator/autotest.go
+ M internal/orchestrator/complete.go
+ M internal/orchestrator/exitgates.go
+?? "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/qa-gotest-QA \351\252\214\346\224\266 \302\267 agy.txt"
+?? docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/qa-gotest-agy.txt
+?? "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/qa-gotest-\345\233\236\345\275\222.txt"
+?? "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/qa-gotest-\351\252\214\346\224\266\345\221\230.txt"
+?? "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/qa-verdict-QA \351\252\214\346\224\266 \302\267 agy.md"
+?? docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/qa-verdict-agy.md
+?? "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/qa-verdict-\345\233\236\345\275\222.md"
+?? "docs/beacon/v2.0.0/features/intent-contract-bridge/evidence/qa-verdict-\351\252\214\346\224\266\345\221\230.md"
+?? docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence/implement-20261111T165547.txt
+?? docs/changes/ops-2026-11-11-rebuild/
+?? docs/changes/qa-2026-11-11-intent-contract-bridge/
+?? internal/orchestrator/kernel_recovery_qa_bridge_test.go
+
+## 2. changed files (diffstat)
+ internal/orchestrator/autotest.go  | 35 ++++++++++++++++++++++++++++++-----
+ internal/orchestrator/complete.go  | 17 ++++++++++++++++-
+ internal/orchestrator/exitgates.go | 23 +++++++++++++----------
+ 3 files changed, 59 insertions(+), 16 deletions(-)
+
+## 3. seed sha256 vs tests.md declaration
+2c6997bcf2212bb72f87095951a507f4e4544daae3b9384504e5815df71ae606  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/lib.sh
+a2476a47b08c24c24d2c6f6210501b535a6d1169b8e949df56812899869e680a  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed1_recover_lifecycle.sh
+e8285ff425202fc6aeec3fc965510659b0c9f227c5700eedffc946a1b1847c1b  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed2_autotest_stage_executed.sh
+744f187e55ad5b914c5158af15bac5a26acf64f92dffe792755b6f9d64eb0ce9  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed3_cross_run_qa_verdict.sh
+declared:
+## 证据文件 sha256
+
+| 文件 | sha256 |
+|------|--------|
+| `seeds/lib.sh` | `2c6997bcf2212bb72f87095951a507f4e4544daae3b9384504e5815df71ae606` |
+| `seeds/seed1_recover_lifecycle.sh` | `a2476a47b08c24c24d2c6f6210501b535a6d1169b8e949df56812899869e680a` |
+| `seeds/seed2_autotest_stage_executed.sh` | `e8285ff425202fc6aeec3fc965510659b0c9f227c5700eedffc946a1b1847c1b` |
+| `seeds/seed3_cross_run_qa_verdict.sh` | `744f187e55ad5b914c5158af15bac5a26acf64f92dffe792755b6f9d64eb0ce9` |
+| `evidence/seed1-red.txt` | `7b4fc7f303a0b03f37becfc30f49c2844457a8d4bf8ab90e24ee91f6214ef87f` |
+
+## 4. seed raw output (three seeds, fresh build from this tree)
+$ go build -o /tmp/beacon-seed ./cmd/beacon
+BUILD OK (exit 0)
+
+===== seed1_recover_lifecycle.sh =====
+after_block=Implement/Blocked
+after_recover=Implement/InProgress
+tick_stage=qa
+tick_blocked=False
+tick_reason=None
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.hKcMpMuVwM/out/seed1.canon
+sha256=488c496ebc2335ff223c8cfbdbb977c4005f07c392d7a2d1347b9e30ce2474fe
+RESULT: PASS - recover restored the lifecycle snapshot and implement advanced to qa
+EXIT=0
+===== seed2_autotest_stage_executed.sh =====
+autotest_total=1
+autotest_passed=1
+autotest_failed=0
+qa_verdict=pass
+qa_reason_codes=
+qa_checks=qa_artifacts_present=True,qa_stage_executed=True,qa_artifact_refs_valid=True
+qa_stage_executed_count=1
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.MUrUdCA767/out/seed2.canon
+sha256=7eacb12dd0b3ef5fc3ca248395b5ec869ae8a36011b870098d523f879e903833
+RESULT: PASS - autotest produced qa stage evidence and the qa gate passed
+EXIT=0
+===== seed3_cross_run_qa_verdict.sh =====
+run_a_qa_verdict=pass
+run_b_stage=qa
+run_b_blocked=True
+run_b_reason=stage_exit_qa_evidence_missing
+run_b_qa_stage_executed_before_exit_tick=0
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.ldgGxZaMT0/out/seed3.canon
+sha256=92cdec723e6c5d6ca3c6e7dc7a3012f2f7e77c257b31178541c5294ab6a93670
+RESULT: PASS - run B stayed at qa (blocked=True, reason=stage_exit_qa_evidence_missing) without its own qa evidence
+EXIT=0
+
+## 5. new AC-004 / AC-005 tests
+$ go test ./internal/orchestrator -run TestKernelRecovery -count=1 -v
+=== RUN   TestKernelRecoveryNegativeGuards
+=== RUN   TestKernelRecoveryNegativeGuards/human_gate_recover_refused_without_state_change
+=== RUN   TestKernelRecoveryNegativeGuards/stage_executed_rejected:_executor_marker_true
+=== RUN   TestKernelRecoveryNegativeGuards/stage_executed_rejected:_recording_true
+=== RUN   TestKernelRecoveryNegativeGuards/stage_executed_rejected:_marker_missing
+=== RUN   TestKernelRecoveryNegativeGuards/real_stage_executed_still_counts
+--- PASS: TestKernelRecoveryNegativeGuards (0.14s)
+    --- PASS: TestKernelRecoveryNegativeGuards/human_gate_recover_refused_without_state_change (0.03s)
+    --- PASS: TestKernelRecoveryNegativeGuards/stage_executed_rejected:_executor_marker_true (0.03s)
+    --- PASS: TestKernelRecoveryNegativeGuards/stage_executed_rejected:_recording_true (0.03s)
+    --- PASS: TestKernelRecoveryNegativeGuards/stage_executed_rejected:_marker_missing (0.03s)
+    --- PASS: TestKernelRecoveryNegativeGuards/real_stage_executed_still_counts (0.03s)
+=== RUN   TestKernelRecoveryContractStable
+--- PASS: TestKernelRecoveryContractStable (0.00s)
+PASS
+ok  	beacon-go/internal/orchestrator	0.464s
+
+## 6. go test ./... (full suite)
+$ go test ./...   # exit 0
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	(cached)
+ok  	beacon-go/internal/agentapi	(cached)
+ok  	beacon-go/internal/benchgate	(cached)
+ok  	beacon-go/internal/changequality	(cached)
+ok  	beacon-go/internal/cli	(cached)
+ok  	beacon-go/internal/core	(cached)
+ok  	beacon-go/internal/effectjournal	(cached)
+ok  	beacon-go/internal/evalgate	58.159s
+ok  	beacon-go/internal/gate	(cached)
+ok  	beacon-go/internal/harness	(cached)
+ok  	beacon-go/internal/llm	(cached)
+ok  	beacon-go/internal/migration	(cached)
+ok  	beacon-go/internal/orchestrator	104.735s
+ok  	beacon-go/internal/progressreview	(cached)
+ok  	beacon-go/internal/session	(cached)
+ok  	beacon-go/internal/store	(cached)
+ok  	beacon-go/internal/stride	(cached)
+ok  	beacon-go/internal/workspace	(cached)
+ok  	beacon-go/skills	(cached)
+
+## 7. feat_lifecycle snapshots (from seed1 raw output above)
+before recover : after_block=Implement/Blocked   (the self-lock)
+after  recover : after_recover=Implement/InProgress
+next implement tick: tick_stage=qa tick_blocked=False tick_reason=None
+
+## 8. implementation summary (who/when/why)
+- internal/orchestrator/complete.go (+17/-1): Recover() now takes stage := m.currentStage() before the tx and, inside the same WithTx as goal_recovered, calls updateLifecycleMonotonic(...Stage=workflowStageForProductStage(stage), Status=InProgress). Release/Completed snapshots are monotonic and never downgraded; human-gate refusal returns before any write.
+- internal/orchestrator/autotest.go (+35/-5): RunAutoTest() computes allPassed = Total>0 && Failed==0 && Blocked==0 and writes autotest_executed plus, only when allPassed, a real stage_executed {stage=qa, executor=kernel_autotest, source=qa_autotest, by, placeholder=false, recording=false, outcome=passed, total, passed} in ONE tx. Failed/blocked/zero-TC suites write no passed evidence.
+- internal/orchestrator/exitgates.go (+23/-11): featureGateFallback() now treats every gate row named by a run-bound stage_exit_evaluated OR gate_evaluated trail event as that run’s own evidence and excludes it from fallback; only unclaimed (feature-level) gate rows remain fallback, so a sibling run cannot open a zero-evidence run’s qa exit.
+- internal/orchestrator/kernel_recovery_qa_bridge_test.go (new): AC-004 negative guards (human gate recover refused with run/lifecycle snapshot unchanged; placeholder=true / recording=true / missing marker stage_executed not counted; a real one still counts) and AC-005 contract stability (reason codes unchanged, aliases unchanged, run FORMAL-FIRST pass/blocked, derived only without verdict, release still human-only).
+
+## 9. mapping note
+AC-001 text says status=active; the Go StageStatus vocabulary has no "active". The kernel uses InProgress, which is exactly the status CreateRun seeds and what seed1 asserts (not /Blocked, tick advances). No enum was widened.
+
+## 10. non-scope confirmation
+- no push, no tag, no release, no qa verdict written.
+- seed files untouched (sha256 above equals tests.md).
+- frozen package docs (truth/tests/tasks/evidence.md) untouched.
+- unrelated ?? files (intent-contract-bridge evidence, docs/changes/) untouched.

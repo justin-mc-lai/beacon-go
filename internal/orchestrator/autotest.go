@@ -46,6 +46,7 @@ import (
 	"beacon-go/internal/core"
 	"beacon-go/internal/gate"
 	"beacon-go/internal/harness"
+	"beacon-go/internal/store"
 )
 
 // EventAutoTestExecuted is appended once per RunAutoTest call with
@@ -214,11 +215,35 @@ func (e *Engine) RunAutoTest(ctx context.Context, runID string, opts AutoTestOpt
 			}
 		}
 	}
-	_ = e.appendEvent(run, EventAutoTestExecuted, map[string]any{
-		"total": report.Total, "passed": report.Passed,
-		"failed": report.Failed, "blocked": report.Blocked,
-		"by": opts.By, "report_path": report.ReportPath,
-	})
+	// AC-002: the aggregate audit event and the qa stage evidence land
+	// as ONE transaction. A suite that ran real TCs and passed every one
+	// of them is a real qa stage execution, so it leaves the same
+	// kernel-authored stage_executed a manual/external completion leaves:
+	// the executor marker is explicitly false (the gate treats a missing
+	// marker as recording state) and the source names this lane. A run
+	// with failures, blocked TCs or no executable TC writes no passed
+	// evidence — the qa gate must stay closed.
+	allPassed := report.Total > 0 && report.Failed == 0 && report.Blocked == 0
+	if err := e.store.WithTx(func(tx *store.Tx) error {
+		if err := e.appendEventOn(tx, run, EventAutoTestExecuted, map[string]any{
+			"total": report.Total, "passed": report.Passed,
+			"failed": report.Failed, "blocked": report.Blocked,
+			"by": opts.By, "report_path": report.ReportPath,
+		}); err != nil {
+			return err
+		}
+		if !allPassed {
+			return nil
+		}
+		return e.appendEventOn(tx, run, "stage_executed", map[string]any{
+			"stage": StageQA, "executor": "kernel_autotest",
+			"source": "qa_autotest", "by": strings.TrimSpace(opts.By),
+			"placeholder": false, "recording": false, "outcome": "passed",
+			"total": report.Total, "passed": report.Passed,
+		})
+	}); err != nil {
+		return report, err
+	}
 	if report.Failed > 0 || report.Blocked > 0 {
 		return report, core.NewError(core.ReasonAutoTestFailed,
 			"qa.RunAutoTest", "auto-test finished with failures or blocked TCs (see report)")
