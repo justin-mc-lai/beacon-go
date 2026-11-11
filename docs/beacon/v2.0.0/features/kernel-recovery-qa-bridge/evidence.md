@@ -90,3 +90,7 @@ RESULT: FAIL - run B reached release without its own qa evidence, borrowing run 
 - 未运行 `truth freeze`，未写 intent 签名，`intent_confirmed: false`。
 - 未 push、未发布、未重建安装 `~/.local/opt/beacon-go/beacon`。
 - 未对三条缺口给出 pass/blocked 的最终验收 verdict；修复后的绿由 implement 与独立 QA 判定。
+
+## implement 阶段（2026-11-11 17:15，HEAD 3f50e09）
+
+生产代码已落地：`complete.go` Recover 同步 lifecycle、`autotest.go` 全过时补真实 `stage_executed`、`exitgates.go` 回落只收未绑定任何 run 的 feature 级 gate 行；新增 `TestKernelRecoveryNegativeGuards` 与 `TestKernelRecoveryContractStable`。复跑证据见 `evidence/implement-rework-20261111T171500.txt`：三条 seed 均 `RESULT: PASS`、`exit=0`，`go test ./...` 全绿，seed 文件 sha256 与 tests.md 一致。上节「本包未做什么」是 plan 阶段的状态，已被本节取代；仍未 push、未发布、未写 QA verdict。
