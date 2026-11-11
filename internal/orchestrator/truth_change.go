@@ -258,6 +258,7 @@ func (e *Engine) CancelTruthChange(ctx store.FeatureContext, by string, acceptCu
 	}
 	liveSHA := sha256HexOf(rawTruth)
 	baseMissing := false
+	bases := make(map[string]string, len(view.PendingChangeIDs))
 	for _, id := range view.PendingChangeIDs {
 		docAbs := filepath.Join(resolvePkgPath(ctx.Project.RootPath, pkgDir), "changes", id+".md")
 		baseSHA := ""
@@ -266,6 +267,7 @@ func (e *Engine) CancelTruthChange(ctx store.FeatureContext, by string, acceptCu
 				baseSHA = scalars["base_truth_sha256"]
 			}
 		}
+		bases[id] = baseSHA
 		if baseSHA == "" {
 			baseMissing = true
 			if !acceptCurrent {
@@ -280,17 +282,32 @@ func (e *Engine) CancelTruthChange(ctx store.FeatureContext, by string, acceptCu
 		}
 	}
 	ids := append([]string{}, view.PendingChangeIDs...)
-	for _, id := range ids {
-		docAbs := filepath.Join(resolvePkgPath(ctx.Project.RootPath, pkgDir), "changes", id+".md")
-		if raw, rerr := os.ReadFile(docAbs); rerr == nil {
-			updated := strings.Replace(string(raw), "status: pending", "status: cancelled", 1)
-			_ = os.WriteFile(docAbs, []byte(updated), 0o644)
-		}
+	// AC-001/AC-005: the cancel event names the decision and the
+	// evidence behind it. AC-005 keeps changes/<id>.md byte-identical,
+	// so the doc status is never rewritten; pending state is derived
+	// from events, and the cancel event only ever appends.
+	payload := map[string]any{
+		"by": by, "change_ids": ids, "decision": "cancel",
+		"accepted_current": acceptCurrent, "baseline_missing": baseMissing,
+		"truth_sha256": liveSHA,
 	}
-	if err := e.appendFeatureEvent(ctx.Feature.ID, EventTruthChangeCancelled, map[string]any{
-		"by": by, "change_ids": ids, "accepted_current": acceptCurrent,
-		"baseline_missing": baseMissing,
-	}); err != nil {
+	if len(ids) == 1 {
+		id := ids[0]
+		payload["change_id"] = id
+		payload["change_doc"] = filepath.ToSlash(filepath.Join(pkgDir, "changes", id+".md"))
+		payload["base_truth_sha256"] = bases[id]
+	} else if len(ids) > 1 {
+		changes := make([]map[string]any, 0, len(ids))
+		for _, id := range ids {
+			changes = append(changes, map[string]any{
+				"change_id":         id,
+				"change_doc":        filepath.ToSlash(filepath.Join(pkgDir, "changes", id+".md")),
+				"base_truth_sha256": bases[id],
+			})
+		}
+		payload["changes"] = changes
+	}
+	if err := e.appendFeatureEvent(ctx.Feature.ID, EventTruthChangeCancelled, payload); err != nil {
 		return view, err
 	}
 	return e.TruthPackage(ctx)

@@ -1,0 +1,20 @@
+# kernel-truth-change-cancel seed3 canon — green run 2026-11-11
+# binary: /tmp/beacon-cancel-verify2 (built from cb7805f + AC-005/usage fixes, working tree)
+# canon sha256: 18fb6b60cd3d41d5d44f8d7650c37a5f772a0b252b78628b8d05f91a968fbeea
+# the canon contains a random chg_ id; compare field values across rounds, not the raw file sha
+# run=first
+rc_first=0
+stderr_first=
+status_first=frozen
+change_pending_first=False
+cancel_events_first=0
+requested_events_first=0
+body_unchanged_first=yes
+# run=second
+rc_second=0
+stderr_second=
+status_second=frozen
+change_pending_second=False
+cancel_events_second=0
+requested_events_second=0
+body_unchanged_second=yes

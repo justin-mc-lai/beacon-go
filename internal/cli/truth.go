@@ -183,6 +183,9 @@ func newTruthChangeCmd() *cobra.Command {
 		Short: "Register a change against a frozen package (writes changes/<id>.md; the truth body is untouched)",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if acceptCurrent && !cancelChange {
+				return fmt.Errorf("--accept-current only applies with --cancel")
+			}
 			st, err := openWriteStore()
 			if err != nil {
 				return err

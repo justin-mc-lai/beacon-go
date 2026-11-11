@@ -1,0 +1,16 @@
+# kernel-truth-change-cancel seed2 canon — green run 2026-11-11
+# binary: /tmp/beacon-cancel-verify2 (built from cb7805f + AC-005/usage fixes, working tree)
+# canon sha256: bb2ac42049964f08137df162d1d15b8aa825c71049a5d025b74e72b3e4db51c5
+# the canon contains a random chg_ id; compare field values across rounds, not the raw file sha
+change_rc=0
+change_pending_at_open=True
+cancel_rc=1
+cancel_stderr=Error: truth.Cancel: change chg_5c4dc9204ca7 has a modified body (base 6e3a649f0ff1 vs live 5644ba1f7df8); run `beacon truth refreeze` instead of cancelling (truth_change_already_pending) 
+status=change_pending
+change_pending=True
+pending_ids=['chg_5c4dc9204ca7']
+cancel_events=0
+requested_events=1
+refrozen_events=0
+body_untouched=yes
+change_doc_present=yes
