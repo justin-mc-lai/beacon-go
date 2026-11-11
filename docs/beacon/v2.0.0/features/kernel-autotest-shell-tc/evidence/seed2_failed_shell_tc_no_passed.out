@@ -1,0 +1,13 @@
+autotest_rc=1
+autotest_total=1
+autotest_failed=1
+tc001_status=failed
+tc001_exit=-1
+tc001_reason=executor_command_missing
+tc001_stdout=
+tc001_stderr=
+qa_stage_executed_count=0
+autotest_executed_count=1
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.qC5jqwLZ6W/out/seed2.canon
+sha256=18edc88107aeb521a209045c6b79ab27b06bf695a7ee3765035821bb70578c50
+RESULT: FAIL - expected the script's exit 7, got exit=-1 reason=executor_command_missing

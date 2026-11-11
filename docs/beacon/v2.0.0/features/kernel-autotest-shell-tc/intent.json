@@ -1,0 +1,28 @@
+{
+  "schema": "beacon-intent-v1",
+  "feature_slug": "kernel-autotest-shell-tc",
+  "version": "v2.0.0",
+  "truth_path": "docs/beacon/v2.0.0/features/kernel-autotest-shell-tc/truth.md",
+  "recorded_at": "2026-11-11T12:32:41Z",
+  "recorded_by": "apple(via opencode)",
+  "confirmed": true,
+  "briefing": {
+    "original_prompt": "让 qa autotest 支持 shell 型 TC",
+    "restated_intent": "qa autotest 能执行 tests.md 中的 shell 命令（按 shebang/后缀选解释器），记录每个 TC 的退出码与输出作为证据；只有 TC 数大于 0 且全部通过时才补写一条真实 stage_executed；失败、blocked、空集都保持拒绝，marker 规则不放宽。",
+    "identified_risks": [
+      "放宽 marker 让执行者自证",
+      "空集或失败被当成通过",
+      "shell 注入或卡死"
+    ],
+    "boundaries": [
+      "不改 gate marker 规则",
+      "不加新的 reason code",
+      "失败与空集必须拒绝",
+      "不 push 不发布"
+    ],
+    "proposed_slugs": [
+      "kernel-autotest-shell-tc"
+    ],
+    "confirmed": true
+  }
+}

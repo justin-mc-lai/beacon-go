@@ -1,0 +1,48 @@
+# kernel-readonly-http-api plan seeds (red)
+date=2026-11-11T20:22:17+0800
+repo=/Users/apple/Developer/Personal/products/beacon-go
+head=36c40b6
+binary=/tmp/beacon-ro-api
+version=Beacon CLI v2.0.0-go.15
+
+===== seed1_default_off
+seed=seed1_default_off
+serve_exit=0
+timed_out=no
+disabled_notice=no
+port=8787
+probe_before=open
+new_listener=no
+PASS: serve exits 0
+PASS: serve exits within 5s
+FAIL: prints a disabled notice (want=yes got=no)
+PASS: adds no listener on 8787
+NOTE: output carried no disabled notice; goal serve is not a known subcommand at this HEAD
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.1LAYhlvMzf/out/seed1.canon
+sha256=c5dbbb5e7ca5edf2a247e0c1a72ee801842832635aa79ba32d9f3e4487c8c592
+RESULT: FAIL - seed1_default_off (1 assertion(s) failed)
+exit=1
+
+===== seed2_loopback_schema_order
+seed=seed2_loopback_schema_order
+serve_started=no
+serve_exit=1
+serve_stderr=unknown_flag
+NOTE: `goal serve --http` did not start: Error: unknown flag: --http 
+FAIL: goal serve --http starts on 127.0.0.1:29195
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.S1N5FLDnJo/out/seed2.canon
+sha256=026aa9655e43ebdea7eac49c6315a960b56cbf1924efaeb17120e38fa620769c
+RESULT: FAIL - seed2_loopback_schema_order (1 assertion(s) failed)
+exit=1
+
+===== seed3_no_write_surface
+seed=seed3_no_write_surface
+serve_started=no
+serve_exit=1
+serve_stderr=unknown_flag
+NOTE: `goal serve --http` did not start: Error: unknown flag: --http 
+FAIL: goal serve --http starts on 127.0.0.1:32510
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.nSK6CXX5eX/out/seed3.canon
+sha256=89dca9db3ff1af172a6236c22812831d8a0adea330e0114fab9d2e9be67f46da
+RESULT: FAIL - seed3_no_write_surface (1 assertion(s) failed)
+exit=1

@@ -1,0 +1,28 @@
+{
+  "schema": "beacon-intent-v1",
+  "feature_slug": "kernel-readonly-http-api",
+  "version": "v2.0.0",
+  "truth_path": "docs/beacon/v2.0.0/features/kernel-readonly-http-api/truth.md",
+  "recorded_at": "2026-11-11T12:32:46Z",
+  "recorded_by": "apple(via opencode)",
+  "confirmed": true,
+  "briefing": {
+    "original_prompt": "给内核加只读 HTTP/JSON 服务面",
+    "restated_intent": "在 beacon-go 里新增默认关闭的只读 HTTP 服务：仅在 --http 时启动，只绑 127.0.0.1，提供 health、spine runs、spine gates、runs/{id}、features/{slug} 五个 GET 端点，schema 与排序固定，非 GET 一律 405，不存在任何写操作或 release/publish 路径。",
+    "identified_risks": [
+      "端点 schema 漂移会让 OMB 投影失效",
+      "误绑 0.0.0.0 暴露内核账本",
+      "悄悄加入写端点"
+    ],
+    "boundaries": [
+      "只读打开账本",
+      "默认不启动",
+      "不引入 release 能力",
+      "不改 gate 语义"
+    ],
+    "proposed_slugs": [
+      "kernel-readonly-http-api"
+    ],
+    "confirmed": true
+  }
+}

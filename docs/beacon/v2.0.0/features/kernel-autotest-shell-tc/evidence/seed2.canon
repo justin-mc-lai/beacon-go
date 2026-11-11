@@ -1,0 +1,10 @@
+autotest_rc=1
+autotest_total=1
+autotest_failed=1
+tc001_status=failed
+tc001_exit=-1
+tc001_reason=executor_command_missing
+tc001_stdout=
+tc001_stderr=
+qa_stage_executed_count=0
+autotest_executed_count=1

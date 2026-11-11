@@ -1,0 +1,18 @@
+autotest_rc=1
+autotest_total=2
+autotest_passed=0
+autotest_failed=2
+tc001_status=failed
+tc001_exit=-1
+tc001_reason=executor_command_missing
+tc001_stdout=
+tc002_status=failed
+tc002_exit=-1
+tc002_stdout=
+qa_stage_executed_count=0
+autotest_executed_count=1
+--- stderr
+Error: qa.RunAutoTest: auto-test finished with failures or blocked TCs (see report) (autotest_failed)
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.SP0IARPAzA/out/seed1.canon
+sha256=6ed34ca4e5c8ceb43570bec9edb43321299808fa115ef69d65d56a9eae136db3
+RESULT: FAIL - qa autotest run exited 1; shell TC rows did not execute
