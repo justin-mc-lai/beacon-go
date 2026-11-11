@@ -1,0 +1,11 @@
+# seed1 red run @ afd5cc7 2026-11-11T08:27:46Z
+# command: BEACON_BIN=/tmp/beacon-seed zsh docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed1_recover_lifecycle.sh
+after_block=Implement/Blocked
+after_recover=Implement/Blocked
+tick_stage=implement
+tick_blocked=True
+tick_reason=stage_exit_implement_blocked
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.vLpW7rDVOx/out/seed1.canon
+sha256=06828a808db5165abb730701eb98755f0ea0c360b4092e3998b3d4b1e1d9269b
+RESULT: FAIL - recover cleared the run but lifecycle stayed Implement/Blocked
+exit=1

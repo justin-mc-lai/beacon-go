@@ -1,0 +1,11 @@
+# seed3 red run @ afd5cc7 2026-11-11T08:27:49Z
+# command: BEACON_BIN=/tmp/beacon-seed zsh docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed3_cross_run_qa_verdict.sh
+run_a_qa_verdict=pass
+run_b_stage=release
+run_b_blocked=False
+run_b_reason=None
+run_b_qa_stage_executed_before_exit_tick=0
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.Mm0HiCAiYy/out/seed3.canon
+sha256=32f60684271289ca9fe9f5c1388f0b105b1a1afed30f070b48d10adbe069aaac
+RESULT: FAIL - run B reached release without its own qa evidence, borrowing run A's verdict
+exit=1

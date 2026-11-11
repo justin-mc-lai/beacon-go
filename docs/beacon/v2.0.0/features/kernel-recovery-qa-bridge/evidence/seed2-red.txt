@@ -1,0 +1,13 @@
+# seed2 red run @ afd5cc7 2026-11-11T08:27:48Z
+# command: BEACON_BIN=/tmp/beacon-seed zsh docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed2_autotest_stage_executed.sh
+autotest_total=1
+autotest_passed=1
+autotest_failed=0
+qa_verdict=blocked
+qa_reason_codes=qa_stage_not_executed
+qa_checks=qa_artifacts_present=True,qa_stage_executed=False,qa_artifact_refs_valid=True
+qa_stage_executed_count=0
+canon=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.Uldt9FEsI2/out/seed2.canon
+sha256=824a353fd733a728720002885817f1e496e0e207745e03097001696ca064b648
+RESULT: FAIL - autotest passed 1/1 but the qa gate still reports qa_stage_not_executed
+exit=1

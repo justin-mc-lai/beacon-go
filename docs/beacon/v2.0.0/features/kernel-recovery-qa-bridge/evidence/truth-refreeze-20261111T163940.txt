@@ -1,0 +1,135 @@
+truth freeze landing evidence  20261111T163940
+project: /Users/apple/Developer/Personal/products/beacon-go
+feature: kernel-recovery-qa-bridge  version: v2.0.0
+head_before_commit: afd5cc7
+
+## 1) freeze content source
+restored byte-identical from d15399e (git checkout d15399e -- docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/)
+truth.md sha256: bfb60aeef632c4c4227741c0a80488746c76f55b0dd9a682501d210d1fe022b2
+freeze record truth_sha256_after (store): bfb60aeef632c4c4227741c0a80488746c76f55b0dd9a682501d210d1fe022b2
+
+## 2) seed sha256 (unchanged vs d15399e)
+2c6997bcf2212bb72f87095951a507f4e4544daae3b9384504e5815df71ae606  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/lib.sh
+a2476a47b08c24c24d2c6f6210501b535a6d1169b8e949df56812899869e680a  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed1_recover_lifecycle.sh
+e8285ff425202fc6aeec3fc965510659b0c9f227c5700eedffc946a1b1847c1b  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed2_autotest_stage_executed.sh
+744f187e55ad5b914c5158af15bac5a26acf64f92dffe792755b6f9d64eb0ce9  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed3_cross_run_qa_verdict.sh
+
+## 3) 命令原始输出
+$ beacon-go truth show --feature kernel-recovery-qa-bridge --version v2.0.0 --json
+{
+  "slug": "kernel-recovery-qa-bridge",
+  "feature_id": "feat_ead73fb35e5b0801aaa9eaf2",
+  "project_root": "/Users/apple/Developer/Personal/products/beacon-go",
+  "version": "v2.0.0",
+  "status": "frozen",
+  "frozen": true,
+  "change_pending": false,
+  "package_dir": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge",
+  "truth_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/truth.md",
+  "tests_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/tests.md",
+  "tasks_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/tasks.md",
+  "evidence_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence.md",
+  "lifecycle_stage": "Freeze",
+  "lifecycle_status": "Completed",
+  "branch_check": "ok",
+  "current_branch": "main",
+  "canonical_branch": "main",
+  "baseline_status": "committed",
+  "baseline_commit": "d15399e6eaea429a7e06a73bcef1586ddfa8dde4"
+}
+
+$ beacon-go truth freeze --feature kernel-recovery-qa-bridge --version v2.0.0 --json
+{
+  "slug": "kernel-recovery-qa-bridge",
+  "feature_id": "feat_ead73fb35e5b0801aaa9eaf2",
+  "project_root": "/Users/apple/Developer/Personal/products/beacon-go",
+  "version": "v2.0.0",
+  "status": "frozen",
+  "frozen": true,
+  "change_pending": false,
+  "package_dir": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge",
+  "truth_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/truth.md",
+  "tests_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/tests.md",
+  "tasks_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/tasks.md",
+  "evidence_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence.md",
+  "lifecycle_stage": "Freeze",
+  "lifecycle_status": "Completed",
+  "already_frozen": true,
+  "branch_check": "ok",
+  "current_branch": "main",
+  "canonical_branch": "main",
+  "baseline_status": "committed",
+  "baseline_commit": "d15399e6eaea429a7e06a73bcef1586ddfa8dde4"
+}
+
+$ beacon-go truth drift --feature kernel-recovery-qa-bridge --version v2.0.0
+package: kernel-recovery-qa-bridge
+clean:   true
+body drift: false
+exit=0
+
+$ git status --short -- docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence.md
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence/seed1-red.txt
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence/seed2-red.txt
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence/seed3-red.txt
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/intent.json
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/lib.sh
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed1_recover_lifecycle.sh
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed2_autotest_stage_executed.sh
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/seeds/seed3_cross_run_qa_verdict.sh
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/tasks.md
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/tests.md
+A  docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/truth.md
+?? docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence/truth-refreeze-20261111T163940.txt
+
+## 4) d15399e 处置
+d15399e 的内容已 byte-identical 落回 main 工作树并在本提交中入库；d15399e 本身仍是不在 main 上的游离提交（仅 reflog 可达），被本提交取代，未合入、未复用其提交号。
+
+## 5) 签署来源（留痕）
+冻结事件 signer: apple(via opencode)（truth_frozen 事件 2026-11-11T08:33:37Z）；body 的 intent_confirmed: true 来自该次冻结。本次落库未新增 intent 签署事件。
+业务代码零改动：git status --short -- '*.go' 为空。
+
+## 6) 提交后复核
+landed_commit: 3007f91 3007f91af0eea159a951a7b67544353842c045fb
+
+$ beacon-go truth baseline --feature kernel-recovery-qa-bridge --version v2.0.0 --json
+{
+  "slug": "kernel-recovery-qa-bridge",
+  "feature_id": "feat_ead73fb35e5b0801aaa9eaf2",
+  "project_root": "/Users/apple/Developer/Personal/products/beacon-go",
+  "version": "v2.0.0",
+  "status": "frozen",
+  "frozen": true,
+  "change_pending": false,
+  "package_dir": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge",
+  "truth_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/truth.md",
+  "tests_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/tests.md",
+  "tasks_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/tasks.md",
+  "evidence_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence.md",
+  "lifecycle_stage": "Freeze",
+  "lifecycle_status": "Completed",
+  "branch_check": "ok",
+  "current_branch": "main",
+  "canonical_branch": "main",
+  "baseline_status": "committed",
+  "baseline_commit": "3007f91af0eea159a951a7b67544353842c045fb",
+  "baseline_recorded": true
+}
+exit=0
+
+$ beacon-go truth show --feature kernel-recovery-qa-bridge --version v2.0.0 --json | jq -c "{status,frozen,baseline_status,baseline_commit,lifecycle_stage,lifecycle_status}"
+{"status":"frozen","frozen":true,"baseline_status":"committed","baseline_commit":"3007f91af0eea159a951a7b67544353842c045fb","lifecycle_stage":"Freeze","lifecycle_status":"Completed"}
+
+$ beacon-go truth drift --feature kernel-recovery-qa-bridge --version v2.0.0
+package: kernel-recovery-qa-bridge
+clean:   true
+body drift: false
+exit=0
+
+$ git status --short -- docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge
+ M docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/evidence/truth-refreeze-20261111T163940.txt
+(空 = 包已全部入库)
+
+$ go test ./...
+exit=0（全绿：internal/orchestrator 102.827s、internal/cli 15.585s、internal/evalgate 55.070s 等全部 ok）

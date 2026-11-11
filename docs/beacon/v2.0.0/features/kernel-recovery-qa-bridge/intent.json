@@ -1,0 +1,28 @@
+{
+  "schema": "beacon-intent-v1",
+  "feature_slug": "kernel-recovery-qa-bridge",
+  "version": "v2.0.0",
+  "truth_path": "docs/beacon/v2.0.0/features/kernel-recovery-qa-bridge/truth.md",
+  "recorded_at": "2026-11-11T08:32:37Z",
+  "recorded_by": "apple(via opencode)",
+  "confirmed": true,
+  "briefing": {
+    "original_prompt": "修三个已实测的内核缺口：recover 不同步 lifecycle、autotest 不产生真实 qa 证据、跨 run qa verdict 互相污染",
+    "restated_intent": "把三处会让交付卡死或误判的内核缺陷修掉：①goal recover 清 run 阻断时必须同步校订 lifecycle 快照，否则 Implement/Blocked 会让 exit gate 永久自锁；②qa autotest 在聚合成功（有 TC 且全过）时补写一条真实 stage_executed，让自动测试成为可被闸接受的真实执行证据（不得放宽 marker 规则）；③qa 出口只看本 run 的事实，feature 级回落不得让其它 run 的 blocked verdict 污染新 run。",
+    "identified_risks": [
+      "放宽 placeholder/marker 规则会让执行者自证通过",
+      "recover 改写 lifecycle 可能把已 release 的快照降级",
+      "跨 run 收敛过度会让 feature 级合法 verdict 失效"
+    ],
+    "boundaries": [
+      "不新增或改名 reason code",
+      "不改 release 语义与 formal-first 优先级",
+      "autotest 失败或 0 个 TC 不得写 passed 证据",
+      "不 push、不打 tag、不发布"
+    ],
+    "proposed_slugs": [
+      "kernel-recovery-qa-bridge"
+    ],
+    "confirmed": true
+  }
+}
