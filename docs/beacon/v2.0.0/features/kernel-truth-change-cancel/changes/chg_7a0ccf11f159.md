@@ -1,7 +1,9 @@
 ---
 change_id: chg_7a0ccf11f159
 slug: kernel-truth-change-cancel
-status: pending
+rebased_by: apple(via opencode)
+rebased_at: 2026-11-11T13:26:21.125745Z
+status: cancelled
 created_by: apple(via opencode)
 created_at: 2026-11-11T13:26:11.938088Z
 base_truth_sha256: 38ffceea1eff20e46cded50687287773e0f2197150ecd6d0db2b6aef814c031d
@@ -22,3 +24,7 @@ base_requirement_fingerprints:
 ## Route
 
 Edit the package truth (and its tests/tasks/evidence as needed), then close this change with `beacon truth refreeze`. The change stays pending — and the truth_freeze gate stays blocked — until the refreeze lands.
+
+## Rebase Note
+
+回退打包期文档改动，接受冻结正文为基线

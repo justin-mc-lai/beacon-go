@@ -39,13 +39,13 @@ scope_mode: focused
 
 ## 起点现场
 
-- 单一真源为 beacon-go 仓库，本 feature 包位于 `docs/beacon/v2.0.0/features/kernel-truth-change-cancel/`；派单时 HEAD 为 `0efd235`，打包期间另一条线的 docs-only 提交把 HEAD 推进到 `199e875`，三条 seed 已在 `199e875` 重跑。
-- 派单时工作区另有其他 feature 的未提交改动；打包期间这些改动已被另一条线提交，本包始终未接触、未提交它们。
+- 单一真源为 beacon-go 仓库，HEAD `0efd235`，本 feature 包位于 `docs/beacon/v2.0.0/features/kernel-truth-change-cancel/`。
+- 工作区另有其他 feature 的未提交改动，本包不接触、不提交。
 - `truth change` 的实现位于 `internal/cli/truth.go`（命令）与 `internal/orchestrator/truth_change.go`（引擎）；`--summary` 当前被 `MarkFlagRequired` 强制。
 - 挂起状态由两处扫描得出：`internal/orchestrator/truth.go` 的 `pendingChangeIDs` 与 `internal/orchestrator/branch.go` 的 `trailRecords`；两处都只在 `truth_frozen` / `truth_refrozen` 时清空挂起列表。
 - 本阶段未建 goal run、未 tick、未 freeze、未改生产代码。
 
-## 当前行为（隔离 store 实测，0efd235 与 199e875 结果一致）
+## 当前行为（HEAD 0efd235，隔离 store 实测）
 
 | ID | 实测事实 |
 |----|----------|

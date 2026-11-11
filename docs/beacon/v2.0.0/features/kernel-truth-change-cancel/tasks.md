@@ -1,6 +1,5 @@
 ---
 slug: kernel-truth-change-cancel
-materials_status: stale
 version: v2.0.0
 status: draft
 revision_id: R1-draft
