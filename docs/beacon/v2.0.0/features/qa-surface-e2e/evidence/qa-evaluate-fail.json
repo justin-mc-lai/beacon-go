@@ -1,0 +1,47 @@
+{
+  "gate_type": "qa",
+  "verdict": "blocked",
+  "reason_codes": [
+    "qa_autotest_recorded_missing",
+    "qa_surface_evidence_miss:desktop"
+  ],
+  "checks": [
+    {
+      "check": "qa_artifacts_present",
+      "ok": true,
+      "applicable": true,
+      "detail": "QA artifact pointers recorded"
+    },
+    {
+      "check": "qa_stage_executed",
+      "ok": true,
+      "applicable": true,
+      "detail": "a qa stage execution is on record (stage_executed)"
+    },
+    {
+      "check": "qa_artifact_refs_valid",
+      "ok": true,
+      "applicable": true,
+      "detail": "every QA artifact file exists and its hash matches"
+    },
+    {
+      "check": "qa_autotest_recorded",
+      "ok": false,
+      "applicable": true,
+      "reason_code": "qa_autotest_recorded_missing",
+      "detail": "no .beacon/autotest/\u003crun-id\u003e/ evidence and no registered autotest artifact for this feature's runs"
+    },
+    {
+      "check": "qa_surface_evidence",
+      "ok": false,
+      "applicable": true,
+      "reason_code": "qa_surface_evidence_miss:desktop",
+      "detail": "missing surface evidence: qa_surface_evidence_miss:desktop"
+    }
+  ],
+  "evaluator": "qa-bot",
+  "feature_id": "feat_4e5ce1b44c20604c4462a266",
+  "feature_slug": "feat-a",
+  "gate_result_id": "gate_7717c867dedc39f77801c846",
+  "evaluated_at": "2026-11-12T15:48:22.968695000Z"
+}

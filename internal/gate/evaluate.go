@@ -253,6 +253,66 @@ type QAFacts struct {
 	QAArtifactCount int
 	QAStageExecuted bool
 	StaleArtifacts  []StaleRef
+	// qa-surface-e2e: the two fail-closed doors. The gate still never
+	// runs tests; it now refuses to pass without evidence that some
+	// autotest record exists and that every declared surface has its
+	// own kind of proof.
+	AutotestRecorded bool
+	AutotestDetail   string
+	// Surfaces is the requirement truth's `surfaces` list (empty when
+	// the package never declared one).
+	Surfaces []string
+	// SurfaceStrict is `surface_strict: true` on the frozen package.
+	// false keeps the legacy waiver: the two new checks only warn.
+	SurfaceStrict bool
+	// LiveKindCounts counts live (hash-matching) artifacts per kind;
+	// SurfaceEvidence maps a declared surface to the kinds registered.
+	SurfaceEvidence map[string]map[string]bool
+}
+
+// qaSurfaceEvidenceItem is one declared surface's proof requirement.
+func qaSurfaceEvidenceItem(f QAFacts) CheckItem {
+	if !f.SurfaceStrict {
+		return warnItem("qa_surface_evidence", core.ReasonLegacyWaiverSurface,
+			"surface_strict is false (legacy package): declared-surface evidence is only warned about")
+	}
+	if len(f.Surfaces) == 0 {
+		return failItem("qa_surface_evidence", "qa_surface_evidence_miss:surfaces_undeclared",
+			"surface_strict is true but the truth declares no surfaces")
+	}
+	var missing []string
+	for _, surface := range f.Surfaces {
+		want := SurfaceEvidenceKind(surface)
+		if want == "" {
+			missing = append(missing, SurfaceEvidenceReason(surface))
+			continue
+		}
+		kinds := f.SurfaceEvidence[surface]
+		if !kinds[want] {
+			missing = append(missing, SurfaceEvidenceReason(surface))
+		}
+	}
+	if len(missing) == 0 {
+		return okItem("qa_surface_evidence", "every declared surface has its evidence kind")
+	}
+	return failItem("qa_surface_evidence", missing[0],
+		"missing surface evidence: "+strings.Join(missing, ", "))
+}
+
+func qaAutotestItem(f QAFacts) CheckItem {
+	if !f.SurfaceStrict {
+		return warnItem("qa_autotest_recorded", core.ReasonLegacyWaiverSurface,
+			"surface_strict is false (legacy package): autotest evidence is only warned about")
+	}
+	if f.AutotestRecorded {
+		detail := f.AutotestDetail
+		if detail == "" {
+			detail = "autotest evidence on record"
+		}
+		return okItem("qa_autotest_recorded", detail)
+	}
+	return failItem("qa_autotest_recorded", core.ReasonQAAutotestRecordedMissing,
+		"no .beacon/autotest/<run-id>/ evidence and no registered autotest artifact for this feature's runs")
 }
 
 func EvaluateQA(f QAFacts, evaluator string) Evaluation {
@@ -278,6 +338,7 @@ func EvaluateQA(f QAFacts, evaluator string) Evaluation {
 		checks = append(checks, failItem("qa_artifact_refs_valid", core.ReasonQAArtifactStale,
 			"stale QA artifact "+first.Path+" ("+first.Reason+")"))
 	}
+	checks = append(checks, qaAutotestItem(f), qaSurfaceEvidenceItem(f))
 	return finish(GateQA, evaluator, checks)
 }
 

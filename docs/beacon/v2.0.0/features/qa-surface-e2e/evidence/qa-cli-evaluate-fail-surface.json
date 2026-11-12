@@ -1,0 +1,47 @@
+{
+  "gate_type": "qa",
+  "verdict": "blocked",
+  "reason_codes": [
+    "qa_surface_evidence_miss:desktop"
+  ],
+  "checks": [
+    {
+      "check": "qa_artifacts_present",
+      "ok": true,
+      "applicable": true,
+      "detail": "QA artifact pointers recorded"
+    },
+    {
+      "check": "qa_stage_executed",
+      "ok": true,
+      "applicable": true,
+      "detail": "a qa stage execution is on record (stage_executed)"
+    },
+    {
+      "check": "qa_artifact_refs_valid",
+      "ok": true,
+      "applicable": true,
+      "detail": "every QA artifact file exists and its hash matches"
+    },
+    {
+      "check": "qa_autotest_recorded",
+      "ok": true,
+      "applicable": true,
+      "detail": "autotest evidence recorded for run run_9b66f03be3b78114a2e0cf5a"
+    },
+    {
+      "check": "qa_surface_evidence",
+      "ok": false,
+      "applicable": true,
+      "reason_code": "qa_surface_evidence_miss:desktop",
+      "detail": "missing surface evidence: qa_surface_evidence_miss:desktop"
+    }
+  ],
+  "evaluator": "qa-bot",
+  "feature_id": "feat_8d485204631a806e531697c9",
+  "feature_slug": "cli-fail-surface",
+  "run_id": "run_9b66f03be3b78114a2e0cf5a",
+  "gate_result_id": "gate_cdc616a1df01039e5c9c8c55",
+  "evaluated_at": "2026-11-12T15:47:48.804935000Z"
+}
+Error: gate evaluate: gate qa blocked for feature cli-fail-surface (qa_surface_evidence_miss:desktop)

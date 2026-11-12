@@ -1,0 +1,42 @@
+{
+  "gate_type": "qa",
+  "verdict": "pass",
+  "checks": [
+    {
+      "check": "qa_artifacts_present",
+      "ok": true,
+      "applicable": true,
+      "detail": "QA artifact pointers recorded"
+    },
+    {
+      "check": "qa_stage_executed",
+      "ok": true,
+      "applicable": true,
+      "detail": "a qa stage execution is on record (stage_executed)"
+    },
+    {
+      "check": "qa_artifact_refs_valid",
+      "ok": true,
+      "applicable": true,
+      "detail": "every QA artifact file exists and its hash matches"
+    },
+    {
+      "check": "qa_autotest_recorded",
+      "ok": true,
+      "applicable": true,
+      "detail": "autotest evidence recorded for run run_5fd9c6b957ce6d17bc7f4a78"
+    },
+    {
+      "check": "qa_surface_evidence",
+      "ok": true,
+      "applicable": true,
+      "detail": "every declared surface has its evidence kind"
+    }
+  ],
+  "evaluator": "qa-bot",
+  "feature_id": "feat_323f87bd4d397cf5ec721c75",
+  "feature_slug": "cli-pass",
+  "run_id": "run_5fd9c6b957ce6d17bc7f4a78",
+  "gate_result_id": "gate_c07d2ea9db2be2bd4f0c10ab",
+  "evaluated_at": "2026-11-12T15:47:48.782920000Z"
+}

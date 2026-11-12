@@ -1,0 +1,9 @@
+package:  surf-bad2 (v2.0.0)
+status:   draft
+dir:      docs/beacon/v2.0.0/features/surf-bad2
+lifecycle: Think/NotStarted
+branch:   check=not_a_git_repo
+surfaces: foo (strict=false)
+blocked:  truth_surface_invalid
+  [truth_surface_invalid       ] docs/beacon/v2.0.0/features/surf-bad2/truth.md — surface declaration rejected: truth_surface_invalid
+Error: truth.Freeze: package surf-bad2 is blocked by the freeze precheck (1 finding(s)); first reasons: truth_surface_invalid (truth_surface_invalid)

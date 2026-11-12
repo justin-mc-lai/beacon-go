@@ -74,6 +74,11 @@ type CheckItem struct {
 	Applicable bool   `json:"applicable"`
 	ReasonCode string `json:"reason_code,omitempty"`
 	Detail     string `json:"detail,omitempty"`
+	// Severity is empty for a hard item and "warn" for an item that is
+	// reported without affecting the verdict (the qa gate's legacy
+	// surface waiver). It never changes finish(): only applicable+!OK
+	// items block.
+	Severity string `json:"severity,omitempty"`
 }
 
 // Evaluation is one formal gate evaluation: the persisted verdict plus
@@ -131,4 +136,11 @@ func naItemCode(check, code, detail string) CheckItem {
 
 func failItem(check, code, detail string) CheckItem {
 	return CheckItem{Check: check, Applicable: true, ReasonCode: code, Detail: detail}
+}
+
+// warnItem reports a finding that must be visible but never blocks: a
+// satisfied item (OK) carrying the warning's reason code and the warn
+// severity. finish() ignores OK items, so the verdict stays pass.
+func warnItem(check, code, detail string) CheckItem {
+	return CheckItem{Check: check, OK: true, Applicable: true, ReasonCode: code, Detail: detail, Severity: "warn"}
 }

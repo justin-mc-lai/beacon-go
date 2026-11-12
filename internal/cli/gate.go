@@ -171,6 +171,12 @@ type gateStatusRow struct {
 	Verdict     string   `json:"verdict,omitempty"`
 	ReasonCodes []string `json:"reason_codes,omitempty"`
 	EvaluatedAt string   `json:"evaluated_at,omitempty"`
+	// Warnings are non-blocking observations about the package that
+	// feed the gate's judgement, surfaced where a human looks first.
+	// qa-surface-e2e: a legacy frozen package without a `surfaces`
+	// key gets surface_undeclared — a notice, never a retroactive
+	// failure and never a mutation of the old package.
+	Warnings []string `json:"warnings,omitempty"`
 }
 
 func newGateStatusCmd() *cobra.Command {
@@ -202,6 +208,12 @@ func newGateStatusCmd() *cobra.Command {
 				byType[g.GateType] = g
 			}
 			rows := make([]gateStatusRow, 0, len(gate.OrderedGateTypes))
+			// qa-surface-e2e: read the declaration once; a legacy package
+			// (no surfaces key) is only warned about, never judged.
+			var packageWarnings []string
+			if view, verr := orchestrator.NewEngine(st).TruthPackage(ctx); verr == nil && !view.SurfacesDeclared {
+				packageWarnings = append(packageWarnings, core.ReasonSurfaceUndeclared)
+			}
 			for _, t := range gate.OrderedGateTypes {
 				row := gateStatusRow{GateType: string(t)}
 				if g, ok := byType[string(t)]; ok {
@@ -209,6 +221,9 @@ func newGateStatusCmd() *cobra.Command {
 					row.Verdict = g.Verdict
 					row.ReasonCodes = g.ReasonCodes
 					row.EvaluatedAt = g.EvaluatedAt
+				}
+				if t == gate.GateQA && len(packageWarnings) > 0 {
+					row.Warnings = packageWarnings
 				}
 				rows = append(rows, row)
 			}
@@ -218,6 +233,7 @@ func newGateStatusCmd() *cobra.Command {
 					"feature_id":   ctx.Feature.ID,
 					"version":      ctx.Version.Version,
 					"gates":        rows,
+					"warnings":     packageWarnings,
 				})
 			}
 			out := cmd.OutOrStdout()
@@ -227,6 +243,9 @@ func newGateStatusCmd() *cobra.Command {
 					continue
 				}
 				fmt.Fprintf(out, "%-16s %-10s %v (%s)\n", r.GateType, r.Verdict, r.ReasonCodes, r.EvaluatedAt)
+			}
+			for _, w := range packageWarnings {
+				fmt.Fprintf(out, "warning:   %s\n", w)
 			}
 			return nil
 		},

@@ -108,6 +108,13 @@ type TruthPackageView struct {
 	PreviousRevisionID string `json:"previous_revision_id,omitempty"`
 	NewRevisionID      string `json:"new_revision_id,omitempty"`
 	ReopenReason       string `json:"reopen_reason,omitempty"`
+	// qa-surface-e2e: the package's declared surfaces and the strict
+	// flag the qa gate reads. A legacy package has SurfacesDeclared
+	// false, an empty list and SurfaceStrict false.
+	Surfaces         []string            `json:"surfaces,omitempty"`
+	SurfacesDeclared bool                `json:"surfaces_declared"`
+	SurfaceStrict    bool                `json:"surface_strict"`
+	ACSurfaces       map[string][]string `json:"ac_surfaces,omitempty"`
 }
 
 var slugRe = regexp.MustCompile(`^[a-z0-9]+(?:[-_][a-z0-9]+)*$`)
@@ -170,14 +177,19 @@ func (e *Engine) TruthPackage(ctx store.FeatureContext) (TruthPackageView, error
 			fmStatus = scalars["status"]
 		}
 	}
+	decl := gate.ParseSurfaceDeclaration(pkg.Truth.Text)
 	v := TruthPackageView{
 		Slug: feat.Slug, FeatureID: feat.ID, ProjectRoot: ctx.Project.RootPath,
-		Version:      ctx.Version.Version,
-		PackageDir:   filepath.Dir(feat.TruthPath),
-		TruthPath:    feat.TruthPath,
-		TestsPath:    pkg.Tests.Path,
-		TasksPath:    pkg.Tasks.Path,
-		EvidencePath: pkg.Evidence.Path,
+		Version:          ctx.Version.Version,
+		PackageDir:       filepath.Dir(feat.TruthPath),
+		TruthPath:        feat.TruthPath,
+		TestsPath:        pkg.Tests.Path,
+		TasksPath:        pkg.Tasks.Path,
+		EvidencePath:     pkg.Evidence.Path,
+		Surfaces:         decl.Surfaces,
+		SurfacesDeclared: decl.Declared,
+		SurfaceStrict:    decl.Strict,
+		ACSurfaces:       decl.ACSurfaces,
 	}
 	if lc, err := e.store.Features().GetLifecycle(feat.ID); err == nil {
 		v.LifecycleStage = string(lc.Stage)
@@ -374,6 +386,25 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string) (TruthPacka
 			return view, false, nil
 		}
 	}
+	// qa-surface-e2e: a declared surface list must be non-empty and
+	// in the closed vocabulary, and under strict (the default for a
+	// new freeze) every AC's `surface=` must stay inside it. A package
+	// with no `surfaces` key is legacy and is not judged here.
+	surfaceDecl := gate.ParseSurfaceDeclaration(pkg.Truth.Text)
+	effective := surfaceDecl
+	effective.Strict = surfaceDecl.EffectiveStrict()
+	if codes := gate.ValidateSurfaceDeclaration(effective); len(codes) > 0 {
+		view.Blocked = true
+		view.BlockReasons = codes
+		for _, code := range codes {
+			view.Findings = append(view.Findings, gate.Finding{
+				Kind: code, ReasonCode: code, File: pkg.Truth.Path,
+				Detail:      "surface declaration rejected: " + code,
+				RepairRoute: gate.DefaultRepairRoute,
+			})
+		}
+		return view, false, nil
+	}
 	iv, err := e.EvaluateIntegrity(ctx, by, gate.IntegrityModeBlock)
 	if err != nil {
 		return TruthPackageView{}, false, err
@@ -424,12 +455,29 @@ func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload
 	if err != nil {
 		return TruthPackageView{}, err
 	}
+	// qa-surface-e2e: a fresh freeze of a package that declares
+	// surfaces without saying surface_strict becomes strict. A legacy
+	// package (no surfaces key) is untouched, and an explicit
+	// `surface_strict: false` stays the author's waiver. The write
+	// happens after truth_sha256_before was taken, so that hash still
+	// describes the bytes the author froze.
+	surfaceDecl := gate.ParseSurfaceDeclaration(string(rawBefore))
+	if surfaceDecl.Declared && len(surfaceDecl.Surfaces) > 0 && !surfaceDecl.StrictDeclared {
+		if updated, changed := setFrontmatterScalar(string(raw), "surface_strict", "true"); changed {
+			if err := os.WriteFile(abs, []byte(updated), 0o644); err != nil {
+				return TruthPackageView{}, err
+			}
+			raw = []byte(updated)
+		}
+	}
 	sum := sha256.Sum256(rawBefore)
 	if payload == nil {
 		payload = map[string]any{}
 	}
 	payload["slug"] = ctx.Feature.Slug
 	payload["truth_sha256_before"] = hex.EncodeToString(sum[:])
+	payload["surfaces"] = surfaceDecl.Surfaces
+	payload["surface_strict"] = surfaceDecl.EffectiveStrict()
 	// Package body fingerprint (P4c): the drift baseline doctor
 	// rebuild checks later. Recorded from the pre-flip bytes — the
 	// fingerprint normalizes the status line out, so it describes

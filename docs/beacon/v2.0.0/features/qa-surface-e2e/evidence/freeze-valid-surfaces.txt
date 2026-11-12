@@ -1,0 +1,7 @@
+package:  surf-ok2 (v2.0.0)
+status:   frozen
+dir:      docs/beacon/v2.0.0/features/surf-ok2
+lifecycle: Freeze/Completed
+branch:   check=not_a_git_repo
+surfaces: api,desktop (strict=true)
+baseline: not_a_git_repo

@@ -8,6 +8,8 @@ package orchestrator
 import (
 	"context"
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"beacon-go/internal/core"
@@ -183,6 +185,8 @@ func qaKind(kind string) bool {
 	switch {
 	case kind == "qa", kind == "scorecard", kind == "test_result", kind == "test_results":
 		return true
+	case kind == "a11y_tree", kind == "browser_trace", kind == "e2e_report":
+		return true
 	case strings.HasPrefix(kind, "qa_"):
 		return true
 	}
@@ -192,6 +196,12 @@ func qaKind(kind string) bool {
 // evalQA gathers the QA-evidence facts across the feature's runs.
 func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evaluation, error) {
 	f := gate.QAFacts{}
+	// qa-surface-e2e: the requirement truth names the surfaces the run
+	// must prove. A package without the key is legacy (strict=false).
+	decl := gate.ParseSurfaceDeclaration(readPkgFile(ctx.Project.RootPath, ctx.Feature.TruthPath).Text)
+	f.Surfaces = decl.Surfaces
+	f.SurfaceStrict = decl.EffectiveStrict()
+	f.SurfaceEvidence = map[string]map[string]bool{}
 	runs, err := e.store.Runs().ListByFeature(ctx.Feature.ID)
 	if err != nil {
 		return gate.Evaluation{}, err
@@ -212,10 +222,19 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 	// liveQA remembers runs with at least one QA-kind artifact whose
 	// file still hashes to its registered content.
 	liveQA := map[string]bool{}
+	liveKinds := map[string]bool{}
 	for _, run := range runs {
 		arts, err := e.store.Artifacts().ListByRun(run.ID)
 		if err != nil {
 			return gate.Evaluation{}, err
+		}
+		// qa_autotest_recorded: a non-empty .beacon/autotest/<run-id>/
+		// directory, or a registered pointer inside it, is the run's
+		// autotest record. Checked per run so one run's evidence cannot
+		// silently vouch for another.
+		if !f.AutotestRecorded && autotestEvidence(ctx.Project.RootPath, run.ID, arts) {
+			f.AutotestRecorded = true
+			f.AutotestDetail = "autotest evidence recorded for run " + run.ID
 		}
 		for _, a := range arts {
 			if !qaKind(a.Kind) {
@@ -270,7 +289,11 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 			f.StaleArtifacts = append(f.StaleArtifacts, gate.StaleRef{Kind: a.Kind, Path: a.AbsPath, Reason: reason})
 		} else {
 			liveQA[a.RunID] = true
+			liveKinds[a.Kind] = true
 		}
+	}
+	for _, surface := range f.Surfaces {
+		f.SurfaceEvidence[surface] = liveKinds
 	}
 	// AC-003: an external completion record plus at least one registered
 	// QA artifact whose hash still matches is equivalent to a real qa
@@ -285,6 +308,25 @@ func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evalua
 		}
 	}
 	return gate.EvaluateQA(f, evaluator), nil
+}
+
+// autotestEvidence reports whether one run left auto-test evidence:
+// a non-empty .beacon/autotest/<run-id>/ directory, or a registered
+// artifact whose path lives under it. Directory listing is read-only
+// and never creates anything.
+func autotestEvidence(root, runID string, arts []store.ArtifactRef) bool {
+	dir := filepath.Join(root, ".beacon", "autotest", runID)
+	if entries, err := os.ReadDir(dir); err == nil && len(entries) > 0 {
+		return true
+	}
+	for _, a := range arts {
+		rel, err := filepath.Rel(dir, a.AbsPath)
+		if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			continue
+		}
+		return true
+	}
+	return false
 }
 
 // releaseFacts composes the release facts: the other four gates'

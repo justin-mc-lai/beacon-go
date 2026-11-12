@@ -118,7 +118,9 @@ func TestOtherGatesUnchanged(t *testing.T) {
 		t.Fatalf("design check set changed: %s", got)
 	}
 	qa := EvaluateQA(QAFacts{QAArtifactCount: 1, QAStageExecuted: true}, "qa-bot")
-	if got := strings.Join(checkNames(qa), ","); got != "qa_artifacts_present,qa_stage_executed,qa_artifact_refs_valid" {
+	// qa-surface-e2e AC-008/AC-009 deliberately extend the QA gate with
+	// two fail-closed doors; the other three gates below stay pinned.
+	if got := strings.Join(checkNames(qa), ","); got != "qa_artifacts_present,qa_stage_executed,qa_artifact_refs_valid,qa_autotest_recorded,qa_surface_evidence" {
 		t.Fatalf("qa check set changed: %s", got)
 	}
 	passFact := GateFact{Present: true, Verdict: string(VerdictPass)}

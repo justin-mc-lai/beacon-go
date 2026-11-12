@@ -61,6 +61,14 @@ func printTruthView(cmd *cobra.Command, v orchestrator.TruthPackageView, asJSON 
 		}
 		fmt.Fprintln(out, line)
 	}
+	// qa-surface-e2e: the declared surface list is part of the frozen
+	// contract, so `truth show` prints it. A legacy package says so
+	// explicitly instead of printing an empty list.
+	if v.SurfacesDeclared || len(v.Surfaces) > 0 {
+		fmt.Fprintf(out, "surfaces: %s (strict=%t)\n", strings.Join(v.Surfaces, ","), v.SurfaceStrict)
+	} else {
+		fmt.Fprintln(out, "surfaces: undeclared (legacy)")
+	}
 	if v.Frozen && v.BaselineStatus != "" {
 		line := "baseline: " + v.BaselineStatus
 		if v.BaselineCommit != "" {

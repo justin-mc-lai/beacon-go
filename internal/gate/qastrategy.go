@@ -16,6 +16,7 @@ package gate
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -26,8 +27,10 @@ var QA9Types = []string{
 	"functional", "regression", "exception", "compatibility",
 }
 
-// QAProjectTypes is qa9.PROJECT_TYPES.
-var QAProjectTypes = []string{"ai-agent-skill", "web-app", "api-service", "sdk-lib"}
+// QAProjectTypes is qa9.PROJECT_TYPES, extended with desktop-app so a
+// native window (Electron / Tauri) is a first-class project type
+// instead of being mis-inferred as web-app or sdk-lib.
+var QAProjectTypes = []string{"ai-agent-skill", "web-app", "api-service", "sdk-lib", "desktop-app"}
 
 // qaProfileTypes is qa9.QA_PROFILE_TYPES.
 var qaProfileTypes = map[string][]string{
@@ -152,6 +155,10 @@ func DefaultCommandForQAType(qaType, uiRunner string) string {
 		switch runner {
 		case "cypress":
 			return "npx cypress run --headless"
+		case "ego-browser":
+			return "qae2e run --surface web --spec .beacon/e2e/<feature>.json"
+		case "agent-desktop":
+			return "qae2e run --surface desktop --spec .beacon/e2e/<feature>.json"
 		case "browser-use":
 			return `python3 -m beacon.adapters.browser_use_runner --mode functional --deterministic-command "python3 -m pytest -q -k functional --junitxml \"${BEACON_JUNIT_PATH:-.beacon/junit.xml}\""`
 		case "agent-browser":
@@ -168,6 +175,10 @@ func DefaultCommandForQAType(qaType, uiRunner string) string {
 		switch runner {
 		case "cypress":
 			return "npx cypress run --browser chrome"
+		case "ego-browser":
+			return "qae2e run --surface web --spec .beacon/e2e/<feature>.json"
+		case "agent-desktop":
+			return "qae2e run --surface desktop --spec .beacon/e2e/<feature>.json"
 		case "browser-use":
 			return `python3 -m beacon.adapters.browser_use_runner --mode compatibility --deterministic-command "python3 -m pytest -q -k compatibility --junitxml \"${BEACON_JUNIT_PATH:-.beacon/junit.xml}\""`
 		case "agent-browser":
@@ -320,7 +331,63 @@ func InferProjectScan(root string) ProjectScan {
 	}
 }
 
-// InferProjectType ports infer_project_type.
+// electronBuildAppIDRe matches the Electron Forge / builder build
+// block ("build": { "appId": ...) that marks a packaged desktop app
+// even when the dependency scan misses it.
+var electronBuildAppIDRe = regexp.MustCompile(`"build"\s*:\s*\{\s*"appId"`)
+
+// packageJSONHasDependency reports whether package.json declares a
+// dependency whose name contains needle (electron, @electron-forge/*,
+// electron-builder). A missing or malformed package.json is false.
+func packageJSONHasDependency(raw []byte, needle string) bool {
+	if len(raw) == 0 {
+		return false
+	}
+	text := strings.ToLower(string(raw))
+	for _, section := range []string{"dependencies", "devdependencies", "optionaldependencies"} {
+		idx := strings.Index(text, `"`+section+`"`)
+		if idx < 0 {
+			continue
+		}
+		segment := text[idx:]
+		if end := strings.Index(segment, "}"); end >= 0 {
+			segment = segment[:end]
+		}
+		if strings.Contains(segment, `"`+needle) {
+			return true
+		}
+	}
+	return false
+}
+
+// looksLikeDesktopApp reports the native-app signals of
+// infer_project_type: an Electron dependency, a Tauri config /
+// src-tauri directory, an Electron builder appId block, or any
+// *.entitlements file in the project tree.
+func looksLikeDesktopApp(root string) bool {
+	packageJSON := filepath.Join(root, "package.json")
+	if raw, err := os.ReadFile(packageJSON); err == nil {
+		if packageJSONHasDependency(raw, "electron") || electronBuildAppIDRe.Match(raw) {
+			return true
+		}
+	}
+	if pathExists(filepath.Join(root, "tauri.conf.json")) ||
+		pathExists(filepath.Join(root, "src-tauri")) ||
+		pathExists(filepath.Join(root, "src-tauri", "tauri.conf.json")) {
+		return true
+	}
+	for _, rel := range walkRelFiles(root, 5000) {
+		if strings.HasSuffix(strings.ToLower(rel), ".entitlements") {
+			return true
+		}
+	}
+	return false
+}
+
+// InferProjectType ports infer_project_type, with the desktop-app
+// check sitting after the skill markers and BEFORE web-app: an
+// Electron project also ships a web frontend, so the web signal alone
+// must not win.
 func InferProjectType(root string, scan ProjectScan) string {
 	framework := strings.ToLower(scan.Framework)
 	hasSkillMarkers := pathExists(filepath.Join(root, "skills")) ||
@@ -336,6 +403,9 @@ func InferProjectType(root string, scan ProjectScan) string {
 	}
 	if hasSkillMarkers {
 		return "ai-agent-skill"
+	}
+	if looksLikeDesktopApp(root) {
+		return "desktop-app"
 	}
 	if strings.ToLower(scan.Frontend) == "web" {
 		return "web-app"
@@ -366,6 +436,18 @@ func QAApplicability(projectType string, hasWebUI bool) map[string]string {
 			"unit": "required", "interface": "required", "contract": "conditional",
 			"integration": "required", "smoke": "required", "functional": "required",
 			"regression": "required", "exception": "required", "compatibility": "required",
+		}
+	case "desktop-app":
+		// Difference from web-app: functional acceptance runs against
+		// the native window and its accessibility tree (a11y_tree
+		// evidence), so functional/regression/exception stay required;
+		// there is no consumer/provider contract surface (na), and
+		// cross-device compatibility is conditional rather than a
+		// browser matrix requirement.
+		return map[string]string{
+			"unit": "required", "interface": "required", "contract": "na",
+			"integration": "conditional", "smoke": "required", "functional": "required",
+			"regression": "required", "exception": "required", "compatibility": "conditional",
 		}
 	case "api-service":
 		return map[string]string{
@@ -494,6 +576,9 @@ func BuildQAStrategy(root string, qaTypes []string, uiRunner, generatedAt string
 	functionalPrimary := "playwright"
 	if projectType == "ai-agent-skill" || projectType == "web-app" {
 		functionalPrimary = "browser-use"
+	}
+	if projectType == "desktop-app" {
+		functionalPrimary = "agent-desktop"
 	}
 	baseline := map[string]string{}
 	assertions := map[string]string{}

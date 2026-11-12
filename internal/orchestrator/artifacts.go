@@ -33,6 +33,10 @@ const (
 	ReasonArtifactKindNotAllowed    = "artifact_kind_not_allowed"
 	ReasonArtifactFileMissing       = "artifact_file_missing"
 	ReasonArtifactRegistrarRequired = "artifact_registrar_required"
+	// ReasonArtifactKindExtensionNotAllowed refuses a surface-evidence
+	// kind whose file extension cannot be that evidence (a11y_tree as
+	// .txt, browser_trace as .md, e2e_report as .zip).
+	ReasonArtifactKindExtensionNotAllowed = "artifact_kind_extension_not_allowed"
 )
 
 // EventArtifactRegistered is appended once per NEW artifact_refs row
@@ -52,6 +56,35 @@ var registerableKinds = map[string]bool{
 	"test_result": true, "test_results": true,
 	"evidence": true, "implement_artifact": true,
 	"report": true, "log": true, "artifact": true,
+	// qa-surface-e2e: the surface-evidence vocabulary. a11y_tree is a
+	// serialized accessibility tree, browser_trace is a Playwright/
+	// Chromium trace archive, e2e_report is the runner's verdict.
+	"a11y_tree": true, "browser_trace": true, "e2e_report": true,
+}
+
+// artifactKindExtensions is the extension whitelist of the three
+// surface-evidence kinds. Kinds outside this map accept any extension
+// (their meaning is the registrant's declaration, as before).
+var artifactKindExtensions = map[string][]string{
+	"a11y_tree":     {".json"},
+	"browser_trace": {".zip", ".json"},
+	"e2e_report":    {".json", ".md"},
+}
+
+// ArtifactKindAllowsPath reports whether path's extension is allowed
+// for kind. Unconstrained kinds always pass.
+func ArtifactKindAllowsPath(kind, path string) bool {
+	allowed, ok := artifactKindExtensions[strings.ToLower(strings.TrimSpace(kind))]
+	if !ok {
+		return true
+	}
+	ext := strings.ToLower(filepath.Ext(path))
+	for _, candidate := range allowed {
+		if ext == candidate {
+			return true
+		}
+	}
+	return false
 }
 
 // ValidRegisterKind reports whether kind may be registered through
@@ -93,7 +126,12 @@ func (e *Engine) RegisterArtifact(runID, kind, path, by string) (ArtifactRegistr
 	if !ValidRegisterKind(kind) {
 		return ArtifactRegistration{}, core.NewError(ReasonArtifactKindNotAllowed,
 			"goal.RegisterArtifact", "kind "+kind+" is not in the registration vocabulary "+
-				"(qa, qa_*, scorecard, test_result, test_results, evidence, implement_artifact, report, log, artifact)")
+				"(qa, qa_*, scorecard, test_result, test_results, evidence, implement_artifact, report, log, artifact, a11y_tree, browser_trace, e2e_report)")
+	}
+	if !ArtifactKindAllowsPath(kind, path) {
+		return ArtifactRegistration{}, core.NewError(ReasonArtifactKindExtensionNotAllowed,
+			"goal.RegisterArtifact", "kind "+kind+" does not accept extension "+filepath.Ext(path)+
+				" (allowed: "+strings.Join(artifactKindExtensions[kind], ", ")+")")
 	}
 	run, _, _, err := e.loadRun(runID)
 	if err != nil {
