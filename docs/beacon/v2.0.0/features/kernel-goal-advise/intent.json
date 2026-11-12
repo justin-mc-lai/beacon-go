@@ -1,0 +1,28 @@
+{
+  "schema": "beacon-intent-v1",
+  "feature_slug": "kernel-goal-advise",
+  "version": "v2.0.0",
+  "truth_path": "docs/beacon/v2.0.0/features/kernel-goal-advise/truth.md",
+  "recorded_at": "2026-11-12T00:45:08Z",
+  "recorded_by": "apple(via opencode)",
+  "confirmed": true,
+  "briefing": {
+    "original_prompt": "内核只排事实，AI 只改措辞，这样每次都可复跑",
+    "restated_intent": "新增只读的 goal advise：按硬阻塞、进行中、阶段、暂停这些事实给一个项目的 feature 排序，输出建议阶段和证据字段；不写散文、不含时钟，保证同输入同输出。",
+    "identified_risks": [
+      "把措辞塞进内核导致不可复跑",
+      "排序引入随机量或时间戳",
+      "输出虚构不存在的 blocker"
+    ],
+    "boundaries": [
+      "只读账本",
+      "不改 run 状态",
+      "不新增 reason code",
+      "不调用模型"
+    ],
+    "proposed_slugs": [
+      "kernel-goal-advise"
+    ],
+    "confirmed": true
+  }
+}

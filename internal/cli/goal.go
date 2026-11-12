@@ -61,6 +61,7 @@ func newGoalCmd() *cobra.Command {
 		// whose absence stopped the end-to-end chain at the qa
 		// gate); folded into goal, no new top-level command.
 		newGoalArtifactsCmd(),
+		newGoalAdviseCmd(),
 		// kernel-readonly-http-api: opt-in loopback HTTP projection.
 		newGoalServeCmd(),
 		// S2: the standard execution flow (AC-138) + admission

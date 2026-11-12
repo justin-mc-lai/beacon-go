@@ -1,0 +1,15 @@
+=== baseline (installed, no advise) ===
+--- seed1_blocked_ranks_first.sh
+RESULT: FAIL - goal advise unavailable: Error: unknown flag: --project
+--- seed2_deterministic.sh
+RESULT: FAIL - goal advise unavailable: Error: unknown flag: --project
+--- seed3_no_invented_facts.sh
+RESULT: FAIL - goal advise unavailable: Error: unknown flag: --project
+
+=== new build ===
+--- seed1_blocked_ranks_first.sh
+RESULT: PASS - blocked feature ranked first (score=150)
+--- seed2_deterministic.sh
+RESULT: PASS - advise is deterministic across runs
+--- seed3_no_invented_facts.sh
+RESULT: PASS - every advised item and blocker traces to a spine fact
