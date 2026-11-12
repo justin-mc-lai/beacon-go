@@ -175,6 +175,27 @@ func ValidateSurfaceDeclaration(d SurfaceDeclaration) []string {
 	if !d.Declared {
 		return nil
 	}
+	return validateSurfaceDeclarationDeclared(d)
+}
+
+// ValidateSurfaceDeclarationForFreeze is the freeze-time rule with the
+// draft/legacy distinction. A FIRST freeze (a package that has never
+// been frozen) must declare its surfaces — a fresh draft that omits the
+// key would otherwise buy the legacy waiver forever and downgrade both
+// qa evidence gates to warnings. A REFREEZE of a package that was frozen
+// before keeps the legacy shape valid: its missing key is history, not
+// a new omission.
+func ValidateSurfaceDeclarationForFreeze(d SurfaceDeclaration, firstFreeze bool) []string {
+	if !d.Declared {
+		if firstFreeze {
+			return []string{core.ReasonTruthSurfaceRequired}
+		}
+		return nil
+	}
+	return validateSurfaceDeclarationDeclared(d)
+}
+
+func validateSurfaceDeclarationDeclared(d SurfaceDeclaration) []string {
 	if len(d.Surfaces) == 0 {
 		return []string{core.ReasonTruthSurfaceRequired}
 	}

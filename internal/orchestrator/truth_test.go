@@ -63,6 +63,19 @@ func (env truthEnv) create(t *testing.T, slug string) TruthPackageView {
 	if err != nil {
 		t.Fatalf("CreateTruthPackage(%s): %v", slug, err)
 	}
+	seedDefaultSurfaces(t, env.root, slug)
+	completeIntentForTest(t, env.eng, env.ctx(t, slug))
+	return v
+}
+
+// createBare skips the surface seed: only the legacy-waiver tests need
+// a package whose truth carries no `surfaces` key at all.
+func (env truthEnv) createBare(t *testing.T, slug string) TruthPackageView {
+	t.Helper()
+	v, err := env.eng.CreateTruthPackage(env.root, "", slug)
+	if err != nil {
+		t.Fatalf("CreateTruthPackage(%s): %v", slug, err)
+	}
 	completeIntentForTest(t, env.eng, env.ctx(t, slug))
 	return v
 }
@@ -160,6 +173,9 @@ func TestTruthFreezeHappyAndIdempotent(t *testing.T) {
 	// `draft` is a contradiction — 2026-10-29 fix). Nothing else moves.
 	wantText := strings.Replace(draftBytes, "status: draft", "status: frozen", 1)
 	wantText = strings.Replace(wantText, "materials_status: draft", "materials_status: current", 1)
+	// qa-surface-e2e: a first freeze of a declared package also records
+	// surface_strict: true (inserted after slug, ahead of surfaces).
+	wantText = strings.Replace(wantText, "slug: feat-x\n", "slug: feat-x\nsurface_strict: true\n", 1)
 	if frozenText != wantText {
 		t.Fatalf("freeze changed more than the status/materials lines:\n--- draft ---\n%s\n--- frozen ---\n%s", draftBytes, frozenText)
 	}

@@ -11,18 +11,33 @@ import (
 
 	"beacon-go/internal/core"
 	"beacon-go/internal/gate"
+	"beacon-go/internal/store"
 )
 
 func seedSurfaceFrontmatter(t *testing.T, path, block string) {
 	t.Helper()
 	text := readFile(t, path)
-	updated := strings.Replace(text, "status: draft\n", "status: draft\n"+block, 1)
-	if updated == text {
-		t.Fatalf("fixture frontmatter has no status: draft line:\n%s", text)
+	line := strings.TrimSpace(block)
+	key, val, ok := strings.Cut(line, ":")
+	if !ok {
+		t.Fatalf("seed block is not a frontmatter line: %q", block)
+	}
+	updated, _ := setFrontmatterScalar(text, strings.TrimSpace(key), strings.TrimSpace(val))
+	if updated == text && !strings.Contains(text, strings.TrimSpace(key)+":") {
+		t.Fatalf("fixture has no frontmatter to seed %q into:\n%s", block, text)
 	}
 	if err := os.WriteFile(path, []byte(updated), 0o644); err != nil {
 		t.Fatal(err)
 	}
+}
+
+// seedDefaultSurfaces gives the unit-test fixtures a surface declaration:
+// a first freeze now refuses a draft that omits it. Tests that exercise
+// the legacy waiver use createBare instead.
+func seedDefaultSurfaces(t *testing.T, root, slug string) {
+	t.Helper()
+	path := filepath.Join(root, "docs", "beacon", "v2.0.0", "features", slug, "truth.md")
+	seedSurfaceFrontmatter(t, path, "surfaces: [api]")
 }
 
 func TestTruthFreezeSurfaceStrict(t *testing.T) {
@@ -93,20 +108,98 @@ func TestTruthFreezeSurfaceRejects(t *testing.T) {
 	}
 }
 
-func TestTruthFreezeLegacyPackageWritesNoStrict(t *testing.T) {
+func TestTruthFreezeNewDraftRequiresSurfaces(t *testing.T) {
 	env := newTruthEnv(t)
-	env.create(t, "surf-legacy")
+	env.createBare(t, "surf-nokey")
+	ctx := env.ctx(t, "surf-nokey")
+	truthPath := filepath.Join(env.root, ctx.Feature.TruthPath)
+	before := readFile(t, truthPath)
+
+	_, err := env.eng.FreezeTruthPackage(ctx, "qa-bot")
+	if err == nil {
+		t.Fatal("a first freeze without a surfaces key must be refused")
+	}
+	if rc, ok := core.ReasonCodeOf(err); !ok || rc != core.ReasonTruthSurfaceRequired {
+		t.Fatalf("reason = %v (ok=%v), want %s", err, ok, core.ReasonTruthSurfaceRequired)
+	}
+	view, verr := env.eng.TruthPackage(ctx)
+	if verr != nil {
+		t.Fatal(verr)
+	}
+	if view.Status != "draft" || view.Frozen {
+		t.Fatalf("refused first freeze mutated state: %+v", view)
+	}
+	if after := readFile(t, truthPath); after != before {
+		t.Fatalf("refused first freeze rewrote truth.md")
+	}
+}
+
+// A package frozen before surfaces existed must keep its waiver on
+// refreeze: the missing key is history, not a fresh omission. This is
+// the AC-003 exemption, keyed on the prior freeze record rather than
+// on the key's presence in the text.
+func TestTruthFreezeLegacyRefreezeKeepsWaiver(t *testing.T) {
+	env := newTruthEnv(t)
+	env.createBare(t, "surf-legacy")
 	ctx := env.ctx(t, "surf-legacy")
 	truthPath := filepath.Join(env.root, ctx.Feature.TruthPath)
-	v, err := env.eng.FreezeTruthPackage(ctx, "qa-bot")
+	testsPath := filepath.Join(env.root, ctx.Feature.TestsPath)
+
+	// Build the pre-surface frozen shape by hand: status frozen with no
+	// surfaces/surface_strict key, a frozen package row, and a legacy
+	// truth_frozen trail record (no surface_fingerprint, no revision id).
+	text, changed := setFrontmatterStatus(readFile(t, truthPath), "frozen")
+	if !changed {
+		t.Fatal("fixture truth has no status line to flip")
+	}
+	if err := os.WriteFile(truthPath, []byte(text), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := env.st.Features().UpdatePackageStatus(ctx.Feature.ID, "frozen"); err != nil {
+		t.Fatal(err)
+	}
+	if err := updateLifecycleMonotonic(env.st.Features(), store.Lifecycle{
+		FeatureID: ctx.Feature.ID, Stage: core.StageFreeze, Status: core.StatusCompleted,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := env.eng.appendFeatureEvent(ctx.Feature.ID, EventTruthFrozen, map[string]any{
+		"slug": ctx.Feature.Slug,
+		"package_fingerprint": core.PackageFingerprint(
+			[]byte(text), []byte(readFile(t, testsPath))),
+		"fingerprint_alg":             core.FingerprintAlg,
+		"requirement_fingerprints":    core.RequirementFingerprints([]byte(text)),
+		"requirement_fingerprint_alg": core.RequirementFingerprintAlg,
+		"truth_sha256_after":          sha256Hex([]byte(text)),
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := env.eng.RequestTruthChange(ctx, "legacy edit", "alice"); err != nil {
+		t.Fatalf("change on the legacy frozen package: %v", err)
+	}
+	edited := strings.Replace(readFile(t, truthPath),
+		"第一条可验证的完成标准", "第一条可验证的完成标准（legacy 编辑）", 1)
+	if err := os.WriteFile(truthPath, []byte(edited), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// The refreeze may settle kernel bookkeeping lines (status,
+	// materials_status); the requirement body must not move.
+	wantHash := sha256Hex(core.NormalizeTruthForFingerprint([]byte(readFile(t, truthPath))))
+
+	rv, err := env.eng.RefreezeTruthPackage(ctx, "alice")
 	if err != nil {
-		t.Fatalf("legacy freeze: %v", err)
+		t.Fatalf("legacy refreeze: %v", err)
 	}
-	if v.Status != "frozen" || v.SurfacesDeclared || v.SurfaceStrict {
-		t.Fatalf("legacy view = %+v", v)
+	if rv.Status != "frozen" || !rv.Frozen || rv.SurfacesDeclared || rv.SurfaceStrict {
+		t.Fatalf("legacy refreeze view = %+v", rv)
 	}
-	if frozen := readFile(t, truthPath); strings.Contains(frozen, "surface_strict:") {
-		t.Fatalf("legacy freeze must not backfill surface_strict:\n%s", frozen)
+	frozen := readFile(t, truthPath)
+	if strings.Contains(frozen, "surfaces:") || strings.Contains(frozen, "surface_strict:") {
+		t.Fatalf("legacy refreeze must not backfill surface keys:\n%s", frozen)
+	}
+	if got := sha256Hex(core.NormalizeTruthForFingerprint([]byte(frozen))); got != wantHash {
+		t.Fatalf("legacy refreeze changed truth.md: %s -> %s", wantHash, got)
 	}
 }
 
@@ -183,27 +276,15 @@ func surfaceTruthDoc(surfaces, strict string) string {
 		"status: frozen\nsurfaces: "+surfaces+"\nsurface_strict: "+strict+"\n", 1)
 }
 
-func repoRoot(t *testing.T) string {
-	t.Helper()
-	dir, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	for {
-		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			t.Fatal("go.mod not found above the test directory")
-		}
-		dir = parent
-	}
-}
-
 func writeVerdictEvidence(t *testing.T, name string, ev gate.Evaluation) {
 	t.Helper()
-	dir := filepath.Join(repoRoot(t), "docs", "beacon", "v2.0.0", "features", "qa-surface-e2e", "evidence")
+	// The committed verdict JSONs live under the feature's evidence dir;
+	// a plain test run must not rewrite tracked files, so regeneration is
+	// opt-in (BEACON_EVIDENCE_DIR=docs/.../qa-surface-e2e/evidence).
+	dir := os.Getenv("BEACON_EVIDENCE_DIR")
+	if dir == "" {
+		return
+	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}

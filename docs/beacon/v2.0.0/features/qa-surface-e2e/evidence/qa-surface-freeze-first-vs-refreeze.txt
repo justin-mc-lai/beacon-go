@@ -1,0 +1,49 @@
+qa-surface-e2e rework: first freeze requires surfaces, refreeze keeps the legacy waiver.
+Captured 2026-11-13 from the real CLI on throwaway projects (BEACON_STORE_PATH isolated).
+
+1) NEW DRAFT, no surfaces key -> first freeze refused (exit 1)
+
+$ beacon-new truth freeze --project proj-nokey --feature surf-nokey --by qa-bot
+package:  surf-nokey (v2.0.0)
+status:   draft
+dir:      docs/beacon/v2.0.0/features/surf-nokey
+lifecycle: Think/NotStarted
+branch:   check=not_a_git_repo
+surfaces: undeclared (legacy)
+blocked:  truth_surface_required
+  [truth_surface_required      ] docs/beacon/v2.0.0/features/surf-nokey/truth.md - a first freeze must declare `surfaces: [api|web|desktop|cli]`; this draft carries no surfaces key
+Error: truth.Freeze: package surf-nokey is blocked by the freeze precheck (1 finding(s)); first reasons: truth_surface_required (truth_surface_required)
+exit=1
+
+$ beacon-new truth show --project proj-nokey --feature surf-nokey
+status:   draft
+surfaces: undeclared (legacy)
+
+2) LEGACY PACKAGE (frozen by the pre-fix binary 2bc358b, no surfaces key) -> refreeze succeeds
+
+$ beacon-old truth freeze --project proj-legacy --feature surf-legacy --by qa-bot
+status: frozen / lifecycle: Freeze/Completed
+surfaces: undeclared (legacy)
+
+$ beacon-new truth change --project proj-legacy --feature surf-legacy --summary 'legacy edit' --by alice
+exit=0
+
+$ beacon-new truth refreeze --project proj-legacy --feature surf-legacy --by alice
+package:  surf-legacy (v2.0.0)
+status:   frozen
+dir:      docs/beacon/v2.0.0/features/surf-legacy
+lifecycle: Freeze/Completed
+branch:   check=not_a_git_repo
+surfaces: undeclared (legacy)
+baseline: not_a_git_repo
+refreeze_exit=0
+
+$ grep -nE '^(surfaces|surface_strict):' truth.md
+(none - the refreeze backfills nothing)
+
+$ beacon-new truth freeze ... (already frozen, idempotent)
+note:     already frozen (idempotent)
+idempotent_exit=0
+hash_before=f59267620f279d83c395d261e461c9b4bb580874ab0b2a5c39a218eae0fcf3cb
+hash_after=f59267620f279d83c395d261e461c9b4bb580874ab0b2a5c39a218eae0fcf3cb
+hash_unchanged=yes

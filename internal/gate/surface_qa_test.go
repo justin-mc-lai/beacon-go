@@ -77,6 +77,28 @@ func TestValidateSurfaceDeclaration(t *testing.T) {
 	}
 }
 
+func TestValidateSurfaceDeclarationForFreeze(t *testing.T) {
+	legacy := SurfaceDeclaration{ACSurfaces: map[string][]string{}}
+	if codes := ValidateSurfaceDeclarationForFreeze(legacy, true); len(codes) != 1 ||
+		codes[0] != core.ReasonTruthSurfaceRequired {
+		t.Fatalf("first freeze without a surfaces key codes = %v", codes)
+	}
+	if codes := ValidateSurfaceDeclarationForFreeze(legacy, false); len(codes) != 0 {
+		t.Fatalf("refreeze of a previously frozen legacy package codes = %v", codes)
+	}
+	empty := SurfaceDeclaration{Declared: true, ACSurfaces: map[string][]string{}}
+	for _, first := range []bool{true, false} {
+		if codes := ValidateSurfaceDeclarationForFreeze(empty, first); len(codes) != 1 ||
+			codes[0] != core.ReasonTruthSurfaceRequired {
+			t.Fatalf("explicit empty list (first=%v) codes = %v", first, codes)
+		}
+	}
+	valid := SurfaceDeclaration{Declared: true, Surfaces: []string{"web"}, ACSurfaces: map[string][]string{}}
+	if codes := ValidateSurfaceDeclarationForFreeze(valid, true); len(codes) != 0 {
+		t.Fatalf("valid first freeze codes = %v", codes)
+	}
+}
+
 func writeSurfaceFixture(t *testing.T, root, name, text string) {
 	t.Helper()
 	p := filepath.Join(root, name)

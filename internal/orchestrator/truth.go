@@ -362,7 +362,11 @@ func (e *Engine) CreateTruthPackage(projectRoot, version, slug string) (TruthPac
 // block mode (AC-101 judgement, reused — which also covers the
 // no-undecided-deferral requirement via its deferral_pending
 // findings). It returns the blocked view when anything fails.
-func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string) (TruthPackageView, bool, error) {
+//
+// requireSurfaces is true only for a package's FIRST freeze: the
+// surface declaration is mandatory there, while a refreeze of a
+// previously frozen (legacy) package keeps the no-key waiver.
+func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string, requireSurfaces bool) (TruthPackageView, bool, error) {
 	view, err := e.TruthPackage(ctx)
 	if err != nil {
 		return TruthPackageView{}, false, err
@@ -388,18 +392,24 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string) (TruthPacka
 	}
 	// qa-surface-e2e: a declared surface list must be non-empty and
 	// in the closed vocabulary, and under strict (the default for a
-	// new freeze) every AC's `surface=` must stay inside it. A package
-	// with no `surfaces` key is legacy and is not judged here.
+	// new freeze) every AC's `surface=` must stay inside it. A first
+	// freeze must declare the key at all; a package frozen before this
+	// rule keeps the legacy waiver (its key is history, not a fresh
+	// omission).
 	surfaceDecl := gate.ParseSurfaceDeclaration(pkg.Truth.Text)
 	effective := surfaceDecl
 	effective.Strict = surfaceDecl.EffectiveStrict()
-	if codes := gate.ValidateSurfaceDeclaration(effective); len(codes) > 0 {
+	if codes := gate.ValidateSurfaceDeclarationForFreeze(effective, requireSurfaces); len(codes) > 0 {
 		view.Blocked = true
 		view.BlockReasons = codes
 		for _, code := range codes {
+			detail := "surface declaration rejected: " + code
+			if code == core.ReasonTruthSurfaceRequired && !surfaceDecl.Declared {
+				detail = "a first freeze must declare `surfaces: [api|web|desktop|cli]`; this draft carries no surfaces key"
+			}
 			view.Findings = append(view.Findings, gate.Finding{
 				Kind: code, ReasonCode: code, File: pkg.Truth.Path,
-				Detail:      "surface declaration rejected: " + code,
+				Detail:      detail,
 				RepairRoute: gate.DefaultRepairRoute,
 			})
 		}
@@ -460,7 +470,9 @@ func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload
 	// package (no surfaces key) is untouched, and an explicit
 	// `surface_strict: false` stays the author's waiver. The write
 	// happens after truth_sha256_before was taken, so that hash still
-	// describes the bytes the author froze.
+	// describes the bytes the author froze; the body fingerprints below
+	// are taken from `raw` after this write, because they describe the
+	// frozen body (which carries the injected flag).
 	surfaceDecl := gate.ParseSurfaceDeclaration(string(rawBefore))
 	if surfaceDecl.Declared && len(surfaceDecl.Surfaces) > 0 && !surfaceDecl.StrictDeclared {
 		if updated, changed := setFrontmatterScalar(string(raw), "surface_strict", "true"); changed {
@@ -482,12 +494,12 @@ func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload
 	// rebuild checks later. Recorded from the pre-flip bytes — the
 	// fingerprint normalizes the status line out, so it describes
 	// the frozen BODY, identical before and after the flip.
-	payload["package_fingerprint"] = core.PackageFingerprint(rawBefore, testsRawBefore)
+	payload["package_fingerprint"] = core.PackageFingerprint(raw, testsRawBefore)
 	payload["fingerprint_alg"] = core.FingerprintAlg
 	// R1: requirement-level hashes are the drift baseline. The
 	// package fingerprint says "something moved"; this map says
 	// WHICH acceptance criterion moved.
-	payload["requirement_fingerprints"] = core.RequirementFingerprints(rawBefore)
+	payload["requirement_fingerprints"] = core.RequirementFingerprints(raw)
 	payload["requirement_fingerprint_alg"] = core.RequirementFingerprintAlg
 	// S1 (AC-137): the four-surface fingerprint (the refreeze
 	// transaction's proof base — at least one requirement surface
@@ -604,7 +616,13 @@ func (e *Engine) FreezeTruthPackage(ctx store.FeatureContext, by string) (TruthP
 		view.AlreadyFrozen = true
 		return view, nil
 	}
-	pre, ok, err := e.freezePrecheck(ctx, by)
+	// A package with a freeze record on its trail was frozen before:
+	// the missing-surface waiver is history, not a choice made now.
+	recs, err := e.trailRecords(ctx.Feature.ID)
+	if err != nil {
+		return TruthPackageView{}, err
+	}
+	pre, ok, err := e.freezePrecheck(ctx, by, recs.freeze == nil)
 	if err != nil {
 		return TruthPackageView{}, err
 	}

@@ -230,6 +230,8 @@ func seedRefrozenCLIPackage(t *testing.T) (string, string) {
 	body := strings.Replace(string(raw),
 		"（一句话说清这个需求解决什么问题、给谁用、做到什么算完。冻结前由作者补齐。）",
 		"给验收方一条可判定的完成标准：本次变更覆盖的 AC 能直接对照。", 1)
+	// A first freeze now requires an explicit surface declaration.
+	body = strings.Replace(body, "status: draft\n", "status: draft\nsurfaces: [api]\n", 1)
 	if err := os.WriteFile(truthPath, []byte(body), 0o644); err != nil {
 		t.Fatal(err)
 	}

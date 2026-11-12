@@ -17,6 +17,7 @@ func TestIntentFreezeBlockedUntilConfirmed(t *testing.T) {
 	if _, err := env.eng.CreateTruthPackage(env.root, "", "ask-first"); err != nil {
 		t.Fatal(err)
 	}
+	seedDefaultSurfaces(t, env.root, "ask-first")
 	ctx := env.ctx(t, "ask-first")
 
 	pre, err := env.eng.FreezeTruthPackage(ctx, "tester")

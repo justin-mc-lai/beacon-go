@@ -46,6 +46,8 @@ func truthCreate(t *testing.T, root, slug string) map[string]any {
 			t.Fatal(err)
 		}
 	}
+	// A first freeze now requires an explicit surface declaration.
+	seedTruthSurfaces(t, root, slug)
 
 	if out, err := runCLI(t, "truth", "intent", "--project", root, "--feature", slug,
 		"--utterance", "test utterance", "--goal", "test goal",
@@ -60,6 +62,24 @@ func truthCreate(t *testing.T, root, slug string) map[string]any {
 		t.Fatalf("truth confirm %s: %v (%s)", slug, err, out)
 	}
 	return parseDoc(t, out)
+}
+
+// seedTruthSurfaces writes the surface declaration a first freeze now
+// requires into a freshly created package.
+func seedTruthSurfaces(t *testing.T, root, slug string) {
+	t.Helper()
+	path := filepath.Join(root, "docs", "beacon", "v2.0.0", "features", slug, "truth.md")
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	updated := strings.Replace(string(raw), "status: draft\n", "status: draft\nsurfaces: [api]\n", 1)
+	if updated == string(raw) {
+		t.Fatalf("truth fixture has no status: draft line:\n%s", raw)
+	}
+	if err := os.WriteFile(path, []byte(updated), 0o644); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func truthFreeze(t *testing.T, root, slug string) map[string]any {

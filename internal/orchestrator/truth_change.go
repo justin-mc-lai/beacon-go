@@ -350,7 +350,10 @@ func (e *Engine) RefreezeTruthPackageAcceptCurrent(ctx store.FeatureContext, by 
 			return view, err
 		}
 	}
-	pre, ok, err := e.freezePrecheck(ctx, by)
+	// A refreeze always follows a previous freeze, so the missing-surface
+	// legacy waiver applies here (the package is not entering its first
+	// freeze).
+	pre, ok, err := e.freezePrecheck(ctx, by, false)
 	if err != nil {
 		return TruthPackageView{}, err
 	}
