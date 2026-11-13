@@ -69,6 +69,16 @@ func printTruthView(cmd *cobra.Command, v orchestrator.TruthPackageView, asJSON 
 	} else {
 		fmt.Fprintln(out, "surfaces: undeclared (legacy)")
 	}
+	// restatement-gate: the signed restatement is part of what the
+	// freeze checked, so `truth show` prints it. A legacy package with
+	// no file prints nothing here.
+	if v.Restatement != nil {
+		fmt.Fprintf(out, "restatement: %s confirmed_by=%q matches=%t\n",
+			v.Restatement.Path, v.Restatement.ConfirmedBy, v.Restatement.Matches)
+	}
+	for _, w := range v.Warnings {
+		fmt.Fprintf(out, "warning:  %s\n", w)
+	}
 	if v.Frozen && v.BaselineStatus != "" {
 		line := "baseline: " + v.BaselineStatus
 		if v.BaselineCommit != "" {

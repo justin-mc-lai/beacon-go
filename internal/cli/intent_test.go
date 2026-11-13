@@ -47,6 +47,7 @@ func TestTruthAskConfirmDriftCLI(t *testing.T) {
 		}
 	}
 	seedTruthSurfaces(t, root, slug)
+	seedTruthRestatement(t, root, slug)
 	out, err := runCLI(t, "truth", "ask", "--project", root, "--feature", slug,
 		"--question", "What is explicitly out of scope?", "--json")
 	if err != nil {

@@ -138,6 +138,7 @@ func TestTruthR2dFacesCLI(t *testing.T) {
 		t.Fatal(err)
 	}
 	seedTruthSurfaces(t, root, slug)
+	seedTruthRestatement(t, root, slug)
 	if _, err := runCLI(t, "truth", "intent", "--project", root, "--feature", slug,
 		"--utterance", "用户能注册登录，支付订阅后开通权益，还能导出报表。",
 		"--goal", "deliver it", "--non-goals", "not that", "--constraints", "local", "--json"); err != nil {

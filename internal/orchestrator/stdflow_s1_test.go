@@ -72,6 +72,7 @@ func (env s1GitEnv) create(t *testing.T, slug string) TruthPackageView {
 		t.Fatalf("CreateTruthPackage(%s): %v", slug, err)
 	}
 	seedDefaultSurfaces(t, env.root, slug)
+	seedDefaultRestatement(t, filepath.Join(env.root, env.ctx(t, slug).Feature.TruthPath))
 	completeIntentForTest(t, env.eng, env.ctx(t, slug))
 	return v
 }

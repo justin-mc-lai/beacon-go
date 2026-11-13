@@ -1,0 +1,22 @@
+?   	beacon-go/cmd/beacon	[no test files]
+ok  	beacon-go/desktop	1.181s
+ok  	beacon-go/internal/agentapi	2.784s
+ok  	beacon-go/internal/benchgate	(cached)
+ok  	beacon-go/internal/changequality	(cached)
+ok  	beacon-go/internal/cli	14.997s
+ok  	beacon-go/internal/core	(cached)
+ok  	beacon-go/internal/effectjournal	(cached)
+ok  	beacon-go/internal/evalgate	49.161s
+ok  	beacon-go/internal/gate	1.616s
+ok  	beacon-go/internal/harness	(cached)
+?   	beacon-go/internal/httpapi	[no test files]
+ok  	beacon-go/internal/llm	(cached)
+ok  	beacon-go/internal/migration	(cached)
+ok  	beacon-go/internal/orchestrator	94.157s
+ok  	beacon-go/internal/progressreview	(cached)
+ok  	beacon-go/internal/session	(cached)
+ok  	beacon-go/internal/store	(cached)
+ok  	beacon-go/internal/stride	(cached)
+ok  	beacon-go/internal/workspace	3.561s
+ok  	beacon-go/skills	(cached)
+EXIT=0

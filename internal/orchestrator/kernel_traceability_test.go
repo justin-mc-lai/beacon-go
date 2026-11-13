@@ -275,9 +275,8 @@ func seedTwoACFrozenPackage(t *testing.T, env truthEnv, slug string) store.Featu
 	ctx := env.ctx(t, slug)
 	truthPath := filepath.Join(env.root, ctx.Feature.TruthPath)
 	text := readFile(t, truthPath)
-	text = strings.Replace(text,
-		"| AC-001 | 作者写下第一条可验证的完成标准（可被 tests.md 的 TC-001 直接验证） |",
-		"| AC-001 | 作者写下第一条可验证的完成标准（可被 tests.md 的 TC-001 直接验证） |\n| AC-002 | 第二条可验证的完成标准（改前文本） |", 1)
+	text = insertACSectionRow(text, "AC-001",
+		"| AC-002 | 第二条可验证的完成标准（改前文本） restates=1 |")
 	text = strings.Replace(text,
 		"| AC-001 | test utterance | conversation:test |",
 		"| AC-001 | test utterance | conversation:test |\n| AC-002 | test utterance | conversation:test |", 1)
@@ -310,9 +309,7 @@ func TestRefreezeRecordsACDiff(t *testing.T) {
 	truthPath := filepath.Join(env.root, ctx.Feature.TruthPath)
 	text := readFile(t, truthPath)
 	text = strings.Replace(text, "第二条可验证的完成标准（改前文本）", "第二条可验证的完成标准（改后文本）", 1)
-	text = strings.Replace(text,
-		"| AC-002 | 第二条可验证的完成标准（改后文本） |",
-		"| AC-002 | 第二条可验证的完成标准（改后文本） |\n| AC-004 | 新增的第四条完成标准 |", 1)
+	text = insertACSectionRow(text, "AC-002", "| AC-004 | 新增的第四条完成标准 restates=1 |")
 	text = strings.Replace(text,
 		"| AC-002 | test utterance | conversation:test |",
 		"| AC-002 | test utterance | conversation:test |\n| AC-004 | test utterance | conversation:test |", 1)

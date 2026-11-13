@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -61,7 +63,55 @@ func truthCreate(t *testing.T, root, slug string) map[string]any {
 	if out, err := runCLI(t, "truth", "confirm", "--project", root, "--feature", slug, "--json"); err != nil {
 		t.Fatalf("truth confirm %s: %v (%s)", slug, err, out)
 	}
+	seedTruthRestatement(t, root, slug)
 	return parseDoc(t, out)
+}
+
+// restatementCLIBody is the five-section restatement every CLI fixture
+// signs before its first freeze. The fixture AC rows point at section 1.
+const restatementCLIBody = "## 1 交付形态\n\n测试夹具复述。\n\n## 2 界面与交互\n\n仅 CLI。\n\n## 3 业务流转\n\n## 3.1 首次冻结\n\n冻结前校验复述。\n\n## 4 边界与不做\n\n不改既有语义。\n\n## 5 歧义与默认值\n\n无。\n"
+
+// seedTruthRestatement writes a signed restatement.md beside the truth
+// document and stamps restates=1 on Acceptance Criteria rows that carry
+// no token, so a fixture's first freeze passes the gate.
+func seedTruthRestatement(t *testing.T, root, slug string) {
+	t.Helper()
+	dir := filepath.Join(root, "docs", "beacon", "v2.0.0", "features", slug)
+	truthPath := filepath.Join(dir, "truth.md")
+	raw, err := os.ReadFile(truthPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	lines := strings.Split(string(raw), "\n")
+	inAC := false
+	for i, line := range lines {
+		if strings.HasPrefix(line, "#") {
+			level := len(line) - len(strings.TrimLeft(line, "#"))
+			title := strings.ToLower(strings.TrimSpace(strings.TrimLeft(line, "#")))
+			if level <= 2 {
+				inAC = strings.HasPrefix(title, "acceptance criteria")
+			}
+			continue
+		}
+		if !inAC || !strings.HasPrefix(line, "| AC-") || strings.Contains(line, "restates=") {
+			continue
+		}
+		trimmed := strings.TrimRight(line, " ")
+		if strings.HasSuffix(trimmed, "|") {
+			cell := strings.TrimRight(strings.TrimSuffix(trimmed, "|"), " ")
+			lines[i] = cell + " restates=1 |"
+		}
+	}
+	if err := os.WriteFile(truthPath, []byte(strings.Join(lines, "\n")), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	sum := sha256.Sum256([]byte(restatementCLIBody))
+	doc := "---\nslug: " + slug + "\nconfirmed_by: justin-mc-lai (unit fixture)\n" +
+		"confirmed_at: 2026-11-13T00:00:00Z\nhash: " + hex.EncodeToString(sum[:]) +
+		"\n---\n" + restatementCLIBody
+	if err := os.WriteFile(filepath.Join(dir, "restatement.md"), []byte(doc), 0o644); err != nil {
+		t.Fatal(err)
+	}
 }
 
 // seedTruthSurfaces writes the surface declaration a first freeze now

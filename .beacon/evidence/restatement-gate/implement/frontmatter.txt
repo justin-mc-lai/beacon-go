@@ -1,0 +1,5 @@
+slug: restatement-gate
+confirmed_by: justin-mc-lai (confirmed 2026-11-13 in chat, scope = restatement-gate plan)
+confirmed_at: 2026-11-13T04:39:57Z
+hash: 51f4871f72d08fa8ae89f15facdea105c8808f7b1941ca6cf28a196fd53c8694
+---

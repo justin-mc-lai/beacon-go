@@ -1,0 +1,19 @@
+PASS missing freeze_rc=1 reason=restatement_required
+PASS unconfirmed freeze_rc=1 reason=restatement_unconfirmed
+PASS stale freeze_rc=1 reason=restatement_stale
+PASS partial freeze_rc=1 reason=restatement_sections_missing
+PASS dangling freeze_rc=1 reason=ac_not_traceable_to_restatement
+PASS order freeze_rc=1 first=truth_surface_required restatement_reported=no
+PASS good_first_freeze frozen frozen=True matches=True by=justin blocked=False
+PASS legacy_refreeze_waiver frozen frozen=True warnings=1 restatement=omitted
+PASS truth_show_restatement_block path=True by=True keys=confirmed_at,confirmed_by,hash,matches,path matches=True
+---
+missing rc=1 status=draft blocked=True reasons=restatement_required restatement=omitted
+unconfirmed rc=1 status=draft blocked=True reasons=restatement_unconfirmed restatement=present
+stale rc=1 status=draft blocked=True reasons=restatement_stale restatement=present
+partial rc=1 status=draft blocked=True reasons=restatement_sections_missing restatement=present
+dangling rc=1 status=draft blocked=True reasons=ac_not_traceable_to_restatement restatement=present
+order rc=1 status=draft blocked=True reasons=truth_surface_required restatement=omitted
+good rc=0 status=frozen blocked=False reasons=- restatement=present
+seed_tmp=/var/folders/2t/f90n3twn0jsc89rglztl65b00000gn/T/tmp.LigGYfVkOA
+checks_passed=9 checks_failed=0

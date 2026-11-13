@@ -18,6 +18,7 @@ func TestIntentFreezeBlockedUntilConfirmed(t *testing.T) {
 		t.Fatal(err)
 	}
 	seedDefaultSurfaces(t, env.root, "ask-first")
+	seedDefaultRestatement(t, filepath.Join(env.root, "docs", "beacon", "v2.0.0", "features", "ask-first", "truth.md"))
 	ctx := env.ctx(t, "ask-first")
 
 	pre, err := env.eng.FreezeTruthPackage(ctx, "tester")

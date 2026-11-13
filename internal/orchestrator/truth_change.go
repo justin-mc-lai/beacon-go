@@ -381,9 +381,17 @@ func (e *Engine) RefreezeTruthPackageAcceptCurrent(ctx store.FeatureContext, by 
 	// applyFreeze's truth_refrozen event clears the pending list in
 	// the trail scan, so the returned view already reads frozen with
 	// no pending change; changeIDs rides along in the event payload.
-	return e.applyFreeze(ctx, EventTruthRefrozen, map[string]any{
+	refrozen, err := e.applyFreeze(ctx, EventTruthRefrozen, map[string]any{
 		"by": by, "change_ids": changeIDs, "change_ac_diff": diff,
 	})
+	if err != nil {
+		return refrozen, err
+	}
+	// The legacy restatement waiver is decided in the precheck; carry its
+	// non-blocking notes onto the refrozen view so `truth show` reports
+	// them instead of silently dropping the waiver.
+	refrozen.Warnings = append(refrozen.Warnings, pre.Warnings...)
+	return refrozen, nil
 }
 
 // changeACDiff compares the base requirement fingerprints recorded at

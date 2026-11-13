@@ -247,6 +247,7 @@ func seedRefrozenCLIPackage(t *testing.T) (string, string) {
 	if _, err := eng.ConfirmIntent(ctx, "tester"); err != nil {
 		t.Fatalf("confirm: %v", err)
 	}
+	seedTruthRestatement(t, root, "trace-cli")
 	if _, err := eng.FreezeTruthPackage(ctx, "qa-bot"); err != nil {
 		t.Fatalf("freeze: %v", err)
 	}
@@ -259,7 +260,7 @@ func seedRefrozenCLIPackage(t *testing.T) (string, string) {
 		t.Fatal(err)
 	}
 	text := strings.Replace(string(raw),
-		"| AC-001 | 作者写下第一条可验证的完成标准（可被 tests.md 的 TC-001 直接验证） |",
+		"| AC-001 | 作者写下第一条可验证的完成标准（可被 tests.md 的 TC-001 直接验证） restates=1 |",
 		"| AC-001 | the first criterion, now sharper |\n| AC-002 | the second criterion |", 1)
 	text = strings.Replace(text,
 		"| AC-001 | user utterance | truth.md#User-Intent-Snapshot |",

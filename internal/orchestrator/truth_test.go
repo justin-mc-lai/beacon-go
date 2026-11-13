@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -64,6 +65,7 @@ func (env truthEnv) create(t *testing.T, slug string) TruthPackageView {
 		t.Fatalf("CreateTruthPackage(%s): %v", slug, err)
 	}
 	seedDefaultSurfaces(t, env.root, slug)
+	seedDefaultRestatement(t, filepath.Join(env.root, env.ctx(t, slug).Feature.TruthPath))
 	completeIntentForTest(t, env.eng, env.ctx(t, slug))
 	return v
 }
@@ -83,6 +85,93 @@ func (env truthEnv) createBare(t *testing.T, slug string) TruthPackageView {
 func sha256Hex(b []byte) string {
 	sum := sha256.Sum256(b)
 	return hex.EncodeToString(sum[:])
+}
+
+// restatementFixtureBody is the signed restatement every create-based
+// unit fixture carries now that a first freeze demands one. Section 1
+// is what the fixture AC rows point at (`restates=1`).
+const restatementFixtureBody = "## 1 交付形态\n\n测试夹具复述。\n\n## 2 界面与交互\n\n仅 CLI。\n\n## 3 业务流转\n\n## 3.1 首次冻结\n\n冻结前校验复述。\n\n## 4 边界与不做\n\n不改既有语义。\n\n## 5 歧义与默认值\n\n无。\n"
+
+var fixtureACRowRe = regexp.MustCompile(`^\|\s*(AC-\d{3})\s*\|`)
+
+// seedDefaultRestatement writes the fixture restatement.md beside the
+// truth document and stamps `restates=1` on every Acceptance Criteria
+// row that has no token yet. Tests that exercise the missing-file,
+// unsigned or strayed shapes build their own fixture instead.
+func seedDefaultRestatement(t *testing.T, truthPath string) {
+	t.Helper()
+	text := readFile(t, truthPath)
+	text = stampDefaultRestates(text)
+	if err := os.WriteFile(truthPath, []byte(text), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	slug := filepath.Base(filepath.Dir(truthPath))
+	doc := "---\nslug: " + slug + "\nconfirmed_by: justin-mc-lai (unit fixture)\n" +
+		"confirmed_at: 2026-11-13T00:00:00Z\nhash: " + sha256Hex([]byte(restatementFixtureBody)) +
+		"\n---\n" + restatementFixtureBody
+	if err := os.WriteFile(filepath.Join(filepath.Dir(truthPath), "restatement.md"), []byte(doc), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// stampDefaultRestates adds `restates=1` to the Acceptance Criteria
+// rows that carry no token, so the fixture passes the traceability
+// check without hand-editing every fixture table.
+func stampDefaultRestates(text string) string {
+	lines := strings.Split(text, "\n")
+	inAC := false
+	for i, line := range lines {
+		if strings.HasPrefix(line, "#") {
+			level := len(line) - len(strings.TrimLeft(line, "#"))
+			title := strings.ToLower(strings.TrimSpace(strings.TrimLeft(line, "#")))
+			if level <= 2 {
+				inAC = strings.HasPrefix(title, "acceptance criteria")
+			}
+			continue
+		}
+		if !inAC {
+			continue
+		}
+		if fixtureACRowRe.MatchString(line) && !strings.Contains(line, "restates=") {
+			trimmed := strings.TrimRight(line, " ")
+			if strings.HasSuffix(trimmed, "|") {
+				cell := strings.TrimRight(strings.TrimSuffix(trimmed, "|"), " ")
+				lines[i] = cell + " restates=1 |"
+			}
+		}
+	}
+	return strings.Join(lines, "\n")
+}
+
+// insertACSectionRow inserts row directly after the Acceptance Criteria
+// table row carrying acID, tolerating trailing tokens (restates=1) that
+// the fixture stamping may already have added.
+func insertACSectionRow(text, acID, row string) string {
+	lines := strings.Split(text, "\n")
+	inAC := false
+	for i, line := range lines {
+		if strings.HasPrefix(line, "#") {
+			level := len(line) - len(strings.TrimLeft(line, "#"))
+			title := strings.ToLower(strings.TrimSpace(strings.TrimLeft(line, "#")))
+			if level <= 2 {
+				inAC = strings.HasPrefix(title, "acceptance criteria")
+			}
+			continue
+		}
+		if !inAC {
+			continue
+		}
+		m := fixtureACRowRe.FindStringSubmatch(line)
+		if m == nil || m[1] != acID {
+			continue
+		}
+		out := make([]string, 0, len(lines)+1)
+		out = append(out, lines[:i+1]...)
+		out = append(out, row)
+		out = append(out, lines[i+1:]...)
+		return strings.Join(out, "\n")
+	}
+	return text
 }
 
 func readFile(t *testing.T, path string) string {

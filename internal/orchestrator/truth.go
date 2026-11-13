@@ -115,6 +115,23 @@ type TruthPackageView struct {
 	SurfacesDeclared bool                `json:"surfaces_declared"`
 	SurfaceStrict    bool                `json:"surface_strict"`
 	ACSurfaces       map[string][]string `json:"ac_surfaces,omitempty"`
+	// restatement-gate: the restatement document beside the four-piece
+	// set. A package with no file omits the block entirely.
+	Restatement *RestatementView `json:"restatement,omitempty"`
+	// Warnings are non-blocking notes (legacy waivers) for this read.
+	// They never turn into BlockReasons.
+	Warnings []string `json:"warnings,omitempty"`
+}
+
+// RestatementView is the read-only `restatement` block of
+// `truth show --json`. Matches only says the body's current sha256
+// equals the hash recorded in the frontmatter.
+type RestatementView struct {
+	Path        string `json:"path"`
+	ConfirmedBy string `json:"confirmed_by"`
+	ConfirmedAt string `json:"confirmed_at"`
+	Hash        string `json:"hash"`
+	Matches     bool   `json:"matches"`
 }
 
 var slugRe = regexp.MustCompile(`^[a-z0-9]+(?:[-_][a-z0-9]+)*$`)
@@ -190,6 +207,22 @@ func (e *Engine) TruthPackage(ctx store.FeatureContext) (TruthPackageView, error
 		SurfacesDeclared: decl.Declared,
 		SurfaceStrict:    decl.Strict,
 		ACSurfaces:       decl.ACSurfaces,
+	}
+	// restatement-gate: the restatement document is read-only context
+	// for every view; a missing file (a legacy package) leaves the
+	// block absent instead of inventing one.
+	restRel := siblingPkgPath(feat.TruthPath, gate.RestatementFile)
+	if restRel != "" {
+		rest, rerr := gate.LoadRestatement(resolvePkgPath(ctx.Project.RootPath, restRel), filepath.ToSlash(restRel))
+		if rerr != nil {
+			return TruthPackageView{}, rerr
+		}
+		if rest.Present {
+			v.Restatement = &RestatementView{
+				Path: rest.Path, ConfirmedBy: rest.ConfirmedBy,
+				ConfirmedAt: rest.ConfirmedAt, Hash: rest.Hash, Matches: rest.Matches,
+			}
+		}
 	}
 	if lc, err := e.store.Features().GetLifecycle(feat.ID); err == nil {
 		v.LifecycleStage = string(lc.Stage)
@@ -363,10 +396,11 @@ func (e *Engine) CreateTruthPackage(projectRoot, version, slug string) (TruthPac
 // no-undecided-deferral requirement via its deferral_pending
 // findings). It returns the blocked view when anything fails.
 //
-// requireSurfaces is true only for a package's FIRST freeze: the
-// surface declaration is mandatory there, while a refreeze of a
-// previously frozen (legacy) package keeps the no-key waiver.
-func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string, requireSurfaces bool) (TruthPackageView, bool, error) {
+// firstFreeze is true only for a package's FIRST freeze: the surface
+// declaration and the restatement are mandatory there, while a
+// refreeze of a previously frozen (legacy) package keeps both legacy
+// waivers.
+func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string, firstFreeze bool) (TruthPackageView, bool, error) {
 	view, err := e.TruthPackage(ctx)
 	if err != nil {
 		return TruthPackageView{}, false, err
@@ -399,7 +433,7 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string, requireSurf
 	surfaceDecl := gate.ParseSurfaceDeclaration(pkg.Truth.Text)
 	effective := surfaceDecl
 	effective.Strict = surfaceDecl.EffectiveStrict()
-	if codes := gate.ValidateSurfaceDeclarationForFreeze(effective, requireSurfaces); len(codes) > 0 {
+	if codes := gate.ValidateSurfaceDeclarationForFreeze(effective, firstFreeze); len(codes) > 0 {
 		view.Blocked = true
 		view.BlockReasons = codes
 		for _, code := range codes {
@@ -414,6 +448,48 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string, requireSurf
 			})
 		}
 		return view, false, nil
+	}
+	// restatement-gate (AC-002/AC-004): between the surface declaration
+	// and the integrity gate, a first freeze must carry a confirmed,
+	// unfrayed restatement and every AC must point into it. A refreeze
+	// keeps the legacy waiver: no blocking, warnings only.
+	restRel := siblingPkgPath(ctx.Feature.TruthPath, gate.RestatementFile)
+	rest, rerr := gate.LoadRestatement(resolvePkgPath(ctx.Project.RootPath, restRel), filepath.ToSlash(restRel))
+	if rerr != nil {
+		return TruthPackageView{}, false, rerr
+	}
+	if codes := gate.ValidateRestatementForFreeze(rest, firstFreeze); len(codes) > 0 {
+		view.Blocked = true
+		view.BlockReasons = codes
+		for _, code := range codes {
+			view.Findings = append(view.Findings, gate.Finding{
+				Kind: code, ReasonCode: code, File: rest.Path,
+				Detail:      restatementDetail(code, rest),
+				RepairRoute: gate.DefaultRepairRoute,
+			})
+		}
+		return view, false, nil
+	}
+	if rest.Present && firstFreeze {
+		if untraceable := gate.UntraceableACs(pkg.Truth.Text, rest); len(untraceable) > 0 {
+			view.Blocked = true
+			view.BlockReasons = []string{core.ReasonACNotTraceableToRestatement}
+			for _, ac := range untraceable {
+				view.Findings = append(view.Findings, gate.Finding{
+					Kind: core.ReasonACNotTraceableToRestatement, ReasonCode: core.ReasonACNotTraceableToRestatement,
+					File:        pkg.Truth.Path,
+					Detail:      ac + " carries no usable restates=<section> token pointing into " + rest.Path,
+					RepairRoute: gate.DefaultRepairRoute,
+				})
+			}
+			return view, false, nil
+		}
+	} else if !rest.Present && !firstFreeze {
+		view.Warnings = append(view.Warnings, gate.RestatementWarnings(rest)...)
+	} else if rest.Present {
+		// A refreeze with a restatement on disk: its defects are waived,
+		// but they are reported.
+		view.Warnings = append(view.Warnings, gate.RestatementWarnings(rest)...)
 	}
 	iv, err := e.EvaluateIntegrity(ctx, by, gate.IntegrityModeBlock)
 	if err != nil {
@@ -642,4 +718,25 @@ func freezeBlockedError(op string, view TruthPackageView) error {
 	return core.NewError(code, op, fmt.Sprintf(
 		"package %s is blocked by the freeze precheck (%d finding(s)); first reasons: %s",
 		view.Slug, len(view.Findings), strings.Join(view.BlockReasons, ", ")))
+}
+
+// restatementDetail is the human half of a restatement finding: the
+// exact file and the fact that failed, so the author can repair it
+// without guessing.
+func restatementDetail(code string, rest gate.Restatement) string {
+	file := rest.Path
+	if file == "" {
+		file = gate.RestatementFile
+	}
+	switch code {
+	case core.ReasonRestatementRequired:
+		return "a first freeze requires " + file + " (five sections, confirmed_by, body hash)"
+	case core.ReasonRestatementUnconfirmed:
+		return file + " has an empty confirmed_by; an unsigned restatement does not count as confirmation"
+	case core.ReasonRestatementStale:
+		return file + " body sha256 " + rest.BodySHA256 + " does not match the recorded hash " + rest.Hash
+	case core.ReasonRestatementSectionsMissing:
+		return file + " is missing required section(s): " + strings.Join(rest.MissingSections(), ", ")
+	}
+	return file + " failed the restatement check: " + code
 }

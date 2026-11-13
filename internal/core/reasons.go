@@ -46,31 +46,36 @@ const (
 // ReasonCatalog maps the stage-exit / admission family to the
 // user-facing descriptions of goal_reason_codes.REASON_CATALOG.
 var ReasonCatalog = map[string]string{
-	ReasonStageExitOK:               "Stage exit verifier passed",
-	ReasonStageExitPlanIncomplete:   "Plan/journey incomplete; cannot leave plan",
-	ReasonStageExitTruthNotFrozen:   "Feature truth exists but status is not frozen",
-	ReasonStageExitTruthMissing:     "Feature truth package missing; fill then freeze",
-	ReasonIntentMissing:             "Kernel-driven run needs a confirmed intent recorded in the feature package",
-	ReasonStageExitDesignIncompl:    "Design stage lacks verifiable design evidence",
-	ReasonStageExitImplementBlock:   "Implement admission failed",
-	ReasonStageExitQAEvidenceMiss:   "QA lacks scorecard/evidence artifact",
-	ReasonReleaseRequiresHuman:      "Release requires human confirmation",
-	ReasonExecutorUnsupported:       "Executor selector is not supported; no run was created",
-	ReasonStageGateNotEvaluated:     "Stage has no exit gate verdict; the run cannot advance",
-	ReasonManualTickRequired:        "Manual/external executor: record completion with goal tick --by <identity>",
-	ReasonExternalActorRequired:     "An external result must name who reports it (--by)",
-	ReasonExternalSummRequired:      "An external result must carry a summary (--summary)",
-	ReasonConformanceFailed:         "The delivery is not recognised by the kernel: see the failed conformance items",
-	ReasonFreezeAckRequired:         "Freeze ack required before implement (fill ≠ self-sign)",
-	ReasonTruthSurfaceRequired:      "Feature truth must declare at least one surface (api|web|desktop|cli)",
-	ReasonTruthSurfaceInvalid:       "Feature truth declares a surface outside api|web|desktop|cli",
-	ReasonTruthACSurfaceUndeclared:  "An AC narrows to a surface the package did not declare",
-	ReasonQAAutotestRecordedMissing: "No autotest evidence for the run (.beacon/autotest/<run-id> or a registered autotest artifact)",
-	ReasonQASurfaceEvidenceMiss:     "A declared surface has no surface-specific evidence",
-	ReasonLegacyWaiverSurface:       "Legacy package without surface_strict: surface checks downgraded to a warning",
-	ReasonSurfaceUndeclared:         "Legacy frozen package declares no surfaces; qa surface checks are waived",
-	ReasonMainImplementForbidden:    "Business path commit on main/master forbidden",
-	ReasonMainDocsPolicyForbidden:   "Docs path outside allowed main docs policy",
+	ReasonStageExitOK:                 "Stage exit verifier passed",
+	ReasonStageExitPlanIncomplete:     "Plan/journey incomplete; cannot leave plan",
+	ReasonStageExitTruthNotFrozen:     "Feature truth exists but status is not frozen",
+	ReasonStageExitTruthMissing:       "Feature truth package missing; fill then freeze",
+	ReasonIntentMissing:               "Kernel-driven run needs a confirmed intent recorded in the feature package",
+	ReasonStageExitDesignIncompl:      "Design stage lacks verifiable design evidence",
+	ReasonStageExitImplementBlock:     "Implement admission failed",
+	ReasonStageExitQAEvidenceMiss:     "QA lacks scorecard/evidence artifact",
+	ReasonReleaseRequiresHuman:        "Release requires human confirmation",
+	ReasonExecutorUnsupported:         "Executor selector is not supported; no run was created",
+	ReasonStageGateNotEvaluated:       "Stage has no exit gate verdict; the run cannot advance",
+	ReasonManualTickRequired:          "Manual/external executor: record completion with goal tick --by <identity>",
+	ReasonExternalActorRequired:       "An external result must name who reports it (--by)",
+	ReasonExternalSummRequired:        "An external result must carry a summary (--summary)",
+	ReasonConformanceFailed:           "The delivery is not recognised by the kernel: see the failed conformance items",
+	ReasonFreezeAckRequired:           "Freeze ack required before implement (fill ≠ self-sign)",
+	ReasonTruthSurfaceRequired:        "Feature truth must declare at least one surface (api|web|desktop|cli)",
+	ReasonTruthSurfaceInvalid:         "Feature truth declares a surface outside api|web|desktop|cli",
+	ReasonTruthACSurfaceUndeclared:    "An AC narrows to a surface the package did not declare",
+	ReasonQAAutotestRecordedMissing:   "No autotest evidence for the run (.beacon/autotest/<run-id> or a registered autotest artifact)",
+	ReasonQASurfaceEvidenceMiss:       "A declared surface has no surface-specific evidence",
+	ReasonLegacyWaiverSurface:         "Legacy package without surface_strict: surface checks downgraded to a warning",
+	ReasonSurfaceUndeclared:           "Legacy frozen package declares no surfaces; qa surface checks are waived",
+	ReasonRestatementRequired:         "A first truth freeze requires restatement.md beside the four pieces",
+	ReasonRestatementUnconfirmed:      "restatement.md carries no confirmed_by; an unsigned restatement is not a restatement",
+	ReasonRestatementStale:            "restatement.md body no longer matches its recorded hash; reconfirm it",
+	ReasonRestatementSectionsMissing:  "restatement.md is missing one of the five required sections",
+	ReasonACNotTraceableToRestatement: "An acceptance criterion names no restatement section, or one that does not exist",
+	ReasonMainImplementForbidden:      "Business path commit on main/master forbidden",
+	ReasonMainDocsPolicyForbidden:     "Docs path outside allowed main docs policy",
 }
 
 // HumanGateReasonCodes is the closed set of blocker reason codes whose
@@ -301,6 +306,14 @@ const (
 	ReasonQASurfaceEvidenceMiss     = "qa_surface_evidence_miss" // family prefix; per-surface code adds ":<surface>"
 	ReasonLegacyWaiverSurface       = "legacy_waiver_surface"
 	ReasonSurfaceUndeclared         = "surface_undeclared"
+	// restatement-gate (AC-006): the truth freeze side's restatement
+	// contract. Five stable strings; the kernel references only these
+	// constants.
+	ReasonRestatementRequired         = "restatement_required"
+	ReasonRestatementUnconfirmed      = "restatement_unconfirmed"
+	ReasonRestatementStale            = "restatement_stale"
+	ReasonRestatementSectionsMissing  = "restatement_sections_missing"
+	ReasonACNotTraceableToRestatement = "ac_not_traceable_to_restatement"
 )
 
 // ---- Implement work-gate family (implement-work-gate AC-001..006) ----

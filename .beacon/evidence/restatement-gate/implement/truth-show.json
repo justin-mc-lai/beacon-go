@@ -1,0 +1,70 @@
+{
+  "slug": "restatement-gate",
+  "feature_id": "feat_e8c84b8a15f4ab2707946e50",
+  "project_root": "/Users/apple/Developer/Personal/products/beacon-go",
+  "version": "v2.0.0",
+  "status": "frozen",
+  "frozen": true,
+  "change_pending": false,
+  "package_dir": "docs/beacon/v2.0.0/features/restatement-gate",
+  "truth_path": "docs/beacon/v2.0.0/features/restatement-gate/truth.md",
+  "tests_path": "docs/beacon/v2.0.0/features/restatement-gate/tests.md",
+  "tasks_path": "docs/beacon/v2.0.0/features/restatement-gate/tasks.md",
+  "evidence_path": "docs/beacon/v2.0.0/features/restatement-gate/evidence.md",
+  "lifecycle_stage": "Freeze",
+  "lifecycle_status": "Completed",
+  "change_ac_diff": {
+    "added": [],
+    "changed": [
+      {
+        "ac": "AC-004",
+        "before": "2006be6337f8",
+        "after": "496099d353a8"
+      }
+    ],
+    "removed": []
+  },
+  "branch_check": "ok",
+  "current_branch": "main",
+  "canonical_branch": "main",
+  "baseline_status": "committed",
+  "baseline_commit": "c4a012b423e4759efca9a4840e9575b850fca9dd",
+  "surfaces": [
+    "cli"
+  ],
+  "surfaces_declared": true,
+  "surface_strict": true,
+  "ac_surfaces": {
+    "AC-001": [
+      "cli"
+    ],
+    "AC-002": [
+      "cli"
+    ],
+    "AC-003": [
+      "cli"
+    ],
+    "AC-004": [
+      "cli"
+    ],
+    "AC-005": [
+      "cli"
+    ],
+    "AC-006": [
+      "cli"
+    ],
+    "AC-007": [
+      "cli"
+    ],
+    "AC-008": [
+      "cli"
+    ]
+  },
+  "restatement": {
+    "path": "docs/beacon/v2.0.0/features/restatement-gate/restatement.md",
+    "confirmed_by": "justin-mc-lai (confirmed 2026-11-13 in chat, scope = restatement-gate plan)",
+    "confirmed_at": "2026-11-13T04:39:57Z",
+    "hash": "51f4871f72d08fa8ae89f15facdea105c8808f7b1941ca6cf28a196fd53c8694",
+    "matches": true
+  }
+}
