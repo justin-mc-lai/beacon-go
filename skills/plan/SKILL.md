@@ -13,6 +13,7 @@ then work it):
 | mode | what it does | Go surface |
 |------|--------------|------------|
 | pln-brainstorm | Socratic questions + first-principles decomposition before freeze | `beacon truth ask` / `beacon truth answer` (one question at a time, each with a recommendation) |
+| pln-fsm | Domain FSM decomposition: entity precedence, aggregate transitions, illegal slots | `beacon truth fsm check` / `beacon fsm transition` (mandatory for any workflow, order, dispatch, approval, lifecycle, or multi-state feature) |
 | pln-review | multi-angle planner review of a plan or package | `beacon goal planner-review` / `beacon qa planner-review` (real subprocess reviewers, one block blocks all) |
 | pln-source | source-anchored research — read the code, never invent | host reads the repo; findings land in the intent (`beacon truth intent`) |
 | pln-program | sea-to-lake: split the big thing into boilable lakes, then the human multi-selects | `beacon goal program propose` / `select` / `plan --from-proposal` (3-7 lakes; cycles, unknown lakes and unselected deps refused) |
@@ -65,11 +66,13 @@ Three worked routes; open the file before acting (they are examples, not
 requirement authority — the frozen package is):
 
 - `examples/sea-to-lake.md` — chain `full-delivery`: an ocean-sized goal is split into lakes before any code.
+- `examples/domain-fsm-decomposition.md` — chain `domain-fsm`: workflow/lifecycle features must decompose entity precedence, aggregate transitions, and illegal slots.
 - `examples/vague-requirement.md` — chain `honest-block`: a one-line request without an outcome stops at questions.
 - `examples/source-anchored-review.md` — chain `full-delivery`: every claim in a plan cites a file or command output.
 
 ## HARD GATE
 
+- Any request that involves workflow, state transition, dispatch, lifecycle, approval, or order flow MUST trigger `pln-fsm`: decompose Entity Precedence, Aggregate FSM, and Illegal Transition Slots before routing to truth freeze.
 - Planning ends at a signed intent and a reviewed plan. Never at code, never at a
   frozen package, never at a QA or release verdict.
 - One question at a time, each with a recommendation. Never bundle five questions
@@ -87,8 +90,8 @@ summary alone.
 
 ## Output contract (minimum)
 
-- `mode_id`: one of `pln-brainstorm|pln-review|pln-source|pln-program|pln-friction`
-- the artifact for that mode (question list, review verdict, findings, lake graph)
+- `mode_id`: one of `pln-brainstorm|pln-fsm|pln-review|pln-source|pln-program|pln-friction`
+- the artifact for that mode (question list, FSM matrix, review verdict, findings, lake graph)
 - `evidence_refs`: files read, commands run, sources cited
 - `next`: one of `truth|goal|stop`
 - `plain_summary`: one sentence a non-engineer understands

@@ -18,6 +18,7 @@ route to another public core instead of stretching this one.
 |---------|---------|-------|
 | pln-review | multi-angle planner review | reviewers run as real subprocesses in Go; one valid block blocks all; the verdict writes back into the run's state machine (P0 blocks implement, drift routes to change/refreeze) |
 | pln-brainstorm | brainstorm before freeze | Socratic four questions + first-principles decomposition; in Go the questions live in the truth ask/answer ledger, one at a time, each carrying a recommendation |
+| pln-fsm | Domain FSM decomposition | Entity Precedence + Aggregate FSM Tables + Illegal Transition Slots; verified via `beacon truth fsm check`; required for any stateful/workflow feature |
 | pln-source | source-anchored research | anchor every claim to code that exists; "对着源码，别瞎编" — findings feed the intent snapshot |
 | pln-program | sea-to-lake program plan | AI proposes 3-7 lakes (`lake-proposal.v1`), the human multi-selects, only selected lakes become drafts; `plan --from-proposal` records the graph; a cycle, unknown lake, unselected dependency or empty selection is refused |
 | pln-program-auto / pln-program-interactive | program variants | same selected graph, different driving: automatic advance vs step-by-step human routing |
