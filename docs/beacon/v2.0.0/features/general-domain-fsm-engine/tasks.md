@@ -9,11 +9,11 @@ task_source: acceptance_criteria
 
 ## Task Ledger
 
-- [ ] TASK-001 Implement domain_kind decoupling in internal/gate · ac=AC-001
-- [ ] TASK-002 Implement beacon truth fsm check CLI · ac=AC-002
-- [ ] TASK-003 Implement beacon fsm transition CLI · ac=AC-003
-- [ ] TASK-004 Implement test coverage and verify autotest · ac=AC-004
-- [ ] TASK-005 Validate package gates · ac=GATES
+- [x] TASK-001 Implement domain_kind decoupling in internal/gate · ac=AC-001
+- [x] TASK-002 Implement beacon truth fsm check CLI · ac=AC-002
+- [x] TASK-003 Implement beacon fsm transition CLI · ac=AC-003
+- [x] TASK-004 Implement test coverage and verify autotest · ac=AC-004
+- [x] TASK-005 Validate package gates · ac=GATES
 
 ## Boundary
 
