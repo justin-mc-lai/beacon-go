@@ -40,6 +40,7 @@ func newTruthCmd() *cobra.Command {
 		// brainstorm questions, code2truth intake, revision reopen.
 		newTruthDecomposeCmd(), newTruthBrainstormCmd(),
 		newTruthCode2TruthCmd(), newTruthReopenCmd(),
+		newTruthFSMCmd(),
 	)
 	return c
 }

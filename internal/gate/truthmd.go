@@ -136,7 +136,7 @@ func businessDomain(scalars map[string]string, truthMD string) bool {
 		return false
 	}
 	switch domainKind(scalars, truthMD) {
-	case "lifecycle", "gate", "platform", "meta":
+	case "lifecycle", "gate", "platform", "meta", "workflow", "general", "cli", "engine":
 		return false
 	}
 	return true
