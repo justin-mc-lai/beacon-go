@@ -45,6 +45,9 @@ type PackageFiles struct {
 	Tests    PackageFile
 	Tasks    PackageFile
 	Evidence PackageFile
+	// Restatement is the signed restatement beside the four-piece set;
+	// it is part of the contract face but not of the integrity members.
+	Restatement PackageFile
 }
 
 // ArtifactFact is one registered artifact pointer (artifact_refs).

@@ -118,53 +118,93 @@ type ArtifactRegistration struct {
 // the qa evidence check sees a live pointer instead of a stale
 // leftover, and the event trail records the refresh.
 func (e *Engine) RegisterArtifact(runID, kind, path, by string) (ArtifactRegistration, error) {
-	if strings.TrimSpace(by) == "" {
-		return ArtifactRegistration{}, core.NewError(ReasonArtifactRegistrarRequired,
-			"goal.RegisterArtifact", "a registrant identity (--by) is required")
-	}
-	kind = strings.ToLower(strings.TrimSpace(kind))
-	if !ValidRegisterKind(kind) {
-		return ArtifactRegistration{}, core.NewError(ReasonArtifactKindNotAllowed,
-			"goal.RegisterArtifact", "kind "+kind+" is not in the registration vocabulary "+
-				"(qa, qa_*, scorecard, test_result, test_results, evidence, implement_artifact, report, log, artifact, a11y_tree, browser_trace, e2e_report)")
-	}
-	if !ArtifactKindAllowsPath(kind, path) {
-		return ArtifactRegistration{}, core.NewError(ReasonArtifactKindExtensionNotAllowed,
-			"goal.RegisterArtifact", "kind "+kind+" does not accept extension "+filepath.Ext(path)+
-				" (allowed: "+strings.Join(artifactKindExtensions[kind], ", ")+")")
-	}
 	run, _, _, err := e.loadRun(runID)
 	if err != nil {
 		return ArtifactRegistration{}, err
 	}
+	res, payload, err := e.registerArtifactScoped(run.ID, kind, path, by)
+	if err != nil {
+		return ArtifactRegistration{}, err
+	}
+	if res.AlreadyRegistered {
+		return res, nil
+	}
+	if err := e.appendEvent(run, EventArtifactRegistered, payload); err != nil {
+		return ArtifactRegistration{}, err
+	}
+	return res, nil
+}
+
+// RegisterFeatureArtifact registers a file as evidence of a FEATURE
+// instead of a run (AC-002: the freeze -> run -> artifact cycle). The
+// pointer lands under the feature-scope sentinel run_id so the
+// evidence-reference check accepts it with no run in existence; the
+// event is feature-scoped. Run-scoped registration is unchanged.
+func (e *Engine) RegisterFeatureArtifact(fc store.FeatureContext, kind, path, by string) (ArtifactRegistration, error) {
+	res, payload, err := e.registerArtifactScoped(store.FeatureScopeRunID(fc.Feature.ID), kind, path, by)
+	if err != nil {
+		return ArtifactRegistration{}, err
+	}
+	if res.AlreadyRegistered {
+		return res, nil
+	}
+	payload["feature_id"] = fc.Feature.ID
+	payload["feature_slug"] = fc.Feature.Slug
+	payload["scope"] = "feature"
+	if err := e.appendFeatureEvent(fc.Feature.ID, EventArtifactRegistered, payload); err != nil {
+		return ArtifactRegistration{}, err
+	}
+	return res, nil
+}
+
+// registerArtifactScoped is the shared write half: validate the
+// declaration, hash the file, upsert the pointer under scopeRunID and
+// return the event payload the caller's scope writes.
+func (e *Engine) registerArtifactScoped(scopeRunID, kind, path, by string) (ArtifactRegistration, map[string]any, error) {
+	if strings.TrimSpace(by) == "" {
+		return ArtifactRegistration{}, nil, core.NewError(ReasonArtifactRegistrarRequired,
+			"goal.RegisterArtifact", "a registrant identity (--by) is required")
+	}
+	kind = strings.ToLower(strings.TrimSpace(kind))
+	if !ValidRegisterKind(kind) {
+		return ArtifactRegistration{}, nil, core.NewError(ReasonArtifactKindNotAllowed,
+			"goal.RegisterArtifact", "kind "+kind+" is not in the registration vocabulary "+
+				"(qa, qa_*, scorecard, test_result, test_results, evidence, implement_artifact, report, log, artifact, a11y_tree, browser_trace, e2e_report)")
+	}
+	if !ArtifactKindAllowsPath(kind, path) {
+		return ArtifactRegistration{}, nil, core.NewError(ReasonArtifactKindExtensionNotAllowed,
+			"goal.RegisterArtifact", "kind "+kind+" does not accept extension "+filepath.Ext(path)+
+				" (allowed: "+strings.Join(artifactKindExtensions[kind], ", ")+")")
+	}
 	abs := path
 	if !filepath.IsAbs(abs) {
+		var err error
 		abs, err = filepath.Abs(path)
 		if err != nil {
-			return ArtifactRegistration{}, err
+			return ArtifactRegistration{}, nil, err
 		}
 	}
 	info, err := os.Stat(abs)
 	if err != nil || !info.Mode().IsRegular() {
-		return ArtifactRegistration{}, core.NewError(ReasonArtifactFileMissing,
+		return ArtifactRegistration{}, nil, core.NewError(ReasonArtifactFileMissing,
 			"goal.RegisterArtifact", "artifact file does not exist or is not a regular file: "+abs)
 	}
 	f, err := os.Open(abs)
 	if err != nil {
-		return ArtifactRegistration{}, core.NewError(ReasonArtifactFileMissing,
+		return ArtifactRegistration{}, nil, core.NewError(ReasonArtifactFileMissing,
 			"goal.RegisterArtifact", "artifact file unreadable: "+abs)
 	}
 	h := sha256.New()
 	size, err := io.Copy(h, f)
 	f.Close()
 	if err != nil {
-		return ArtifactRegistration{}, err
+		return ArtifactRegistration{}, nil, err
 	}
 	sum := hex.EncodeToString(h.Sum(nil))
 
-	existing, err := e.store.Artifacts().ListByRun(run.ID)
+	existing, err := e.store.Artifacts().ListByRun(scopeRunID)
 	if err != nil {
-		return ArtifactRegistration{}, err
+		return ArtifactRegistration{}, nil, err
 	}
 	var previous, previousHash string
 	for _, a := range existing {
@@ -172,17 +212,17 @@ func (e *Engine) RegisterArtifact(runID, kind, path, by string) (ArtifactRegistr
 			continue
 		}
 		if a.ContentHash == sum {
-			return ArtifactRegistration{Artifact: a, AlreadyRegistered: true}, nil
+			return ArtifactRegistration{Artifact: a, AlreadyRegistered: true}, nil, nil
 		}
-		previous = a.ID // previous row for this run+kind+path
+		previous = a.ID // previous row for this scope+kind+path
 		previousHash = a.ContentHash
 	}
 	ref, err := e.store.Artifacts().Add(store.ArtifactRef{
-		RunID: run.ID, Kind: kind, AbsPath: abs,
+		RunID: scopeRunID, Kind: kind, AbsPath: abs,
 		ContentHash: sum, SizeBytes: size,
 	})
 	if err != nil {
-		return ArtifactRegistration{}, err
+		return ArtifactRegistration{}, nil, err
 	}
 	payload := map[string]any{
 		"artifact_id": ref.ID, "kind": kind, "abs_path": abs,
@@ -201,10 +241,7 @@ func (e *Engine) RegisterArtifact(runID, kind, path, by string) (ArtifactRegistr
 			payload["supersedes"] = previous
 		}
 	}
-	if err := e.appendEvent(run, EventArtifactRegistered, payload); err != nil {
-		return ArtifactRegistration{}, err
-	}
-	return ArtifactRegistration{Artifact: ref, Supersedes: supersedes}, nil
+	return ArtifactRegistration{Artifact: ref, Supersedes: supersedes}, payload, nil
 }
 
 // ListRunArtifacts returns the run's registered pointers with live
@@ -215,6 +252,21 @@ func (e *Engine) ListRunArtifacts(runID string) ([]store.ArtifactView, error) {
 		return nil, err
 	}
 	arts, err := e.store.Artifacts().ListByRun(runID)
+	if err != nil {
+		return nil, err
+	}
+	views := []store.ArtifactView{}
+	for _, a := range arts {
+		views = append(views, store.ViewOf(a))
+	}
+	return views, nil
+}
+
+// ListFeatureArtifacts returns the feature-scoped pointers of a feature
+// with live staleness verdicts (the `goal artifacts list --feature`
+// read side).
+func (e *Engine) ListFeatureArtifacts(fc store.FeatureContext) ([]store.ArtifactView, error) {
+	arts, err := e.store.Artifacts().ListByFeatureScope(fc.Feature.ID)
 	if err != nil {
 		return nil, err
 	}

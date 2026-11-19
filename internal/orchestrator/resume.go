@@ -293,3 +293,31 @@ func (e *Engine) Trace(runID string) (TraceBundle, error) {
 		LoopStage: m.LoopStage, EventCount: len(events), Events: events,
 	}, nil
 }
+
+// FeatureTrace is the feature-dimension event trail: every
+// lifecycle_event of the feature, run-scoped or not, so a pre-run
+// failure (AC-003: truth_precheck_failed carries no run_id) is
+// observable in `goal trace --feature`.
+type FeatureTrace struct {
+	FeatureID   string                 `json:"feature_id"`
+	FeatureSlug string                 `json:"feature_slug"`
+	EventCount  int                    `json:"event_count"`
+	Events      []store.LifecycleEvent `json:"events"`
+}
+
+// TraceFeature returns the feature-dimension trail in time order.
+func (e *Engine) TraceFeature(fc store.FeatureContext) (FeatureTrace, error) {
+	events, err := e.store.ListEvents(fc.Feature.ID)
+	if err != nil {
+		return FeatureTrace{}, err
+	}
+	if events == nil {
+		events = []store.LifecycleEvent{}
+	}
+	return FeatureTrace{
+		FeatureID:   fc.Feature.ID,
+		FeatureSlug: fc.Feature.Slug,
+		EventCount:  len(events),
+		Events:      events,
+	}, nil
+}

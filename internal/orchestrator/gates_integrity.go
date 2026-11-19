@@ -57,7 +57,18 @@ func (e *Engine) packageFiles(ctx store.FeatureContext) gate.PackageFiles {
 	pkg.Tests = readPkgFile(root, testsPath)
 	pkg.Tasks = readPkgFile(root, tasksPath)
 	pkg.Evidence = readPkgFile(root, evidencePath)
+	pkg.Restatement = readPkgFile(root, siblingPkgPath(feat.TruthPath, gate.RestatementFile))
 	return pkg
+}
+
+// surfaceDrifted reports whether the live package's contract face moved
+// off the recorded freeze fingerprint. Evidence edits are the byproduct
+// of implementation and do not drift a frozen package (AC-001); legacy
+// four-surface records still compare fresh through their own hash.
+func surfaceDrifted(recorded string, pkg gate.PackageFiles) bool {
+	return core.PackageSurfaceDrifted(recorded,
+		[]byte(pkg.Truth.Text), []byte(pkg.Tests.Text), []byte(pkg.Tasks.Text),
+		[]byte(pkg.Evidence.Text), []byte(pkg.Restatement.Text))
 }
 
 // integrityReportLive runs the integrity check WITHOUT persisting
@@ -85,6 +96,13 @@ func (e *Engine) integrityReportLive(ctx store.FeatureContext, mode string) (gat
 		if err != nil {
 			return gate.IntegrityReport{}, pkg, mode, err
 		}
+		for _, a := range arts {
+			artifacts = append(artifacts, gate.ArtifactFact{AbsPath: a.AbsPath})
+		}
+	}
+	// Feature-scoped registrations (AC-002) count as evidence too: a
+	// package can register its artifacts with no run in existence.
+	if arts, ferr := e.store.Artifacts().ListByFeatureScope(ctx.Feature.ID); ferr == nil {
 		for _, a := range arts {
 			artifacts = append(artifacts, gate.ArtifactFact{AbsPath: a.AbsPath})
 		}

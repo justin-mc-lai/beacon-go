@@ -82,9 +82,7 @@ func (e *Engine) gatherReviewFacts(fc store.FeatureContext) (reviewFacts, error)
 	// fingerprint no longer matches the freeze record.
 	if frozen.Frozen {
 		if recs, rerr := e.trailRecords(fc.Feature.ID); rerr == nil && recs.freeze != nil && recs.freeze.SurfaceFingerprint != "" {
-			live := core.PackageSurfaceFingerprint([]byte(f.pkg.Truth.Text), []byte(f.pkg.Tests.Text),
-				[]byte(f.pkg.Tasks.Text), []byte(f.pkg.Evidence.Text))
-			f.drift = live != recs.freeze.SurfaceFingerprint
+			f.drift = surfaceDrifted(recs.freeze.SurfaceFingerprint, f.pkg)
 		}
 	}
 	if f.pendingChange {
