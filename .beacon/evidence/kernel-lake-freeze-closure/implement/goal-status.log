@@ -1,0 +1,8 @@
+run:    run_18d7031fba3b78cb7249b13b
+status: running (loop_stage governance_precheck)
+stage:  plan
+blocked: false
+executor: external
+gate:   plan evaluated=false (this stage has no recorded verdict)
+hint:   not auto-driven: record each stage with `beacon goal tick --run-id run_18d7031fba3b78cb7249b13b --by <identity>`
+next:   beacon-plan

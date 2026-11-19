@@ -1,0 +1,20 @@
+=== TC-005: go test ./internal/... -count=1
+ok  	beacon-go/internal/agentapi	4.111s
+ok  	beacon-go/internal/benchgate	0.716s
+ok  	beacon-go/internal/changequality	1.126s
+ok  	beacon-go/internal/cli	17.002s
+ok  	beacon-go/internal/core	2.251s
+ok  	beacon-go/internal/effectjournal	1.847s
+ok  	beacon-go/internal/evalgate	47.926s
+ok  	beacon-go/internal/gate	3.133s
+ok  	beacon-go/internal/harness	12.013s
+?   	beacon-go/internal/httpapi	[no test files]
+ok  	beacon-go/internal/llm	2.915s
+ok  	beacon-go/internal/migration	3.688s
+ok  	beacon-go/internal/orchestrator	88.694s
+ok  	beacon-go/internal/progressreview	2.672s
+ok  	beacon-go/internal/session	2.529s
+ok  	beacon-go/internal/store	2.699s
+ok  	beacon-go/internal/stride	2.914s
+ok  	beacon-go/internal/workspace	3.904s
+exit=0
