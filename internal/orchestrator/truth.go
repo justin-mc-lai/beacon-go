@@ -121,6 +121,10 @@ type TruthPackageView struct {
 	// Warnings are non-blocking notes (legacy waivers) for this read.
 	// They never turn into BlockReasons.
 	Warnings []string `json:"warnings,omitempty"`
+	// EventWarnings report a bookkeeping failure that did not block the
+	// main flow (a precheck-failure event that could not be written).
+	// The CLI prints them to stderr instead of stdout.
+	EventWarnings []string `json:"event_warnings,omitempty"`
 }
 
 // RestatementView is the read-only `restatement` block of
@@ -135,6 +139,31 @@ type RestatementView struct {
 }
 
 var slugRe = regexp.MustCompile(`^[a-z0-9]+(?:[-_][a-z0-9]+)*$`)
+
+// EventTruthPrecheckFailed is the feature-scoped lifecycle event written
+// when a freeze/refreeze precheck blocks the package (AC-003): the
+// failure becomes observable in `goal trace --feature` / spine instead
+// of only in the CLI exit.
+const EventTruthPrecheckFailed = "truth_precheck_failed"
+
+// recordPrecheckFailure writes the truth_precheck_failed event for a
+// blocked precheck. It is best-effort on purpose: a bookkeeping write
+// failure must not turn a blocked package into a different error, so it
+// is reported back as a stderr warning (AC-003).
+func (e *Engine) recordPrecheckFailure(ctx store.FeatureContext, op string, view TruthPackageView) []string {
+	payload := map[string]any{
+		"feature_id":   ctx.Feature.ID,
+		"slug":         ctx.Feature.Slug,
+		"op":           op,
+		"blocked":      view.Blocked,
+		"reason_codes": view.BlockReasons,
+		"findings":     view.Findings,
+	}
+	if err := e.appendFeatureEvent(ctx.Feature.ID, EventTruthPrecheckFailed, payload); err != nil {
+		return []string{"precheck failure not recorded as " + EventTruthPrecheckFailed + ": " + err.Error()}
+	}
+	return nil
+}
 
 // appendFeatureEvent writes a feature-scoped trail entry (no run).
 func (e *Engine) appendFeatureEvent(featureID, eventType string, payload map[string]any) error {
@@ -582,9 +611,9 @@ func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload
 	// must change) and the document's declared revision id (the
 	// drift comparison base), recorded from the same bytes.
 	pkg := e.packageFiles(ctx)
-	payload["surface_fingerprint"] = core.PackageSurfaceFingerprint(
-		[]byte(pkg.Truth.Text), []byte(pkg.Tests.Text), []byte(pkg.Tasks.Text), []byte(pkg.Evidence.Text))
-	payload["surface_fingerprint_alg"] = core.SurfaceFingerprintAlg
+	payload["surface_fingerprint"] = core.PackageContractFingerprint(
+		[]byte(pkg.Truth.Text), []byte(pkg.Tests.Text), []byte(pkg.Tasks.Text), []byte(pkg.Restatement.Text))
+	payload["surface_fingerprint_alg"] = core.ContractSurfaceFingerprintAlg
 	if scalars, _, ok := gate.ParseFrontmatter(string(raw)); ok {
 		if rev := scalars["revision_id"]; rev != "" {
 			payload["revision_id"] = rev
@@ -703,6 +732,7 @@ func (e *Engine) FreezeTruthPackage(ctx store.FeatureContext, by string) (TruthP
 		return TruthPackageView{}, err
 	}
 	if !ok {
+		pre.EventWarnings = append(pre.EventWarnings, e.recordPrecheckFailure(ctx, "truth.Freeze", pre)...)
 		return pre, freezeBlockedError("truth.Freeze", pre)
 	}
 	return e.applyFreeze(ctx, EventTruthFrozen, map[string]any{"by": by})

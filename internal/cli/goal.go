@@ -694,18 +694,46 @@ func newGoalResumePackCmd() *cobra.Command {
 }
 
 func newGoalTraceCmd() *cobra.Command {
-	var runID, project string
+	var runID, feature, version, project string
 	var asJSON bool
 	c := &cobra.Command{
 		Use:   "trace",
-		Short: "Aggregate the run's full lifecycle event trail in time order (read-only)",
+		Short: "Aggregate a run's or feature's full lifecycle event trail in time order (read-only)",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if (strings.TrimSpace(runID) == "") == (strings.TrimSpace(feature) == "") {
+				return fail("trace_scope_required", "goal.trace",
+					"exactly one scope is required: --run-id <run> or --feature <slug>")
+			}
 			eng, closeFn, err := goalReadEngine()
 			if err != nil {
 				return err
 			}
 			defer closeFn()
+			if feature != "" {
+				// AC-003: feature-dimension trail; run-less events
+				// (truth_precheck_failed) are only visible here.
+				ctx, cerr := resolveGateFeature(eng.Store(), project, feature, version)
+				if cerr != nil {
+					return cerr
+				}
+				bundle, err := eng.TraceFeature(ctx)
+				if err != nil {
+					return err
+				}
+				if asJSON {
+					return printJSON(cmd, bundle)
+				}
+				fmt.Fprintf(cmd.OutOrStdout(), "feature %s (%s) events: %d\n", bundle.FeatureSlug, bundle.FeatureID, bundle.EventCount)
+				for _, ev := range bundle.Events {
+					run := "-"
+					if ev.RunID.Valid && ev.RunID.String != "" {
+						run = ev.RunID.String
+					}
+					fmt.Fprintf(cmd.OutOrStdout(), "%s  %-24s run=%s %s\n", ev.CreatedAt, ev.EventType, run, string(ev.Payload))
+				}
+				return nil
+			}
 			bundle, err := eng.Trace(runID)
 			if err != nil {
 				return err
@@ -720,9 +748,10 @@ func newGoalTraceCmd() *cobra.Command {
 			return nil
 		},
 	}
-	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
-	c.Flags().StringVarP(&project, "project", "p", "", "project root path (accepted for v1 parity)")
+	c.Flags().StringVar(&runID, "run-id", "", "goal run id (scope: run; give this or --feature)")
+	c.Flags().StringVar(&feature, "feature", "", "feature slug (scope: feature; includes run-less events)")
+	c.Flags().StringVar(&version, "version", "", "docs version filter (with --feature)")
+	c.Flags().StringVarP(&project, "project", "p", "", "project root path (with --feature)")
 	c.Flags().BoolVar(&asJSON, "json", true, "emit one JSON document")
-	_ = c.MarkFlagRequired("run-id")
 	return c
 }

@@ -85,19 +85,22 @@ func PackageFingerprint(truthRaw, testsRaw []byte) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-// SurfaceFingerprintAlg tags the four-surface package fingerprint
-// (S1, AC-137): the refreeze transaction must prove at least one
-// requirement surface — truth, tests, tasks or evidence — changed
-// content since the last freeze. The recorded PackageFingerprint
-// covers only truth+tests, so freeze/refreeze additionally record
-// this wider fingerprint; the truth member is status-normalized
-// exactly as in PackageFingerprint (the freeze flip itself is not
-// a content change).
+// SurfaceFingerprintAlg tags the legacy four-surface package
+// fingerprint (S1, AC-137). It stays only so freeze records written
+// before the contract/evidence split still compare fresh; new freeze
+// records use ContractSurfaceFingerprintAlg.
 const SurfaceFingerprintAlg = "pkgsurface-v1"
+
+// ContractSurfaceFingerprintAlg tags the contract-face fingerprint
+// (kernel-lake-freeze-closure AC-001): the surfaces whose change
+// requires the governed change -> refreeze flow. Evidence is the
+// byproduct of implementation and is deliberately outside it.
+const ContractSurfaceFingerprintAlg = "pkgcontract-v1"
 
 // PackageSurfaceFingerprint hashes all four requirement surfaces
 // of a package (bookkeeping-normalized truth + tests + tasks +
-// evidence), domain-separated by the algorithm tag.
+// evidence), domain-separated by the algorithm tag. Legacy: freeze
+// records written before the contract split carry this value.
 func PackageSurfaceFingerprint(truthRaw, testsRaw, tasksRaw, evidenceRaw []byte) string {
 	h := sha256.New()
 	h.Write([]byte(SurfaceFingerprintAlg))
@@ -110,6 +113,39 @@ func PackageSurfaceFingerprint(truthRaw, testsRaw, tasksRaw, evidenceRaw []byte)
 	h.Write([]byte{0})
 	h.Write(NormalizeTruthForFingerprint(evidenceRaw))
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+// PackageContractFingerprint hashes the contract face: truth + tests
+// + tasks + restatement. These are the files a change flow governs;
+// evidence.md is excluded because implementation appends to it
+// (AC-001).
+func PackageContractFingerprint(truthRaw, testsRaw, tasksRaw, restatementRaw []byte) string {
+	h := sha256.New()
+	h.Write([]byte(ContractSurfaceFingerprintAlg))
+	h.Write([]byte{0})
+	h.Write(NormalizeTruthForFingerprint(truthRaw))
+	h.Write([]byte{0})
+	h.Write(NormalizeTruthForFingerprint(testsRaw))
+	h.Write([]byte{0})
+	h.Write(NormalizeTruthForFingerprint(tasksRaw))
+	h.Write([]byte{0})
+	h.Write(NormalizeTruthForFingerprint(restatementRaw))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// PackageSurfaceDrifted reports whether the live package moved off the
+// recorded freeze fingerprint. A legacy pkgsurface-v1 record (four
+// surfaces including evidence, before restatement was tracked) still
+// compares fresh via its own hash, so upgrading the kernel does not
+// fake a drift on packages frozen by an older build.
+func PackageSurfaceDrifted(recorded string, truthRaw, testsRaw, tasksRaw, evidenceRaw, restatementRaw []byte) bool {
+	if recorded == "" {
+		return false
+	}
+	if recorded == PackageContractFingerprint(truthRaw, testsRaw, tasksRaw, restatementRaw) {
+		return false
+	}
+	return recorded != PackageSurfaceFingerprint(truthRaw, testsRaw, tasksRaw, evidenceRaw)
 }
 
 // RequirementFingerprintAlg tags the per-AC fingerprint map recorded

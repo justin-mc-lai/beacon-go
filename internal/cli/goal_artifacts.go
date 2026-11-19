@@ -14,8 +14,12 @@ package cli
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
+
+	"beacon-go/internal/orchestrator"
+	"beacon-go/internal/store"
 )
 
 func newGoalArtifactsCmd() *cobra.Command {
@@ -35,19 +39,34 @@ func newGoalArtifactsCmd() *cobra.Command {
 }
 
 func newGoalArtifactsRegisterCmd() *cobra.Command {
-	var runID, kind, path, by string
+	var runID, feature, project, version, kind, path, by string
 	var asJSON bool
 	c := &cobra.Command{
 		Use:   "register",
-		Short: "Register a real file as a run artifact (computes sha256, writes artifact_refs)",
+		Short: "Register a real file as a run or feature artifact (computes sha256, writes artifact_refs)",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if (strings.TrimSpace(runID) == "") == (strings.TrimSpace(feature) == "") {
+				return fail("artifact_scope_required", "goal.artifacts.register",
+					"exactly one scope is required: --run-id <run> or --feature <slug>")
+			}
 			eng, closeFn, err := goalEngine("")
 			if err != nil {
 				return err
 			}
 			defer closeFn()
-			res, err := eng.RegisterArtifact(runID, kind, path, by)
+			var res orchestrator.ArtifactRegistration
+			if feature != "" {
+				// AC-002: feature-scoped registration needs no run, so the
+				// freeze -> artifact -> run cycle is broken here.
+				ctx, cerr := resolveGateFeature(eng.Store(), project, feature, version)
+				if cerr != nil {
+					return cerr
+				}
+				res, err = eng.RegisterFeatureArtifact(ctx, kind, path, by)
+			} else {
+				res, err = eng.RegisterArtifact(runID, kind, path, by)
+			}
 			if err != nil {
 				return err
 			}
@@ -55,8 +74,12 @@ func newGoalArtifactsRegisterCmd() *cobra.Command {
 				return printJSON(cmd, res)
 			}
 			a := res.Artifact
-			fmt.Fprintf(cmd.OutOrStdout(), "artifact: %s\nkind:     %s\npath:     %s\nhash:     %s\nsize:     %d\nrun:      %s\n",
-				a.ID, a.Kind, a.AbsPath, a.ContentHash, a.SizeBytes, a.RunID)
+			scope := "run:      " + a.RunID
+			if feature != "" {
+				scope = "feature:  " + feature + " (no run)"
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "artifact: %s\nkind:     %s\npath:     %s\nhash:     %s\nsize:     %d\n%s\n",
+				a.ID, a.Kind, a.AbsPath, a.ContentHash, a.SizeBytes, scope)
 			if res.AlreadyRegistered {
 				fmt.Fprintln(cmd.OutOrStdout(), "note:     already registered with the same hash (idempotent, nothing written)")
 			}
@@ -66,12 +89,14 @@ func newGoalArtifactsRegisterCmd() *cobra.Command {
 			return nil
 		},
 	}
-	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
+	c.Flags().StringVar(&runID, "run-id", "", "goal run id (scope: run; give this or --feature)")
+	c.Flags().StringVar(&feature, "feature", "", "feature slug (scope: feature; registers with no run)")
+	c.Flags().StringVarP(&project, "project", "p", ".", "project root path (with --feature)")
+	c.Flags().StringVar(&version, "version", "", "docs version filter (with --feature)")
 	c.Flags().StringVar(&kind, "kind", "", "artifact kind from the controlled vocabulary, e.g. qa_report (required)")
 	c.Flags().StringVar(&path, "path", "", "path of the real file to register (required)")
 	c.Flags().StringVar(&by, "by", "", "registrant identity (required)")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
-	_ = c.MarkFlagRequired("run-id")
 	_ = c.MarkFlagRequired("kind")
 	_ = c.MarkFlagRequired("path")
 	_ = c.MarkFlagRequired("by")
@@ -79,27 +104,48 @@ func newGoalArtifactsRegisterCmd() *cobra.Command {
 }
 
 func newGoalArtifactsListCmd() *cobra.Command {
-	var runID string
+	var runID, feature, project, version string
 	var asJSON bool
 	c := &cobra.Command{
 		Use:   "list",
-		Short: "List a run's registered artifacts with stale flags (same view as `spine artifacts`)",
+		Short: "List a run's or feature's registered artifacts with stale flags (same view as `spine artifacts`)",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if (strings.TrimSpace(runID) == "") == (strings.TrimSpace(feature) == "") {
+				return fail("artifact_scope_required", "goal.artifacts.list",
+					"exactly one scope is required: --run-id <run> or --feature <slug>")
+			}
 			eng, closeFn, err := goalReadEngine()
 			if err != nil {
 				return err
 			}
 			defer closeFn()
-			views, err := eng.ListRunArtifacts(runID)
+			var views []store.ArtifactView
+			label := "run " + runID
+			if feature != "" {
+				ctx, cerr := resolveGateFeature(eng.Store(), project, feature, version)
+				if cerr != nil {
+					return cerr
+				}
+				views, err = eng.ListFeatureArtifacts(ctx)
+				label = "feature " + feature
+			} else {
+				views, err = eng.ListRunArtifacts(runID)
+			}
 			if err != nil {
 				return err
 			}
 			if asJSON {
-				return printJSON(cmd, map[string]any{"run_id": runID, "artifact_refs": views})
+				out := map[string]any{"artifact_refs": views}
+				if feature != "" {
+					out["feature"] = feature
+				} else {
+					out["run_id"] = runID
+				}
+				return printJSON(cmd, out)
 			}
 			if len(views) == 0 {
-				fmt.Fprintf(cmd.OutOrStdout(), "no artifacts for run %s\n", runID)
+				fmt.Fprintf(cmd.OutOrStdout(), "no artifacts for %s\n", label)
 				return nil
 			}
 			for _, v := range views {
@@ -112,8 +158,10 @@ func newGoalArtifactsListCmd() *cobra.Command {
 			return nil
 		},
 	}
-	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
+	c.Flags().StringVar(&runID, "run-id", "", "goal run id (scope: run; give this or --feature)")
+	c.Flags().StringVar(&feature, "feature", "", "feature slug (scope: feature)")
+	c.Flags().StringVarP(&project, "project", "p", ".", "project root path (with --feature)")
+	c.Flags().StringVar(&version, "version", "", "docs version filter (with --feature)")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
-	_ = c.MarkFlagRequired("run-id")
 	return c
 }

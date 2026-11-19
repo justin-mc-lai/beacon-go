@@ -120,8 +120,8 @@ func (e *Engine) BuildFeatureMap(projectRoot, slug string) (FeatureMapView, erro
 
 	view := FeatureMapView{
 		Contract: FeatureMapContract, Slug: fc.Feature.Slug, Version: fc.Version.Version,
-		SurfaceFingerprint: core.PackageSurfaceFingerprint(
-			[]byte(pkg.Truth.Text), []byte(pkg.Tests.Text), []byte(pkg.Tasks.Text), []byte(pkg.Evidence.Text)),
+		SurfaceFingerprint: core.PackageContractFingerprint(
+			[]byte(pkg.Truth.Text), []byte(pkg.Tests.Text), []byte(pkg.Tasks.Text), []byte(pkg.Restatement.Text)),
 	}
 	for _, ac := range acs {
 		row := FeatureMapRow{AC: ac, EntryPoint: entries[ac], Verification: commands[ac]}

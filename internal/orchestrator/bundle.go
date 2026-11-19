@@ -192,6 +192,11 @@ func (e *Engine) bundleMaterials(run store.Run) BundleItem {
 			}
 		}
 	}
+	if arts, err := e.store.Artifacts().ListByFeatureScope(fc.Feature.ID); err == nil {
+		for _, a := range arts {
+			artifacts = append(artifacts, gate.ArtifactFact{AbsPath: a.AbsPath})
+		}
+	}
 	rep := gate.CheckIntegrity(gate.IntegrityInput{
 		Pkg: pkg, Artifacts: artifacts,
 		ResolveRef: func(ref string) string { return resolvePkgPath(root, ref) },
@@ -219,9 +224,7 @@ func (e *Engine) bundleMaterials(run store.Run) BundleItem {
 	// must still describe the live package — a body that moved
 	// after its freeze without a refreeze is not strict-clean.
 	if recs, err := e.trailRecords(fc.Feature.ID); err == nil && recs.freeze != nil && recs.freeze.SurfaceFingerprint != "" {
-		live := core.PackageSurfaceFingerprint([]byte(pkg.Truth.Text), []byte(pkg.Tests.Text),
-			[]byte(pkg.Tasks.Text), []byte(pkg.Evidence.Text))
-		if live != recs.freeze.SurfaceFingerprint {
+		if surfaceDrifted(recs.freeze.SurfaceFingerprint, pkg) {
 			item.ReasonCode = core.ReasonRevisionAuthorityDrift
 			item.ReasonCodes = []string{core.ReasonRevisionAuthorityDrift}
 			item.Detail = "package surface fingerprint drifted from the frozen record (S1 pkgsurface-v1); " +

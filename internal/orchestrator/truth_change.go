@@ -347,6 +347,13 @@ func (e *Engine) RefreezeTruthPackageAcceptCurrent(ctx store.FeatureContext, by 
 	// empty refreeze must not even reach the package checks.
 	if !acceptCurrent {
 		if err := e.refreezeTxGuard(ctx); err != nil {
+			failed := view
+			failed.Blocked = true
+			if code, ok := core.ReasonCodeOf(err); ok {
+				failed.BlockReasons = []string{code}
+			}
+			view.EventWarnings = append(view.EventWarnings,
+				e.recordPrecheckFailure(ctx, "truth.Refreeze", failed)...)
 			return view, err
 		}
 	}
@@ -358,6 +365,7 @@ func (e *Engine) RefreezeTruthPackageAcceptCurrent(ctx store.FeatureContext, by 
 		return TruthPackageView{}, err
 	}
 	if !ok {
+		pre.EventWarnings = append(pre.EventWarnings, e.recordPrecheckFailure(ctx, "truth.Refreeze", pre)...)
 		return pre, freezeBlockedError("truth.Refreeze", pre)
 	}
 	// K7 (AC-004): compute the base -> after AC difference BEFORE the
@@ -554,10 +562,9 @@ func (e *Engine) refreezeTxGuard(ctx store.FeatureContext) error {
 	}
 	pkg := e.packageFiles(ctx)
 	if recs.freeze.SurfaceFingerprint != "" {
-		cur := core.PackageSurfaceFingerprint([]byte(pkg.Truth.Text), []byte(pkg.Tests.Text), []byte(pkg.Tasks.Text), []byte(pkg.Evidence.Text))
-		if cur == recs.freeze.SurfaceFingerprint {
+		if !surfaceDrifted(recs.freeze.SurfaceFingerprint, pkg) {
 			return core.NewError(core.ReasonEmptyRefreezeReasonOnly, "truth.Refreeze",
-				"no requirement surface (truth/tests/tasks/evidence) changed since the last freeze; a refreeze that only restates the reason or the machine projection is refused (AC-137)")
+				"no contract surface (truth/tests/tasks/restatement) changed since the last freeze; evidence append does not warrant a refreeze, and a refreeze that only restates the reason or the machine projection is refused (AC-137)")
 		}
 	} else if recs.freeze.Fingerprint != "" {
 		cur := core.PackageFingerprint([]byte(pkg.Truth.Text), []byte(pkg.Tests.Text))

@@ -49,6 +49,11 @@ func printTruthView(cmd *cobra.Command, v orchestrator.TruthPackageView, asJSON 
 	if asJSON {
 		return printJSON(cmd, v)
 	}
+	// AC-003: a bookkeeping failure (precheck event not written) is a
+	// warning on stderr — the freeze outcome itself is unchanged.
+	for _, w := range v.EventWarnings {
+		fmt.Fprintf(cmd.ErrOrStderr(), "warning:  %s\n", w)
+	}
 	out := cmd.OutOrStdout()
 	fmt.Fprintf(out, "package:  %s (%s)\nstatus:   %s\n", v.Slug, v.Version, v.Status)
 	fmt.Fprintf(out, "dir:      %s\n", v.PackageDir)

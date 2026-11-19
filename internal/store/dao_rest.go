@@ -174,6 +174,33 @@ func scanArtifact(row interface{ Scan(...any) error }) (ArtifactRef, error) {
 
 const artifactCols = `id, run_id, kind, abs_path, content_hash, size_bytes, created_at`
 
+// FeatureScopeRunIDPrefix marks artifact_refs.run_id values that bind a
+// pointer to a feature instead of a run (AC-002). artifact_refs.run_id
+// carries no foreign key, so feature scope needs no schema change.
+const FeatureScopeRunIDPrefix = "feature:"
+
+// FeatureScopeRunID is the run_id sentinel for a feature-scoped pointer.
+func FeatureScopeRunID(featureID string) string { return FeatureScopeRunIDPrefix + featureID }
+
+// ListByFeatureScope returns the feature-scoped pointers of a feature
+// (registered without a run) in creation order.
+func (d *ArtifactDao) ListByFeatureScope(featureID string) ([]ArtifactRef, error) {
+	rows, err := d.q.Query(`SELECT `+artifactCols+` FROM artifact_refs WHERE run_id = ? ORDER BY created_at, rowid`, FeatureScopeRunID(featureID))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []ArtifactRef
+	for rows.Next() {
+		a, err := scanArtifact(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, a)
+	}
+	return out, rows.Err()
+}
+
 // ListByRun returns artifact pointers of a run in creation order.
 func (d *ArtifactDao) ListByRun(runID string) ([]ArtifactRef, error) {
 	rows, err := d.q.Query(`SELECT `+artifactCols+` FROM artifact_refs WHERE run_id = ? ORDER BY created_at, rowid`, runID)

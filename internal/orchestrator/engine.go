@@ -59,6 +59,11 @@ type Engine struct {
 	implementWorkGate string
 }
 
+// Store exposes the engine's store for callers that must resolve a
+// feature (or read the ledger) around an engine call. Read-only by
+// convention: mutations still go through engine methods.
+func (e *Engine) Store() *store.Store { return e.store }
+
 // NewEngine builds an engine with no executors registered.
 func NewEngine(st *store.Store) *Engine {
 	return &Engine{store: st, executors: map[string]StageExecutor{}, laneExecutors: map[string]StageExecutor{}}

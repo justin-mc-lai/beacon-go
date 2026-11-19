@@ -211,9 +211,7 @@ func (e *Engine) TruthMapVerify(projectRoot, slug string) (TruthMapView, error) 
 			Message: "package is frozen but no freeze fingerprint is recorded; freshness cannot be verified",
 		})
 	default:
-		live := core.PackageSurfaceFingerprint([]byte(pkg.Truth.Text), []byte(pkg.Tests.Text),
-			[]byte(pkg.Tasks.Text), []byte(pkg.Evidence.Text))
-		if live != recs.freeze.SurfaceFingerprint {
+		if surfaceDrifted(recs.freeze.SurfaceFingerprint, pkg) {
 			v.FingerprintStatus = "stale"
 			v.Diagnostics = append(v.Diagnostics, TruthMapDiagnostic{
 				Code: core.ReasonTruthMapStale, Severity: "error",
@@ -238,8 +236,8 @@ func (e *Engine) TruthMapVerify(projectRoot, slug string) (TruthMapView, error) 
 			})
 		} else {
 			scalars, _, _ := gate.ParseFrontmatter(string(raw))
-			live := core.PackageSurfaceFingerprint([]byte(pkg.Truth.Text), []byte(pkg.Tests.Text),
-				[]byte(pkg.Tasks.Text), []byte(pkg.Evidence.Text))
+			live := core.PackageContractFingerprint([]byte(pkg.Truth.Text), []byte(pkg.Tests.Text),
+				[]byte(pkg.Tasks.Text), []byte(pkg.Restatement.Text))
 			if scalars["surface_fingerprint"] == "" || scalars["surface_fingerprint"] != live {
 				v.FeatureMapStatus = "stale"
 				v.Diagnostics = append(v.Diagnostics, TruthMapDiagnostic{
