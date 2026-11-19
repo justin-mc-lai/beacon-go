@@ -1,0 +1,418 @@
+{
+  "feature_id": "feat_3c6d6b0daec440986130d953",
+  "feature_slug": "kernel-lake-freeze-closure",
+  "event_count": 21,
+  "events": [
+    {
+      "id": "evt_3c364208e002d618bdb66c73",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "",
+        "Valid": false
+      },
+      "event_type": "truth_created",
+      "payload_json": {
+        "package_dir": "docs/beacon/v2.0.0/features/kernel-lake-freeze-closure",
+        "slug": "kernel-lake-freeze-closure",
+        "version": "v2.0.0"
+      },
+      "created_at": "2026-11-19T05:50:08.318002000Z"
+    },
+    {
+      "id": "evt_658b9e419c7e87c9eccf2290",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "",
+        "Valid": false
+      },
+      "event_type": "truth_intent_confirmed",
+      "payload_json": {
+        "by": "justin (chat)"
+      },
+      "created_at": "2026-11-19T05:50:39.922922000Z"
+    },
+    {
+      "id": "evt_ca948190171bb38288acdac7",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "",
+        "Valid": false
+      },
+      "event_type": "truth_integrity_evaluated",
+      "payload_json": {
+        "evaluator": "justin (chat)",
+        "findings": 0,
+        "gate_result_id": "gate_4270f231864bfc7fbedb92f9",
+        "gate_type": "truth_integrity",
+        "mode": "block",
+        "reason_codes": null,
+        "verdict": "pass"
+      },
+      "created_at": "2026-11-19T05:50:40.209392000Z"
+    },
+    {
+      "id": "evt_ccde21135ab1d1fd8e56d407",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "",
+        "Valid": false
+      },
+      "event_type": "truth_frozen",
+      "payload_json": {
+        "baseline_status": "uncommitted",
+        "by": "justin (chat)",
+        "fingerprint_alg": "pkgfp-v1",
+        "package_fingerprint": "0c1990bf175f48315fd806ff8d7b7d6fb7f2cb0d55ea7ce774c4d45199141e1e",
+        "requirement_fingerprint_alg": "reqfp-v1",
+        "requirement_fingerprints": {
+          "AC-001": "ba316deecf844fc72d37ce0bf4d862e3b7b1adbcbe77a33318133f034bf08f6b",
+          "AC-002": "ef873b62ade14af381285d1697ed20752b8e224ad3c11ad5c04910ca4694626b",
+          "AC-003": "1eb61bb60d0fe898e2e3ae9b00c3897d80fdddd3937fce1d80b4221d2eef977a",
+          "AC-004": "1743d8e5dfd2cb5bd16cd9771cc3ec067467e13c07a6ba1c425425ae968a777e"
+        },
+        "slug": "kernel-lake-freeze-closure",
+        "surface_fingerprint": "282df5f3703aaec8ab87edcc42ac25d0f377e16a0df24b2be363bb6eba0d1a0b",
+        "surface_fingerprint_alg": "pkgsurface-v1",
+        "surface_strict": true,
+        "surfaces": [
+          "cli"
+        ],
+        "truth_sha256_after": "4eeaad31b3428473b018b262dfaa9e1251800806027f021415b6f425532dac2e",
+        "truth_sha256_before": "e58a0d7387251e5d1c22677d3d83ebb24af3c130aed49c5f5954bc0549f4f803"
+      },
+      "created_at": "2026-11-19T05:50:40.300717000Z"
+    },
+    {
+      "id": "evt_07e6bfc533409b5a8a77da5b",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "",
+        "Valid": false
+      },
+      "event_type": "truth_baseline_recorded",
+      "payload_json": {
+        "baseline_commit": "07d40c91d5a7dee9f05d69099ff20a4c50264947",
+        "by": "justin (chat)",
+        "canonical_branch": "main",
+        "truth_sha256": "4eeaad31b3428473b018b262dfaa9e1251800806027f021415b6f425532dac2e"
+      },
+      "created_at": "2026-11-19T05:51:05.396705000Z"
+    },
+    {
+      "id": "evt_a00618bb8e81a22d4a6c745f",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_aa336f287f270f7929c54623",
+        "Valid": true
+      },
+      "event_type": "goal_run_created",
+      "payload_json": {
+        "feature_slug": "kernel-lake-freeze-closure",
+        "loop_stage": "governance_precheck",
+        "stages": [
+          "plan",
+          "truth",
+          "implement",
+          "qa",
+          "release"
+        ],
+        "utterance": "issue #10: 湖在流程内全部冻结",
+        "ux_required": false
+      },
+      "created_at": "2026-11-19T05:51:05.570163000Z"
+    },
+    {
+      "id": "evt_2e548aa8fecbd1cb5a12d11e",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_aa336f287f270f7929c54623",
+        "Valid": true
+      },
+      "event_type": "stage_executed",
+      "payload_json": {
+        "by": "justin (chat)",
+        "executor": "external",
+        "outcome": "done",
+        "placeholder": false,
+        "recording": false,
+        "source": "external",
+        "stage": "plan"
+      },
+      "created_at": "2026-11-19T05:51:39.511022000Z"
+    },
+    {
+      "id": "evt_1e6a34206157acaaa9a7730a",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_aa336f287f270f7929c54623",
+        "Valid": true
+      },
+      "event_type": "stage_exit_evaluated",
+      "payload_json": {
+        "completed_by": "justin (chat)",
+        "derived": true,
+        "evaluated_at": "2026-11-19T05:51:39.511259000Z",
+        "evaluator": "justin (chat)",
+        "executor": "external",
+        "formal_verdict": "",
+        "frozen_source": "",
+        "gate_result_id": "gate_615e8d206562df65f5c0196d",
+        "gate_type": "plan",
+        "stage": "plan",
+        "verdict": "pass"
+      },
+      "created_at": "2026-11-19T05:51:39.511309000Z"
+    },
+    {
+      "id": "evt_6a52d4ff447b85658008ac9e",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_aa336f287f270f7929c54623",
+        "Valid": true
+      },
+      "event_type": "stage_advanced",
+      "payload_json": {
+        "from_stage": "plan",
+        "loop_stage": "truth_routing",
+        "to_stage": "truth"
+      },
+      "created_at": "2026-11-19T05:51:39.511554000Z"
+    },
+    {
+      "id": "evt_3dae4118974f9159e408dd6a",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_aa336f287f270f7929c54623",
+        "Valid": true
+      },
+      "event_type": "stage_executed",
+      "payload_json": {
+        "by": "justin (chat)",
+        "executor": "external",
+        "outcome": "done",
+        "placeholder": false,
+        "recording": false,
+        "source": "external",
+        "stage": "truth"
+      },
+      "created_at": "2026-11-19T05:51:39.633678000Z"
+    },
+    {
+      "id": "evt_a67f0706e1029dc21527efee",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_aa336f287f270f7929c54623",
+        "Valid": true
+      },
+      "event_type": "stage_exit_evaluated",
+      "payload_json": {
+        "completed_by": "justin (chat)",
+        "derived": true,
+        "evaluated_at": "2026-11-19T05:51:39.633721000Z",
+        "evaluator": "justin (chat)",
+        "executor": "external",
+        "formal_verdict": "",
+        "frozen_source": "frontmatter",
+        "gate_result_id": "gate_049bdeb34db49e88d8527aa7",
+        "gate_type": "truth_freeze",
+        "stage": "truth",
+        "verdict": "pass"
+      },
+      "created_at": "2026-11-19T05:51:39.633780000Z"
+    },
+    {
+      "id": "evt_6c6829a4a9c0c320d7af76a4",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_aa336f287f270f7929c54623",
+        "Valid": true
+      },
+      "event_type": "stage_advanced",
+      "payload_json": {
+        "from_stage": "truth",
+        "loop_stage": "implement_routing",
+        "to_stage": "implement"
+      },
+      "created_at": "2026-11-19T05:51:39.633866000Z"
+    },
+    {
+      "id": "evt_1c839f78277c39c126b53799",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_18d7031fba3b78cb7249b13b",
+        "Valid": true
+      },
+      "event_type": "goal_run_created",
+      "payload_json": {
+        "feature_slug": "kernel-lake-freeze-closure",
+        "loop_stage": "governance_precheck",
+        "stages": [
+          "plan",
+          "truth",
+          "implement",
+          "qa",
+          "release"
+        ],
+        "utterance": "",
+        "ux_required": false
+      },
+      "created_at": "2026-11-19T06:47:27.802875000Z"
+    },
+    {
+      "id": "evt_0aa05f331e8cf55b3e3c0768",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "",
+        "Valid": false
+      },
+      "event_type": "artifact_registered",
+      "payload_json": {
+        "abs_path": "/Users/apple/Developer/Personal/products/beacon-go/.beacon/evidence/kernel-lake-freeze-closure/implement/go-test-all.log",
+        "artifact_id": "art_3476efdb1ddbfa00499b536d",
+        "content_hash": "a33867d83eaba13171fad05fcc774037e6effd92c12293d55206988b3fe2a6e7",
+        "feature_id": "feat_3c6d6b0daec440986130d953",
+        "feature_slug": "kernel-lake-freeze-closure",
+        "kind": "test_results",
+        "registered_by": "ExecEngineer",
+        "scope": "feature",
+        "size_bytes": 865
+      },
+      "created_at": "2026-11-19T07:22:28.342699000Z"
+    },
+    {
+      "id": "evt_a7552cbf09e345ca7ef27670",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "",
+        "Valid": false
+      },
+      "event_type": "artifact_registered",
+      "payload_json": {
+        "abs_path": "/Users/apple/Developer/Personal/products/beacon-go/.beacon/evidence/kernel-lake-freeze-closure/implement/TC-005.log",
+        "artifact_id": "art_cbdc4c4e93dc30bfe08879af",
+        "content_hash": "31b263e509abb8e395cffc7894e0b2c3eb594de3bbb1206a9230eba957dd4269",
+        "feature_id": "feat_3c6d6b0daec440986130d953",
+        "feature_slug": "kernel-lake-freeze-closure",
+        "kind": "test_results",
+        "registered_by": "ExecEngineer",
+        "scope": "feature",
+        "size_bytes": 781
+      },
+      "created_at": "2026-11-19T07:22:28.360204000Z"
+    },
+    {
+      "id": "evt_0f2293337a8094ca3760a2af",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_18d7031fba3b78cb7249b13b",
+        "Valid": true
+      },
+      "event_type": "stage_executed",
+      "payload_json": {
+        "by": "ExecEngineer",
+        "executor": "external",
+        "outcome": "done",
+        "placeholder": false,
+        "recording": false,
+        "source": "external",
+        "stage": "plan"
+      },
+      "created_at": "2026-11-19T07:23:08.438955000Z"
+    },
+    {
+      "id": "evt_549620ef882cbb157d3119f2",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_18d7031fba3b78cb7249b13b",
+        "Valid": true
+      },
+      "event_type": "stage_exit_evaluated",
+      "payload_json": {
+        "completed_by": "ExecEngineer",
+        "derived": true,
+        "evaluated_at": "2026-11-19T07:23:08.439004000Z",
+        "evaluator": "ExecEngineer",
+        "executor": "external",
+        "formal_verdict": "",
+        "frozen_source": "",
+        "gate_result_id": "gate_81005474d4d7c87730c84f2d",
+        "gate_type": "plan",
+        "stage": "plan",
+        "verdict": "pass"
+      },
+      "created_at": "2026-11-19T07:23:08.439078000Z"
+    },
+    {
+      "id": "evt_46056498ec3c1ab0c33331b7",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_18d7031fba3b78cb7249b13b",
+        "Valid": true
+      },
+      "event_type": "stage_advanced",
+      "payload_json": {
+        "from_stage": "plan",
+        "loop_stage": "truth_routing",
+        "to_stage": "truth"
+      },
+      "created_at": "2026-11-19T07:23:08.439176000Z"
+    },
+    {
+      "id": "evt_293a2abc08b6d4d4fdac0947",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_18d7031fba3b78cb7249b13b",
+        "Valid": true
+      },
+      "event_type": "stage_executed",
+      "payload_json": {
+        "by": "ExecEngineer",
+        "executor": "external",
+        "outcome": "done",
+        "placeholder": false,
+        "recording": false,
+        "source": "external",
+        "stage": "truth"
+      },
+      "created_at": "2026-11-19T07:23:27.275643000Z"
+    },
+    {
+      "id": "evt_b1a43d4eb8619d04b822e4c4",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_18d7031fba3b78cb7249b13b",
+        "Valid": true
+      },
+      "event_type": "stage_exit_evaluated",
+      "payload_json": {
+        "completed_by": "ExecEngineer",
+        "derived": true,
+        "evaluated_at": "2026-11-19T07:23:27.275724000Z",
+        "evaluator": "ExecEngineer",
+        "executor": "external",
+        "formal_verdict": "",
+        "frozen_source": "frontmatter",
+        "gate_result_id": "gate_35de979b5c710279f3b2f7a4",
+        "gate_type": "truth_freeze",
+        "stage": "truth",
+        "verdict": "pass"
+      },
+      "created_at": "2026-11-19T07:23:27.275772000Z"
+    },
+    {
+      "id": "evt_019b29d41ecf3816d413aa61",
+      "feature_id": "feat_3c6d6b0daec440986130d953",
+      "run_id": {
+        "String": "run_18d7031fba3b78cb7249b13b",
+        "Valid": true
+      },
+      "event_type": "stage_advanced",
+      "payload_json": {
+        "from_stage": "truth",
+        "loop_stage": "implement_routing",
+        "to_stage": "implement"
+      },
+      "created_at": "2026-11-19T07:23:27.275853000Z"
+    }
+  ]
+}

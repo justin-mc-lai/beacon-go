@@ -73,7 +73,7 @@ Full-suite run (`go test ./... -count=1`): every package ok, exit=0 — raw log
 
 ### Run state (honest)
 
-`beacon goal status` → stage `plan`, run `run_18d7031fba3b78cb7249b13b` (external executor, not auto-driven).
+`beacon goal status` → stage `implement` (ticked plan→truth→implement by ExecEngineer), run `run_18d7031fba3b78cb7249b13b` (external executor, not auto-driven).
 `beacon goal conformance` → **fail**: `gates_evaluated` (no stage exit verdicts recorded yet),
 `verifier_attached` (no independent verifier). `truth_frozen` and `state_exported` pass.
 
