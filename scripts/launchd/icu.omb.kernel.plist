@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  TEMPLATE ONLY - not installed. The total board approves the switch.
+  It replaces the external kernel_maintainer.sh job (retained, unmodified,
+  for audit). ProgramArguments is one absolute path: no shell, no inline
+  command. The job only reads the manifest/approval hash and the target
+  sha256 and reports aligned / drifted / missing; it never fetches, builds,
+  installs or dispatches.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>icu.omb.kernel</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/apple/Developer/Personal/products/beacon-go/scripts/kernel_maintainer_readonly.sh</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>BEACON_REPO</key>
+    <string>/Users/apple/Developer/Personal/products/beacon-go</string>
+    <key>BEACON_RELEASE_STATE</key>
+    <string>/Users/apple/Developer/Personal/products/beacon-go/.beacon/release-state</string>
+    <key>BEACON_TARGET</key>
+    <string>/Users/apple/.local/opt/beacon-go/beacon</string>
+    <key>BEACON_DRIFT_LOG</key>
+    <string>/Users/apple/Developer/Personal/products/beacon-go/.beacon/release-drift.log</string>
+  </dict>
+  <key>StartInterval</key>
+  <integer>3600</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/apple/.openmausbot/monitor/kernel-readonly.out</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/apple/.openmausbot/monitor/kernel-readonly.err</string>
+</dict>
+</plist>
