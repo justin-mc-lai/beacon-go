@@ -227,6 +227,25 @@ const (
 	ReasonProgramTruthNotFrozen    = "program_truth_not_frozen"
 	ReasonProgramGraphInvalid      = "feature_graph_invalid"
 	ReasonProgramGraphFileMissing  = "file_missing"
+
+	// Integrated-delivery (program-integrated-delivery AC-001..003):
+	// the shared start judgement, handoff recording and one-shot
+	// candidate approval. Legacy Program behavior is unchanged until
+	// the integrated mode is enabled explicitly.
+	ReasonProgramIntegratedModeRequired = "program_integrated_mode_required"
+	ReasonProgramPlanNotFrozen          = "program_plan_not_frozen"
+	ReasonProgramNotIntegrated          = "program_not_integrated"
+	ReasonProgramCommitMismatch         = "program_commit_mismatch"
+	ReasonProgramHandoffInvalid         = "program_handoff_invalid"
+	ReasonProgramCandidateNotReady      = "program_candidate_not_ready"
+	ReasonProgramCandidateChanged       = "program_candidate_changed"
+	ReasonProgramApprovalInvalid        = "program_approval_invalid"
+	ReasonProgramApprovalRequired       = "program_approval_required"
+	ReasonProgramDispatchStage          = "program_dispatch_stage_invalid"
+	// Continuous-drive bounding: UntilDone must stop on a deadline or
+	// when a lake returns without advancing, never spin forever.
+	ReasonProgramDriveTimeout    = "program_drive_timeout"
+	ReasonProgramDriveNoProgress = "program_drive_no_progress"
 )
 
 // ---- Hotfix family (P2d, G-13: prod_ops_v168.py) ----

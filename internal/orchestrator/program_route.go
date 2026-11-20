@@ -10,6 +10,7 @@
 package orchestrator
 
 import (
+	"context"
 	"sort"
 	"strings"
 
@@ -100,6 +101,14 @@ func (e *Engine) judgeLakeAdmission(run store.Run, plan *ProgramState, slug stri
 		if plan.lakeAdmitted(dep) {
 			continue
 		}
+		// Integrated delivery: a verified, merged upstream handoff
+		// closes a dependency (the shared start judgement).
+		if plan.Mode == ProgramModeIntegrated {
+			live := e.livePlan(context.Background(), run, plan)
+			if h := live.handoffFor(dep); h != nil && h.Valid {
+				continue
+			}
+		}
 		depFeat, err := e.lakeFeature(run, dep)
 		if err != nil {
 			unclosed = append(unclosed, dep)
@@ -140,6 +149,15 @@ func (e *Engine) ProgramRoute(runID string) (ProgramRouteView, error) {
 			"recorded program graph has a cycle")
 	}
 	view := ProgramRouteView{RunID: runID, ProgramSlug: plan.Slug, Frozen: plan.Frozen, AllComplete: len(order) > 0}
+	integrated := plan.Mode == ProgramModeIntegrated
+	if integrated {
+		// Live revalidation: a handoff cached in the snapshot only
+		// counts while git still says its commits are merged. Route,
+		// single-step drive and continuous drive all read this plan.
+		plan = e.livePlan(context.Background(), run, plan)
+		view.Integrated = true
+		view.Stage = plan.Stage
+	}
 	if m.LakeProposal != nil {
 		view.ProposalID = m.LakeProposal.ProposalID
 		view.ProposalSelected = len(m.LakeProposal.Selected)
@@ -173,6 +191,13 @@ func (e *Engine) ProgramRoute(runID string) (ProgramRouteView, error) {
 				depsDone = false
 			}
 		}
+		// Integrated delivery uses ONE shared start judgement
+		// (integratedStartBlock) instead of "dependency completed":
+		// a verified, merged upstream handoff unlocks dependents.
+		integratedBlock := ""
+		if integrated {
+			integratedBlock = integratedStartBlock(plan, slug)
+		}
 		switch {
 		case completed:
 			row.Status = LakeCompleted
@@ -182,7 +207,13 @@ func (e *Engine) ProgramRoute(runID string) (ProgramRouteView, error) {
 		case !e.featureFrozen(feat.ID):
 			row.Status = LakeBlocked
 			row.ReasonCode = core.ReasonProgramTruthNotFrozen
-		case !depsDone:
+		case integratedBlock == core.ReasonProgramHandoffInvalid:
+			row.Status = LakeBlocked
+			row.ReasonCode = integratedBlock
+		case integratedBlock != "":
+			row.Status = LakeWaiting
+			row.ReasonCode = integratedBlock
+		case !depsDone && !integrated:
 			row.Status = LakeWaiting
 			row.ReasonCode = core.ReasonProgramDependencyUnclos
 		case plan.lakeAdmitted(slug):
@@ -242,6 +273,9 @@ func (e *Engine) ProgramRoute(runID string) (ProgramRouteView, error) {
 		view.ProgramStatus = "awaiting_release"
 	default:
 		view.ProgramStatus = "running"
+	}
+	if integrated && plan.Stage != "" {
+		view.ProgramStatus = plan.Stage
 	}
 	view.NextActions = programNextActions(runID, view.Lakes)
 	return view, nil

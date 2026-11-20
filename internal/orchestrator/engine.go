@@ -9,6 +9,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"sync"
 	"time"
 
 	"beacon-go/internal/core"
@@ -57,6 +58,10 @@ type Engine struct {
 	// (implement-work-gate truth 配置项). "" and "on" both mean on
 	// — the zero value must never silently disable a gate.
 	implementWorkGate string
+	// mergeMu serializes main-star merges for integrated delivery
+	// (AC-002): satellites may run concurrently, but land on the
+	// main star one at a time.
+	mergeMu sync.Mutex
 }
 
 // Store exposes the engine's store for callers that must resolve a

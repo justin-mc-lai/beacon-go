@@ -86,6 +86,17 @@ type ProgramState struct {
 	CreatedAt string          `json:"created_at"`
 	UpdatedAt string          `json:"updated_at,omitempty"`
 	Changes   []ProgramChange `json:"changes,omitempty"`
+
+	// Integrated delivery (program-integrated-delivery AC-001..003).
+	// Mode is "" (legacy) or "integrated"; exactly one explicit
+	// switch enables it, so existing Program behavior is unchanged.
+	Mode       string            `json:"mode,omitempty"`
+	Stage      string            `json:"stage,omitempty"` // integrating | awaiting_approval | finalizing | delivered
+	Handoffs   []ProgramHandoff  `json:"handoffs,omitempty"`
+	Dispatches []ProgramDispatch `json:"dispatches,omitempty"`
+	BatchSeq   int               `json:"batch_seq,omitempty"`
+	Candidate  *ProgramCandidate `json:"candidate,omitempty"`
+	Approval   *ProgramApproval  `json:"approval,omitempty"`
 }
 
 func (p *ProgramState) lake(slug string) *ProgramLake {
@@ -169,7 +180,12 @@ type ProgramRouteView struct {
 	NextActions   []ProgramNextAction `json:"next_actions,omitempty"`
 	AllComplete   bool                `json:"all_complete"`
 	ProgramStatus string              `json:"program_status"` // running | awaiting_release | blocked | delivered
-	Rollup        ProgramRollup       `json:"rollup"`
+	// Integrated is true when the plan runs integrated delivery;
+	// Stage is then integrating | awaiting_approval | finalizing |
+	// delivered (legacy plans leave both empty).
+	Integrated bool          `json:"integrated,omitempty"`
+	Stage      string        `json:"stage,omitempty"`
+	Rollup     ProgramRollup `json:"rollup"`
 	// Proposal provenance (sea-to-lake): the AI proposal and the
 	// human's multi-select counts, so route can show intent drift.
 	ProposalID       string `json:"proposal_id,omitempty"`

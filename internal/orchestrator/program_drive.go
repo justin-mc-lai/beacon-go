@@ -7,6 +7,7 @@ package orchestrator
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -25,6 +26,25 @@ type ProgramDriveOptions struct {
 	// are skipped; dependents may start once their dependency is at
 	// its release gate (release-ready closure).
 	UntilDone bool
+	// Context bounds the whole drive (host interrupt / deadline).
+	// Nil keeps the legacy context.Background behavior, so existing
+	// callers are unchanged.
+	Context context.Context
+	// MaxDurationSec bounds continuous drive wall-clock time (<=0
+	// unlimited). It is the program-level counterpart of the driver's
+	// --max-duration-sec.
+	MaxDurationSec int
+	// TurnTimeoutSec bounds one lake's drive step (<=0 no per-step
+	// deadline). It is the program-level counterpart of the driver's
+	// --turn-timeout-sec.
+	TurnTimeoutSec int
+}
+
+func (o ProgramDriveOptions) ctx() context.Context {
+	if o.Context != nil {
+		return o.Context
+	}
+	return context.Background()
 }
 
 type ProgramDriveView struct {
@@ -84,7 +104,21 @@ func (e *Engine) ProgramDrive(hostRunID string, opts ProgramDriveOptions) (Progr
 }
 
 func (e *Engine) programDriveUntilDone(hostRunID string, opts ProgramDriveOptions) (ProgramDriveView, error) {
+	ctx := opts.ctx()
+	if opts.MaxDurationSec > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, time.Duration(opts.MaxDurationSec)*time.Second)
+		defer cancel()
+	}
+	var lastLake, lastStatus, lastRollup string
 	for {
+		if rc := driveContextReason(ctx); rc != "" {
+			route, _ := e.ProgramRoute(hostRunID)
+			return ProgramDriveView{
+				RunID: hostRunID, ProgramStatus: route.ProgramStatus,
+				Route: route, ReasonCode: rc,
+			}, nil
+		}
 		order, route, err := e.driveOrder(hostRunID)
 		if err != nil {
 			return ProgramDriveView{}, err
@@ -95,15 +129,61 @@ func (e *Engine) programDriveUntilDone(hostRunID string, opts ProgramDriveOption
 				ProgramStatus: route.ProgramStatus, Route: route,
 			}, nil
 		}
+		opts.Context = ctx
 		v, err := e.driveOneLake(hostRunID, order[0], opts)
 		if err != nil {
 			return ProgramDriveView{}, err
 		}
+		// A deadline that fired during this round wins over any
+		// reason the round reported: the round was cut short.
+		if rc := driveContextReason(ctx); rc != "" {
+			v.ReasonCode = rc
+			return v, nil
+		}
 		if v.LakeStatus == "blocked" {
 			return v, nil
 		}
+		// A lake that keeps reporting "running" without moving the
+		// route is a stalled loop, not progress: stop and say so
+		// instead of spinning until the deadline.
+		rollup := fmt.Sprintf("%d/%d/%d/%d", v.Route.Rollup.Completed,
+			v.Route.Rollup.AwaitingRelease, v.Route.Rollup.Blocked, v.Route.Rollup.Pending)
+		cur := driveProgress{lake: v.AdvancedLake, status: v.LakeStatus, rollup: rollup}
+		if driveStalled(driveProgress{lake: lastLake, status: lastStatus, rollup: lastRollup}, cur) {
+			v.ReasonCode = core.ReasonProgramDriveNoProgress
+			return v, nil
+		}
+		lastLake, lastStatus, lastRollup = cur.lake, cur.status, cur.rollup
 		// completed / awaiting_release / running: keep the sea moving.
 	}
+}
+
+// driveProgress is one loop round's fingerprint. A round that keeps
+// the same lake, status and rollup has made no progress.
+type driveProgress struct {
+	lake, status, rollup string
+}
+
+// driveStalled reports the loop's stop rule: a "running" round that is
+// identical to the previous one is a stall, not progress.
+func driveStalled(prev, cur driveProgress) bool {
+	return prev.lake != "" && cur.status == "running" &&
+		cur.lake == prev.lake && cur.status == prev.status && cur.rollup == prev.rollup
+}
+
+// driveContextReason maps a finished context to the drive's stable
+// reason code ("" while the context is still live).
+func driveContextReason(ctx context.Context) string {
+	if ctx == nil {
+		return ""
+	}
+	switch ctx.Err() {
+	case context.DeadlineExceeded:
+		return core.ReasonProgramDriveTimeout
+	case context.Canceled:
+		return core.ReasonHostInterrupted
+	}
+	return ""
 }
 
 // driveOrder returns the startable lakes in topological order. A
@@ -127,6 +207,14 @@ func (e *Engine) driveOrder(hostRunID string) ([]string, ProgramRouteView, error
 		if row.Status == LakeBlocked {
 			continue
 		}
+		// Integrated delivery: the shared start judgement (verified
+		// upstream handoff) decides readiness, not lake completion.
+		if route.Integrated {
+			if row.Status == LakeReady || row.Status == LakeAdmitted {
+				out = append(out, row.Lake)
+			}
+			continue
+		}
 		depsReady := true
 		for _, dep := range row.DependsOn {
 			d := bySlug[dep]
@@ -145,6 +233,12 @@ func (e *Engine) driveOrder(hostRunID string) ([]string, ProgramRouteView, error
 // empty AdvancedLake when the lake is already terminal or
 // release-ready, so callers can move on.
 func (e *Engine) driveOneLake(hostRunID, slug string, opts ProgramDriveOptions) (ProgramDriveView, error) {
+	ctx := opts.ctx()
+	if opts.TurnTimeoutSec > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, time.Duration(opts.TurnTimeoutSec)*time.Second)
+		defer cancel()
+	}
 	route, err := e.ProgramRoute(hostRunID)
 	if err != nil {
 		return ProgramDriveView{}, err
@@ -191,6 +285,14 @@ func (e *Engine) driveOneLake(hostRunID, slug string, opts ProgramDriveOptions) 
 		}
 		view.ReasonCode = reason
 		return view, nil
+	}
+
+	// AC-001: single-step drive shares the route's start judgement.
+	if m.Program.Mode == ProgramModeIntegrated {
+		live := e.livePlan(ctx, run, m.Program)
+		if block := integratedStartBlock(live, slug); block != "" {
+			return finish(lake, lake.RunID, "blocked", block)
+		}
 	}
 
 	fc, ok, err := e.featureContextOf(run.FeatureID)
@@ -286,7 +388,16 @@ func (e *Engine) driveOneLake(hostRunID, slug string, opts ProgramDriveOptions) 
 			}
 		}
 	}
-	if _, derr := e.DriverRunLoop(context.Background(), lakeRunID, opts.MaxTurns, nil); derr != nil {
+	if _, derr := e.DriverRunLoop(ctx, lakeRunID, opts.MaxTurns, nil); derr != nil {
+		// A deadline/cancel is not a lake block: report it as the
+		// drive's reason so UntilDone stops with a stable code.
+		if rc := driveContextReason(ctx); rc != "" {
+			view.ReasonCode = rc
+			view.AdvancedLake = slug
+			view.LakeRunID = lakeRunID
+			view.LakeStatus = "running"
+			return view, nil
+		}
 		return finish(lake, lakeRunID, "blocked", driveReasonCode(derr))
 	}
 

@@ -118,6 +118,19 @@ func WorktreeAdd(ctx context.Context, root, path, branch, startPoint string) (st
 	return gitOutput(ctx, root, args...)
 }
 
+// WorktreeCheckout materializes an EXISTING branch in a worktree at
+// path. Used to rebuild a worktree whose directory was lost but whose
+// branch (and commits) survived.
+func WorktreeCheckout(ctx context.Context, root, path, branch string) (string, error) {
+	return gitOutput(ctx, root, "worktree", "add", path, branch)
+}
+
+// WorktreePrune drops stale worktree metadata (directories that were
+// deleted outside git).
+func WorktreePrune(ctx context.Context, root string) (string, error) {
+	return gitOutput(ctx, root, "worktree", "prune")
+}
+
 // MergeInto runs `git merge --no-ff --no-edit <branch>` in dir and
 // reports the conflicted files when the merge stops on conflicts.
 func MergeInto(ctx context.Context, dir, branch string) (conflicts []string, out string, err error) {

@@ -450,8 +450,17 @@ func EvidenceRefs(evidence string) []string {
 			strings.ContainsAny(tok, "<>") || !strings.Contains(tok, "/") {
 			return
 		}
+		// Go package patterns (`./...`, `internal/...`) are commands, not files.
+		if tok == "./..." || strings.HasSuffix(tok, "/...") {
+			return
+		}
+		// A directory mention (`status/`, `status/*`) is not a registrable
+		// artifact: artifact_refs only holds files.
+		if strings.Contains(tok, "*") || strings.HasSuffix(tok, "/") {
+			return
+		}
 		base := tok[strings.LastIndex(tok, "/")+1:]
-		if !strings.Contains(base, ".") && !strings.HasSuffix(tok, "/") {
+		if !strings.Contains(base, ".") {
 			return
 		}
 		seen[tok] = true

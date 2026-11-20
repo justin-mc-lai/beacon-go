@@ -28,6 +28,13 @@ func (e *Engine) ProgramComplete(hostRunID, confirmedBy string) (ProgramDriveVie
 		return ProgramDriveView{}, core.NewError(core.ReasonProgramPlanMissing, "goal.ProgramComplete",
 			"run "+hostRunID+" has no program plan")
 	}
+	// AC-003: an integrated program is released only through the
+	// total-candidate approval. The legacy one-shot complete would
+	// let a single entry bypass that signature, so it is refused.
+	if m.Program.Mode == ProgramModeIntegrated {
+		return ProgramDriveView{}, core.NewError(core.ReasonProgramApprovalRequired, "goal.ProgramComplete",
+			"program "+m.Program.Slug+" is in integrated delivery; record the total candidate and sign it once (goal program integrated approve)")
+	}
 	route, err := e.ProgramRoute(hostRunID)
 	if err != nil {
 		return ProgramDriveView{}, err

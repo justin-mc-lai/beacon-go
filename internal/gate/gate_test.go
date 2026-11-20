@@ -298,3 +298,13 @@ func TestIntegrityRejectsDocsOnlyTC(t *testing.T) {
 		t.Fatalf("missing docs_only_tc finding: %+v", rep.Findings)
 	}
 }
+
+func TestEvidenceRefsSkipsGoPackagePatterns(t *testing.T) {
+	refs := EvidenceRefs("- run `go vet ./...` and `go build ./...`\n" +
+		"- run `go test ./internal/gate/...`\n" +
+		"- file: tools/adbd/cmd/adbd/stage_receipts.go\n" +
+		"- untouched: status/ and status/*\n")
+	if len(refs) != 1 || refs[0] != "tools/adbd/cmd/adbd/stage_receipts.go" {
+		t.Fatalf("want only the real file, got %#v", refs)
+	}
+}

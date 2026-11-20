@@ -33,13 +33,14 @@ func newGoalProgramCmd() *cobra.Command {
 		newGoalProgramChangeCmd(), newGoalProgramFreezeCmd(),
 		newGoalProgramValidateCmd(), newGoalProgramImportCmd(),
 		newGoalProgramDriveCmd(), newGoalProgramCompleteCmd(),
-		newGoalProgramProposeCmd(), newGoalProgramSelectCmd())
+		newGoalProgramProposeCmd(), newGoalProgramSelectCmd(),
+		newGoalProgramIntegratedCmd())
 	return c
 }
 
 func newGoalProgramDriveCmd() *cobra.Command {
 	var runID, executor string
-	var maxRounds int
+	var maxRounds, turnTimeoutSec, maxDurationSec int
 	var asJSON, untilDone bool
 	var ef execFlags
 	c := &cobra.Command{
@@ -54,6 +55,7 @@ func newGoalProgramDriveCmd() *cobra.Command {
 			defer closeFn()
 			v, err := eng.ProgramDrive(runID, orchestrator.ProgramDriveOptions{
 				Executor: executor, Exec: ef.config(), MaxTurns: maxRounds, UntilDone: untilDone,
+				TurnTimeoutSec: turnTimeoutSec, MaxDurationSec: maxDurationSec,
 			})
 			if err != nil {
 				return err
@@ -78,6 +80,8 @@ func newGoalProgramDriveCmd() *cobra.Command {
 	c.Flags().StringVar(&executor, "executor", "", "stage executor: recording | subprocess | subprocess:<profile> | ralph")
 	c.Flags().IntVar(&maxRounds, "max-rounds", 0, "driver turn cap per lake (<=0 default)")
 	c.Flags().BoolVar(&untilDone, "until-done", false, "keep advancing ready lakes until all are release-ready or one blocks")
+	c.Flags().IntVar(&turnTimeoutSec, "turn-timeout-sec", 0, "per-lake drive step timeout seconds (0 = no per-step deadline)")
+	c.Flags().IntVar(&maxDurationSec, "max-duration-sec", 0, "continuous drive wall-clock budget seconds (0 = unlimited)")
 	addExecFlags(c, &ef, true)
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("run-id")
