@@ -7,6 +7,12 @@
   command. The job only reads the manifest/approval hash and the target
   sha256 and reports aligned / drifted / missing; it never fetches, builds,
   installs or dispatches.
+
+  PRECONDITION: ProgramArguments points into the MAIN repo
+  (/Users/apple/Developer/Personal/products/beacon-go). The script must be
+  committed and present there before this template is loaded; the isolated
+  candidate worktree is NOT the main repo. Loading this template while that
+  path is absent fails closed (the job exits 1) and does not build or install.
 -->
 <plist version="1.0">
 <dict>
