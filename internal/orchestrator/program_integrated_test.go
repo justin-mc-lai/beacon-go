@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"beacon-go/internal/core"
+	"beacon-go/internal/gate"
 	"beacon-go/internal/harness"
 	"beacon-go/internal/store"
 )
@@ -28,6 +29,7 @@ func addIntegratedFeature(t *testing.T, env gitEnv, slug string) store.FeaturePa
 	if err != nil {
 		t.Fatal(err)
 	}
+	writePackage(t, env.root, f.TruthPath, slug, "frozen")
 	for _, gt := range []string{"truth_freeze", "qa"} {
 		if _, err := env.st.Gates().Record(store.GateResult{FeatureID: f.ID, GateType: gt, Verdict: "pass"}); err != nil {
 			t.Fatal(err)
@@ -41,6 +43,7 @@ func addIntegratedFeature(t *testing.T, env gitEnv, slug string) store.FeaturePa
 func setupIntegratedProgram(t *testing.T, lakes []ProgramLakeInput) (gitEnv, string) {
 	t.Helper()
 	env := newGitEnv(t)
+	writePackage(t, env.root, "truth.md", "feat-a", "frozen")
 	for _, gt := range []string{"truth_freeze", "qa"} {
 		if _, err := env.st.Gates().Record(store.GateResult{FeatureID: env.feature.ID, GateType: gt, Verdict: "pass"}); err != nil {
 			t.Fatal(err)
@@ -114,6 +117,24 @@ func attachLakeVerifier(t *testing.T, env gitEnv, hostID, slug string) {
 	if _, err := env.eng.AttachVerifier(lake.RunID, []string{ref}, "qa-bot", "host-1"); err != nil {
 		t.Fatal(err)
 	}
+	if _, err := env.eng.RegisterArtifact(lake.RunID, "qa_report", ref, "qa-bot"); err != nil {
+		t.Fatal(err)
+	}
+	fc, _, err := env.eng.featureContextOf(mustRunFeature(t, env, lake.RunID))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.persistGateResult(fc, gate.Evaluation{GateType: gate.GateQA, Verdict: gate.VerdictPass}, lake.RunID, EventGateEvaluated, nil); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func mustRunFeature(t *testing.T, env gitEnv, id string) string {
+	r, err := env.st.Runs().GetByID(id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return r.FeatureID
 }
 
 // threeEntryRoutes returns route / single-step drive / continuous
@@ -131,13 +152,10 @@ func threeEntryRoutes(t *testing.T, env gitEnv, hostID string) map[string]Progra
 	} else {
 		out["drive_single"] = v.Route
 	}
-	// Continuous drive's start judgement is driveOrder: the loop
-	// consumes exactly this list, so checking it here is the same
-	// gate without spinning a live driver.
-	if _, v, err := env.eng.driveOrder(hostID); err != nil {
+	if v, err := env.eng.ProgramDrive(hostID, ProgramDriveOptions{Executor: "recording", UntilDone: true, MaxDurationSec: 1, MaxTurns: 1}); err != nil {
 		t.Fatal(err)
 	} else {
-		out["drive_continuous"] = v
+		out["drive_continuous"] = v.Route
 	}
 	return out
 }
@@ -382,6 +400,9 @@ func TestProgramIntegratedParallel(t *testing.T) {
 	// Shared-surface lake stays serial: it only starts after B (its
 	// surface peer) already finished, so their intervals cannot
 	// overlap.
+	if _, err := env.eng.ProgramIntegratedMerge(ctx, host, "feat-e"); err != nil {
+		t.Fatal(err)
+	}
 	d4, err := env.eng.ProgramIntegratedDispatch(ctx, host)
 	if err != nil {
 		t.Fatal(err)
@@ -509,6 +530,17 @@ func TestProgramIntegratedApproval(t *testing.T) {
 	if _, err := env.eng.ProgramIntegratedQA(ctx, host, "fail", []string{"qa/total.txt"}, "qa-bot"); reasonOf(err) != core.ReasonProgramCandidateNotReady {
 		t.Fatalf("failing total QA err = %v", err)
 	}
+	if _, err := env.eng.ProgramIntegratedQA(ctx, host, "pass", []string{"qa/total.txt"}, "qa-bot"); err == nil {
+		t.Fatal("missing total QA file must be refused")
+	}
+	if err := os.MkdirAll(filepath.Join(env.root, "qa"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"total.txt", "total-2.txt"} {
+		if err := os.WriteFile(filepath.Join(env.root, "qa", name), []byte("fixture total QA evidence\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
 	v, err := env.eng.ProgramIntegratedQA(ctx, host, "pass", []string{"qa/total.txt"}, "qa-bot")
 	if err != nil {
 		t.Fatal(err)
@@ -548,33 +580,10 @@ func TestProgramIntegratedApproval(t *testing.T) {
 	if _, err := env.eng.ProgramIntegratedApprove(ctx, host, candidateSHA, digest, "lai"); err != nil {
 		t.Fatal(err)
 	}
-	fin, err := env.eng.ProgramIntegratedFinalize(ctx, host)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if fin.Stage != ProgramStageDelivered {
-		t.Fatalf("finalize stage = %s", fin.Stage)
-	}
-	// Same candidate, interrupted finalize can be resumed idempotently.
-	again, err := env.eng.ProgramIntegratedFinalize(ctx, host)
-	if err != nil || again.Stage != ProgramStageDelivered {
-		t.Fatalf("idempotent finalize = %+v %v", again, err)
-	}
-	_, hm, _, err := env.eng.loadRun(host)
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, slug := range []string{"feat-a", "feat-b"} {
-		_, lm, _, err := env.eng.loadRun(hm.Program.lake(slug).RunID)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if lm.LoopStage != string(core.LoopDone) {
-			t.Fatalf("lake %s not closed: %s", slug, lm.LoopStage)
-		}
-	}
-	if hm.Program.Stage != ProgramStageDelivered {
-		t.Fatalf("host stage = %s", hm.Program.Stage)
+	// This legacy unit fixture has no real implement gate. It must not
+	// manufacture a release PASS. The CLI diamond proves positive closure.
+	if _, err := env.eng.ProgramIntegratedFinalize(ctx, host); err == nil {
+		t.Fatal("finalize must preserve the formal release gate")
 	}
 }
 

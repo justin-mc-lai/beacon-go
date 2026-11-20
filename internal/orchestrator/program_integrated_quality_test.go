@@ -147,6 +147,12 @@ printf 'barrier %s\n' "$(date +%s.%N)" > "$me.barrier"
 
 	// Cross-batch serial: shared-surface F and unknown-surface E must
 	// not start until the parallel batch's active intervals closed.
+	for i := 0; i < 2; i++ {
+		again, err := env.eng.ProgramIntegratedDispatch(ctx, host)
+		if err != nil || len(again.Dispatched) != 0 {
+			t.Fatalf("active B/C must exclude shared F and unknown E: %+v %v", again, err)
+		}
+	}
 	commitInWorktree(t, paths["feat-b"], "b.txt", "B\n", "B")
 	commitInWorktree(t, paths["feat-c"], "c.txt", "C\n", "C")
 	if _, err := env.eng.ProgramIntegratedMerge(ctx, host, "feat-b"); err != nil {
@@ -379,7 +385,7 @@ func runHandoffTamperRejected(t *testing.T) {
 	// says valid, but git does not contain that commit — refused live.
 	env.eng.loadRun(host)
 	tamper(t, func(h *ProgramHandoff) {
-		h.QADigest = digestOf(h.QAEvidence...)
+		h.QADigest, _ = env.eng.lakeQADigest(env.root, h.LakeRunID, h.QAEvidence)
 		h.SourceSHA = strings.Repeat("1", 40)
 	})
 	expectBlockedEverywhere(t, core.ReasonProgramHandoffInvalid)

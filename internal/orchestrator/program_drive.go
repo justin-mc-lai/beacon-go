@@ -84,6 +84,17 @@ func (e *Engine) advanceFlowForDrive(runID string) (string, error) {
 // ProgramDrive advances at most one ready lake, or every ready lake
 // when UntilDone is set.
 func (e *Engine) ProgramDrive(hostRunID string, opts ProgramDriveOptions) (ProgramDriveView, error) {
+	_, m, _, err := e.loadRun(hostRunID)
+	if err != nil {
+		return ProgramDriveView{}, err
+	}
+	if m.Program != nil && m.Program.Mode == ProgramModeIntegrated {
+		unlock, err := e.lockProgram(hostRunID)
+		if err != nil {
+			return ProgramDriveView{}, err
+		}
+		defer unlock()
+	}
 	if opts.UntilDone {
 		return e.programDriveUntilDone(hostRunID, opts)
 	}

@@ -45,6 +45,7 @@ type ProgramHandoff struct {
 	LakeRunID      string   `json:"lake_run_id"`
 	QAEvidence     []string `json:"qa_evidence,omitempty"`
 	QADigest       string   `json:"qa_digest,omitempty"`
+	RequirementFP  string   `json:"requirement_fingerprint"`
 	SourceSHA      string   `json:"source_sha"`
 	IntegrationSHA string   `json:"integration_sha"`
 	ContractFP     string   `json:"contract_fingerprint"`
@@ -83,6 +84,7 @@ type ProgramCandidate struct {
 	Lakes          []string `json:"lakes"`
 	Runs           []string `json:"runs"`
 	QAVerdict      string   `json:"qa_verdict,omitempty"`
+	ContractFP     string   `json:"contract_fingerprint"`
 	BoundAt        string   `json:"bound_at"`
 }
 
@@ -160,19 +162,13 @@ func (e *Engine) livePlan(ctx context.Context, run store.Run, plan *ProgramState
 	if plan == nil {
 		return nil
 	}
-	root, err := e.runProjectRoot(run)
-	if err != nil || root == "" {
-		return plan
-	}
-	head, herr := harness.HeadCommit(ctx, root)
-	if herr != nil {
-		return plan
-	}
 	cp := *plan
+	root, err := e.runProjectRoot(run)
+	head, herr := harness.HeadCommit(ctx, root)
 	cp.Handoffs = make([]ProgramHandoff, 0, len(plan.Handoffs))
 	for i := range plan.Handoffs {
 		h := plan.Handoffs[i]
-		if !liveHandoffValidity(ctx, root, &h, head) {
+		if err != nil || herr != nil || !e.liveHandoffValidity(ctx, root, plan, &h, head) {
 			// Keep the row so callers can distinguish "no handoff"
 			// from "recorded handoff that no longer holds".
 			h.Valid = false
@@ -189,14 +185,21 @@ func (e *Engine) livePlan(ctx context.Context, run store.Run, plan *ProgramState
 // the source commit must still be an ancestor of the recorded
 // integration commit, and that integration commit must still be on the
 // main star. The QA digest must still match the recorded evidence.
-func liveHandoffValidity(ctx context.Context, root string, h *ProgramHandoff, head string) bool {
+func (e *Engine) liveHandoffValidity(ctx context.Context, root string, plan *ProgramState, h *ProgramHandoff, head string) bool {
 	if h == nil || !h.Valid || head == "" {
 		return false
 	}
 	if h.SourceSHA == "" || h.IntegrationSHA == "" || h.QADigest == "" {
 		return false
 	}
-	if h.QADigest != digestOf(h.QAEvidence...) {
+	lake := plan.lake(h.Lake)
+	if lake == nil || lake.RunID != h.LakeRunID {
+		return false
+	}
+	digest, err := e.lakeQADigest(root, h.LakeRunID, h.QAEvidence)
+	fp, ferr := e.programRequirementFP(root, h.LakeRunID)
+	if err != nil || ferr != nil || fp != h.RequirementFP || h.QADigest != digest ||
+		h.ContractFP != digestOf(h.Lake, h.LakeRunID, h.SourceSHA, h.IntegrationSHA, digest, fp, lake.Goal, strings.Join(lake.DependsOn, ",")) {
 		return false
 	}
 	if ok, err := harness.IsAncestor(ctx, root, h.SourceSHA, h.IntegrationSHA); err != nil || !ok {
@@ -266,6 +269,11 @@ func (e *Engine) integratedView(run store.Run, m *runMeta, allowed bool, reason,
 // ProgramIntegratedEnable flips an already-frozen program into
 // integrated delivery. Legacy plans are untouched until this call.
 func (e *Engine) ProgramIntegratedEnable(runID string) (ProgramIntegratedView, error) {
+	unlock, err := e.lockProgram(runID)
+	if err != nil {
+		return ProgramIntegratedView{}, err
+	}
+	defer unlock()
 	run, m, _, err := e.loadRun(runID)
 	if err != nil {
 		return ProgramIntegratedView{}, err
@@ -296,6 +304,11 @@ func (e *Engine) ProgramIntegratedEnable(runID string) (ProgramIntegratedView, e
 
 // ProgramIntegratedHandoff verifies and records one lake handoff.
 func (e *Engine) ProgramIntegratedHandoff(ctx context.Context, hostRunID, lake, claimedSource, claimedIntegration string, qaEvidence []string) (ProgramHandoff, error) {
+	unlock, err := e.lockProgram(hostRunID)
+	if err != nil {
+		return ProgramHandoff{}, err
+	}
+	defer unlock()
 	run, m, plan, err := e.loadIntegrated(hostRunID)
 	if err != nil {
 		return ProgramHandoff{}, err
@@ -364,12 +377,20 @@ func (e *Engine) ProgramIntegratedHandoff(ctx context.Context, hostRunID, lake, 
 		return ProgramHandoff{}, core.NewError(core.ReasonProgramNotIntegrated, "program.integrated.Handoff",
 			"lake commit "+src+" is not merged into the main star "+mainSHA)
 	}
-	qaDigest := digestOf(qaEvidence...)
+	qaDigest, err := e.lakeQADigest(mustRoot(e, lrun), pl.RunID, qaEvidence)
+	if err != nil {
+		return ProgramHandoff{}, err
+	}
+	fp, err := e.programRequirementFP(mustRoot(e, lrun), pl.RunID)
+	if err != nil {
+		return ProgramHandoff{}, err
+	}
 	h := ProgramHandoff{
 		Lake: lake, LakeRunID: pl.RunID, QAEvidence: qaEvidence, QADigest: qaDigest,
 		SourceSHA: src, IntegrationSHA: mainSHA,
-		ContractFP: digestOf(lake, src, mainSHA, qaDigest, pl.Goal, strings.Join(pl.DependsOn, ",")),
-		Valid:      true, RecordedAt: nowISO(),
+		RequirementFP: fp,
+		ContractFP:    digestOf(lake, pl.RunID, src, mainSHA, qaDigest, fp, pl.Goal, strings.Join(pl.DependsOn, ",")),
+		Valid:         true, RecordedAt: nowISO(),
 	}
 	upsertHandoff(plan, h)
 	plan.UpdatedAt = nowISO()
@@ -417,6 +438,11 @@ func digestOf(parts ...string) string {
 
 // ProgramIntegratedDispatch starts the next non-conflicting batch.
 func (e *Engine) ProgramIntegratedDispatch(ctx context.Context, hostRunID string) (ProgramDispatchResult, error) {
+	unlock, err := e.lockProgram(hostRunID)
+	if err != nil {
+		return ProgramDispatchResult{}, err
+	}
+	defer unlock()
 	run, m, plan, err := e.loadIntegrated(hostRunID)
 	if err != nil {
 		return ProgramDispatchResult{}, err
@@ -462,6 +488,19 @@ func (e *Engine) ProgramIntegratedDispatch(ctx context.Context, hostRunID string
 	// explicitly declared, pairwise-disjoint lakes form one batch.
 	var group []string
 	for _, slug := range toStart {
+		var occupied []string
+		mainOccupied := false
+		for _, d := range plan.Dispatches {
+			if d.Status == "active" && d.Lake != slug {
+				occupied = append(occupied, d.Lake)
+				if filepath.Clean(d.WorktreePath) == filepath.Clean(root) {
+					mainOccupied = true
+				}
+			}
+		}
+		if len(occupied) > 0 && (mainOccupied || !parallelCompatible(plan, occupied, slug)) {
+			continue
+		}
 		if len(group) == 0 {
 			group = append(group, slug)
 			continue
@@ -804,6 +843,11 @@ func pathExists(p string) bool {
 // Merges are serialized by mergeMu; a conflict stops the merge and
 // leaves dependents blocked (no handoff can be recorded).
 func (e *Engine) ProgramIntegratedMerge(ctx context.Context, hostRunID, lake string) (ProgramIntegratedView, error) {
+	unlock, err := e.lockProgram(hostRunID)
+	if err != nil {
+		return ProgramIntegratedView{}, err
+	}
+	defer unlock()
 	run, m, plan, err := e.loadIntegrated(hostRunID)
 	if err != nil {
 		return ProgramIntegratedView{}, err
@@ -871,6 +915,11 @@ func (e *Engine) ProgramIntegratedRoute(hostRunID string) (ProgramIntegratedView
 // the one candidate SHA; only then does the program enter
 // awaiting_approval.
 func (e *Engine) ProgramIntegratedQA(ctx context.Context, hostRunID, verdict string, evidence []string, by string) (ProgramIntegratedView, error) {
+	unlock, err := e.lockProgram(hostRunID)
+	if err != nil {
+		return ProgramIntegratedView{}, err
+	}
+	defer unlock()
 	run, m, plan, err := e.loadIntegrated(hostRunID)
 	if err != nil {
 		return ProgramIntegratedView{}, err
@@ -886,6 +935,9 @@ func (e *Engine) ProgramIntegratedQA(ctx context.Context, hostRunID, verdict str
 	if len(evidence) == 0 {
 		return ProgramIntegratedView{}, core.NewError(core.ReasonProgramCandidateNotReady, "program.integrated.QA",
 			"total QA needs evidence refs")
+	}
+	if strings.TrimSpace(by) == "" || by == m.ExecutorID {
+		return ProgramIntegratedView{}, core.NewError(core.ReasonProgramCandidateNotReady, "program.integrated.QA", "independent QA identity required")
 	}
 	root, err := e.runProjectRoot(run)
 	if err != nil {
@@ -908,7 +960,7 @@ func (e *Engine) ProgramIntegratedQA(ctx context.Context, hostRunID, verdict str
 				"lake "+slug+" is not at its release gate (stage="+stage+")")
 		}
 		h := plan.handoffFor(slug)
-		if !liveHandoffValidity(ctx, root, h, sha) {
+		if !e.liveHandoffValidity(ctx, root, plan, h, sha) {
 			return ProgramIntegratedView{}, core.NewError(core.ReasonProgramNotIntegrated, "program.integrated.QA",
 				"lake "+slug+" has no live valid handoff (recorded handoff must still be merged on the main star)")
 		}
@@ -921,10 +973,19 @@ func (e *Engine) ProgramIntegratedQA(ctx context.Context, hostRunID, verdict str
 		runs = append(runs, pl.RunID)
 	}
 	sort.Strings(evidence)
-	digest := digestOf(append([]string{sha}, evidence...)...)
+	fp, err := e.programCandidateFP(root, run.ID, plan)
+	if err != nil {
+		return ProgramIntegratedView{}, err
+	}
+	content, err := evidenceDigest(root, evidence)
+	if err != nil {
+		return ProgramIntegratedView{}, err
+	}
+	digest := digestOf(sha, fp, content)
 	plan.Candidate = &ProgramCandidate{
 		SHA: sha, EvidenceDigest: digest, Evidence: evidence,
 		Lakes: lakes, Runs: runs, QAVerdict: "pass", BoundAt: nowISO(),
+		ContractFP: fp,
 	}
 	plan.Stage = ProgramStageAwaitingApproval
 	plan.Approval = nil
@@ -942,6 +1003,11 @@ func (e *Engine) ProgramIntegratedQA(ctx context.Context, hostRunID, verdict str
 // ProgramIntegratedApprove persists the ONE human signature bound to
 // the candidate, then enters finalizing.
 func (e *Engine) ProgramIntegratedApprove(ctx context.Context, hostRunID, candidateSHA, evidenceDigest, signedBy string) (ProgramIntegratedView, error) {
+	unlock, err := e.lockProgram(hostRunID)
+	if err != nil {
+		return ProgramIntegratedView{}, err
+	}
+	defer unlock()
 	run, m, plan, err := e.loadIntegrated(hostRunID)
 	if err != nil {
 		return ProgramIntegratedView{}, err
@@ -980,6 +1046,9 @@ func (e *Engine) ProgramIntegratedApprove(ctx context.Context, hostRunID, candid
 		return ProgramIntegratedView{}, core.NewError(core.ReasonProgramApprovalInvalid, "program.integrated.Approve",
 			"the signature does not match the bound candidate SHA + evidence digest")
 	}
+	if err := e.verifyProgramCandidate(ctx, root, run.ID, plan); err != nil {
+		return ProgramIntegratedView{}, err
+	}
 	plan.Approval = &ProgramApproval{
 		CandidateSHA: plan.Candidate.SHA, EvidenceDigest: plan.Candidate.EvidenceDigest,
 		SignedBy: signedBy, SignedAt: nowISO(),
@@ -999,14 +1068,16 @@ func (e *Engine) ProgramIntegratedApprove(ctx context.Context, hostRunID, candid
 // ProgramIntegratedFinalize completes every lake and closes the host.
 // Idempotent for the same candidate (中断可续).
 func (e *Engine) ProgramIntegratedFinalize(ctx context.Context, hostRunID string) (ProgramIntegratedView, error) {
+	unlock, err := e.lockProgram(hostRunID)
+	if err != nil {
+		return ProgramIntegratedView{}, err
+	}
+	defer unlock()
 	run, m, plan, err := e.loadIntegrated(hostRunID)
 	if err != nil {
 		return ProgramIntegratedView{}, err
 	}
-	if plan.Stage == ProgramStageDelivered {
-		return e.integratedView(run, m, true, "", ""), nil
-	}
-	if plan.Stage != ProgramStageFinalizing || plan.Approval == nil || plan.Candidate == nil {
+	if (plan.Stage != ProgramStageFinalizing && plan.Stage != ProgramStageDelivered) || plan.Approval == nil || plan.Candidate == nil {
 		return ProgramIntegratedView{}, core.NewError(core.ReasonProgramApprovalRequired, "program.integrated.Finalize",
 			"a valid approval for the candidate is required (stage="+plan.Stage+")")
 	}
@@ -1028,6 +1099,15 @@ func (e *Engine) ProgramIntegratedFinalize(ctx context.Context, hostRunID string
 			core.NewError(core.ReasonProgramCandidateChanged, "program.integrated.Finalize",
 				"candidate changed before finalize; the old signature cannot cover it")
 	}
+	if plan.Approval.EvidenceDigest != plan.Candidate.EvidenceDigest || strings.TrimSpace(plan.Approval.SignedBy) == "" {
+		return ProgramIntegratedView{}, core.NewError(core.ReasonProgramApprovalInvalid, "program.integrated.Finalize", "approval binding changed")
+	}
+	if err := e.verifyProgramCandidate(ctx, root, run.ID, plan); err != nil {
+		return ProgramIntegratedView{}, err
+	}
+	if plan.Stage == ProgramStageDelivered {
+		return e.integratedView(run, m, true, "", ""), nil
+	}
 	for _, slug := range plan.Candidate.Lakes {
 		pl := plan.lake(slug)
 		if pl == nil || pl.RunID == "" {
@@ -1038,13 +1118,23 @@ func (e *Engine) ProgramIntegratedFinalize(ctx context.Context, hostRunID string
 			pl.ProgramStatus = "completed"
 			continue
 		}
-		if _, cerr := e.Complete(pl.RunID, CompleteOptions{
-			HumanConfirmed: true, ConfirmedBy: "program:" + plan.Approval.SignedBy,
-		}); cerr != nil {
+		if cerr := e.completeProgramRun(pl.RunID, plan.Approval); cerr != nil {
 			return ProgramIntegratedView{}, cerr
 		}
 		pl.ProgramStatus = "completed"
 		pl.UpdatedAt = nowISO()
+		if err := e.saveRun(run, m); err != nil {
+			return ProgramIntegratedView{}, err
+		}
+	}
+	if err := e.completeProgramRun(hostRunID, plan.Approval); err != nil {
+		return ProgramIntegratedView{}, err
+	}
+	// Complete writes the host snapshot; never overwrite its done state with
+	// the pre-finalize copy when recording the program's delivered event.
+	run, m, plan, err = e.loadIntegrated(hostRunID)
+	if err != nil {
+		return ProgramIntegratedView{}, err
 	}
 	plan.Stage = ProgramStageDelivered
 	plan.UpdatedAt = nowISO()
