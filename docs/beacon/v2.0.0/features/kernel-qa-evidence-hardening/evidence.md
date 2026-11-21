@@ -7,10 +7,10 @@
 | truth | requirement_truth | truth.md | authored | truth |
 | tests | test_truth | tests.md | executor_checks_run | qa |
 | interface | requirement_truth | interfaces.md | authored | truth |
-| implementation | source | internal/orchestrator/qa_evidence.go | candidate_pending_independent_qa | implement |
-| execution adapters | source | internal/orchestrator/qa_execution.go | executor_checks_run | implement |
-| CLI regressions | test_source | internal/cli/kernel_qa_evidence_cli_test.go | executor_checks_run | qa |
-| full chain fixture | test_source | e2e/run_e2e.sh | executor_checks_run | qa |
+| implementation | acceptance_truth | internal/orchestrator/qa_evidence.go | candidate_pending_independent_qa | implement |
+| execution adapters | acceptance_truth | internal/orchestrator/qa_execution.go | executor_checks_run | implement |
+| CLI regressions | test_truth | internal/cli/kernel_qa_evidence_cli_test.go | executor_checks_run | qa |
+| full chain fixture | test_truth | e2e/run_e2e.sh | executor_checks_run | qa |
 
 用户确认与真实CLI旧内核反例见总盘决策《2026-11-21-kernel-qa-hardening》。反例不代表本修复已实现；产品QA与当前候选证据待实施后登记。
 
