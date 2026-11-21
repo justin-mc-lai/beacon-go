@@ -312,6 +312,7 @@ func TestSurfaceEvaluateRealPackage(t *testing.T) {
 	if _, err := pass.eng.RegisterArtifact(run.RunID, "a11y_tree", a11y, "qa-bot"); err != nil {
 		t.Fatal(err)
 	}
+	prepareProductQA(t, pass.testEnv, run.RunID, "qa-bot")
 	autotestDir := filepath.Join(pass.root, ".beacon", "autotest", run.RunID)
 	if err := os.MkdirAll(autotestDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -337,12 +338,21 @@ func TestSurfaceEvaluateRealPackage(t *testing.T) {
 	if _, err := fail.eng.RegisterArtifact(failRun.RunID, "e2e_report", onlyReport, "qa-bot"); err != nil {
 		t.Fatal(err)
 	}
+	// First obtain valid product evidence with both surfaces, then remove
+	// the desktop file to isolate the live surface check.
+	missingDesktop := registerSurfaceFixture(t, fail.root, "desktop.json", "{}")
+	if _, err := fail.eng.RegisterArtifact(failRun.RunID, "a11y_tree", missingDesktop, "qa-bot"); err != nil {
+		t.Fatal(err)
+	}
+	prepareProductQA(t, fail.testEnv, failRun.RunID, "qa-bot")
+	if err := os.Remove(missingDesktop); err != nil {
+		t.Fatal(err)
+	}
 	failEv, err := fail.eng.EvaluateGate(fail.ctx, "qa", "", "qa-bot")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if failEv.Verdict != gate.VerdictBlocked || !containsReason(failEv, "qa_surface_evidence_miss:desktop") ||
-		!containsReason(failEv, core.ReasonQAAutotestRecordedMissing) {
+	if failEv.Verdict != gate.VerdictBlocked || !containsReason(failEv, "qa_surface_evidence_miss:desktop") {
 		t.Fatalf("missing desktop evidence and autotest must block, got %+v", failEv)
 	}
 	writeVerdictEvidence(t, "qa-evaluate-fail.json", failEv)
@@ -356,11 +366,12 @@ func TestSurfaceEvaluateRealPackage(t *testing.T) {
 	if _, err := noAuto.eng.RegisterArtifact(noAutoRun.RunID, "e2e_report", apiReport, "qa-bot"); err != nil {
 		t.Fatal(err)
 	}
+	prepareQACandidate(t, noAuto.testEnv, noAutoRun.RunID)
 	noAutoEv, err := noAuto.eng.EvaluateGate(noAuto.ctx, "qa", "", "qa-bot")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if noAutoEv.Verdict != gate.VerdictBlocked || !containsReason(noAutoEv, core.ReasonQAAutotestRecordedMissing) {
+	if noAutoEv.Verdict != gate.VerdictBlocked || !containsReason(noAutoEv, "qa_execution_missing") {
 		t.Fatalf("missing autotest must block, got %+v", noAutoEv)
 	}
 	if containsReason(noAutoEv, "qa_surface_evidence_miss:api") {
@@ -376,6 +387,7 @@ func TestSurfaceEvaluateRealPackage(t *testing.T) {
 	if _, err := legacy.eng.RegisterArtifact(legacyRun.RunID, "e2e_report", legacyReport, "qa-bot"); err != nil {
 		t.Fatal(err)
 	}
+	prepareProductQA(t, legacy.testEnv, legacyRun.RunID, "qa-bot")
 	legacyEv, err := legacy.eng.EvaluateGate(legacy.ctx, "qa", "", "qa-bot")
 	if err != nil {
 		t.Fatal(err)

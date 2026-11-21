@@ -140,11 +140,12 @@ func TestRecoverRefusesHumanGateReasonsWithoutStateChange(t *testing.T) {
 func TestHumanConfirmationClearsHumanGateBlock(t *testing.T) {
 	env := newGateEnv(t, frozenTruthDoc)
 	run := walkToReleaseGate(t, env)
+	productReport := prepareProductQA(t, env.testEnv, run.RunID, "independent-verifier")
 	verifier := filepath.Join(t.TempDir(), "verifier.md")
 	if err := os.WriteFile(verifier, []byte("# independent verification\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.eng.AttachVerifier(run.RunID, []string{verifier}, "independent-verifier", ""); err != nil {
+	if _, err := env.eng.AttachVerifier(run.RunID, []string{productReport}, "independent-verifier", ""); err != nil {
 		t.Fatal(err)
 	}
 	// Empty identity is refused and writes nothing.
@@ -328,6 +329,7 @@ func TestStatusShowsHumanGateBlockTruthfully(t *testing.T) {
 func TestRecoverAndAttachVerifierDoNotHideHumanGateBlock(t *testing.T) {
 	env := newGateEnv(t, frozenTruthDoc)
 	run := walkToReleaseGate(t, env)
+	productReport := prepareProductQA(t, env.testEnv, run.RunID, "independent-verifier")
 	before, err := env.eng.Status(run.RunID)
 	if err != nil {
 		t.Fatal(err)
@@ -339,7 +341,7 @@ func TestRecoverAndAttachVerifierDoNotHideHumanGateBlock(t *testing.T) {
 	if err := os.WriteFile(verifier, []byte("# verification\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.eng.AttachVerifier(run.RunID, []string{verifier}, "independent-verifier", ""); err != nil {
+	if _, err := env.eng.AttachVerifier(run.RunID, []string{productReport}, "independent-verifier", ""); err != nil {
 		t.Fatal(err)
 	}
 	after, err := env.eng.Status(run.RunID)
@@ -385,6 +387,12 @@ func TestRepeatedHumanConfirmationAfterReblockKeepsStatusUnblocked(t *testing.T)
 	}
 	// First confirmation clears the gate; Complete still fails on the
 	// missing verifier, but the confirmation fact is on the trail.
+	row, meta, _, _ := env.eng.loadRun(run.RunID)
+	refs := append([]string{}, meta.Verifier.Refs...)
+	meta.Verifier = nil
+	if err := env.eng.saveRun(row, meta); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := env.eng.Complete(run.RunID, CompleteOptions{HumanConfirmed: true, ConfirmedBy: "owner-1"}); err == nil {
 		t.Fatal("complete without a verifier must be refused")
 	} else if rc, ok := core.ReasonCodeOf(err); !ok || rc != ReasonVerifierRequired {
@@ -394,7 +402,7 @@ func TestRepeatedHumanConfirmationAfterReblockKeepsStatusUnblocked(t *testing.T)
 	if err := os.WriteFile(verifier, []byte("# independent verification\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.eng.AttachVerifier(run.RunID, []string{verifier}, "independent-verifier", ""); err != nil {
+	if _, err := env.eng.AttachVerifier(run.RunID, refs, "qa-bot", ""); err != nil {
 		t.Fatal(err)
 	}
 	// A different tick identity is new evidence: the release gate

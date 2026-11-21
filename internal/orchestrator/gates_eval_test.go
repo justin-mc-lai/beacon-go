@@ -249,7 +249,7 @@ func TestQAGateEvidenceFlow(t *testing.T) {
 		t.Fatalf("no QA evidence must block, got %+v", ev)
 	}
 	joined := strings.Join(ev.ReasonCodes, ",")
-	if !strings.Contains(joined, core.ReasonStageExitQAEvidenceMiss) || !strings.Contains(joined, core.ReasonQAStageNotExecuted) {
+	if !strings.Contains(joined, "qa_candidate_missing") {
 		t.Fatalf("block must name both missing facts, got %v", ev.ReasonCodes)
 	}
 	// Provide evidence: a real blob + pointer + a qa stage execution.
@@ -267,6 +267,7 @@ func TestQAGateEvidenceFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 	appendRealStageExecuted(t, env.testEnv, run.RunID, StageQA)
+	productReport := prepareProductQA(t, env.testEnv, run.RunID, "qa-bot")
 	ev, err = env.eng.EvaluateGate(env.ctx, "qa", "", "qa-bot")
 	if err != nil {
 		t.Fatal(err)
@@ -275,14 +276,14 @@ func TestQAGateEvidenceFlow(t *testing.T) {
 		t.Fatalf("complete evidence must pass, got %+v", ev)
 	}
 	// Tamper with the blob: the same gate now blocks as stale.
-	if err := os.WriteFile(blob, []byte("tampered"), 0o644); err != nil {
+	if err := os.WriteFile(productReport, []byte("tampered"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	ev, err = env.eng.EvaluateGate(env.ctx, "qa", "", "qa-bot")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ev.Verdict != gate.VerdictBlocked || ev.ReasonCodes[0] != core.ReasonQAArtifactStale {
+	if ev.Verdict != gate.VerdictBlocked || ev.ReasonCodes[0] != "qa_product_review_invalid" {
 		t.Fatalf("tampered evidence must block as stale, got %+v", ev)
 	}
 }
@@ -321,6 +322,7 @@ func TestReleaseGateComposition(t *testing.T) {
 		t.Fatal(err)
 	}
 	appendRealStageExecuted(t, env.testEnv, run.RunID, StageQA)
+	prepareProductQA(t, env.testEnv, run.RunID, "qa-bot")
 	if _, err := env.eng.EvaluateGate(env.ctx, "qa", "", "release-bot"); err != nil {
 		t.Fatal(err)
 	}
@@ -401,15 +403,15 @@ func TestExitGateFormalFirst(t *testing.T) {
 	}
 	// Formal qa pass opens the exit even with zero raw artifacts.
 	pass := EvaluateStageExit(ExitInput{
-		Stage: StageQA, LatestGates: map[string]GateFact{"qa": {Verdict: "pass"}},
+		Stage: StageQA, QAEligible: true, LatestGates: map[string]GateFact{"qa": {Verdict: "pass"}},
 	})
 	if !pass.Allowed || pass.Derived || pass.FormalVerdict != "pass" {
 		t.Fatalf("formal qa pass must decide, got %+v", pass)
 	}
 	// No formal verdict: derived judgement, marked Derived.
 	derived := EvaluateStageExit(ExitInput{Stage: StageQA, ArtifactCount: 1})
-	if !derived.Allowed || !derived.Derived {
-		t.Fatalf("artifact presence stays a derived pass, got %+v", derived)
+	if derived.Allowed || !derived.Derived {
+		t.Fatalf("artifact presence cannot substitute for formal current QA, got %+v", derived)
 	}
 	// Release: formal pass is surfaced but tick still cannot exit —
 	// completion is Complete's human act.
@@ -443,23 +445,22 @@ func TestTickStopsAtFormalQABlock(t *testing.T) {
 		}
 	}
 	// Seed a FORMAL qa block (as `gate evaluate qa` would write).
-	if _, err := env.st.Gates().Record(store.GateResult{
-		FeatureID: env.feature.ID, GateType: "qa", Verdict: "blocked",
-		ReasonCodes: []string{core.ReasonQAArtifactStale},
-	}); err != nil {
+	prepareProductQA(t, env.testEnv, run.RunID, "qa-bot")
+	if _, err := env.eng.persistGateResult(env.ctx, gate.Evaluation{GateType: gate.GateQA, Verdict: gate.VerdictBlocked, ReasonCodes: []string{core.ReasonQAArtifactStale}}, run.RunID, EventGateEvaluated, nil); err != nil {
 		t.Fatal(err)
 	}
 	v, err := env.eng.Tick(ctx, run.RunID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !v.Blocked || v.CurrentStage != StageQA || v.ReasonCode != core.ReasonQAArtifactStale {
+	if !v.Blocked || v.CurrentStage != StageQA || v.ReasonCode != ReasonQAGateNotPassed {
 		t.Fatalf("tick must stop at qa on the formal block, got %+v", v)
 	}
 	// Formal pass re-arms the tick (new gate fact changes the key).
-	if _, err := env.st.Gates().Record(store.GateResult{
-		FeatureID: env.feature.ID, GateType: "qa", Verdict: "pass",
-	}); err != nil {
+	if _, err := env.eng.EvaluateGate(env.ctx, "qa", run.RunID, "qa-bot"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.Recover(run.RunID, "owner", "new current QA passed"); err != nil {
 		t.Fatal(err)
 	}
 	v, err = env.eng.Tick(ctx, run.RunID)

@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"beacon-go/internal/core"
 	"beacon-go/internal/gate"
 	"beacon-go/internal/store"
 )
@@ -41,6 +40,7 @@ func qaFixture(t *testing.T) (testEnv, RunView, string) {
 	t.Helper()
 	env := newTestEnv(t, "active")
 	run := env.createRun(t)
+	prepareProductQA(t, env, run.RunID, "qa-bot")
 	appendRealStageExecuted(t, env, run.RunID, StageQA)
 	dir := t.TempDir()
 	reportPath := filepath.Join(dir, "qa", "report.json")
@@ -79,11 +79,19 @@ func TestQAStalenessUsesLatestPerPath(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(rows) != 3 {
-		t.Fatalf("fixture rows = %d, want 3 legacy duplicates", len(rows))
+	count := 0
+	for _, a := range rows {
+		if a.AbsPath == reportPath {
+			count++
+		}
+	}
+	if count != 3 {
+		t.Fatalf("fixture rows = %d, want 3 legacy duplicates", count)
 	}
 
 	ctx := qaCtx(t, env)
+	// Bind the live duplicated path as current product-review evidence.
+	bindQAReviewEvidence(t, env, run.RunID, reportPath)
 	ev, err := env.eng.evalQA(ctx, "qa-bot")
 	if err != nil {
 		t.Fatalf("evalQA: %v", err)
@@ -106,7 +114,7 @@ func TestQAStalenessUsesLatestPerPath(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ev.Verdict != gate.VerdictBlocked || len(ev.ReasonCodes) == 0 || ev.ReasonCodes[0] != core.ReasonQAArtifactStale {
+	if ev.Verdict != gate.VerdictBlocked || len(ev.ReasonCodes) == 0 || ev.ReasonCodes[0] != "qa_product_review_invalid" {
 		t.Fatalf("newest row matching no disk bytes must block as stale, got %+v", ev)
 	}
 }
@@ -131,8 +139,14 @@ func TestQALegacyDuplicatesNoMigration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(before) != 4 {
-		t.Fatalf("fixture rows = %d, want 4 (3 stale + 1 live)", len(before))
+	count := 0
+	for _, a := range before {
+		if a.AbsPath == reportPath {
+			count++
+		}
+	}
+	if count != 4 {
+		t.Fatalf("fixture rows = %d, want 4 (3 stale + 1 live)", count)
 	}
 	// The schema is what it always was: nothing was added to hold
 	// duplicate rows (AC-006) and nothing has to be migrated away.
@@ -140,6 +154,8 @@ func TestQALegacyDuplicatesNoMigration(t *testing.T) {
 		t.Fatalf("schema contract drifted: %v", err)
 	}
 	ctx := qaCtx(t, env)
+	bindQAReviewEvidence(t, env, run.RunID, reportPath)
+	before, _ = env.st.Artifacts().ListByRun(run.RunID)
 	ev, err := env.eng.evalQA(ctx, "qa-bot")
 	if err != nil {
 		t.Fatalf("evalQA over legacy duplicates: %v", err)
@@ -170,9 +186,10 @@ func TestQAReRegisterClearsStale(t *testing.T) {
 	writeBlob(t, reportPath, "# qa report v1\nall green\n")
 	ctx := qaCtx(t, env)
 
-	if _, err := env.eng.RegisterArtifact(run.RunID, "qa_report", reportPath, "qa-bot"); err != nil {
+	if _, err := env.eng.RegisterArtifact(run.RunID, "log", reportPath, "qa-bot"); err != nil {
 		t.Fatalf("first register: %v", err)
 	}
+	bindQAReviewEvidence(t, env, run.RunID, reportPath)
 	ev, err := env.eng.evalQA(ctx, "qa-bot")
 	if err != nil {
 		t.Fatal(err)
@@ -188,19 +205,20 @@ func TestQAReRegisterClearsStale(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ev.Verdict != gate.VerdictBlocked || len(ev.ReasonCodes) == 0 || ev.ReasonCodes[0] != core.ReasonQAArtifactStale {
+	if ev.Verdict != gate.VerdictBlocked || len(ev.ReasonCodes) == 0 || ev.ReasonCodes[0] != "qa_product_review_invalid" {
 		t.Fatalf("a rewritten file must read stale first, got %+v", ev)
 	}
 
 	// Registering the same path again refreshes the pointer in place:
 	// the gate clears instead of carrying a dead hash forever.
-	res, err := env.eng.RegisterArtifact(run.RunID, "qa_report", reportPath, "qa-bot")
+	res, err := env.eng.RegisterArtifact(run.RunID, "log", reportPath, "qa-bot")
 	if err != nil {
 		t.Fatalf("re-register: %v", err)
 	}
 	if res.AlreadyRegistered {
 		t.Fatal("changed bytes must not report already_registered")
 	}
+	bindQAReviewEvidence(t, env, run.RunID, reportPath)
 	ev, err = env.eng.evalQA(ctx, "qa-bot")
 	if err != nil {
 		t.Fatal(err)
@@ -212,10 +230,16 @@ func TestQAReRegisterClearsStale(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(rows) != 1 {
-		t.Fatalf("re-registering the same path must not append rows: %d rows", len(rows))
+	count := 0
+	for _, a := range rows {
+		if a.AbsPath == reportPath {
+			count++
+			if a.ContentHash != hashOf("# qa report v2\nre-run\nall green\n") {
+				t.Fatalf("stored hash = %q", a.ContentHash)
+			}
+		}
 	}
-	if rows[0].ContentHash != hashOf("# qa report v2\nre-run\nall green\n") {
-		t.Fatalf("stored hash = %q, want the re-run bytes", rows[0].ContentHash)
+	if count != 1 {
+		t.Fatalf("same path rows: %d", count)
 	}
 }

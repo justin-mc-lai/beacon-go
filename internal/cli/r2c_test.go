@@ -166,6 +166,7 @@ func TestQAAutotestCLI(t *testing.T) {
 		t.Fatalf("goal run: %v\n%s", err, out)
 	}
 	runID := strField(t, parseDoc(t, out), "run_id")
+	prepareCLIProductQA(t, root, "feat-a", runID, "qa-bot")
 	out, err = runCLI(t, "qa", "autotest", "run", "--run-id", runID, "--by", "qa-bot", "--json")
 	if err != nil {
 		t.Fatalf("qa autotest run: %v\n%s", err, out)
@@ -174,7 +175,7 @@ func TestQAAutotestCLI(t *testing.T) {
 	if got, _ := doc["passed"].(float64); got != 1 {
 		t.Fatalf("autotest passed = %v, want 1 (%s)", doc, out)
 	}
-	if _, err := os.Stat(filepath.Join(root, ".beacon", "autotest", runID, "report.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(root, doc["report_path"].(string))); err != nil {
 		t.Errorf("autotest report on disk: %v", err)
 	}
 }

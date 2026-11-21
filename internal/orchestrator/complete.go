@@ -53,6 +53,35 @@ func (e *Engine) AttachVerifier(runID string, refs []string, source, executorID 
 		return v, core.NewError(core.ReasonStopWhenUnverified, "goal.AttachVerifier",
 			"maker != checker: verifier source equals the executor identity "+executor)
 	}
+	// Overrides can add a restriction; they cannot replace the actual maker.
+	c, err := e.currentQACandidate(run)
+	if err != nil {
+		return viewOf(run, m, slug), err
+	}
+	r, p, err := e.currentQAReview(run, m, c)
+	if err != nil {
+		return viewOf(run, m, slug), err
+	}
+	if _, err := e.currentQAEligibility(run, m, false); err != nil {
+		return viewOf(run, m, slug), err
+	}
+	if source != r.Checker {
+		return viewOf(run, m, slug), qaError(ReasonVerifierRequired, "source must match the current independent report checker")
+	}
+	fc, err := e.featureContext(run.FeatureID)
+	if err != nil {
+		return RunView{}, err
+	}
+	for _, ref := range refs {
+		path := resolvePkgPath(fc.Project.RootPath, ref)
+		ok := path == p.Path
+		for _, ev := range r.EvidenceRefs {
+			ok = ok || path == resolvePkgPath(fc.Project.RootPath, ev)
+		}
+		if !ok {
+			return viewOf(run, m, slug), qaError(ReasonVerifierRequired, "ref must name current product report or its registered evidence")
+		}
+	}
 	m.Verifier = &VerifierInfo{RequiredForComplete: true, Present: true, Refs: refs, Source: source}
 	wasBlocked := m.Blocked
 	// AC-004: attaching a verifier records the independent checker. It
@@ -237,12 +266,15 @@ func (e *Engine) Complete(runID string, opts CompleteOptions) (RunView, error) {
 	if !m.ReleaseHumanConfirmed {
 		return reject(core.ReasonReleaseRequiresHuman, "release requires explicit human confirmation")
 	}
+	if m.Blocked {
+		return reject(m.LastBlockReason, "unresolved blocker requires explicit recovery")
+	}
 	if m.Verifier == nil || !m.Verifier.Present || len(m.Verifier.Refs) == 0 {
 		return reject(ReasonVerifierRequired, "an independent verifier must be attached before complete")
 	}
-	qa, err := e.store.Gates().Latest(run.FeatureID, "qa")
-	if err != nil || qa.Verdict != "pass" {
-		return reject(ReasonQAGateNotPassed, "latest qa gate verdict is not pass")
+	if err := e.requireCurrentFormalQA(run, m); err != nil {
+		code, _ := core.ReasonCodeOf(err)
+		return reject(code, err.Error())
 	}
 	ls := m.loopState()
 	if err := ls.CheckReleaseGate(true); err != nil {

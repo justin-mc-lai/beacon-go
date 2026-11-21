@@ -169,12 +169,13 @@ func DefinedACs(truth string) map[string]bool {
 // packages omit it); `goal conformance` requires it for packages
 // that declare the traceability contract.
 type TCRow struct {
-	AC        string
-	TC        string
-	Command   string
-	Assertion string
-	Evidence  string
-	Line      int
+	AC            string
+	TC            string
+	Command       string
+	Assertion     string
+	Evidence      string
+	RequiredTests []string
+	Line          int
 }
 
 var softCellValues = map[string]bool{
@@ -201,6 +202,7 @@ func (r TCRow) IsSoft() bool {
 func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok bool) {
 	inMatrix := false
 	evidenceCol := -1
+	requiredCol := -1
 	for i, line := range strings.Split(tests, "\n") {
 		trimmed := strings.TrimSpace(line)
 		if !strings.HasPrefix(trimmed, "|") {
@@ -218,9 +220,13 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 			inMatrix = true
 			ok = true
 			evidenceCol = -1
+			requiredCol = -1
 			for j, c := range lowered {
 				if c == "evidence" {
 					evidenceCol = j
+				}
+				if c == "required tests" {
+					requiredCol = j
 				}
 			}
 			if evidenceCol >= 0 {
@@ -249,6 +255,13 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 		}
 		if evidenceCol >= 0 && evidenceCol < len(cells) {
 			row.Evidence = cells[evidenceCol]
+		}
+		if requiredCol >= 0 && requiredCol < len(cells) {
+			for _, name := range strings.Split(cells[requiredCol], ",") {
+				if name = strings.TrimSpace(strings.Trim(name, "`")); name != "" {
+					row.RequiredTests = append(row.RequiredTests, name)
+				}
+			}
 		}
 		rows = append(rows, row)
 	}

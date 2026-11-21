@@ -67,6 +67,9 @@ func newGitEnv(t *testing.T) gitEnv {
 	if err := os.WriteFile(filepath.Join(root, "README.md"), []byte("# proj\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	if err := os.WriteFile(filepath.Join(root, "qa-source.py"), []byte("print('implementation')\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	gitCmd(t, root, "add", ".")
 	gitCmd(t, root, "commit", "-m", "init")
 	p, err := st.Projects().Register(store.Project{RootPath: root, Name: "proj"})

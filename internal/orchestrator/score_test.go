@@ -323,6 +323,7 @@ func TestScoreDoesNotInfluenceGates(t *testing.T) {
 	}
 
 	// Direction 2: a grade-D score must not revoke an existing pass.
+	env.createRun(t)
 	env.seedQAPass(t)
 	if _, err := env.eng.ScoreSkill(ctx, ScoreOptions{Target: weak, Evaluator: "grader-1"}); err != nil {
 		t.Fatal(err)

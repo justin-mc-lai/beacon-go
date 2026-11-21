@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"beacon-go/internal/core"
+	"beacon-go/internal/gate"
 	"beacon-go/internal/store"
 )
 
@@ -65,9 +66,11 @@ func (env testEnv) createRun(t *testing.T) RunView {
 
 func (env testEnv) seedQAPass(t *testing.T) {
 	t.Helper()
-	if _, err := env.st.Gates().Record(store.GateResult{FeatureID: env.feature.ID, GateType: "qa", Verdict: "pass"}); err != nil {
-		t.Fatal(err)
+	runs, err := env.st.Runs().ListByFeature(env.feature.ID)
+	if err != nil || len(runs) == 0 {
+		t.Fatalf("QA fixture run: %v", err)
 	}
+	prepareProductQA(t, env, runs[len(runs)-1].ID, "qa-bot")
 }
 
 func (env testEnv) seedTruthFrozen(t *testing.T) {
@@ -267,6 +270,12 @@ func TestCompleteFourGates(t *testing.T) {
 		t.Errorf("reason = %q", rc)
 	}
 	// (3) confirmed, no verifier.
+	raw, m, _, _ := env.eng.loadRun(run.RunID)
+	refs := append([]string{}, m.Verifier.Refs...)
+	m.Verifier = nil
+	if err := env.eng.saveRun(raw, m); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := env.eng.Complete(run.RunID, CompleteOptions{HumanConfirmed: true, ConfirmedBy: "lai"}); err == nil {
 		t.Fatal("complete without verifier must fail")
 	} else if rc, _ := core.ReasonCodeOf(err); rc != ReasonVerifierRequired {
@@ -274,10 +283,11 @@ func TestCompleteFourGates(t *testing.T) {
 	}
 	// Attach verifier, then remove the qa pass by recording a newer
 	// blocked qa verdict -> (4) qa not pass.
-	if _, err := env.eng.AttachVerifier(run.RunID, []string{"evidence/qa.md"}, "qa-bot", ""); err != nil {
+	if _, err := env.eng.AttachVerifier(run.RunID, refs, "qa-bot", ""); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.st.Gates().Record(store.GateResult{FeatureID: env.feature.ID, GateType: "qa", Verdict: "blocked", ReasonCodes: []string{"regression"}}); err != nil {
+	fc, _ := env.eng.featureContext(env.feature.ID)
+	if _, err := env.eng.persistGateResult(fc, gate.Evaluation{GateType: gate.GateQA, Verdict: gate.VerdictBlocked, ReasonCodes: []string{"regression"}}, run.RunID, EventGateEvaluated, nil); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := env.eng.Complete(run.RunID, CompleteOptions{}); err == nil {
@@ -310,7 +320,8 @@ func TestAttachVerifierMakerChecker(t *testing.T) {
 	} else if rc, _ := core.ReasonCodeOf(err); rc != core.ReasonStopWhenUnverified {
 		t.Errorf("reason = %q", rc)
 	}
-	v, err := env.eng.AttachVerifier(run.RunID, []string{"e.md"}, "qa-bot", "")
+	productReport := prepareProductQA(t, env, run.RunID, "qa-bot")
+	v, err := env.eng.AttachVerifier(run.RunID, []string{productReport}, "qa-bot", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -431,8 +442,8 @@ func TestEvaluateStageExitBranches(t *testing.T) {
 		{"design ok", ExitInput{Stage: StageDesign, DesignEvidence: true}, ""},
 		{"implement admission blocked", ExitInput{Stage: StageImplement, LatestGates: map[string]GateFact{"implement_admission": {Verdict: "blocked"}}}, ReasonStageExitImplementBlk},
 		{"qa no evidence", ExitInput{Stage: StageQA, LatestGates: map[string]GateFact{}}, ReasonStageExitQAEvidence},
-		{"qa artifacts", ExitInput{Stage: StageQA, ArtifactCount: 2, LatestGates: map[string]GateFact{}}, ""},
-		{"qa gate pass", ExitInput{Stage: StageQA, LatestGates: map[string]GateFact{"qa": {Verdict: "pass"}}}, ""},
+		{"qa artifacts", ExitInput{Stage: StageQA, ArtifactCount: 2, LatestGates: map[string]GateFact{}}, ReasonStageExitQAEvidence},
+		{"qa gate pass", ExitInput{Stage: StageQA, QAEligible: true, LatestGates: map[string]GateFact{"qa": {Verdict: "pass"}}}, ""},
 		{"release always blocked", ExitInput{Stage: StageRelease}, core.ReasonReleaseRequiresHuman},
 	}
 	for _, c := range cases {

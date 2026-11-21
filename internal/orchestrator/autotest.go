@@ -37,7 +37,6 @@ package orchestrator
 import (
 	"context"
 	"encoding/json"
-	"encoding/xml"
 	"os"
 	"path/filepath"
 	"strings"
@@ -63,22 +62,29 @@ const (
 // AutoTestTCResult is one test case's execution record. It is also
 // the on-disk shape of the per-TC result.json evidence file.
 type AutoTestTCResult struct {
-	TC             string `json:"tc"`
-	AC             string `json:"ac"`
-	Command        string `json:"command"`
-	Status         string `json:"status"` // passed | failed | blocked
-	ReasonCode     string `json:"reason_code,omitempty"`
-	Detail         string `json:"detail,omitempty"`
-	ExitCode       int    `json:"exit_code"`
-	TimedOut       bool   `json:"timed_out,omitempty"`
-	DurationMS     int64  `json:"duration_ms"`
-	AssertionCount *int   `json:"assertion_count,omitempty"` // from a junit file the command wrote at BEACON_JUNIT_PATH
-	ResultPath     string `json:"result_path,omitempty"`     // project-relative
-	ArtifactID     string `json:"artifact_id,omitempty"`
+	TC         string `json:"tc"`
+	AC         string `json:"ac"`
+	Command    string `json:"command"`
+	Status     string `json:"status"` // passed | failed | blocked
+	ReasonCode string `json:"reason_code,omitempty"`
+	Detail     string `json:"detail,omitempty"`
+	ExitCode   int    `json:"exit_code"`
+	TimedOut   bool   `json:"timed_out,omitempty"`
+	DurationMS int64  `json:"duration_ms"`
+	// TestCount is machine-executed cases from the shared QA adapter;
+	// JUnit's tests attribute is a test count, never called assertions.
+	TestCount        *int             `json:"test_count,omitempty"`
+	ExecutionAdapter string           `json:"execution_adapter,omitempty"`
+	Cases            []QAExecutedCase `json:"cases,omitempty"`
+	CandidateHash    string           `json:"candidate_hash,omitempty"`
+	ResultPath       string           `json:"result_path,omitempty"` // project-relative
+	ArtifactID       string           `json:"artifact_id,omitempty"`
 }
 
 // AutoTestReport is one RunAutoTest outcome.
 type AutoTestReport struct {
+	CandidateHash   string             `json:"candidate_hash"`
+	RawFiles        []qaFile           `json:"raw_files"`
 	RunID           string             `json:"run_id"`
 	FeatureSlug     string             `json:"feature_slug"`
 	ProjectRoot     string             `json:"project_root"`
@@ -119,6 +125,10 @@ func (e *Engine) RunAutoTest(ctx context.Context, runID string, opts AutoTestOpt
 		return AutoTestReport{}, err
 	}
 	root := fctx.Project.RootPath
+	candidate, err := e.currentQACandidate(run)
+	if err != nil {
+		return AutoTestReport{}, err
+	}
 	pkg := e.packageFiles(fctx)
 	if !pkg.Tests.Present {
 		return AutoTestReport{}, core.NewError(core.ReasonAutoTestTestsDocMissing,
@@ -144,7 +154,13 @@ func (e *Engine) RunAutoTest(ctx context.Context, runID string, opts AutoTestOpt
 	// order): blocked rows hold their slot via their row index.
 	var jobs []job
 	blockedAt := map[int]AutoTestTCResult{}
+	seenTC := map[string]bool{}
 	for i, row := range rows {
+		key := sanitizeTCDir(row.TC)
+		if seenTC[key] || key == "." || key == ".." {
+			return AutoTestReport{}, qaError(core.ReasonQAExecutionResultInvalid, "duplicate or invalid TC directory identity: "+row.TC)
+		}
+		seenTC[key] = true
 		cmd := strings.Trim(strings.TrimSpace(row.Command), "`")
 		switch {
 		case strings.Contains(row.Command, "BLOCKED:"):
@@ -170,13 +186,32 @@ func (e *Engine) RunAutoTest(ctx context.Context, runID string, opts AutoTestOpt
 	}
 
 	report := AutoTestReport{
-		RunID: run.ID, FeatureSlug: slug, ProjectRoot: root,
+		CandidateHash: candidate.Hash,
+		RunID:         run.ID, FeatureSlug: slug, ProjectRoot: root,
 		StartedAt: time.Now().UTC().Format(time.RFC3339), FallbackCommand: fallback,
 	}
-	baseDir := filepath.Join(root, ".beacon", "autotest", run.ID)
+	parentDir := filepath.Join(root, ".beacon", "autotest", run.ID)
+	if err := os.MkdirAll(parentDir, 0o755); err != nil {
+		return report, err
+	}
+	baseDir, err := os.MkdirTemp(parentDir, "invocation-")
+	if err != nil {
+		return report, err
+	}
+	if err := e.appendEvent(run, EventAutoTestExecuted, map[string]any{"candidate_hash": candidate.Hash, "report_path": filepath.Join(baseDir, "report.json"), "outcome": "started"}); err != nil {
+		return report, err
+	}
 	executedAt := map[int]AutoTestTCResult{}
 	for _, j := range jobs {
-		res := e.executeOneTC(ctx, run.ID, root, baseDir, j.row, j.command, opts)
+		if c, err := e.currentQACandidate(run); err != nil || c.Hash != candidate.Hash {
+			return report, qaError("qa_candidate_stale", "candidate changed before TC execution")
+		}
+		res := e.executeOneTC(ctx, run.ID, root, baseDir, j.row, j.command, candidate.Hash, opts)
+		if c, err := e.currentQACandidate(run); err != nil || c.Hash != candidate.Hash {
+			res.Status = AutoTestFailed
+			res.ReasonCode = "qa_candidate_stale"
+			res.Detail = "candidate changed during TC execution"
+		}
 		if res.Status == AutoTestPassed {
 			report.Passed++
 		} else {
@@ -196,6 +231,32 @@ func (e *Engine) RunAutoTest(ctx context.Context, runID string, opts AutoTestOpt
 	report.Results = results
 	report.Total = len(results)
 	report.FinishedAt = time.Now().UTC().Format(time.RFC3339)
+	// Recheck candidate, source, contract and artifacts after all processes exit.
+	current, freshErr := e.currentQACandidate(run)
+	if freshErr != nil || current.Hash != candidate.Hash {
+		report.Failed++
+		report.Passed = 0
+	}
+	if err := filepath.WalkDir(baseDir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.IsDir() {
+			h, err := qaHash(path)
+			if err != nil {
+				return err
+			}
+			report.RawFiles = append(report.RawFiles, qaFile{path, h})
+			if filepath.Base(path) == "result.json" {
+				return nil
+			}
+			_, err = e.RegisterArtifact(run.ID, "log", path, opts.By)
+			return err
+		}
+		return nil
+	}); err != nil {
+		return report, err
+	}
 
 	// Aggregate report: the path is fixed BEFORE marshaling so the
 	// bytes on disk are final at registration time — the artifact
@@ -203,18 +264,21 @@ func (e *Engine) RunAutoTest(ctx context.Context, runID string, opts AutoTestOpt
 	// rewrite would make the gate judge the evidence stale. The
 	// registration id itself lives only in the returned report and
 	// the registry, never inside the registered file.
-	report.ReportPath = filepath.ToSlash(filepath.Join(".beacon", "autotest", run.ID, "report.json"))
-	if err := os.MkdirAll(baseDir, 0o755); err == nil {
-		raw, merr := json.MarshalIndent(report, "", "  ")
-		if merr == nil {
-			reportAbs := filepath.Join(baseDir, "report.json")
-			if werr := os.WriteFile(reportAbs, raw, 0o644); werr == nil {
-				if reg, rerr := e.RegisterArtifact(run.ID, "test_results", reportAbs, opts.By); rerr == nil {
-					report.ReportArtifact = reg.Artifact.ID
-				}
-			}
-		}
+	rel, _ := filepath.Rel(root, filepath.Join(baseDir, "report.json"))
+	report.ReportPath = filepath.ToSlash(rel)
+	raw, merr := json.MarshalIndent(report, "", "  ")
+	if merr != nil {
+		return report, merr
 	}
+	reportAbs := filepath.Join(baseDir, "report.json")
+	if err := os.WriteFile(reportAbs, raw, 0o644); err != nil {
+		return report, err
+	}
+	reg, rerr := e.RegisterArtifact(run.ID, "test_results", reportAbs, opts.By)
+	if rerr != nil {
+		return report, rerr
+	}
+	report.ReportArtifact = reg.Artifact.ID
 	// AC-002: the aggregate audit event and the qa stage evidence land
 	// as ONE transaction. A suite that ran real TCs and passed every one
 	// of them is a real qa stage execution, so it leaves the same
@@ -224,11 +288,16 @@ func (e *Engine) RunAutoTest(ctx context.Context, runID string, opts AutoTestOpt
 	// with failures, blocked TCs or no executable TC writes no passed
 	// evidence — the qa gate must stay closed.
 	allPassed := report.Total > 0 && report.Failed == 0 && report.Blocked == 0
+	reportHash, hashErr := qaHash(filepath.Join(baseDir, "report.json"))
+	if hashErr != nil {
+		return report, hashErr
+	}
 	if err := e.store.WithTx(func(tx *store.Tx) error {
 		if err := e.appendEventOn(tx, run, EventAutoTestExecuted, map[string]any{
 			"total": report.Total, "passed": report.Passed,
 			"failed": report.Failed, "blocked": report.Blocked,
 			"by": opts.By, "report_path": report.ReportPath,
+			"candidate_hash": candidate.Hash, "report_hash": reportHash,
 		}); err != nil {
 			return err
 		}
@@ -254,9 +323,14 @@ func (e *Engine) RunAutoTest(ctx context.Context, runID string, opts AutoTestOpt
 // executeOneTC runs one TC command and lands its evidence files +
 // artifact registration. It never returns an error: every outcome
 // is a result row (the aggregate decides).
-func (e *Engine) executeOneTC(ctx context.Context, runID, root, baseDir string, row gate.TCRow, command string, opts AutoTestOptions) AutoTestTCResult {
-	res := AutoTestTCResult{TC: row.TC, AC: row.AC, Command: command, ExitCode: -1}
+func (e *Engine) executeOneTC(ctx context.Context, runID, root, baseDir string, row gate.TCRow, command, candidateHash string, opts AutoTestOptions) AutoTestTCResult {
+	res := AutoTestTCResult{TC: row.TC, AC: row.AC, Command: command, ExitCode: -1, CandidateHash: candidateHash}
 	tcDir := filepath.Join(baseDir, sanitizeTCDir(row.TC))
+	if err := os.MkdirAll(tcDir, 0o755); err != nil {
+		res.Status = AutoTestFailed
+		res.Detail = err.Error()
+		return res
+	}
 	argv, err := SplitCommandWords(command)
 	if err != nil {
 		res.Status = AutoTestBlocked
@@ -276,10 +350,16 @@ func (e *Engine) executeOneTC(ctx context.Context, runID, root, baseDir string, 
 		e.writeTCResult(root, tcDir, &res, "", "")
 		return res
 	}
+	if filepath.Base(argv[0]) == "go" && len(argv) > 1 && argv[1] == "test" {
+		argv = append(append([]string{}, argv[:2]...), append([]string{"-count=1"}, argv[2:]...)...)
+	}
 	// A project-relative shell script TC runs through its interpreter
 	// with the path resolved against the project root; everything else
 	// keeps the plain argv/exec.LookPath path.
 	argv, rerr := resolveShellTC(root, argv)
+	if rerr == nil {
+		rerr = validateQATestPaths(root, argv)
+	}
 	if rerr != nil {
 		res.Status = AutoTestFailed
 		if rc, ok := core.ReasonCodeOf(rerr); ok {
@@ -292,17 +372,20 @@ func (e *Engine) executeOneTC(ctx context.Context, runID, root, baseDir string, 
 		return res
 	}
 	junitPath := filepath.Join(tcDir, "junit.xml")
+	customPath := filepath.Join(tcDir, "custom_result.json")
+	// Fresh invocation: never let a stale junit/custom file from an
+	// earlier run satisfy the machine adapter.
 	env := harness.IterationEnv(harness.IterationRequest{RunID: runID, Stage: "qa"})
 	env = append(env,
 		"BEACON_TC_ID="+row.TC, "BEACON_AC_ID="+row.AC,
 		"BEACON_PROJECT_ROOT="+root, "BEACON_JUNIT_PATH="+junitPath,
+		"BEACON_TEST_RESULT_PATH="+customPath, "BEACON_QA_CANDIDATE_HASH="+candidateHash,
 		"BEACON_TC_DIR="+tcDir,
 	)
 	out := harness.RunCommand(ctx, argv, root, env, opts.Timeout)
 	res.ExitCode = out.ExitCode
 	res.TimedOut = out.TimedOut
 	res.DurationMS = out.Duration.Milliseconds()
-	res.AssertionCount = junitAssertionCount(junitPath)
 	switch {
 	case out.Err != nil:
 		res.Status = AutoTestFailed
@@ -321,7 +404,29 @@ func (e *Engine) executeOneTC(ctx context.Context, runID, root, baseDir string, 
 		res.ReasonCode = core.ReasonAutoTestLayerFailed
 		res.Detail = "command exited non-zero"
 	default:
-		res.Status = AutoTestPassed
+		execRes, xerr := evaluateQAExecution(QAExecutionInput{
+			RunID: runID, TC: row.TC, CandidateHash: candidateHash,
+			Stdout: out.Stdout, Stderr: out.Stderr,
+			JUnitPath: junitPath, CustomPath: customPath,
+			Required: row.RequiredTests,
+		})
+		if xerr != nil {
+			res.Status = AutoTestFailed
+			if rc, ok := core.ReasonCodeOf(xerr); ok {
+				res.ReasonCode = rc
+			} else {
+				res.ReasonCode = core.ReasonQAExecutionResultInvalid
+			}
+			res.Detail = xerr.Error()
+		} else {
+			res.Status = AutoTestPassed
+			count := execRes.TestCount
+			res.TestCount = &count
+			res.ExecutionAdapter = execRes.Adapter
+			res.Cases = execRes.Cases
+			res.CandidateHash = candidateHash
+			res.Detail = qaExecutionDetail(execRes)
+		}
 	}
 	e.writeTCResult(root, tcDir, &res, out.Stdout, out.Stderr)
 	// Register the result file as qa-consumable evidence. The file
@@ -330,15 +435,43 @@ func (e *Engine) executeOneTC(ctx context.Context, runID, root, baseDir string, 
 	// hashes content, so a rewrite would read as stale evidence to
 	// the gate. The artifact id therefore lives only on this
 	// in-memory row (and in the aggregate report), not in the file.
-	// A failed registration does not rewrite the execution outcome;
-	// it is recorded on the row instead.
+	// Registration failure makes the aggregate fail without rewriting raw output.
 	resultAbs := filepath.Join(tcDir, "result.json")
 	if reg, rerr := e.RegisterArtifact(runID, "test_result", resultAbs, opts.By); rerr == nil {
 		res.ArtifactID = reg.Artifact.ID
 	} else {
+		res.Status = AutoTestFailed
+		res.ReasonCode = "qa_evidence_unregistered"
 		res.Detail = strings.TrimSpace(res.Detail + " artifact registration failed: " + rerr.Error())
 	}
 	return res
+}
+
+func validateQATestPaths(root string, argv []string) error {
+	// The command is trusted local code, not a sandbox. Refuse explicit
+	// script/source paths outside that trusted project, including symlinks.
+	for i, arg := range argv {
+		if strings.HasPrefix(arg, "-") {
+			continue
+		}
+		ext := filepath.Ext(arg)
+		source := ext == ".py" || ext == ".sh" || ext == ".zsh" || ext == ".go" || ext == ".js" || ext == ".ts" || ext == ".rb"
+		if !source {
+			continue
+		}
+		if i == 0 && (arg == "/bin/sh" || arg == "/bin/zsh") {
+			continue
+		}
+		path := resolvePkgPath(root, arg)
+		real, err := filepath.EvalSymlinks(path)
+		if err != nil {
+			return qaError("qa_execution_source_invalid", err.Error())
+		}
+		if !withinRoot(root, real) {
+			return qaError("qa_execution_source_invalid", "test source escapes trusted project: "+arg)
+		}
+	}
+	return nil
 }
 
 // writeTCResult persists one TC's stdout/stderr/result.json under
@@ -378,38 +511,4 @@ func sanitizeTCDir(tc string) string {
 		}
 	}
 	return b.String()
-}
-
-// junitAssertionCount reads the tests= total from a junit XML file
-// (the Python chain counts assertions from junit first). nil when
-// no readable junit exists — the count is reported, never invented.
-func junitAssertionCount(path string) *int {
-	raw, err := os.ReadFile(path)
-	if err != nil {
-		return nil
-	}
-	var doc struct {
-		XMLName xml.Name `xml:"testsuites"`
-		Tests   *int     `xml:"tests,attr"`
-		Suites  []struct {
-			Tests *int `xml:"tests,attr"`
-		} `xml:"testsuite"`
-	}
-	if err := xml.Unmarshal(raw, &doc); err != nil {
-		return nil
-	}
-	if doc.Tests != nil {
-		return doc.Tests
-	}
-	total, found := 0, false
-	for _, s := range doc.Suites {
-		if s.Tests != nil {
-			total += *s.Tests
-			found = true
-		}
-	}
-	if found {
-		return &total
-	}
-	return nil
 }

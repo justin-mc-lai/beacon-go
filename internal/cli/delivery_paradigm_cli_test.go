@@ -177,6 +177,7 @@ func TestGoalReceiveResultExternalWithoutDelegation(t *testing.T) {
 	}
 	id := runIDOf(t, out)
 	art := filepath.Join(t.TempDir(), "lake-result.md")
+	prepareCLIProductQA(t, root, "feat-gate", id, "independent-verifier")
 	if err := os.WriteFile(art, []byte("# result\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -212,6 +213,7 @@ func TestGoalConformanceAllPassAndFailure(t *testing.T) {
 			t.Fatalf("tick %d: %v\n%s", i, err, out)
 		}
 	}
+	productReport := prepareCLIProductQA(t, root, "feat-gate", id, "independent-verifier")
 	qaArt := filepath.Join(t.TempDir(), "qa-report.md")
 	if err := os.WriteFile(qaArt, []byte("# qa\npass\n"), 0o644); err != nil {
 		t.Fatal(err)
@@ -228,7 +230,7 @@ func TestGoalConformanceAllPassAndFailure(t *testing.T) {
 		t.Fatal(err)
 	}
 	if out, err = runCLI(t, "goal", "attach-verifier", "--run-id", id,
-		"--ref", verRef, "--source", "independent-verifier", "--executor-id", "maker"); err != nil {
+		"--ref", productReport, "--source", "independent-verifier", "--executor-id", "maker"); err != nil {
 		t.Fatalf("attach verifier: %v\n%s", err, out)
 	}
 	if out, err = runCLI(t, "goal", "complete", "--run-id", id,

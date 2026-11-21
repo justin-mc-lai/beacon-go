@@ -54,7 +54,6 @@ func TestReleaseShadowNotConfiguredOnHumanPolicy(t *testing.T) {
 func TestReleaseShadowRecordsVerdictButKeepsHumanGate(t *testing.T) {
 	env := newTestEnv(t, "active")
 	env.seedTruthFrozen(t)
-	env.seedQAPass(t)
 	if _, err := env.st.Gates().Record(store.GateResult{FeatureID: env.feature.ID, GateType: "implement", Verdict: "pass"}); err != nil {
 		t.Fatal(err)
 	}
@@ -65,6 +64,7 @@ func TestReleaseShadowRecordsVerdictButKeepsHumanGate(t *testing.T) {
 		t.Fatal(err)
 	}
 	ctx := context.Background()
+	env.seedQAPass(t)
 	for i := 0; i < 4; i++ {
 		v, err := env.eng.Tick(ctx, run.RunID)
 		if err != nil {
@@ -103,7 +103,6 @@ func TestReleaseShadowRecordsVerdictButKeepsHumanGate(t *testing.T) {
 func TestReleaseShadowRecomputesFreshness(t *testing.T) {
 	env := newTestEnv(t, "active")
 	env.seedTruthFrozen(t)
-	env.seedQAPass(t)
 	if _, err := env.st.Gates().Record(store.GateResult{FeatureID: env.feature.ID, GateType: "implement", Verdict: "pass"}); err != nil {
 		t.Fatal(err)
 	}
@@ -114,6 +113,7 @@ func TestReleaseShadowRecomputesFreshness(t *testing.T) {
 		t.Fatal(err)
 	}
 	ctx := context.Background()
+	env.seedQAPass(t)
 	for i := 0; i < 4; i++ {
 		if v, err := env.eng.Tick(ctx, run.RunID); err != nil || v.Blocked {
 			t.Fatalf("tick %d: %+v %v", i, v, err)

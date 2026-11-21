@@ -97,6 +97,8 @@ type ExitInput struct {
 	// ArtifactCount is the number of artifact pointers across the
 	// feature's runs (QA evidence presence signal).
 	ArtifactCount int
+	QAEligible    bool
+	QAReason      string
 	// DesignEvidence: lifecycle at Prototype/Completed or design gate pass.
 	DesignEvidence bool
 	// DesignEvidenceFormal: a formal design gate pass is (part of)
@@ -273,26 +275,20 @@ func EvaluateStageExit(in ExitInput) ExitVerdict {
 		}
 		return passVerdict()
 	case StageQA:
-		// FORMAL-FIRST (P3a): a recorded qa verdict decides — pass
-		// opens the exit, blocked/fail closes it with the formal
-		// reason codes, regardless of raw artifact counts. Only
-		// when no qa evaluation exists does the derived judgement
-		// (artifact presence) run, marked Derived.
-		if g, ok := gateFactOf(in, "qa"); ok {
-			if g.Verdict == "pass" {
+		// A run-bound formal pass and the same live evidence are both
+		// required. Artifact presence is never a fallback permission.
+		if g, ok := in.LatestGates["qa"]; ok {
+			if g.Verdict == "pass" && in.QAEligible {
 				v := passVerdict()
 				v.Derived, v.FormalVerdict = false, g.Verdict
 				v.FormalSource = g.Source
 				return v
 			}
-			v := blockedVerdict(firstCode(g.ReasonCodes, ReasonStageExitQAEvidence),
+			v := blockedVerdict(firstCode([]string{in.QAReason}, firstCode(g.ReasonCodes, ReasonStageExitQAEvidence)),
 				core.ResumeLoadNextSkill, "beacon-qa")
 			v.Derived, v.FormalVerdict = false, g.Verdict
 			v.FormalSource = g.Source
 			return v
-		}
-		if in.ArtifactCount > 0 {
-			return passVerdict()
 		}
 		return blockedVerdict(ReasonStageExitQAEvidence, core.ResumeLoadNextSkill, "beacon-qa")
 	case StageRelease:
@@ -382,6 +378,13 @@ func (e *Engine) buildExitInput(run store.Run, m *runMeta) (ExitInput, error) {
 		return in, err
 	}
 	in.ArtifactCount = len(arts)
+	if in.Stage == StageQA {
+		if err := e.requireCurrentFormalQA(run, m); err != nil {
+			in.QAReason, _ = core.ReasonCodeOf(err)
+		} else {
+			in.QAEligible = true
+		}
+	}
 	return in, nil
 }
 

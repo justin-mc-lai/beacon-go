@@ -48,6 +48,7 @@ func deliverParadigmRun(t *testing.T, env gateTestEnv) string {
 	}
 	step(StageImplement)
 	step(StageQA)
+	productReport := prepareProductQA(t, env.testEnv, run.RunID, "independent-verifier")
 	qaArtifact := filepath.Join(t.TempDir(), "qa-report.md")
 	if err := os.WriteFile(qaArtifact, []byte("# qa report\npass\n"), 0o644); err != nil {
 		t.Fatal(err)
@@ -60,7 +61,7 @@ func deliverParadigmRun(t *testing.T, env gateTestEnv) string {
 	if err := os.WriteFile(verifier, []byte("# verification\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.eng.AttachVerifier(run.RunID, []string{verifier}, "independent-verifier", ""); err != nil {
+	if _, err := env.eng.AttachVerifier(run.RunID, []string{productReport}, "independent-verifier", ""); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := env.eng.Complete(run.RunID, CompleteOptions{HumanConfirmed: true, ConfirmedBy: "owner"}); err != nil {
@@ -93,11 +94,12 @@ func TestConformanceRejectsUnevaluatedExternalResult(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	productReport := prepareProductQA(t, env.testEnv, run.RunID, "independent-verifier")
 	verifier := filepath.Join(t.TempDir(), "verifier.md")
 	if err := os.WriteFile(verifier, []byte("# verification\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.eng.AttachVerifier(run.RunID, []string{verifier}, "independent-verifier", ""); err != nil {
+	if _, err := env.eng.AttachVerifier(run.RunID, []string{productReport}, "independent-verifier", ""); err != nil {
 		t.Fatal(err)
 	}
 	artifact := filepath.Join(t.TempDir(), "lake-report.md")
@@ -298,6 +300,7 @@ func TestGateFactsAreRunScoped(t *testing.T) {
 	}
 	// A leaves QA using its own artifact, recording a feature-level qa
 	// pass that a sibling must not inherit.
+	prepareProductQA(t, env.testEnv, a.RunID, "qa-a")
 	if v, err := env.eng.Tick(ctx, a.RunID); err != nil || v.CurrentStage != StageRelease {
 		t.Fatalf("run A release tick = %+v err=%v", v, err)
 	}

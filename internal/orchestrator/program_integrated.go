@@ -322,20 +322,17 @@ func (e *Engine) ProgramIntegratedHandoff(ctx context.Context, hostRunID, lake, 
 		return ProgramHandoff{}, core.NewError(core.ReasonProgramHandoffInvalid, "program.integrated.Handoff",
 			"lake "+lake+" has no bound run to hand off")
 	}
-	feat, err := e.lakeFeature(run, lake)
+	_, err = e.lakeFeature(run, lake)
 	if err != nil {
 		return ProgramHandoff{}, core.NewError(core.ReasonProgramLakeFeatureMiss, "program.integrated.Handoff",
 			"no feature package "+lake+" in the host run's project version")
 	}
-	// Independent QA must have passed on the lake's feature and the
-	// lake run must carry a verifier (QA evidence), not the maker's
-	// own word.
-	if g, gerr := e.store.Gates().Latest(feat.ID, "qa"); gerr != nil || g.Verdict != "pass" {
-		return ProgramHandoff{}, core.NewError(core.ReasonProgramHandoffInvalid, "program.integrated.Handoff",
-			"lake "+lake+" has no passing independent qa gate")
-	}
+	// Use the lake run's live candidate, never a sibling feature gate.
 	lrun, lm, _, err := e.loadRun(pl.RunID)
 	if err != nil {
+		return ProgramHandoff{}, err
+	}
+	if err := e.requireCurrentFormalQA(lrun, lm); err != nil {
 		return ProgramHandoff{}, err
 	}
 	if lm.Verifier == nil || !lm.Verifier.Present || len(lm.Verifier.Refs) == 0 {

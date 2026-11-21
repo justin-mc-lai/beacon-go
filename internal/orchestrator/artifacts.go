@@ -122,12 +122,45 @@ func (e *Engine) RegisterArtifact(runID, kind, path, by string) (ArtifactRegistr
 	if err != nil {
 		return ArtifactRegistration{}, err
 	}
+	kind = strings.ToLower(strings.TrimSpace(kind))
+	path, err = filepath.Abs(path)
+	if err != nil {
+		return ArtifactRegistration{}, err
+	}
+	if kind == "qa_candidate" {
+		if _, err := e.validateQACandidate(run, path, by); err != nil {
+			return ArtifactRegistration{}, err
+		}
+	}
 	res, payload, err := e.registerArtifactScoped(run.ID, kind, path, by)
 	if err != nil {
 		return ArtifactRegistration{}, err
 	}
-	if res.AlreadyRegistered {
+	if res.AlreadyRegistered && kind != "qa_candidate" && kind != "qa_report" {
 		return res, nil
+	}
+	if payload == nil {
+		payload = map[string]any{"kind": kind, "abs_path": path, "content_hash": res.Artifact.ContentHash, "artifact_id": res.Artifact.ID, "registered_by": by}
+	}
+	if kind == "qa_report" {
+		// Attribute even malformed reviews to the revision being reviewed.
+		// An invalid latest review must not expose an older PASS.
+		if c, err := e.currentQACandidate(run); err == nil {
+			payload["candidate_hash"] = c.Hash
+		}
+		var r qaProductReview
+		_ = qaRead(path, &r)
+		fc, ferr := e.featureContext(run.FeatureID)
+		if ferr == nil {
+			var files []qaFile
+			for _, ref := range r.EvidenceRefs {
+				abs := resolvePkgPath(fc.Project.RootPath, ref)
+				if a, err := e.qaRegisteredFile(run.ID, abs); err == nil {
+					files = append(files, qaFile{abs, a.ContentHash})
+				}
+			}
+			payload["evidence_files"] = files
+		}
 	}
 	if err := e.appendEvent(run, EventArtifactRegistered, payload); err != nil {
 		return ArtifactRegistration{}, err

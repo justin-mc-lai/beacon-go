@@ -187,6 +187,7 @@ func TestRegisterArtifactQAGateFlow(t *testing.T) {
 	if _, err := env.eng.RegisterArtifact(run.RunID, "qa_report", blob, "e2e-maker"); err != nil {
 		t.Fatal(err)
 	}
+	productReport := prepareProductQA(t, env.testEnv, run.RunID, "qa-bot")
 	ev, err = env.eng.EvaluateGate(env.ctx, "qa", "", "qa-bot")
 	if err != nil {
 		t.Fatal(err)
@@ -195,12 +196,12 @@ func TestRegisterArtifactQAGateFlow(t *testing.T) {
 		t.Fatalf("registered evidence must pass, got %+v", ev)
 	}
 	// Tamper after registration: staleness is the defence line.
-	writeBlob(t, blob, "tampered")
+	writeBlob(t, productReport, "tampered")
 	ev, err = env.eng.EvaluateGate(env.ctx, "qa", "", "qa-bot")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ev.Verdict != gate.VerdictBlocked || len(ev.ReasonCodes) == 0 || ev.ReasonCodes[0] != core.ReasonQAArtifactStale {
+	if ev.Verdict != gate.VerdictBlocked || len(ev.ReasonCodes) == 0 || ev.ReasonCodes[0] != "qa_product_review_invalid" {
 		t.Fatalf("tampered artifact must block as stale, got %+v", ev)
 	}
 }

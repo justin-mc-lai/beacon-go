@@ -82,7 +82,7 @@ func TestRunAutoTestExecutesProjectShellTC(t *testing.T) {
 	env := newTestEnv(t, "active")
 	run := env.createRun(t)
 	script := filepath.Join(env.root, "scripts", "ok_shell.sh")
-	writeTestScript(t, script, "#!/bin/sh\necho hello-from-shell\n")
+	writeTestScript(t, script, "#!/bin/sh\necho hello-from-shell\npython3 qa-case.py\n")
 	doc := "| AC ID | TC ID | Layer | Command | Assertion |\n|---|---|---|---|---|\n" +
 		"| AC-001 | TC-001 | behavior | `scripts/ok_shell.sh` | prints hello |\n"
 	if err := os.MkdirAll(env.root, 0o755); err != nil {
@@ -91,6 +91,7 @@ func TestRunAutoTestExecutesProjectShellTC(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(env.root, "tests.md"), []byte(doc), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	prepareQACandidate(t, env, run.RunID)
 	report, err := env.eng.RunAutoTest(context.Background(), run.RunID, AutoTestOptions{By: "qa-bot"})
 	if err != nil {
 		t.Fatalf("run: %v", err)
@@ -102,7 +103,7 @@ func TestRunAutoTestExecutesProjectShellTC(t *testing.T) {
 	if res.Status != AutoTestPassed || res.ExitCode != 0 {
 		t.Fatalf("result = %+v, want passed/0", res)
 	}
-	out, err := os.ReadFile(filepath.Join(env.root, ".beacon", "autotest", run.RunID, "TC-001", "stdout.log"))
+	out, err := os.ReadFile(filepath.Join(env.root, filepath.Dir(report.Results[0].ResultPath), "stdout.log"))
 	if err != nil {
 		t.Fatalf("stdout evidence: %v", err)
 	}

@@ -84,6 +84,7 @@ func TestKernelRecoveryNegativeGuards(t *testing.T) {
 	t.Run("real stage_executed still counts", func(t *testing.T) {
 		env := newGateEnv(t, frozenTruthDoc)
 		run := env.createRun(t)
+		prepareProductQA(t, env.testEnv, run.RunID, "qa-bot")
 		if _, err := env.st.AppendEvent(store.LifecycleEvent{
 			FeatureID: env.feature.ID, RunID: nullRunID(run.RunID),
 			EventType: "stage_executed",
@@ -95,7 +96,7 @@ func TestKernelRecoveryNegativeGuards(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if c := qaCheck(ev, "qa_stage_executed"); !c.OK {
+		if c := qaCheck(ev, "current_product_qa"); !c.OK {
 			t.Fatalf("a real stage_executed must count: %+v", c)
 		}
 	})
@@ -124,7 +125,7 @@ func TestKernelRecoveryContractStable(t *testing.T) {
 
 	// A run formal qa pass opens the exit even with zero derived evidence.
 	pass := EvaluateStageExit(ExitInput{
-		Stage: StageQA, HasFeature: true,
+		Stage: StageQA, HasFeature: true, QAEligible: true,
 		LatestGates: map[string]GateFact{"qa": {Verdict: "pass", Source: "run_formal_gate"}},
 	})
 	if !pass.Allowed || pass.Derived || pass.FormalVerdict != "pass" || pass.FormalSource != "run_formal_gate" {
@@ -144,7 +145,7 @@ func TestKernelRecoveryContractStable(t *testing.T) {
 
 	// No verdict at all: the derived artifact judgement is the fallback.
 	derived := EvaluateStageExit(ExitInput{Stage: StageQA, HasFeature: true, ArtifactCount: 1})
-	if !derived.Allowed || !derived.Derived {
+	if derived.Allowed || !derived.Derived {
 		t.Fatalf("the derived judgement must only run without a verdict: %+v", derived)
 	}
 

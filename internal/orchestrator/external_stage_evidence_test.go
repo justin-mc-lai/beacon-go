@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"beacon-go/internal/core"
 	"beacon-go/internal/gate"
 	"beacon-go/internal/store"
 )
@@ -172,8 +171,8 @@ func TestQAGateRejectsRecordingExecutorStageEvent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	c := qaCheck(ev, "qa_stage_executed")
-	if c.OK || c.ReasonCode != core.ReasonQAStageNotExecuted {
+	c := qaCheck(ev, "current_product_qa")
+	if c.OK || c.ReasonCode != "qa_candidate_missing" {
 		t.Fatalf("recording-only qa event must not count: %+v", c)
 	}
 	if ev.Verdict != gate.VerdictBlocked {
@@ -202,11 +201,12 @@ func TestQAGateRejectsRecordingExecutorStageEvent(t *testing.T) {
 func TestQAGateAcceptsRealExternalStageEvent(t *testing.T) {
 	env := newGateEnv(t, frozenTruthDoc)
 	run := env.createRun(t)
+	prepareProductQA(t, env.testEnv, run.RunID, "qa-bot")
 	blob := filepath.Join(env.root, "qa-report.md")
 	if err := os.WriteFile(blob, []byte("# qa report\npass\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.eng.RegisterArtifact(run.RunID, "qa_report", blob, "qa-bot"); err != nil {
+	if _, err := env.eng.RegisterArtifact(run.RunID, "qa_attachment", blob, "qa-bot"); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := env.st.AppendEvent(store.LifecycleEvent{
@@ -220,7 +220,7 @@ func TestQAGateAcceptsRealExternalStageEvent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if c := qaCheck(ev, "qa_stage_executed"); !c.OK {
+	if c := qaCheck(ev, "current_product_qa"); !c.OK {
 		t.Fatalf("real external qa event must count: %+v", c)
 	}
 	if ev.Verdict != gate.VerdictPass {
@@ -233,13 +233,14 @@ func TestQAGateAcceptsRealExternalStageEvent(t *testing.T) {
 func TestExternalReceiveResultIsQAStageEvidence(t *testing.T) {
 	env := newGateEnv(t, frozenTruthDoc)
 	run := createExternalRun(t, env.testEnv, ExecutorModeExternal)
+	productReport := prepareProductQA(t, env.testEnv, run.RunID, "qa-bot")
 	blob := filepath.Join(env.root, "qa-report.md")
 	if err := os.WriteFile(blob, []byte("# qa report\npass\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := env.eng.ReceiveExternalResult(run.RunID, ExternalResultInput{
 		By: "room-actor", Summary: "lake finished",
-		Artifacts: []ArtifactInput{{Kind: "qa_report", AbsPath: blob}},
+		Artifacts: []ArtifactInput{{Kind: "evidence", AbsPath: productReport}},
 	}); err != nil {
 		t.Fatalf("ReceiveExternalResult: %v", err)
 	}
@@ -247,7 +248,7 @@ func TestExternalReceiveResultIsQAStageEvidence(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if c := qaCheck(ev, "qa_stage_executed"); !c.OK {
+	if c := qaCheck(ev, "current_product_qa"); !c.OK {
 		t.Fatalf("external completion + live QA artifact must count: %+v", c)
 	}
 	if ev.Verdict != gate.VerdictPass {
@@ -268,8 +269,8 @@ func TestExternalEvidenceRequiresRegisteredHashVerifiedQAArtifacts(t *testing.T)
 		if _, err := env.eng.ReceiveExternalResult(run.RunID, ExternalResultInput{
 			By: "room-actor", Summary: "lake finished",
 			Artifacts: []ArtifactInput{{Kind: "evidence", AbsPath: blob}},
-		}); err != nil {
-			t.Fatal(err)
+		}); err == nil {
+			t.Fatal("whole-lake completion without product QA must reject")
 		}
 		ev, err := env.eng.EvaluateGate(env.ctx, "qa", "", "qa-bot")
 		if err != nil {
@@ -286,17 +287,18 @@ func TestExternalEvidenceRequiresRegisteredHashVerifiedQAArtifacts(t *testing.T)
 	t.Run("hash mismatch", func(t *testing.T) {
 		env := newGateEnv(t, frozenTruthDoc)
 		run := createExternalRun(t, env.testEnv, ExecutorModeExternal)
+		productReport := prepareProductQA(t, env.testEnv, run.RunID, "qa-bot")
 		blob := filepath.Join(env.root, "qa-report.md")
 		if err := os.WriteFile(blob, []byte("# qa report\npass\n"), 0o644); err != nil {
 			t.Fatal(err)
 		}
 		if _, err := env.eng.ReceiveExternalResult(run.RunID, ExternalResultInput{
 			By: "room-actor", Summary: "lake finished",
-			Artifacts: []ArtifactInput{{Kind: "qa_report", AbsPath: blob}},
+			Artifacts: []ArtifactInput{{Kind: "evidence", AbsPath: productReport}},
 		}); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(blob, []byte("tampered"), 0o644); err != nil {
+		if err := os.WriteFile(productReport, []byte("tampered"), 0o644); err != nil {
 			t.Fatal(err)
 		}
 		ev, err := env.eng.EvaluateGate(env.ctx, "qa", "", "qa-bot")
@@ -343,6 +345,7 @@ func TestExternalEvidenceRequiresRegisteredHashVerifiedQAArtifacts(t *testing.T)
 func TestAttachVerifierDoesNotClearUnresolvedBlock(t *testing.T) {
 	env := newGateEnv(t, frozenTruthDoc)
 	run := env.createRun(t)
+	productReport := prepareProductQA(t, env.testEnv, run.RunID, "independent-verifier")
 	if _, err := env.eng.Block(run.RunID, "manual_block"); err != nil {
 		t.Fatal(err)
 	}
@@ -350,7 +353,7 @@ func TestAttachVerifierDoesNotClearUnresolvedBlock(t *testing.T) {
 	if err := os.WriteFile(verifier, []byte("# verification\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.eng.AttachVerifier(run.RunID, []string{verifier}, "independent-verifier", ""); err != nil {
+	if _, err := env.eng.AttachVerifier(run.RunID, []string{productReport}, "independent-verifier", ""); err != nil {
 		t.Fatalf("AttachVerifier: %v", err)
 	}
 	_, m, _, err := env.eng.loadRun(run.RunID)
@@ -364,8 +367,8 @@ func TestAttachVerifierDoesNotClearUnresolvedBlock(t *testing.T) {
 		t.Fatalf("blocked_streak = %d, want 1 (unchanged by attach-verifier)", m.BlockedStreak)
 	}
 	attached := payloadsOf(t, env.st, run.RunID, "verifier_attached")
-	if len(attached) != 1 {
-		t.Fatalf("verifier_attached events = %d, want 1", len(attached))
+	if len(attached) != 2 {
+		t.Fatalf("verifier_attached events = %d, want 2", len(attached))
 	}
 	if attached[0]["cleared_block"] != false {
 		t.Fatalf("verifier_attached cleared_block = %v, want false", attached[0]["cleared_block"])

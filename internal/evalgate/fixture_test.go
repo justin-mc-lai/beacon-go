@@ -2,10 +2,14 @@ package evalgate
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"beacon-go/internal/gate"
 	"beacon-go/internal/orchestrator"
 	"beacon-go/internal/store"
 )
@@ -219,6 +223,49 @@ func (f *fixture) deliver() {
 	step(orchestrator.StageTruth)
 	step(orchestrator.StageImplement)
 	step(orchestrator.StageQA)
+	// Real runner + candidate + independent product report replace artifact-only QA.
+	f.write("qa-case.py", `import os,json,pathlib
+assert 2+2==4
+pathlib.Path(os.environ['BEACON_TEST_RESULT_PATH']).write_text(json.dumps({'schema':'beacon-test-execution.v1','run_id':os.environ['BEACON_RUN_ID'],'tc':os.environ['BEACON_TC_ID'],'candidate_hash':os.environ['BEACON_QA_CANDIDATE_HASH'],'cases':[{'name':'actual-case','status':'passed','assertions':1}]}))
+`)
+	f.write("source.py", "print('implementation')\n")
+	f.write("tests.md", "| AC ID | TC ID | Layer | Command | Assertion |\n|---|---|---|---|---|\n| AC-001 | TC-001 | behavior | python3 qa-case.py | actual assertion |\n")
+	hash := func(name string) string {
+		b, err := os.ReadFile(filepath.Join(f.root, name))
+		if err != nil {
+			f.t.Fatal(err)
+		}
+		return fmt.Sprintf("%x", sha256.Sum256(b))
+	}
+	manifest := map[string]any{"schema": "beacon-qa-candidate.v1", "run_id": run.RunID, "feature_slug": "feat-a", "truth_sha256": hash("truth.md"), "tests_sha256": hash("tests.md"), "source_commit": "", "source_files": []any{map[string]string{"path": "source.py", "sha256": hash("source.py")}}, "maker": "maker", "build_command": "fixture snapshot", "artifacts": []any{map[string]string{"path": filepath.Join(f.root, "source.py"), "sha256": hash("source.py")}}}
+	b, _ := json.Marshal(manifest)
+	f.write("candidate.json", string(b))
+	if _, err := f.eng.RegisterArtifact(run.RunID, "qa_candidate", filepath.Join(f.root, "candidate.json"), "maker"); err != nil {
+		f.t.Fatal(err)
+	}
+	if _, err := f.eng.RunAutoTest(context.Background(), run.RunID, orchestrator.AutoTestOptions{By: "maker"}); err != nil {
+		f.t.Fatal(err)
+	}
+	f.write("observed.log", "independent assertion\n")
+	if _, err := f.eng.RegisterArtifact(run.RunID, "log", filepath.Join(f.root, "observed.log"), "independent-verifier"); err != nil {
+		f.t.Fatal(err)
+	}
+	var tcs []string
+	for _, r := range gate.ParseCoverageRows(string(mustReadFixture(f, "tests.md"))) {
+		tcs = append(tcs, r.TC)
+	}
+	b, _ = json.Marshal(map[string]any{"schema": "beacon-product-qa.v1", "run_id": run.RunID, "candidate_hash": hash("candidate.json"), "scope": "product", "verdict": "pass", "maker": "maker", "checker": "independent-verifier", "covered_tcs": tcs, "evidence_refs": []string{filepath.Join(f.root, "observed.log")}})
+	f.write("product-qa.json", string(b))
+	productReport := filepath.Join(f.root, "product-qa.json")
+	if _, err := f.eng.RegisterArtifact(run.RunID, "qa_report", productReport, "independent-verifier"); err != nil {
+		f.t.Fatal(err)
+	}
+	if _, err := f.eng.AttachVerifier(run.RunID, []string{productReport}, "independent-verifier", ""); err != nil {
+		f.t.Fatal(err)
+	}
+	if ev, err := f.eng.EvaluateGate(f.ctx, "qa", run.RunID, "independent-verifier"); err != nil || ev.Verdict != "pass" {
+		f.t.Fatalf("QA: %+v %v", ev, err)
+	}
 	qaArtifact := filepath.Join(f.t.TempDir(), "qa-report.md")
 	if err := os.WriteFile(qaArtifact, []byte("# qa report\npass\n"), 0o644); err != nil {
 		f.t.Fatal(err)
@@ -231,7 +278,7 @@ func (f *fixture) deliver() {
 	if err := os.WriteFile(verifier, []byte("# independent verification\n"), 0o644); err != nil {
 		f.t.Fatal(err)
 	}
-	if _, err := f.eng.AttachVerifier(run.RunID, []string{verifier}, "independent-verifier", ""); err != nil {
+	if _, err := f.eng.AttachVerifier(run.RunID, []string{productReport}, "independent-verifier", ""); err != nil {
 		f.t.Fatalf("attach verifier: %v", err)
 	}
 	if _, err := f.eng.Complete(run.RunID, orchestrator.CompleteOptions{HumanConfirmed: true, ConfirmedBy: "owner"}); err != nil {
@@ -247,6 +294,14 @@ func (f *fixture) deliver() {
 	if _, _, err := f.eng.ExportProjectState(f.root); err != nil {
 		f.t.Fatalf("export state: %v", err)
 	}
+}
+
+func mustReadFixture(f *fixture, name string) []byte {
+	b, err := os.ReadFile(filepath.Join(f.root, name))
+	if err != nil {
+		f.t.Fatal(err)
+	}
+	return b
 }
 
 // conformance reads the run's conformance view (no pass by default).

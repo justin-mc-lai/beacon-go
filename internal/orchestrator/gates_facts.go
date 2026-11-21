@@ -8,8 +8,6 @@ package orchestrator
 import (
 	"context"
 	"encoding/json"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"beacon-go/internal/core"
@@ -193,140 +191,17 @@ func qaKind(kind string) bool {
 	return false
 }
 
-// evalQA gathers the QA-evidence facts across the feature's runs.
+// evalQA evaluates only the feature's latest goal run.
 func (e *Engine) evalQA(ctx store.FeatureContext, evaluator string) (gate.Evaluation, error) {
-	f := gate.QAFacts{}
-	// qa-surface-e2e: the requirement truth names the surfaces the run
-	// must prove. A package without the key is legacy (strict=false).
-	decl := gate.ParseSurfaceDeclaration(readPkgFile(ctx.Project.RootPath, ctx.Feature.TruthPath).Text)
-	f.Surfaces = decl.Surfaces
-	f.SurfaceStrict = decl.EffectiveStrict()
-	f.SurfaceEvidence = map[string]map[string]bool{}
-	runs, err := e.store.Runs().ListByFeature(ctx.Feature.ID)
+	run, m, has, err := e.latestGoalRun(ctx, "")
 	if err != nil {
 		return gate.Evaluation{}, err
 	}
-	// AC-003/AC-004 (artifact-upsert): only the newest row per
-	// (run, path) is the live pointer. Legacy DBs may still hold
-	// several rows for one path — validating the older ones would
-	// read every re-registration as qa_artifact_stale forever. No
-	// migration is needed: ListByRun ascends by (created_at, rowid),
-	// so the last row seen for a key wins and the older rows simply
-	// never reach the staleness check.
-	latest := map[string]store.ArtifactRef{}
-	seen := map[string]bool{}
-	keys := []string{}
-	// externalCompleted remembers runs whose receive-result record says
-	// the lake finished in an external room (AC-003).
-	externalCompleted := map[string]bool{}
-	// liveQA remembers runs with at least one QA-kind artifact whose
-	// file still hashes to its registered content.
-	liveQA := map[string]bool{}
-	liveKinds := map[string]bool{}
-	for _, run := range runs {
-		arts, err := e.store.Artifacts().ListByRun(run.ID)
-		if err != nil {
-			return gate.Evaluation{}, err
-		}
-		// qa_autotest_recorded: a non-empty .beacon/autotest/<run-id>/
-		// directory, or a registered pointer inside it, is the run's
-		// autotest record. Checked per run so one run's evidence cannot
-		// silently vouch for another.
-		if !f.AutotestRecorded && autotestEvidence(ctx.Project.RootPath, run.ID, arts) {
-			f.AutotestRecorded = true
-			f.AutotestDetail = "autotest evidence recorded for run " + run.ID
-		}
-		for _, a := range arts {
-			if !qaKind(a.Kind) {
-				continue
-			}
-			key := run.ID + "\x00" + a.AbsPath
-			if !seen[key] {
-				seen[key] = true
-				keys = append(keys, key)
-			}
-			latest[key] = a
-		}
-		events, err := e.store.ListEventsByRun(run.ID)
-		if err != nil {
-			return gate.Evaluation{}, err
-		}
-		for _, ev := range events {
-			var p struct {
-				Stage       string `json:"stage"`
-				Outcome     string `json:"outcome"`
-				Source      string `json:"source"`
-				Placeholder *bool  `json:"placeholder"`
-				Recording   *bool  `json:"recording"`
-			}
-			if len(ev.Payload) > 0 {
-				_ = json.Unmarshal(ev.Payload, &p)
-			}
-			switch ev.EventType {
-			case "stage_executed":
-				// AC-002: only a real event counts. The recording marker
-				// must be present AND false; a missing marker is treated
-				// as recording state, and a true marker (placeholder or
-				// recording) is refused outright.
-				real := p.Placeholder != nil && !*p.Placeholder &&
-					(p.Recording == nil || !*p.Recording)
-				if real && p.Stage == StageQA && p.Outcome != "failed" {
-					f.QAStageExecuted = true
-				}
-			case "goal_completed":
-				// AC-003: the external completion record is the
-				// whole-lake path; the source field is required.
-				if p.Source == ExecutorModeExternal {
-					externalCompleted[run.ID] = true
-				}
-			}
-		}
+	if !has {
+		return e.qaEvaluation(evaluator, "", qaError("qa_candidate_missing", "no goal run")), nil
 	}
-	for _, key := range keys {
-		a := latest[key]
-		f.QAArtifactCount++
-		if stale, reason := store.ArtifactStaleness(a); stale {
-			f.StaleArtifacts = append(f.StaleArtifacts, gate.StaleRef{Kind: a.Kind, Path: a.AbsPath, Reason: reason})
-		} else {
-			liveQA[a.RunID] = true
-			liveKinds[a.Kind] = true
-		}
-	}
-	for _, surface := range f.Surfaces {
-		f.SurfaceEvidence[surface] = liveKinds
-	}
-	// AC-003: an external completion record plus at least one registered
-	// QA artifact whose hash still matches is equivalent to a real qa
-	// stage_executed event. It never substitutes for the per-stage path
-	// when that path exists; it is the whole-lake fallback.
-	if !f.QAStageExecuted {
-		for runID := range externalCompleted {
-			if liveQA[runID] {
-				f.QAStageExecuted = true
-				break
-			}
-		}
-	}
-	return gate.EvaluateQA(f, evaluator), nil
-}
-
-// autotestEvidence reports whether one run left auto-test evidence:
-// a non-empty .beacon/autotest/<run-id>/ directory, or a registered
-// artifact whose path lives under it. Directory listing is read-only
-// and never creates anything.
-func autotestEvidence(root, runID string, arts []store.ArtifactRef) bool {
-	dir := filepath.Join(root, ".beacon", "autotest", runID)
-	if entries, err := os.ReadDir(dir); err == nil && len(entries) > 0 {
-		return true
-	}
-	for _, a := range arts {
-		rel, err := filepath.Rel(dir, a.AbsPath)
-		if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
-			continue
-		}
-		return true
-	}
-	return false
+	fp, qerr := e.currentQAEligibility(run, m, true)
+	return e.qaEvaluation(evaluator, fp, qerr), nil
 }
 
 // releaseFacts composes the release facts: the other four gates'

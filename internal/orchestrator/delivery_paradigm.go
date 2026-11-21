@@ -275,6 +275,12 @@ func (e *Engine) ReceiveExternalResult(runID string, in ExternalResultInput) (Ru
 		return RunView{}, core.NewError(core.ReasonResultArtifactsMissing, "goal.ReceiveExternalResult",
 			"an external result must bring at least one --artifact absolute path")
 	}
+	if err := e.requireCurrentFormalQA(run, m); err != nil {
+		return viewOf(run, m, slug), err
+	}
+	if m.Blocked && !core.IsHumanGateReason(m.LastBlockReason) {
+		return viewOf(run, m, slug), core.NewError(m.LastBlockReason, "goal.ReceiveExternalResult", "explicit recovery required before whole-lake completion")
+	}
 	ids, err := e.registerArtifacts(runID, in.Artifacts)
 	if err != nil {
 		return RunView{}, err

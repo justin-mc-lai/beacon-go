@@ -59,13 +59,13 @@ func (e *Engine) VerifyHarness(ctx store.FeatureContext, evaluator string) (Harn
 	out.Checks = ev.Checks
 	out.ReasonCodes = ev.ReasonCodes
 
-	runs, err := e.store.Runs().ListByFeature(ctx.Feature.ID)
+	run, _, has, err := e.latestGoalRun(ctx, "")
 	if err != nil {
 		return HarnessVerification{}, err
 	}
 	type triple struct{ kind, path, hash string }
 	var triples []triple
-	for _, run := range runs {
+	if has {
 		arts, err := e.store.Artifacts().ListByRun(run.ID)
 		if err != nil {
 			return HarnessVerification{}, err

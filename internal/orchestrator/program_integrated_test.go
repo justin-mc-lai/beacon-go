@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"beacon-go/internal/core"
-	"beacon-go/internal/gate"
 	"beacon-go/internal/harness"
 	"beacon-go/internal/store"
 )
@@ -114,19 +113,7 @@ func attachLakeVerifier(t *testing.T, env gitEnv, hostID, slug string) {
 	if err := os.WriteFile(ref, []byte("independent qa passed for "+slug), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.eng.AttachVerifier(lake.RunID, []string{ref}, "qa-bot", "host-1"); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := env.eng.RegisterArtifact(lake.RunID, "qa_report", ref, "qa-bot"); err != nil {
-		t.Fatal(err)
-	}
-	fc, _, err := env.eng.featureContextOf(mustRunFeature(t, env, lake.RunID))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := env.eng.persistGateResult(fc, gate.Evaluation{GateType: gate.GateQA, Verdict: gate.VerdictPass}, lake.RunID, EventGateEvaluated, nil); err != nil {
-		t.Fatal(err)
-	}
+	prepareProductQA(t, env.testEnv, lake.RunID, "qa-bot")
 }
 
 func mustRunFeature(t *testing.T, env gitEnv, id string) string {

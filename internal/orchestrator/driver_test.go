@@ -114,8 +114,8 @@ func TestDriverLeaseTakeoverAfterExpiry(t *testing.T) {
 func TestDriverRunLoopStopsAtReleaseGate(t *testing.T) {
 	env := newTestEnv(t, "active")
 	env.seedTruthFrozen(t)
-	env.seedQAPass(t)
 	run := env.createRun(t)
+	env.seedQAPass(t)
 	if _, err := env.eng.DriverStart(run.RunID, DriverStartOptions{MaxTurns: 10}); err != nil {
 		t.Fatal(err)
 	}

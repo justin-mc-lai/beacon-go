@@ -174,6 +174,7 @@ func (e *Engine) EvaluateGate(ctx store.FeatureContext, gateType, runID, evaluat
 	var ev gate.Evaluation
 	var boundRun string
 	var err error
+	extra := map[string]any{}
 	switch gate.GateType(gateType) {
 	case gate.GateTruthFreeze:
 		ev, err = e.evalTruthFreeze(ctx, evaluator)
@@ -200,15 +201,18 @@ func (e *Engine) EvaluateGate(ctx store.FeatureContext, gateType, runID, evaluat
 			ev = gate.EvaluateImplement(gate.ImplementFacts{HasRun: false}, evaluator)
 		}
 	case gate.GateQA:
-		// QA facts are feature-level; an explicit --run is validated
-		// for membership and recorded as the evaluation's binding.
-		if runID != "" {
-			if _, _, _, verr := e.latestGoalRun(ctx, runID); verr != nil {
-				return gate.Evaluation{}, verr
-			}
-			boundRun = runID
+		run, m, has, rerr := e.latestGoalRun(ctx, runID)
+		if rerr != nil {
+			return gate.Evaluation{}, rerr
 		}
-		ev, err = e.evalQA(ctx, evaluator)
+		if has {
+			boundRun = run.ID
+			fp, qerr := e.currentQAEligibility(run, m, true)
+			ev = e.qaEvaluation(evaluator, fp, qerr)
+			extra["qa_fingerprint"] = fp
+		} else {
+			ev = e.qaEvaluation(evaluator, "", qaError("qa_candidate_missing", "no goal run"))
+		}
 	case gate.GateRelease:
 		if runID != "" {
 			if _, _, _, verr := e.latestGoalRun(ctx, runID); verr != nil {
@@ -221,7 +225,7 @@ func (e *Engine) EvaluateGate(ctx store.FeatureContext, gateType, runID, evaluat
 	if err != nil {
 		return gate.Evaluation{}, err
 	}
-	return e.persistGateResult(ctx, ev, boundRun, EventGateEvaluated, nil)
+	return e.persistGateResult(ctx, ev, boundRun, EventGateEvaluated, extra)
 }
 
 // GateStatus returns the latest recorded verdict per gate type

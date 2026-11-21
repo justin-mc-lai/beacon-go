@@ -42,6 +42,7 @@ func deliverConformanceRun(t *testing.T, root string) string {
 		t.Fatalf("run: %v\n%s", err, out)
 	}
 	id := runIDOf(t, out)
+	productReport := prepareCLIProductQA(t, root, "feat-gate", id, "independent-verifier")
 	for i := 0; i < 3; i++ {
 		if out, err = runCLI(t, "goal", "tick", "--run-id", id, "--executor", "recording"); err != nil {
 			t.Fatalf("tick %d: %v\n%s", i, err, out)
@@ -63,7 +64,7 @@ func deliverConformanceRun(t *testing.T, root string) string {
 		t.Fatal(err)
 	}
 	if out, err = runCLI(t, "goal", "attach-verifier", "--run-id", id,
-		"--ref", verRef, "--source", "independent-verifier", "--executor-id", "maker"); err != nil {
+		"--ref", productReport, "--source", "independent-verifier", "--executor-id", "maker"); err != nil {
 		t.Fatalf("attach verifier: %v\n%s", err, out)
 	}
 	if out, err = runCLI(t, "goal", "complete", "--run-id", id,

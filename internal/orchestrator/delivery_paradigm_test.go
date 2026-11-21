@@ -216,6 +216,7 @@ func TestProgramRouteShowsLakeCompletedAfterExternalResult(t *testing.T) {
 	if err := os.WriteFile(art, []byte("# lake report\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	prepareProductQA(t, env, lakeRun.RunID, "qa-bot")
 	v, err := env.eng.ReceiveExternalResult(lakeRun.RunID, ExternalResultInput{
 		By: "renlink-dev-room", Summary: "lake finished",
 		Artifacts: []ArtifactInput{{Kind: "evidence", AbsPath: art}},

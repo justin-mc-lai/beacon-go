@@ -438,7 +438,7 @@ func TestHarnessVerifyJSON(t *testing.T) {
 	if doc["evidence_hash"] != nil && doc["evidence_hash"] != "" {
 		t.Errorf("blocked verification must not carry an evidence hash: %v", doc["evidence_hash"])
 	}
-	if rc, _ := core.ReasonCodeOf(err); rc != core.ReasonStageExitQAEvidenceMiss {
+	if rc, _ := core.ReasonCodeOf(err); rc != "qa_candidate_missing" {
 		t.Errorf("blocked reason = %q (err %v)", rc, err)
 	}
 
@@ -467,6 +467,7 @@ func TestHarnessVerifyJSON(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	productReport := prepareCLIProductQA(t, seed.projRoot, "demo-feature", seed.run.ID, "qa-bot")
 	out, err = runCLI(t, "qa", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
 	if err != nil {
 		t.Fatalf("verifying real QA evidence must pass: %v\n%s", err, out)
@@ -481,14 +482,14 @@ func TestHarnessVerifyJSON(t *testing.T) {
 	}
 
 	// 4. Editing the blob after registration turns the same answer stale.
-	if err := os.WriteFile(blob, []byte(`{"verdict":"tampered"}`), 0o644); err != nil {
+	if err := os.WriteFile(productReport, []byte(`{"verdict":"tampered"}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	out, err = runCLI(t, "qa", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
 	if err == nil {
 		t.Fatalf("a tampered evidence blob must fail verification:\n%s", out)
 	}
-	if rc, _ := core.ReasonCodeOf(err); rc != core.ReasonQAArtifactStale {
+	if rc, _ := core.ReasonCodeOf(err); rc != "qa_product_review_invalid" {
 		t.Errorf("stale reason = %q (err %v)", rc, err)
 	}
 }

@@ -135,9 +135,7 @@ func TestProgramCompleteSingleSignature(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, runID := range []string{runA, runB} {
-		if _, err := env.eng.AttachVerifier(runID, []string{ref}, "qa-bot", "host-1"); err != nil {
-			t.Fatal(err)
-		}
+		prepareProductQA(t, env, runID, "qa-bot")
 	}
 
 	v, err := env.eng.ProgramComplete(hostID, "lai")

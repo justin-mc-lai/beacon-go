@@ -54,7 +54,7 @@ set -euo pipefail
 
 E2E_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BEACON="${BEACON_BIN:-$E2E_DIR/../bin/beacon}"
-LOG_FILE="$E2E_DIR/last_run.log"
+LOG_FILE="${BEACON_E2E_LOG:-$E2E_DIR/last_run.log}"
 
 # ---- tee plumbing: run main() once, mirror everything to the log ----
 main() {
@@ -101,8 +101,7 @@ print(d)
   echo; echo "===== STEP 1: $STEP ====="
   mkdir -p "$PROJ"
   git init -q -b main "$PROJ"
-  git -C "$PROJ" config user.email "e2e@local"
-  git -C "$PROJ" config user.name "e2e"
+  export GIT_AUTHOR_EMAIL=e2e@local GIT_AUTHOR_NAME=e2e GIT_COMMITTER_EMAIL=e2e@local GIT_COMMITTER_NAME=e2e
   printf '# e2e temp project\n\nTemporary project created by run_e2e.sh for the Beacon Go P6 end-to-end chain.\n' \
     > "$PROJ/README.md"
   git -C "$PROJ" add README.md
@@ -132,9 +131,9 @@ p = d / "truth.md"; t = p.read_text()
 # Freeze precheck requires an explicit surface declaration. This is
 # the fixture's own contract (a CLI-only demo), not a relaxation of
 # the gate: the surface list is real and stays in the frozen body.
-if "surfaces:" not in t:
+if "\nsurfaces:" not in t:
     assert "status: draft\n" in t, "truth.md skeleton status line not found"
-    t = t.replace("status: draft\n", "status: draft\nsurfaces: [cli]\n", 1)
+    t = t.replace("status: draft\n", "status: draft\nsurfaces: [cli]\nsurface_strict: true\n", 1)
 old = "（一句话说清这个需求解决什么问题、给谁用、做到什么算完。冻结前由作者补齐。）"
 new = "给已注册用户提供 TOTP 二次验证：开启后每次登录在密码校验通过后还必须输入动态码，动态码错误或重复使用一律拒绝登录，做到账号密码泄露后仍不能直接登录算完。"
 assert old in t, "truth.md placeholder not found"
@@ -193,6 +192,7 @@ set -eu
 [ -s e2e-work/implementation.txt ] || { echo "no implementation" >&2; exit 1; }
 grep -q "AC-001" e2e-work/implementation.txt
 echo "TC-001 ok: AC-001 implemented"
+python3 e2e-work/machine-proof.py
 TCEOF
   cat > "$PROJ/e2e-work/tc-ac002.sh" <<'TCEOF'
 #!/bin/sh
@@ -200,8 +200,18 @@ set -eu
 [ -s e2e-work/implementation.txt ] || { echo "no implementation" >&2; exit 1; }
 grep -q "AC-002" e2e-work/implementation.txt
 echo "TC-002 ok: AC-002 implemented"
+python3 e2e-work/machine-proof.py
 TCEOF
   chmod +x "$PROJ/e2e-work/tc-ac001.sh" "$PROJ/e2e-work/tc-ac002.sh"
+  cat > "$PROJ/e2e-work/machine-proof.py" <<'PROOFEOF'
+import json, os, pathlib
+text = pathlib.Path('e2e-work/implementation.txt').read_text()
+assert os.environ['BEACON_AC_ID'] in text
+pathlib.Path(os.environ['BEACON_TEST_RESULT_PATH']).write_text(json.dumps({
+    'schema': 'beacon-test-execution.v1', 'run_id': os.environ['BEACON_RUN_ID'],
+    'tc': os.environ['BEACON_TC_ID'], 'candidate_hash': os.environ['BEACON_QA_CANDIDATE_HASH'],
+    'cases': [{'name': os.environ['BEACON_TC_ID'] + '-implementation', 'status': 'passed', 'assertions': 1}]}))
+PROOFEOF
   echo "executable fixture TCs written (tc-ac001.sh, tc-ac002.sh)"
 
   # ==================================================================
@@ -319,10 +329,12 @@ case "$stage" in
   implement)
     printf 'totp challenge + replay guard implemented for AC-001/AC-002\n' \
       > e2e-work/implementation.txt
+    printf 'def login(password_ok, totp_ok, replayed):\n    return password_ok and totp_ok and not replayed\n' > e2e-work/implementation.py
+    git add e2e-work
+    git commit -qm 'implement fixture login guard'
     ;;
   qa)
-    printf '# QA Report: e2e-login-2fa\n\n- TC-001 TestLogin2FAChallenge: PASS (login rejected without valid TOTP, accepted with valid TOTP)\n- TC-002 TestLogin2FAReplay: PASS (replayed TOTP rejected)\n- AC-001 verified\n- AC-002 verified\n' \
-      > e2e-work/qa-report.md
+    echo 'QA stage consumes the registered independent product report'
     ;;
 esac
 echo "agent stage $stage done"
@@ -356,37 +368,41 @@ AGENTEOF
   echo "admission topology_gate item present and passing (AC-173, ref $TOPO_REF)"
 
   # ==================================================================
-  STEP="8 driver run-loop to release_gate"
+  STEP="8 execute plan/truth/implement before independent QA"
   echo; echo "===== STEP 8: $STEP ====="
-  "$BEACON" goal driver start --run-id "$RUN_ID" --max-turns 10 --json
-  "$BEACON" goal driver run-loop --run-id "$RUN_ID" \
-    --executor subprocess:codex-style --max-rounds 10 --json \
-    | tee "$WORK/run-loop.json"
-  [ "$(jval final_state < "$WORK/run-loop.json")" = "awaiting_human" ] || {
-    echo "FAIL: driver did not stop at release_gate awaiting human"; return 1; }
-  [ "$(jval run.loop_stage < "$WORK/run-loop.json")" = "release_gate" ] || {
-    echo "FAIL: run is not at release_gate after run-loop"; return 1; }
-  echo "driver rounds=$(jval rounds < "$WORK/run-loop.json"), final_state=awaiting_human, loop_stage=release_gate"
+  for s in plan truth implement; do
+    "$BEACON" goal tick --run-id "$RUN_ID" --executor subprocess:codex-style --json
+  done
   # The real subprocess agent must have worked every stage.
-  for s in plan truth implement qa; do
+  for s in plan truth implement; do
     grep -q "stage=$s " "$PROJ/e2e-work/agent-output.txt" || {
       echo "FAIL: agent did not execute stage $s"; return 1; }
   done
   [ -s "$PROJ/e2e-work/implementation.txt" ] || { echo "FAIL: implement work product missing"; return 1; }
-  [ -s "$PROJ/e2e-work/qa-report.md" ] || { echo "FAIL: qa report file missing"; return 1; }
   ls -la "$PROJ/e2e-work" "$PROJ/.beacon/artifacts/$RUN_ID"
-  echo "agent work products verified (implementation.txt, qa-report.md, kernel stage captures)"
+  echo "agent implementation and kernel stage captures verified"
 
   # ==================================================================
-  STEP="8b goal artifacts register (QA report -> registered evidence)"
+  STEP="8b goal artifacts register current source candidate"
   echo; echo "===== STEP 8b: $STEP ====="
+  PROJ="$PROJ" PKG_DIR="$PKG_DIR" RUN_ID="$RUN_ID" MAKER="$MAKER" python3 - <<'CANDIDATEEOF'
+import hashlib,json,os,pathlib,subprocess
+r=pathlib.Path(os.environ['PROJ']);pkg=pathlib.Path(os.environ['PKG_DIR'])
+sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+c={'schema':'beacon-qa-candidate.v1','run_id':os.environ['RUN_ID'],'feature_slug':'e2e-login-2fa',
+   'truth_sha256':sha(pkg/'truth.md'),'tests_sha256':sha(pkg/'tests.md'),
+   'source_commit':subprocess.check_output(['git','-C',str(r),'rev-parse','HEAD'],text=True).strip(),
+   'source_files':[{'path':'e2e-work/implementation.py','sha256':sha(r/'e2e-work/implementation.py')}],
+   'build_command':'fixture Python source execution; no compiler','maker':os.environ['MAKER'],
+   'artifacts':[{'path':str(r/'e2e-work/implementation.py'),'sha256':sha(r/'e2e-work/implementation.py')}]}
+(r/'candidate.json').write_text(json.dumps(c))
+CANDIDATEEOF
   OUT="$("$BEACON" goal artifacts register --run-id "$RUN_ID" \
-    --kind qa_report --path "$PROJ/e2e-work/qa-report.md" \
-    --by "$EVALUATOR" --json)"
+    --kind qa_candidate --path "$PROJ/candidate.json" --by "$MAKER" --json)"
   echo "$OUT"
-  [ "$(printf '%s' "$OUT" | jval artifact.kind)" = "qa_report" ] || {
-    echo "FAIL: registered artifact kind is not qa_report"; return 1; }
-  echo "QA report registered as artifact $(printf '%s' "$OUT" | jval artifact.id) (sha256 recorded by the register face)"
+  [ "$(printf '%s' "$OUT" | jval artifact.kind)" = "qa_candidate" ] || {
+    echo "FAIL: registered artifact kind is not qa_candidate"; return 1; }
+  echo "candidate registered as artifact $(printf '%s' "$OUT" | jval artifact.id)"
   "$BEACON" goal artifacts list --run-id "$RUN_ID" --json
 
   # ==================================================================
@@ -394,7 +410,7 @@ AGENTEOF
   echo; echo "===== STEP 8c: $STEP ====="
   OUT="$("$BEACON" qa autotest run --run-id "$RUN_ID" --by "$EVALUATOR" --json)"
   echo "$OUT"
-  [ -s "$PROJ/.beacon/autotest/$RUN_ID/report.json" ] || {
+  [ -s "$PROJ/$(printf '%s' "$OUT" | jval report_path)" ] || {
     echo "FAIL: autotest report missing"; return 1; }
   printf '%s' "$OUT" | grep -q '"failed": 0' || {
     echo "FAIL: autotest reported failing TCs"; return 1; }
@@ -423,6 +439,25 @@ REPEOF
   [ "$(printf '%s' "$OUT" | jval artifact.kind)" = "e2e_report" ] || {
     echo "FAIL: e2e report was not registered as e2e_report"; return 1; }
   echo "CLI surface evidence registered"
+  PROJ="$PROJ" WORK="$WORK" RUN_ID="$RUN_ID" MAKER="$MAKER" CHECKER="$CHECKER" python3 - <<'REVIEWEOF'
+import hashlib,json,os,pathlib,sys
+r=pathlib.Path(os.environ['PROJ']);sys.path.insert(0,str(r/'e2e-work'))
+from implementation import login
+assert not login(True,False,False)
+assert login(True,True,False)
+assert not login(True,True,True)
+c=hashlib.sha256((r/'candidate.json').read_bytes()).hexdigest()
+(r/'product-qa.json').write_text(json.dumps({'schema':'beacon-product-qa.v1','run_id':os.environ['RUN_ID'],
+ 'candidate_hash':c,'scope':'product','verdict':'pass','maker':os.environ['MAKER'],'checker':os.environ['CHECKER'],
+ 'covered_tcs':['TC-001','TC-002'],'evidence_refs':[str(pathlib.Path(os.environ['WORK'])/'e2e-report.md')]}))
+REVIEWEOF
+  "$BEACON" goal artifacts register --run-id "$RUN_ID" --kind qa_report --path "$PROJ/product-qa.json" --by "$CHECKER" --json
+  "$BEACON" goal attach-verifier --run-id "$RUN_ID" --source "$CHECKER" --ref "$PROJ/product-qa.json" --json
+  "$BEACON" gate evaluate qa --project "$PROJ" --feature "$SLUG" --run "$RUN_ID" --evaluator "$CHECKER" --json
+  "$BEACON" goal driver start --run-id "$RUN_ID" --max-turns 10 --json
+  "$BEACON" goal driver run-loop --run-id "$RUN_ID" --executor subprocess:codex-style --max-rounds 10 --json | tee "$WORK/run-loop.json"
+  [ "$(jval final_state < "$WORK/run-loop.json")" = "awaiting_human" ] || { echo "FAIL: driver did not reach human gate"; return 1; }
+  [ "$(jval run.loop_stage < "$WORK/run-loop.json")" = "release_gate" ] || { echo "FAIL: run not at release gate"; return 1; }
 
   # ==================================================================
   STEP="9 gate evaluate design/implement/qa/release"
@@ -460,7 +495,7 @@ REPEOF
   STEP="10 attach-verifier + complete"
   echo; echo "===== STEP 10: $STEP ====="
   "$BEACON" goal attach-verifier --run-id "$RUN_ID" \
-    --source "$CHECKER" --ref "$PROJ/e2e-work/qa-report.md" --json
+    --source "$CHECKER" --ref "$PROJ/product-qa.json" --json
   echo "verifier attached (source=$CHECKER != maker=$MAKER)"
   set +e
   OUT="$("$BEACON" goal complete --run-id "$RUN_ID" \
@@ -484,6 +519,17 @@ REPEOF
   "$BEACON" spine list --project "$PROJ" --json
   "$BEACON" goal trace --run-id "$RUN_ID"
   "$BEACON" goal status --run-id "$RUN_ID" --json
+
+  STEP="12 empty machine execution cannot inherit earlier QA PASS"
+  printf 'pass\n' > "$PROJ/e2e-work/machine-proof.py"
+  if "$BEACON" qa autotest run --run-id "$RUN_ID" --by "$MAKER" --json; then
+    echo "FAIL: exit-0 empty runner was accepted"; return 1
+  fi
+  if "$BEACON" gate evaluate qa --project "$PROJ" --feature "$SLUG" --run "$RUN_ID" --evaluator "$CHECKER" --json; then
+    echo "FAIL: failed latest invocation inherited previous product PASS"; return 1
+  fi
+  [ "$("$BEACON" goal status --run-id "$RUN_ID" --json | jval status)" = "completed" ] || {
+    echo "FAIL: new evaluation rewrote completed history"; return 1; }
 
   echo "=================================================================="
   echo "E2E RESULT: PASS — full chain completed (run $RUN_ID done)"

@@ -59,6 +59,9 @@ func (e *Engine) lakeQADigest(root, runID string, refs []string) (string, error)
 	if err != nil {
 		return "", err
 	}
+	if err := e.requireCurrentFormalQA(run, m); err != nil {
+		return "", err
+	}
 	if m.Verifier == nil || !m.Verifier.Present || len(m.Verifier.Refs) == 0 ||
 		strings.TrimSpace(m.Verifier.Source) == "" || m.Verifier.Source == m.ExecutorID {
 		return "", fmt.Errorf("run %s lacks independent verifier", runID)

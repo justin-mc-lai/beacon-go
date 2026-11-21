@@ -52,7 +52,7 @@ status: draft
 
 | AC ID | TC ID | Layer | Command | Assertion |
 |---|---|---|---|---|
-| AC-001 | TC-001 | cli | true | exit code 0 |
+| AC-001 | TC-001 | cli | python3 qa-case.py | actual assertion |
 | AC-002 | TC-002 | cli | false | exit code 0 |
 | AC-003 | TC-003 | cli |  | exit code 0 |
 `
@@ -66,6 +66,7 @@ func TestRunAutoTestExecutesAndRegistersEvidence(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(env.root, "tests.md"), []byte(autotestTestsDoc), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	prepareQACandidate(t, env, run.RunID)
 	report, err := env.eng.RunAutoTest(context.Background(), run.RunID, AutoTestOptions{By: "qa-bot"})
 	if err == nil {
 		t.Fatal("a failing TC must surface autotest_failed")
@@ -95,11 +96,11 @@ func TestRunAutoTestExecutesAndRegistersEvidence(t *testing.T) {
 			report.Results[0].TC, report.Results[1].TC, report.Results[2].TC)
 	}
 	// Evidence files on disk.
-	resultPath := filepath.Join(env.root, ".beacon", "autotest", run.RunID, "TC-001", "result.json")
+	resultPath := filepath.Join(env.root, report.Results[0].ResultPath)
 	if _, err := os.Stat(resultPath); err != nil {
 		t.Errorf("per-TC evidence missing: %v", err)
 	}
-	if _, err := os.Stat(filepath.Join(env.root, ".beacon", "autotest", run.RunID, "report.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(env.root, report.ReportPath)); err != nil {
 		t.Errorf("aggregate report missing: %v", err)
 	}
 	// The qa gate consumes the evidence with no special-casing.
@@ -145,7 +146,7 @@ func TestRunAutoTestRefusals(t *testing.T) {
 	// No tests.md on disk at all.
 	if _, err := env.eng.RunAutoTest(context.Background(), run.RunID, AutoTestOptions{By: "qa"}); err == nil {
 		t.Fatal("missing tests doc must refuse")
-	} else if rc, _ := core.ReasonCodeOf(err); rc != core.ReasonAutoTestTestsDocMissing {
+	} else if rc, _ := core.ReasonCodeOf(err); rc != "qa_candidate_missing" {
 		t.Fatalf("code = %q, want %q", rc, core.ReasonAutoTestTestsDocMissing)
 	}
 	// tests.md with only a BLOCKED row: nothing executable anywhere.
@@ -156,6 +157,7 @@ func TestRunAutoTestRefusals(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(env.root, "tests.md"), []byte(doc), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	prepareQACandidate(t, env, run.RunID)
 	if _, err := env.eng.RunAutoTest(context.Background(), run.RunID, AutoTestOptions{By: "qa"}); err == nil {
 		t.Fatal("no executable TC must refuse (no fake runs)")
 	} else if rc, _ := core.ReasonCodeOf(err); rc != core.ReasonAutoTestNoExecutable {
@@ -169,14 +171,15 @@ func TestRunAutoTestRefusals(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(env.root, ".beacon"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(env.root, ".beacon", "config"), []byte("test_command = true\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(env.root, ".beacon", "config"), []byte("test_command = python3 qa-case.py\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
+	prepareQACandidate(t, env, run.RunID)
 	report, err := env.eng.RunAutoTest(context.Background(), run.RunID, AutoTestOptions{By: "qa"})
 	if err != nil {
 		t.Fatalf("fallback run: %v", err)
 	}
-	if report.Passed != 1 || report.FallbackCommand != "true" {
+	if report.Passed != 1 || report.FallbackCommand != "python3 qa-case.py" {
 		t.Errorf("fallback report = %+v, want 1 passed via test_command", report)
 	}
 }

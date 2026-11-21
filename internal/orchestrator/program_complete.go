@@ -67,6 +67,13 @@ func (e *Engine) ProgramComplete(hostRunID, confirmedBy string) (ProgramDriveVie
 	// releasing any of them. The program signature covers only the
 	// human-confirmation check — the other gates are re-read live.
 	for _, row := range pending {
+		lake, lm, _, err := e.loadRun(row.GoalRunID)
+		if err != nil {
+			return ProgramDriveView{}, err
+		}
+		if err := e.requireCurrentFormalQA(lake, lm); err != nil {
+			return ProgramDriveView{}, err
+		}
 		if err := e.ensureVerifier(row.GoalRunID); err != nil {
 			return ProgramDriveView{}, err
 		}

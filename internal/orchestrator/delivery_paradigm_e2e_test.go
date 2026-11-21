@@ -56,6 +56,7 @@ func TestDeliveryParadigmEndToEnd(t *testing.T) {
 	}
 	step(StageImplement)
 	step(StageQA)
+	productReport := prepareProductQA(t, env.testEnv, run.RunID, "independent-verifier")
 
 	// QA needs its evidence pointer on record before the stage exits.
 	qaArtifact := filepath.Join(t.TempDir(), "qa-report.md")
@@ -73,7 +74,7 @@ func TestDeliveryParadigmEndToEnd(t *testing.T) {
 	if err := os.WriteFile(verifierRef, []byte("# independent verification\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.eng.AttachVerifier(run.RunID, []string{verifierRef}, "independent-verifier", ""); err != nil {
+	if _, err := env.eng.AttachVerifier(run.RunID, []string{productReport}, "independent-verifier", ""); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := env.eng.Complete(run.RunID, CompleteOptions{HumanConfirmed: true, ConfirmedBy: "owner"}); err != nil {

@@ -45,7 +45,7 @@ func seedGoalProject(t *testing.T) (string, store.FeaturePackage) {
 // -> complete --human-confirmed -> done; trace aggregates the trail.
 // Also: unknown run id exits non-zero with the source reason_code.
 func TestGoalCLIFullChain(t *testing.T) {
-	root, feature := seedGoalProject(t)
+	root, _ := seedGoalProject(t)
 
 	out, err := runCLI(t, "goal", "run", "build the thing",
 		"--project", root, "--feature", "feat-a", "--executor-id", "host-1", "--json")
@@ -62,15 +62,7 @@ func TestGoalCLIFullChain(t *testing.T) {
 		t.Fatalf("current_stage = %q", got)
 	}
 
-	// Seed the qa pass so the qa exit gate can open later.
-	st, err := store.Open(mustEnvStorePath(t))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := st.Gates().Record(store.GateResult{FeatureID: feature.ID, GateType: "qa", Verdict: "pass"}); err != nil {
-		t.Fatal(err)
-	}
-	st.Close()
+	productReport := prepareCLIProductQA(t, root, "feat-a", runID, "qa-bot")
 
 	tick := func() map[string]any {
 		t.Helper()
@@ -91,19 +83,19 @@ func TestGoalCLIFullChain(t *testing.T) {
 		t.Fatalf("loop_stage = %q want release_gate", got)
 	}
 
-	// Complete without verifier -> non-zero, reason on the error.
-	out, err = runCLI(t, "goal", "complete", "--run-id", runID, "--human-confirmed", "--confirmed-by", "lai", "--json")
+	// Human release confirmation is still required after product QA.
+	out, err = runCLI(t, "goal", "complete", "--run-id", runID, "--json")
 	if err == nil {
 		t.Fatal("complete without verifier must fail")
 	}
-	if rc, _ := core.ReasonCodeOf(err); rc != "product_goal_complete_requires_verifier" {
+	if rc, _ := core.ReasonCodeOf(err); rc != core.ReasonReleaseRequiresHuman {
 		t.Errorf("complete reason = %q (err %v)", rc, err)
 	}
 	// The rejection still printed exactly one JSON document.
 	_ = parseDoc(t, out)
 
 	out, err = runCLI(t, "goal", "attach-verifier", "--run-id", runID,
-		"--ref", "evidence/qa-report.md", "--source", "qa-bot", "--json")
+		"--ref", productReport, "--source", "qa-bot", "--json")
 	if err != nil {
 		t.Fatalf("attach-verifier: %v", err)
 	}
@@ -111,7 +103,7 @@ func TestGoalCLIFullChain(t *testing.T) {
 		t.Errorf("verifier = %v", v)
 	}
 
-	out, err = runCLI(t, "goal", "complete", "--run-id", runID, "--json")
+	out, err = runCLI(t, "goal", "complete", "--run-id", runID, "--human-confirmed", "--confirmed-by", "lai", "--json")
 	if err != nil {
 		t.Fatalf("complete: %v (out %s)", err, out)
 	}

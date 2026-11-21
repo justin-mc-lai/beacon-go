@@ -692,21 +692,29 @@ const (
 	ReasonAutoTestShellSyntax     = "autotest_shell_syntax_unsupported" // NEW (R2c): shell operators refused, never silently misrun
 	ReasonAutoTestFailed          = "autotest_failed"                   // NEW (R2c): aggregate headline when any TC fails/blocks
 	ReasonAutoTestDeclaredBlocked = "tc_declared_blocked"               // NEW (R2c): tests.md's own BLOCKED: escape, reported not executed
-	ReasonSkillInstallConflict    = "skill_install_conflict"            // NEW (R2c)
-	ReasonSkillInstallHostUnknown = "skill_install_host_unknown"        // NEW (R2c)
-	ReasonStateSnapshotMissing    = "state_snapshot_missing"            // NEW (R2c)
-	ReasonStateSnapshotInvalid    = "state_snapshot_invalid"            // NEW (R2c)
-	ReasonArchiveStatusInvalid    = "archive_status_invalid"            // NEW (R2c): Python normalizes silently; the Go face refuses a bad status instead of guessing
-	ReasonArchiveFeatureNotFound  = "archive_feature_not_found"         // NEW (R2c)
-	ReasonArchiveNotSupported     = "archive_governance_not_supported"
-	ReasonProjectModeInvalid      = "invalid_project_mode"
-	ReasonHookAdmissionBlocked    = "hook_admission_blocked"
-	ReasonHookDryRunOnly          = "hook_dry_run_only"
-	ReasonHookManualConfirm       = "manual_confirmation_required"
-	ReasonHookHiddenAutoRun       = "hidden_auto_run_not_allowed"
-	ReasonHookFollowupFailed      = "post_release_followup_failed"
-	ReasonHookFileMissing         = "hook_file_missing"
-	ReasonHookCommandFailed       = "hook_command_failed" // NEW (R2c): Python never executed command_template; the Go face does (via harness) and needs the code
+	// QA execution evidence (kernel-qa-evidence-hardening): an exit-0
+	// command is not a pass unless a machine adapter proves executed cases.
+	ReasonQAExecutionResultMissing = "qa_execution_result_missing" // no custom/JUnit/Go machine result at all
+	ReasonQAExecutionResultInvalid = "qa_execution_result_invalid" // malformed or mismatched machine result
+	ReasonQAExecutionNoCases       = "qa_execution_no_cases"       // exit 0 with zero executed cases
+	ReasonQAExecutionCaseFailed    = "qa_execution_case_failed"    // an executed case failed
+	ReasonQAExecutionCaseSkipped   = "qa_execution_case_skipped"   // an executed case skipped
+	ReasonQAExecutionRequiredMiss  = "qa_execution_required_case_missing"
+	ReasonSkillInstallConflict     = "skill_install_conflict"     // NEW (R2c)
+	ReasonSkillInstallHostUnknown  = "skill_install_host_unknown" // NEW (R2c)
+	ReasonStateSnapshotMissing     = "state_snapshot_missing"     // NEW (R2c)
+	ReasonStateSnapshotInvalid     = "state_snapshot_invalid"     // NEW (R2c)
+	ReasonArchiveStatusInvalid     = "archive_status_invalid"     // NEW (R2c): Python normalizes silently; the Go face refuses a bad status instead of guessing
+	ReasonArchiveFeatureNotFound   = "archive_feature_not_found"  // NEW (R2c)
+	ReasonArchiveNotSupported      = "archive_governance_not_supported"
+	ReasonProjectModeInvalid       = "invalid_project_mode"
+	ReasonHookAdmissionBlocked     = "hook_admission_blocked"
+	ReasonHookDryRunOnly           = "hook_dry_run_only"
+	ReasonHookManualConfirm        = "manual_confirmation_required"
+	ReasonHookHiddenAutoRun        = "hidden_auto_run_not_allowed"
+	ReasonHookFollowupFailed       = "post_release_followup_failed"
+	ReasonHookFileMissing          = "hook_file_missing"
+	ReasonHookCommandFailed        = "hook_command_failed" // NEW (R2c): Python never executed command_template; the Go face does (via harness) and needs the code
 )
 
 // ---- Intelligence R2d family (Python v1.6 parity audit
