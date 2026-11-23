@@ -33,6 +33,7 @@ func newGoalCmd() *cobra.Command {
 	c.AddCommand(
 		newGoalRunCmd(), newGoalStatusCmd(), newGoalTickCmd(false), newGoalTickCmd(true),
 		newGoalBlockCmd(), newGoalRecoverCmd(), newGoalAttachVerifierCmd(), newGoalCompleteCmd(),
+		newGoalLegacyCloseCmd(),
 		newGoalCheckpointCmd(), newGoalHeartbeatCmd(), newGoalResumeCmd(), newGoalTraceCmd(),
 		// P4a debt clearance: entry-contract (G-01) + resume-pack
 		// (G-08) — the two P2 sub-surfaces that had no commands of
