@@ -170,13 +170,33 @@ func (e *Engine) ReleaseVersion(root, version string) (versionmanifest.Manifest,
 	return m, nil
 }
 
+// targetManifestPath prefers the project's current draft line. That is
+// how a change to an inherited v2.0.0 lake lands in the open v2.1.0
+// manifest instead of rewriting the baseline.
+func (e *Engine) targetManifestPath(ctx store.FeatureContext) string {
+	fallback := versionmanifest.Path(ctx.Project.RootPath, ctx.Version.Version)
+	p, err := e.store.Projects().GetByRootPath(ctx.Project.RootPath)
+	if err != nil {
+		return fallback
+	}
+	cur, err := e.store.Projects().CurrentVersion(p.ID)
+	if err != nil {
+		return fallback
+	}
+	cand := versionmanifest.Path(ctx.Project.RootPath, cur.Version)
+	if m, err := versionmanifest.Load(cand); err == nil && m.Status == versionmanifest.StatusDraft {
+		return cand
+	}
+	return fallback
+}
+
 // RecordVersionPackage updates the current draft manifest after a
 // freeze/refreeze. A missing manifest is legacy behavior: nothing to do.
 func (e *Engine) RecordVersionPackage(ctx store.FeatureContext, hash string, changeIDs []string) error {
 	if hash == "" {
 		return nil
 	}
-	path := versionmanifest.Path(ctx.Project.RootPath, ctx.Version.Version)
+	path := e.targetManifestPath(ctx)
 	m, err := versionmanifest.Load(path)
 	if err != nil {
 		return nil
@@ -209,7 +229,7 @@ func (e *Engine) MarkVersionChange(ctx store.FeatureContext, changeID string) er
 	if changeID == "" {
 		return nil
 	}
-	path := versionmanifest.Path(ctx.Project.RootPath, ctx.Version.Version)
+	path := e.targetManifestPath(ctx)
 	m, err := versionmanifest.Load(path)
 	if err != nil {
 		return nil
@@ -217,11 +237,19 @@ func (e *Engine) MarkVersionChange(ctx store.FeatureContext, changeID string) er
 	if m.Status != versionmanifest.StatusDraft {
 		return nil
 	}
+	found := false
 	for i := range m.Lakes {
 		if m.Lakes[i].Slug == ctx.Feature.Slug {
 			m.Lakes[i].Status = versionmanifest.LakeDirty
 			m.Lakes[i].Changes = appendUnique(m.Lakes[i].Changes, changeID)
+			found = true
 		}
+	}
+	if !found {
+		m.Lakes = append(m.Lakes, versionmanifest.Lake{
+			Slug: ctx.Feature.Slug, Status: versionmanifest.LakeDirty,
+			Changes: []string{changeID},
+		})
 	}
 	dup := false
 	for _, c := range m.Changes {

@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"beacon-go/internal/store"
 	"beacon-go/internal/versionmanifest"
 )
 
@@ -68,8 +67,8 @@ func TestMarkAndRecordVersionLake(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fc.Version = store.ProjectVersion{Version: "v2.0.1"}
-
+	// The feature lives in v2.0.0; v2.1.0 is the current draft. The
+	// change must land in v2.1.0, never rewrite the baseline.
 	if err := env.eng.MarkVersionChange(fc, "chg_test"); err != nil {
 		t.Fatal(err)
 	}
@@ -90,5 +89,12 @@ func TestMarkAndRecordVersionLake(t *testing.T) {
 	}
 	if m.Lakes[0].Package != "newhash" || m.Lakes[0].Status != versionmanifest.LakeChanged {
 		t.Fatalf("recorded manifest = %+v", m.Lakes[0])
+	}
+	base, err := versionmanifest.LoadVersion(env.root, "v2.0.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if base.Lakes[0].Package == "newhash" || base.Status != versionmanifest.StatusBaseline {
+		t.Fatalf("baseline was rewritten: %+v", base.Lakes[0])
 	}
 }
