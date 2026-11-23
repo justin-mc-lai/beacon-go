@@ -21,7 +21,7 @@ func newVersionCmd() *cobra.Command {
 	c.AddCommand(
 		newVersionBaselineCmd(), newVersionOpenCmd(), newVersionStatusCmd(),
 		newVersionFreezeCmd(), newVersionReleaseCmd(), newVersionCompatCmd(),
-		newVersionPlanCmd(), newVersionReconcileCmd(),
+		newVersionPlanCmd(), newVersionReconcileCmd(), newVersionSyncSeasCmd(),
 	)
 	return c
 }
@@ -286,6 +286,40 @@ func newVersionReconcileCmd() *cobra.Command {
 				return printJSON(cmd, m)
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "reconciled %s\n", m.Version)
+			return nil
+		},
+	}
+	c.Flags().StringVar(&project, "project", ".", "project root path")
+	c.Flags().StringVar(&version, "version", "", "docs version (required)")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("version")
+	return c
+}
+
+func newVersionSyncSeasCmd() *cobra.Command {
+	var project, version string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "sync-seas",
+		Short: "Rebuild a draft manifest's seas from program host runs whose host slug is in this version",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			st, err := openWriteStore()
+			if err != nil {
+				return err
+			}
+			defer st.Close()
+			m, err := orchestrator.NewEngine(st).SyncSeas(project, version)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				return printJSON(cmd, m)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "synced %s: seas=%d\n", m.Version, len(m.Seas))
+			for _, s := range m.Seas {
+				fmt.Fprintf(cmd.OutOrStdout(), "  sea %-28s host=%s lakes=%d\n", s.Slug, s.HostFeature, len(s.Lakes))
+			}
 			return nil
 		},
 	}

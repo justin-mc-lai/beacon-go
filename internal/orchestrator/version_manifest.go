@@ -345,9 +345,16 @@ func (e *Engine) buildSeas(root string, m versionmanifest.Manifest) []versionman
 			continue
 		}
 		pv, err := e.store.Projects().GetVersionByID(feat.ProjectVersionID)
-		if err != nil || pv.ProjectID != proj.ID || pv.Version != m.Version {
+		if err != nil || pv.ProjectID != proj.ID {
 			continue
 		}
+		// The run may be bound to an older feature row; the sea belongs
+		// to this version when its host slug exists in the manifest.
+		host, err := e.store.ResolveFeature(root, feat.Slug, m.Version)
+		if err != nil {
+			continue
+		}
+		feat = host.Feature
 		if seen[meta.Program.Slug] {
 			continue
 		}
@@ -612,6 +619,26 @@ func (e *Engine) ReconcileVersion(root, version string) (versionmanifest.Manifes
 			c.Status = "closed"
 		}
 	}
+	if err := versionmanifest.Save(versionmanifest.Path(root, version), m); err != nil {
+		return versionmanifest.Manifest{}, err
+	}
+	return m, nil
+}
+
+// SyncSeas rebuilds the draft manifest's sea list from all program host
+// runs whose host slug is part of this version. It repairs seas that
+// were created while their feature row was bound to an older line.
+func (e *Engine) SyncSeas(root, version string) (versionmanifest.Manifest, error) {
+	root = store.ResolveRootPath(root)
+	m, err := versionmanifest.LoadVersion(root, version)
+	if err != nil {
+		return versionmanifest.Manifest{}, err
+	}
+	if m.Status != versionmanifest.StatusDraft {
+		return m, core.NewError("version_not_draft", "version.SyncSeas",
+			"manifest "+version+" is "+m.Status+", not draft")
+	}
+	m.Seas = e.buildSeas(root, m)
 	if err := versionmanifest.Save(versionmanifest.Path(root, version), m); err != nil {
 		return versionmanifest.Manifest{}, err
 	}

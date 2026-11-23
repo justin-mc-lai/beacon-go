@@ -203,6 +203,13 @@ func (e *Engine) lakeFeature(run store.Run, slug string) (store.FeaturePackage, 
 	if err != nil {
 		return store.FeaturePackage{}, err
 	}
+	// Prefer the project's current version for the slug; a lake created
+	// in an older line is still the same lake by slug.
+	if fc, err := e.featureContext(run.FeatureID); err == nil {
+		if ctx, err := e.store.ResolveFeature(fc.Project.RootPath, slug, ""); err == nil {
+			return ctx.Feature, nil
+		}
+	}
 	return e.store.Features().GetBySlug(host.ProjectVersionID, slug)
 }
 
