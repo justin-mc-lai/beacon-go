@@ -199,10 +199,11 @@ domain_required: false
 ux_required: false
 parser_contract: beacon-feature-package-v2
 package_contract: truth-tasks
-package_maturity: filled
-materials_status: current
+package_maturity: scaffold
+materials_status: draft
 traceability_required: true
 intent_confirmed: false
+package_author: ""
 surfaces: [cli]
 canonical_refs:
   truth: %[3]s/truth.md
@@ -213,138 +214,80 @@ canonical_refs:
 
 ## 人话
 
-写清谁在什么场景下完成什么，做到什么算完成。
+待补齐：用户、场景、可观察结果。
 
 ## User Intent Snapshot
 
 `+"```yaml"+`
-lake_or_ocean: 湖
-language: zh
-source: user_intent
 utterance: ""
-goal: "写清这个包要达成的结果"
-non_goals: "写清本包明确不做的范围"
-constraints: "写清必须遵守的约束"
-scope_mode: lake
+goal: ""
+non_goals: ""
+constraints: ""
+scope_mode: focused
 `+"```"+`
 
 ## Open Questions
 
 | Q ID | Question | Recommendation | Status | Answer |
 |---|---|---|---|---|
-| Q1 | 谁在什么场景下完成什么？ | 先写目标与非目标 | answered | 目标与非目标已写入 Intent Snapshot |
+| Q1 | 用户要获得什么可验证结果，哪些工作明确不做？ | 依据原话和已有代码回答 | open | |
+| Q2 | 本需求是否有领域状态与安全拒绝路径？ | 明确设置 fsm_required 与 negative_required 并给出依据 | open | |
+
+## Grounding
+
+| Source | Reference | Supports |
+|---|---|---|
+
+## Assumptions
+
+记录需要确认的假设与确认依据；没有假设时明确写无。
 
 ## Intent Coverage
 
 | AC ID | Intent Source | Evidence |
 |---|---|---|
-| AC-001 | 目标：主体流程可达完成 | evidence/ac-001.txt |
-| AC-002 | 约束：非法转移必须拒绝 | evidence/ac-002.txt |
-| AC-003 | 目标：依赖失败可观测 | evidence/ac-003.txt |
-| AC-004 | 约束：恢复必须幂等 | evidence/ac-004.txt |
-| AC-005 | 目标：完成门不可绕过 | evidence/ac-005.txt |
-
-## Subagent Plan
-
-| 阶段 | 角色 | 产出 |
-|---|---|---|
-| intake | business-analyst | 问题清单与边界 |
-| spec | product-manager | AC 与未做清单 |
-| spec | domain-fsm-architect | 状态、转移、非法槽位 |
-| spec | security-engineer | 支付与权限边界 |
-| spec | devops-engineer | 环境与回滚 |
-| spec | microservices-architect | 服务与契约 |
-| spec | ui-designer | 页面与交互状态 |
-| spec | database-administrator | 表结构与迁移 |
-| spec | integration-specialist | 外部接口与回调 |
-| test | test-automator | 每条 AC 的正负用例 |
-| plan | task-distributor | 任务 DAG |
-| review | architect-reviewer | 独立评审结论 |
-
-## FSM
-
-`+"```mermaid"+`
-stateDiagram-v2
-  [*] --> Draft
-  Draft --> Active
-  Active --> Blocked
-  Blocked --> Active
-  Active --> Done
-  Done --> [*]
-`+"```"+`
-
-| From | To | Trigger | Guard | Side effect |
-|---|---|---|---|---|
-| Draft | Active | submit | fields complete | record submitted_at |
-| Active | Blocked | dependency fails | retry budget left | record reason |
-| Blocked | Active | dependency recovers | none | clear reason |
-| Active | Done | accept | checks pass | record accepted_at |
 
 ## Acceptance Criteria
 
 | AC ID | Criterion |
 |---|---|
-| AC-001 | 主体流程在合法输入下到达完成状态。 |
-| AC-002 | 非法转移被拒绝且状态不变。 |
-| AC-003 | 依赖失败进入阻塞并记录原因。 |
-| AC-004 | 依赖恢复后从阻塞回到进行中。 |
-| AC-005 | 完成动作只在检查通过后发生。 |
 
 ## Coverage Matrix
 
-| AC ID | TC ID | Layer | Command | Assertion | Evidence |
-|---|---|---|---|---|---|
-| AC-001 | TC-001 | behavior | `+"`go test ./... -run TestAC001 -count=1`"+` | happy path reaches done | evidence/ac-001.txt |
-| AC-001 | TC-002 | negative | `+"`go test ./... -run TestAC001Reject -count=1`"+` | invalid input rejected | evidence/ac-001-neg.txt |
-| AC-001 | TC-003 | negative | `+"`go test ./... -run TestAC001Retry -count=1`"+` | retry is bounded | evidence/ac-001-retry.txt |
-| AC-002 | TC-004 | behavior | `+"`go test ./... -run TestAC002 -count=1`"+` | illegal slot refused | evidence/ac-002.txt |
-| AC-002 | TC-005 | negative | `+"`go test ./... -run TestAC002Noop -count=1`"+` | state unchanged | evidence/ac-002-noop.txt |
-| AC-002 | TC-006 | negative | `+"`go test ./... -run TestAC002Force -count=1`"+` | forced transition refused | evidence/ac-002-force.txt |
-| AC-003 | TC-007 | behavior | `+"`go test ./... -run TestAC003 -count=1`"+` | blocked state recorded | evidence/ac-003.txt |
-| AC-003 | TC-008 | negative | `+"`go test ./... -run TestAC003NoBudget -count=1`"+` | no retry left blocks | evidence/ac-003-budget.txt |
-| AC-003 | TC-009 | negative | `+"`go test ./... -run TestAC003NoReason -count=1`"+` | missing reason refused | evidence/ac-003-reason.txt |
-| AC-004 | TC-010 | behavior | `+"`go test ./... -run TestAC004 -count=1`"+` | recovery resumes | evidence/ac-004.txt |
-| AC-004 | TC-011 | negative | `+"`go test ./... -run TestAC004Stale -count=1`"+` | stale recovery refused | evidence/ac-004-stale.txt |
-| AC-004 | TC-012 | negative | `+"`go test ./... -run TestAC004Double -count=1`"+` | double resume is idempotent | evidence/ac-004-double.txt |
-| AC-005 | TC-013 | behavior | `+"`go test ./... -run TestAC005 -count=1`"+` | accept after checks | evidence/ac-005.txt |
-| AC-005 | TC-014 | negative | `+"`go test ./... -run TestAC005Early -count=1`"+` | accept before checks refused | evidence/ac-005-early.txt |
-| AC-005 | TC-015 | negative | `+"`go test ./... -run TestAC005FailedCheck -count=1`"+` | failed check blocks accept | evidence/ac-005-fail.txt |
+| AC ID | TC ID | Layer | Command | Assertion | Evidence | Required Tests |
+|---|---|---|---|---|---|---|
+
+## FSM
+
+有状态需求填写 From、To、Trigger、Guard、Side effect 表与转移覆盖；无状态需求设置 fsm_required: false 并说明依据。不要套用需求包生命周期。
+
+## Transition Coverage
+
+| From | To | Trigger | TC ID |
+|---|---|---|---|
 
 ## 未做
 
-| 项 | 原因 |
-|---|---|
-| 旧包迁移 | 本版只保证兼容读取 |
+明确写出本包边界。
 `, slug, version, pkgRel)
-
 	tasks := fmt.Sprintf(`---
-slug: %[1]s
-version: %[2]s
+slug: %s
+version: %s
 materials_status: draft
 task_source: acceptance_criteria
 package_contract: truth-tasks
 ---
 
-# Tasks: %[1]s
+# Tasks: %s
 
 ## Task DAG
 
-| TASK | 动作 | 依赖 | AC | Evidence |
-|---|---|---|---|---|
-| TASK-001 | 落状态与转移实现 | - | AC-001, AC-002 | evidence/ac-001.txt |
-| TASK-002 | 落阻塞与恢复 | TASK-001 | AC-003, AC-004 | evidence/ac-003.txt |
-| TASK-003 | 落完成门与回归 | TASK-002 | AC-005 | evidence/ac-005.txt |
+| TASK | Action | Depends | AC | Command | Verify | Evidence | Auto |
+|---|---|---|---|---|---|---|---|
 
 ## Task Ledger
 
-- [ ] TASK-001 落状态与转移实现 · ac=AC-001,AC-002 · evidence=evidence/ac-001.txt
-- [ ] TASK-002 落阻塞与恢复 · ac=AC-003,AC-004 · evidence=evidence/ac-003.txt
-- [ ] TASK-003 落完成门与回归 · ac=AC-005 · evidence=evidence/ac-005.txt
-
-## Boundary
-
-任务只按 DAG 顺序执行。`+"`[x]`"+` 只在该行 Evidence 文件存在时勾选。
-`, slug, version)
-
+待补齐：每个任务绑定 AC；完成状态以执行回执和证据为准。
+`, slug, version, slug)
 	return map[string]string{"truth.md": truth, "tasks.md": tasks}
 }

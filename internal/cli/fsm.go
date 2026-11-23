@@ -13,13 +13,16 @@ import (
 
 // TransitionResult represents the outcome of evaluating a state transition against the FSM.
 type TransitionResult struct {
-	Allowed   bool   `json:"allowed"`
-	Verdict   string `json:"verdict"` // "allowed", "guard_failed", "illegal_transition", "state_not_found", "transition_not_found"
-	From      string `json:"from"`
-	To        string `json:"to"`
-	Aggregate string `json:"aggregate,omitempty"`
-	Guard     string `json:"guard,omitempty"`
-	Reason    string `json:"reason"`
+	Allowed           bool     `json:"allowed"`
+	Verdict           string   `json:"verdict"`
+	From              string   `json:"from"`
+	To                string   `json:"to"`
+	Aggregate         string   `json:"aggregate,omitempty"`
+	Guard             string   `json:"guard,omitempty"`
+	Event             string   `json:"event,omitempty"`
+	GuardAttestations []string `json:"guard_attestations,omitempty"`
+	GuardExplanation  string   `json:"guard_explanation"`
+	Reason            string   `json:"reason"`
 }
 
 func newFSMCmd() *cobra.Command {
@@ -32,7 +35,8 @@ func newFSMCmd() *cobra.Command {
 }
 
 func newFSMTransitionCmd() *cobra.Command {
-	var project, feature, version, aggregate, from, to string
+	var project, feature, version, aggregate, from, to, event string
+	var guards []string
 	var asJSON bool
 
 	c := &cobra.Command{
@@ -61,10 +65,13 @@ func newFSMTransitionCmd() *cobra.Command {
 			}
 			truthMD := string(truthBytes)
 
-			res := evaluateFSMTransition(truthMD, aggregate, from, to)
+			res := evaluateFSMTransition(truthMD, aggregate, from, to, event, guards)
 
 			if asJSON {
-				return printJSON(cmd, res)
+				if err := printJSON(cmd, res); err != nil {
+					return err
+				}
+				return transitionResultError(res)
 			}
 
 			if res.Allowed {
@@ -76,6 +83,7 @@ func newFSMTransitionCmd() *cobra.Command {
 					cmd.Printf("Guard: %s\n", res.Guard)
 				}
 				cmd.Printf("Reason: %s\n", res.Reason)
+				cmd.Printf("Guards: %s\n", res.GuardExplanation)
 				return nil
 			}
 
@@ -84,7 +92,8 @@ func newFSMTransitionCmd() *cobra.Command {
 				cmd.Printf("Aggregate: %s\n", res.Aggregate)
 			}
 			cmd.Printf("Reason: %s\n", res.Reason)
-			return nil
+			cmd.Printf("Guards: %s\n", res.GuardExplanation)
+			return transitionResultError(res)
 		},
 	}
 
@@ -94,6 +103,8 @@ func newFSMTransitionCmd() *cobra.Command {
 	c.Flags().StringVar(&aggregate, "aggregate", "", "optional aggregate root name")
 	c.Flags().StringVar(&from, "from", "", "origin state (required)")
 	c.Flags().StringVar(&to, "to", "", "target state (required)")
+	c.Flags().StringVar(&event, "event", "", "optional event/trigger to disambiguate transitions")
+	c.Flags().StringArrayVar(&guards, "guard", nil, "caller-attested satisfied guard (exact text; repeatable, not business state proof)")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit JSON document")
 
 	_ = c.MarkFlagRequired("feature")
@@ -103,93 +114,74 @@ func newFSMTransitionCmd() *cobra.Command {
 	return c
 }
 
-func evaluateFSMTransition(truthMD, aggregate, from, to string) TransitionResult {
-	normFrom := strings.TrimSpace(from)
-	normTo := strings.TrimSpace(to)
-	lFrom := strings.ToLower(normFrom)
-	lTo := strings.ToLower(normTo)
-
-	// 1. Try DomainFSMProjection
-	dp := gate.ParseDomainFSM(truthMD)
-
-	// Check domain illegal slots first
-	for _, ill := range dp.IllegalSlots {
-		if aggregate != "" && ill.Aggregate != "" && !strings.EqualFold(ill.Aggregate, aggregate) {
+func evaluateFSMTransition(truthMD, aggregate, from, to, event string, guards []string) TransitionResult {
+	res := TransitionResult{
+		From: strings.TrimSpace(from), To: strings.TrimSpace(to), Aggregate: aggregate,
+		Event: strings.TrimSpace(event), GuardAttestations: guards,
+		GuardExplanation: "Supplied guards are caller attestations, not runtime business state proof; no guard expressions are evaluated.",
+	}
+	p := gate.ParseTruthFSM(truthMD)
+	if !p.FiveTuplePresent || len(p.Transitions) == 0 {
+		res.Verdict, res.Reason = "model_missing", "No FSM transition model found"
+		return res
+	}
+	for _, ill := range p.Illegal {
+		if aggregate != "" && ill.Aggregate != "" && !strings.EqualFold(aggregate, ill.Aggregate) {
 			continue
 		}
-		desc := strings.ToLower(ill.Description)
-		if (strings.Contains(desc, lFrom) && strings.Contains(desc, lTo)) ||
-			strings.Contains(desc, fmt.Sprintf("%s->%s", lFrom, lTo)) ||
-			strings.Contains(desc, fmt.Sprintf("%s -> %s", lFrom, lTo)) {
-			return TransitionResult{
-				Allowed:   false,
-				Verdict:   "illegal_transition",
-				From:      normFrom,
-				To:        normTo,
-				Aggregate: ill.Aggregate,
-				Reason:    fmt.Sprintf("Matches explicit illegal transition: %s", ill.Description),
-			}
+		if strings.EqualFold(ill.From, res.From) && strings.EqualFold(ill.To, res.To) {
+			res.Verdict, res.Reason = "illegal_transition", "Matches explicit illegal transition: "+ill.Description
+			return res
 		}
 	}
-
-	// 2. Try FiveTuple FSMProjection illegal slots
-	tp := gate.ParseTruthFSM(truthMD)
-	for _, ill := range tp.Illegal {
-		if strings.EqualFold(ill.From, lFrom) && strings.EqualFold(ill.To, lTo) {
-			return TransitionResult{
-				Allowed: false,
-				Verdict: "illegal_transition",
-				From:    normFrom,
-				To:      normTo,
-				Reason:  fmt.Sprintf("Matches explicit illegal transition: %s -> %s (%s)", ill.From, ill.To, ill.Description),
+	if findings, blocked := gate.ValidateTruthFSM(p); blocked {
+		res.Verdict = "invalid_model"
+		for _, finding := range findings {
+			if finding.Severity == "error" {
+				res.Reason = finding.Text
+				break
 			}
 		}
+		return res
 	}
-
-	// Check aggregate transitions if aggregates exist
-	if len(dp.Aggregates) > 0 {
-		for _, agg := range dp.Aggregates {
-			if aggregate != "" && !strings.EqualFold(agg.Name, aggregate) {
-				continue
-			}
-			for _, t := range agg.Transitions {
-				if strings.EqualFold(strings.TrimSpace(t.From), lFrom) && strings.EqualFold(strings.TrimSpace(t.To), lTo) {
-					return TransitionResult{
-						Allowed:   true,
-						Verdict:   "allowed",
-						From:      normFrom,
-						To:        normTo,
-						Aggregate: agg.Name,
-						Guard:     t.Guard,
-						Reason:    "Transition is explicitly defined in domain aggregate",
-					}
-				}
-			}
+	var match gate.FSMTransition
+	matchCount := 0
+	for _, tr := range p.Transitions {
+		if aggregate != "" && tr.Aggregate != "" && !strings.EqualFold(tr.Aggregate, aggregate) {
+			continue
+		}
+		if strings.EqualFold(tr.State, res.From) && strings.EqualFold(tr.To, res.To) &&
+			(res.Event == "" || tr.Event == res.Event) {
+			match, matchCount = tr, matchCount+1
 		}
 	}
-
-	// Check five-tuple transitions if five-tuple exists
-	if tp.FiveTuplePresent {
-		for _, t := range tp.Transitions {
-			if strings.EqualFold(strings.TrimSpace(t.State), lFrom) && strings.EqualFold(strings.TrimSpace(t.To), lTo) {
-				return TransitionResult{
-					Allowed: true,
-					Verdict: "allowed",
-					From:    normFrom,
-					To:      normTo,
-					Guard:   t.Guard,
-					Reason:  "Transition is explicitly defined in 5-tuple FSM table",
-				}
-			}
+	if matchCount == 0 {
+		res.Verdict, res.Reason = "transition_not_found", fmt.Sprintf("No defined transition from '%s' to '%s' for the requested aggregate/event", res.From, res.To)
+		return res
+	}
+	if matchCount > 1 {
+		res.Verdict, res.Reason = "ambiguous_transition", "Multiple transitions match; supply --event and/or --aggregate to select one unambiguously"
+		return res
+	}
+	tr := match
+	res.Event, res.Guard, res.Aggregate = tr.Event, tr.Guard, tr.Aggregate
+	satisfied := tr.Guard == "" || strings.EqualFold(tr.Guard, "none") || strings.EqualFold(tr.Guard, "true")
+	for _, guard := range guards {
+		if guard == tr.Guard {
+			satisfied = true
 		}
 	}
-
-	// Not found in any transition table
-	return TransitionResult{
-		Allowed: false,
-		Verdict: "transition_not_found",
-		From:    normFrom,
-		To:      normTo,
-		Reason:  fmt.Sprintf("No defined transition from '%s' to '%s'", normFrom, normTo),
+	if !satisfied {
+		res.Verdict, res.Reason = "guard_failed", "Guard is not satisfied; supply --guard with its exact text to attest satisfaction: "+tr.Guard
+		return res
 	}
+	res.Allowed, res.Verdict, res.Reason = true, "allowed", "Transition is explicitly defined in the normalized FSM model"
+	return res
+}
+
+func transitionResultError(res TransitionResult) error {
+	if !res.Allowed {
+		return fail("fsm_"+res.Verdict, "fsm transition", res.Reason)
+	}
+	return nil
 }

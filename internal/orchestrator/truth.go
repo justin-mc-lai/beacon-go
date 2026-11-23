@@ -455,38 +455,21 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string, firstFreeze
 	}
 	pkg := e.packageFiles(ctx)
 	sdd := pkg.Contract == SDDContract
-	members := []struct {
-		name string
-		pf   gate.PackageFile
-	}{
-		{"truth", pkg.Truth}, {"tasks", pkg.Tasks},
-	}
-	if !sdd {
-		members = append(members,
-			struct {
-				name string
-				pf   gate.PackageFile
-			}{"tests", pkg.Tests},
-			struct {
-				name string
-				pf   gate.PackageFile
-			}{"evidence", pkg.Evidence},
-		)
-	}
-	for _, m := range members {
-		if !m.pf.Present || strings.TrimSpace(m.pf.Text) == "" {
+	for _, member := range pkg.RequiredMembers() {
+		if !member.File.Present || strings.TrimSpace(member.File.Text) == "" {
 			view.Blocked = true
 			view.BlockReasons = []string{core.ReasonIntegrityPackageIncomplete}
 			view.Findings = []gate.Finding{{
-				Kind: "missing_or_empty_" + m.name, ReasonCode: core.ReasonIntegrityPackageIncomplete,
-				File: m.pf.Path, Detail: "package member " + m.name + " is missing or empty",
+				Kind: "missing_or_empty_" + member.Name, ReasonCode: core.ReasonIntegrityPackageIncomplete,
+				File: member.File.Path, Detail: "package member " + member.Name + " is missing or empty",
 				RepairRoute: gate.DefaultRepairRoute,
 			}}
 			return view, false, nil
 		}
 	}
 	if sdd {
-		if findings := sddFreezeFindings(pkg); len(findings) > 0 {
+		findings := append(sddFreezeFindings(pkg), e.sddRecordedReviewFindings(ctx, pkg, true)...)
+		if len(findings) > 0 {
 			view.Blocked = true
 			view.Findings = findings
 			seen := map[string]bool{}

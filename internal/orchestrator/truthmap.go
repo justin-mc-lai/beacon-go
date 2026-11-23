@@ -74,14 +74,9 @@ func (e *Engine) truthMapLayoutProblems(fc store.FeatureContext) (gate.PackageFi
 		return pkg, false, nil
 	}
 	var problems []string
-	for _, f := range []struct {
-		name string
-		pf   gate.PackageFile
-	}{
-		{"truth", pkg.Truth}, {"tests", pkg.Tests}, {"tasks", pkg.Tasks}, {"evidence", pkg.Evidence},
-	} {
-		if !f.pf.Present {
-			problems = append(problems, "registered "+f.name+" member missing on disk: "+f.pf.Path)
+	for _, member := range pkg.RequiredMembers() {
+		if !member.File.Present {
+			problems = append(problems, "registered "+member.Name+" member missing on disk: "+member.File.Path)
 		}
 	}
 	if pkg.Truth.Present {
@@ -93,6 +88,9 @@ func (e *Engine) truthMapLayoutProblems(fc store.FeatureContext) (gate.PackageFi
 				problems = append(problems, "truth.md slug "+scalars["slug"]+" != registered slug "+fc.Feature.Slug)
 			}
 			for name, ref := range refs {
+				if pkg.Contract == SDDContract && (name == "tests" || name == "evidence") {
+					continue // Optional legacy refs do not enlarge the two-file contract.
+				}
 				if _, err := os.Stat(resolvePkgPath(fc.Project.RootPath, ref)); err != nil {
 					problems = append(problems, "canonical_refs."+name+" points at missing file "+ref)
 				}

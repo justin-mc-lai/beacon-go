@@ -502,11 +502,10 @@ func traceabilityFailureLabel(tv traceabilityVerdict) string {
 }
 
 // conformanceTraceability judges AC -> TC -> evidence for the run's
-// package. The contract is opt-in: only a package whose truth
-// frontmatter says `traceability_required: true` is hard-checked.
-// Missing tests.md, an unparseable matrix, no AC definition, a soft or
-// docs-only command, a missing Evidence column, an out-of-package
-// evidence path and a non-existent evidence file all fail closed.
+// package. SDD requires traceability by default; legacy packages opt in with
+// `traceability_required: true`. A missing coverage document, unparseable matrix,
+// no AC definition, a soft or docs-only command, a missing Evidence column, an
+// out-of-package evidence path and a non-existent evidence file fail closed.
 func (e *Engine) conformanceTraceability(run store.Run) traceabilityVerdict {
 	fail := func(codes, missing []string, detail string) traceabilityVerdict {
 		return traceabilityVerdict{
@@ -524,12 +523,12 @@ func (e *Engine) conformanceTraceability(run store.Run) traceabilityVerdict {
 		return fail([]string{core.ReasonTraceabilityMissingTC}, nil,
 			"truth.md missing; coverage cannot be judged (fail-closed)")
 	}
-	scalars, _, ok := gate.ParseFrontmatter(pkg.Truth.Text)
+	_, _, ok := gate.ParseFrontmatter(pkg.Truth.Text)
 	if !ok {
 		return fail([]string{core.ReasonTraceabilityMissingTC}, nil,
 			"truth.md frontmatter unreadable; coverage cannot be judged (fail-closed)")
 	}
-	if !strings.EqualFold(strings.TrimSpace(scalars["traceability_required"]), "true") {
+	if !pkg.TraceabilityRequired() {
 		return traceabilityVerdict{
 			Status: "not_required",
 			Detail: "package does not declare traceability_required: true; the four base judgements decide conformance",
@@ -545,14 +544,15 @@ func (e *Engine) conformanceTraceability(run store.Run) traceabilityVerdict {
 		ids = append(ids, id)
 	}
 	sort.Strings(ids)
-	if !pkg.Tests.Present {
+	coverage := pkg.CoverageFile()
+	if !coverage.Present {
 		return fail([]string{core.ReasonTraceabilityMissingTC}, ids,
-			"tests.md missing; AC without TC: "+strings.Join(ids, ", "))
+			coverage.Path+" missing; AC without TC: "+strings.Join(ids, ", "))
 	}
-	rows, hasEvidenceColumn, matrixOK := gate.ParseCoverageMatrix(pkg.Tests.Text)
+	rows, hasEvidenceColumn, matrixOK := gate.ParseCoverageMatrix(coverage.Text)
 	if !matrixOK {
 		return fail([]string{core.ReasonTraceabilityMissingTC}, ids,
-			"tests.md has no parseable AC ID coverage matrix; AC without TC: "+strings.Join(ids, ", "))
+			coverage.Path+" has no parseable AC ID coverage matrix; AC without TC: "+strings.Join(ids, ", "))
 	}
 	root := ctx.Project.RootPath
 	pkgDir := filepath.Dir(resolvePkgPath(root, ctx.Feature.TruthPath))

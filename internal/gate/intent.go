@@ -446,7 +446,7 @@ func CheckIntentGate(pkg PackageFiles) []Finding {
 	// appear) let a wrong graph freeze.
 	if truthyValue(scalars["domain_required"]) {
 		proj := ParseTruthFSM(pkg.Truth.Text)
-		if !proj.FiveTuplePresent {
+		if !proj.FiveTuplePresent || len(proj.Transitions) == 0 {
 			add("intent_fsm_missing", core.ReasonIntentFSMMissing,
 				"domain_required is true but no FSM five-tuple (State|Event|Guard|To|Action) table is present")
 		} else {

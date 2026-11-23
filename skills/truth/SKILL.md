@@ -36,25 +36,28 @@ keeps pointers and events, never the body. Freeze is canonical-branch only.
 
 `beacon truth create --sdd` writes only `truth.md` + `tasks.md`:
 
-- `truth.md` is the Spec: intent snapshot, open questions, intent coverage,
-  subagent plan, FSM (Mermaid `stateDiagram` + From/To table), acceptance
-  criteria, AC/TC matrix, out-of-scope.
-- `tasks.md` is the task DAG with dependencies, AC bindings and evidence paths.
+- `truth.md` is the Spec: grounded intent, questions, assumptions, AC/TC matrix,
+  explicit `fsm_required` / `negative_required`, applicable FSM and transition coverage.
+- `tasks.md` is the executable DAG (`TASK | Action | Depends | AC | Command | Verify | Evidence | Auto`).
 - `tests.md`, `evidence.md` and `restatement.md` are optional. Evidence lives in
   `evidence/` and is referenced from tasks and the matrix.
 
-Freeze floors for an SDD package:
+Freeze requirements for an SDD package:
 
-1. At least 5 acceptance criteria.
-2. At least 3 executable TCs per AC, at least 2 of them negative.
-3. A `## FSM` section with a Mermaid `stateDiagram` and a From/To transition
-   table of at least 3 rows.
-4. A `## Subagent Plan` covering the roles `beacon truth roles` selects.
-5. No placeholder phrases.
+1. Replace scaffold content; record `package_author`, grounding and resolved assumptions.
+2. Every AC has a positive observable case; negative cases follow the explicit risk policy.
+3. Unique TC IDs and real verification commands. Fixed AC/TC counts are not quality proof.
+4. Stateful work uses the shared parsed FSM and transition-to-TC coverage; stateless work explicitly declares `fsm_required: false`.
+5. Obtain the content fingerprint with `truth semantic-review --feature <slug> --json`.
+   An independent reviewer returns JSON (`fingerprint`, `reviewer`, `verdict`, `findings`, `summary`).
+   Record with `truth semantic-review --feature <slug> --file <receipt.json>`.
+6. `truth confirm --by <owner>` binds that exact reviewed content; edits invalidate it.
 
-`beacon truth roles --utterance "..."` prints the on-demand subagent plan:
-stages, selected roles, deferred specialists and coverage. A workflow utterance
-without `domain-fsm-architect` is not ready.
+`truth roles` recommends specialists only. Role names are not execution receipts,
+semantic review evidence or freeze prerequisites. The external harness performs
+the review; the kernel checks the recorded receipt and never calls an LLM.
+Execute admitted task graphs via `implement tasks run`; optional bounded repair
+uses an explicit external command. Release and installation remain human actions.
 
 Legacy four-piece packages keep the old contract; only packages declaring
 `package_contract: truth-tasks` use the two-file gates.

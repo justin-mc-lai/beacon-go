@@ -43,9 +43,10 @@ would wake it.
 ## Rules
 
 1. No model call in selection; deterministic keyword rules, testable.
-2. A workflow signal without `domain-fsm-architect` fails coverage.
+2. A workflow signal recommends a state-model specialist; the package declares actual FSM applicability explicitly.
 3. A specialist never runs just because it exists in the catalog.
-4. Actual spawning stays with the external harness; the plan is the contract.
+4. Actual spawning stays with the external harness. Listing a role is not proof that it executed.
+5. Independent semantic review is recorded with `truth semantic-review --file <receipt.json>` and bound to exact truth/task content. The reviewer must differ from `package_author`.
 
 ## Relation
 
