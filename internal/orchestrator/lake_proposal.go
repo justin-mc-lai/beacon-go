@@ -6,6 +6,7 @@ package orchestrator
 
 import (
 	"fmt"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -16,18 +17,20 @@ import (
 const LakeProposalSchema = "lake-proposal.v1"
 
 type LakeProposal struct {
-	Schema         string             `json:"schema"`
-	ProposalID     string             `json:"proposal_id"`
-	Utterance      string             `json:"utterance"`
-	Version        string             `json:"version,omitempty"`
-	CommercialLens []string           `json:"commercial_lens,omitempty"`
-	Lakes          []LakeProposalLake `json:"lakes"`
-	NotProposed    []NotProposedLake  `json:"not_proposed"`
-	OpenQuestions  []string           `json:"open_questions,omitempty"`
-	Selected       []string           `json:"selected,omitempty"`
-	Rejected       []string           `json:"rejected,omitempty"`
-	SelectedBy     string             `json:"selected_by,omitempty"`
-	SelectedAt     string             `json:"selected_at,omitempty"`
+	Schema          string             `json:"schema"`
+	ProposalID      string             `json:"proposal_id"`
+	Utterance       string             `json:"utterance"`
+	Version         string             `json:"version,omitempty"`
+	PackageContract string             `json:"package_contract,omitempty"`
+	Readiness       string             `json:"readiness,omitempty"`
+	CommercialLens  []string           `json:"commercial_lens,omitempty"`
+	Lakes           []LakeProposalLake `json:"lakes"`
+	NotProposed     []NotProposedLake  `json:"not_proposed"`
+	OpenQuestions   []string           `json:"open_questions,omitempty"`
+	Selected        []string           `json:"selected,omitempty"`
+	Rejected        []string           `json:"rejected,omitempty"`
+	SelectedBy      string             `json:"selected_by,omitempty"`
+	SelectedAt      string             `json:"selected_at,omitempty"`
 }
 
 type LakeProposalLake struct {
@@ -41,6 +44,8 @@ type LakeProposalLake struct {
 	Size           string   `json:"size"`
 	AcceptanceSeed string   `json:"acceptance_seed"`
 	OutOfScope     []string `json:"out_of_scope,omitempty"`
+	Truth          string   `json:"truth,omitempty"`
+	Tasks          string   `json:"tasks,omitempty"`
 	Questions      []string `json:"questions,omitempty"`
 }
 
@@ -55,6 +60,9 @@ type NotProposedLake struct {
 func ValidateLakeProposal(p LakeProposal) error {
 	if p.Schema != "" && p.Schema != LakeProposalSchema {
 		return core.NewError(core.ReasonLakeProposalInvalid, "program.propose", "unknown schema "+p.Schema)
+	}
+	if p.PackageContract != "" && p.PackageContract != SDDContract {
+		return core.NewError(core.ReasonLakeProposalInvalid, "program.propose", "unknown package_contract "+p.PackageContract)
 	}
 	if strings.TrimSpace(p.Utterance) == "" {
 		return core.NewError(core.ReasonLakeProposalMissingField, "program.propose", "utterance is required")
@@ -92,6 +100,11 @@ func ValidateLakeProposal(p LakeProposal) error {
 		default:
 			return core.NewError(core.ReasonLakeProposalInvalid, "program.propose",
 				"lake "+slug+" size must be S/M/L, got "+l.Size)
+		}
+		if p.PackageContract == SDDContract {
+			if err := validateSDDProposalLake(p, l); err != nil {
+				return err
+			}
 		}
 	}
 	if len(p.NotProposed) == 0 {
@@ -165,6 +178,25 @@ func (e *Engine) ProgramPropose(runID string, p LakeProposal) (LakeProposal, err
 	if err := ValidateLakeProposal(p); err != nil {
 		return LakeProposal{}, err
 	}
+	if p.PackageContract == SDDContract {
+		fc, ok, err := e.featureContextOf(run.FeatureID)
+		if err != nil {
+			return LakeProposal{}, err
+		}
+		if !ok {
+			return LakeProposal{}, core.NewError(ReasonProjectNotRegistered, "program.propose", "SDD proposal needs a registered feature context")
+		}
+		for _, lake := range p.Lakes {
+			pkgRel := filepath.Join(fc.Version.DocsRoot, "features", lake.Slug)
+			if _, err := safeSDDProposalPath(fc.Project.RootPath, pkgRel); err != nil {
+				return LakeProposal{}, sddProposalError(lake.Slug, err.Error())
+			}
+			if err := validateSDDProposalLocation(fc, p, lake, pkgRel); err != nil {
+				return LakeProposal{}, err
+			}
+		}
+	}
+	p.Readiness = lakeProposalReadiness(p)
 	if strings.TrimSpace(p.ProposalID) == "" {
 		p.ProposalID = fmt.Sprintf("lp_%d", time.Now().UnixNano())
 	}
@@ -194,6 +226,10 @@ func (e *Engine) ProgramSelect(runID, proposalID string, selected, rejected []st
 		return LakeProposal{}, core.NewError(core.ReasonLakeProposalNotFound, "program.select",
 			"no proposal "+proposalID+" on run "+runID)
 	}
+	if err := ValidateLakeProposal(*m.LakeProposal); err != nil {
+		return LakeProposal{}, err
+	}
+	m.LakeProposal.Readiness = lakeProposalReadiness(*m.LakeProposal)
 	if len(selected) == 0 {
 		return LakeProposal{}, core.NewError(core.ReasonLakeProposalSelectionEmpty, "program.select",
 			"select at least one lake")
@@ -232,13 +268,19 @@ func (e *Engine) ProgramSelect(runID, proposalID string, selected, rejected []st
 	if !ok {
 		return LakeProposal{}, core.NewError(ReasonProjectNotRegistered, "program.select", "no feature context for run "+runID)
 	}
-	for _, s := range selected {
-		_, cerr := e.CreateTruthPackage(fc.Project.RootPath, fc.Version.Version, s)
-		if cerr != nil {
-			if rc, _ := core.ReasonCodeOf(cerr); rc == ReasonTruthPackageExists || rc == ReasonTruthPackageDirExists {
-				continue
+	if m.LakeProposal.PackageContract == SDDContract {
+		if err := e.selectSDDProposal(fc, *m.LakeProposal, chosen); err != nil {
+			return LakeProposal{}, err
+		}
+	} else {
+		for _, s := range selected {
+			_, cerr := e.CreateTruthPackage(fc.Project.RootPath, fc.Version.Version, s)
+			if cerr != nil {
+				if rc, _ := core.ReasonCodeOf(cerr); rc == ReasonTruthPackageExists || rc == ReasonTruthPackageDirExists {
+					continue
+				}
+				return LakeProposal{}, cerr
 			}
-			return LakeProposal{}, cerr
 		}
 	}
 	if err := e.appendEvent(run, "lake_proposal_selected", map[string]any{

@@ -265,6 +265,15 @@ func (e *Engine) ProgramPlan(runID string, in ProgramPlanInput) (ProgramState, e
 		return *m.Program, core.NewError(core.ReasonProgramPlanFrozen, "program.Plan",
 			"program plan is frozen; record a change with goal program change instead")
 	}
+	if in.Freeze {
+		slugs := make([]string, 0, len(in.Lakes))
+		for _, lake := range in.Lakes {
+			slugs = append(slugs, lake.Slug)
+		}
+		if err := e.checkSDDProgramFreeze(run, m, slugs); err != nil {
+			return ProgramState{}, err
+		}
+	}
 	now := nowRFC()
 	st := &ProgramState{Slug: in.Slug, Goal: in.Goal, ScopeMode: in.ScopeMode, CreatedAt: now}
 	event := "program_plan_created"
@@ -315,6 +324,9 @@ func (e *Engine) ProgramFreeze(runID string) (ProgramState, error) {
 		return ProgramState{}, core.NewError(core.ReasonProgramPlanMissing, "program.Freeze",
 			"run "+runID+" has no program plan")
 	}
+	if err := e.checkSDDProgramFreeze(run, m, m.Program.lakeSlugs()); err != nil {
+		return ProgramState{}, err
+	}
 	if m.Program.Frozen {
 		return *m.Program, nil // already frozen: idempotent
 	}
@@ -359,6 +371,15 @@ func (e *Engine) ProgramChange(runID, note string, lakes []ProgramLakeInput, rep
 		if problems := ValidateProgramGraph(lakes); len(problems) > 0 {
 			p := problems[0]
 			return *m.Program, core.NewError(p.ReasonCode, "program.Change", p.Detail)
+		}
+		if m.Program.Frozen {
+			slugs := make([]string, 0, len(lakes))
+			for _, lake := range lakes {
+				slugs = append(slugs, lake.Slug)
+			}
+			if err := e.checkSDDProgramFreeze(run, m, slugs); err != nil {
+				return *m.Program, err
+			}
 		}
 		m.Program.Lakes = programLakesOf(lakes, nil) // admissions cleared
 		after = m.Program.lakeSlugs()

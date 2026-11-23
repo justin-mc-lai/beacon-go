@@ -619,6 +619,11 @@ func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload
 			raw = []byte(updated)
 		}
 	}
+	// SDD's coverage authority aliases truth, so hash the normalized final
+	// truth bytes on both sides rather than mixing pre/post strict metadata.
+	if packageContract(string(raw)) == SDDContract {
+		testsRawBefore = raw
+	}
 	sum := sha256.Sum256(rawBefore)
 	if payload == nil {
 		payload = map[string]any{}

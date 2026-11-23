@@ -19,15 +19,12 @@ func newTruthDecomposeCmd() *cobra.Command {
 	var asJSON bool
 	c := &cobra.Command{
 		Use:   "decompose",
-		Short: "Decompose one utterance into a draft package (sub-intents, journey seeds, AC/TC/task materialization)",
-		Long: "Ports intent_decomposition.decompose_product_intent +\n" +
-			"intent_first materialization: split the utterance into classified\n" +
-			"sub-intents, match journey seeds, derive ACs (one per clause, one\n" +
-			"per journey acceptance seed) with provenance, render the user\n" +
-			"journey section from the seeds, and lay down tests.md / tasks.md.\n" +
-			"The package must already exist as a draft (`truth create`);\n" +
-			"decomposition never signs — the human still records intent and\n" +
-			"confirms before freeze.",
+		Short: "Deterministic non-LLM rule decomposition into unconfirmed draft suggestions",
+		Long: "Deterministic, non-LLM rule decomposition (非 LLM 规则拆分).\n" +
+			"Keyword/clause matching produces candidate suggestions, not semantic readiness.\n" +
+			"SDD packages keep truth.md + tasks.md; human grounding, questions, actual tests,\n" +
+			"independent review and owner confirmation remain mandatory before freeze.\n" +
+			"Existing authored acceptance criteria or executable task content are not overwritten.",
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			st, err := openWriteStore()
