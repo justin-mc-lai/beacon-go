@@ -167,6 +167,21 @@ func TestProgramCompleteSingleSignature(t *testing.T) {
 	if !found {
 		t.Fatal("program_release_confirmed event missing")
 	}
+	// One signature releases the sea: host run and host feature must agree.
+	_, hm, _, err := env.eng.loadRun(hostID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if hm.LoopStage != string(core.LoopDone) {
+		t.Fatalf("host run not done: %s", hm.LoopStage)
+	}
+	lc, err := env.st.Features().GetLifecycle(env.feature.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if lc.Stage != core.StageRelease || lc.Status != core.StatusCompleted {
+		t.Fatalf("host feature lifecycle = %s/%s, want release/completed", lc.Stage, lc.Status)
+	}
 }
 
 func TestProgramCompleteRefusesLakeNotAtGate(t *testing.T) {

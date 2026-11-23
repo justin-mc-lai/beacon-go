@@ -13,6 +13,7 @@ import (
 
 	"beacon-go/internal/core"
 	"beacon-go/internal/gate"
+	"beacon-go/internal/store"
 )
 
 func (e *Engine) ProgramComplete(hostRunID, confirmedBy string) (ProgramDriveView, error) {
@@ -120,12 +121,32 @@ func (e *Engine) ProgramComplete(hostRunID, confirmedBy string) (ProgramDriveVie
 		m.Program.Lakes[i].UpdatedAt = now
 	}
 	m.Program.UpdatedAt = now
-	if err := e.appendEvent(run, "program_release_confirmed", map[string]any{
-		"by": confirmedBy, "lakes": confirmed,
-	}); err != nil {
-		return ProgramDriveView{}, err
+	// The one program signature is also the host sea package's release:
+	// delivered + host lifecycle + host run terminal state are ONE fact.
+	// Writing them separately left the feature table at Freeze while the
+	// program said delivered (state-machine atomicity drift).
+	m.ReleaseHumanConfirmed = true
+	m.HumanConfirmedBy = confirmedBy
+	m.LoopStage = string(core.LoopDone)
+	m.Blocked = false
+	m.BlockedStreak = 0
+	m.LastBlockReason = ""
+	if idx := m.CurrentStageIdx; idx >= 0 && idx < len(m.StagePlan) {
+		m.StagePlan[idx].Status = "done"
 	}
-	if err := e.saveRun(run, m); err != nil {
+	if err := e.store.WithTx(func(tx *store.Tx) error {
+		if err := e.appendEventOn(tx, run, "program_release_confirmed", map[string]any{
+			"by": confirmedBy, "lakes": confirmed, "host_feature_released": true,
+		}); err != nil {
+			return err
+		}
+		if err := e.saveRunOn(tx, run, m); err != nil {
+			return err
+		}
+		return updateLifecycleMonotonic(tx.Features(), store.Lifecycle{
+			FeatureID: run.FeatureID, Stage: core.StageRelease, Status: core.StatusCompleted,
+		})
+	}); err != nil {
 		return ProgramDriveView{}, err
 	}
 	fresh, ferr := e.ProgramRoute(hostRunID)
