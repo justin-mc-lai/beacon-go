@@ -124,6 +124,19 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 		ok(AdmissionItem{Check: "truth_frozen", OK: true, Applicable: true,
 			Detail: "truth frozen (source: " + in.FrozenSource + ")"})
 	}
+	if fc, fcErr := e.featureContext(run.FeatureID); fcErr != nil {
+		return AdmissionResult{}, fcErr
+	} else {
+		pkg := e.packageFiles(fc)
+		if pkg.Contract == SDDContract {
+			findings := e.sddRecordedReviewFindings(fc, pkg, true)
+			if len(findings) > 0 {
+				fail(AdmissionItem{Check: "sdd_current_confirmation", Applicable: true, ReasonCode: findings[0].ReasonCode, Detail: findings[0].Detail})
+			} else {
+				ok(AdmissionItem{Check: "sdd_current_confirmation", Applicable: true, OK: true, Detail: "independent review and confirmation bind current truth/tasks"})
+			}
+		}
+	}
 
 	// 2. worktree binding: the run's bound ref must be the workstation
 	// the plan assigns. No plan -> the project root itself (".") is

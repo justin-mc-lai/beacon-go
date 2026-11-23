@@ -169,23 +169,20 @@ func (e *Engine) flowCriterion(run store.Run, m *runMeta, slug, step string) (ok
 		}
 		return true, "", "stage plan present (" + strconv.Itoa(len(m.StagePlan)) + " stages) — advisory/planning record on the run", nil, nil
 	case FlowStepAuthoring:
-		// Fact: the four-piece package is drafted on the canonical
+		// Fact: the contract-required package is drafted on the canonical
 		// branch (S1 branch fact + the truth surface's files).
 		if !hasFC {
 			return false, core.ReasonStageExitTruthMissing, "feature is not registered; no package can be authored", nil, nil
 		}
 		pkg := e.packageFiles(fc)
 		var missing []string
-		for _, f := range []struct {
-			name string
-			p    bool
-		}{{"truth", pkg.Truth.Present}, {"tests", pkg.Tests.Present}, {"tasks", pkg.Tasks.Present}, {"evidence", pkg.Evidence.Present}} {
-			if !f.p {
-				missing = append(missing, f.name)
+		for _, member := range pkg.RequiredMembers() {
+			if !member.File.Present {
+				missing = append(missing, member.Name)
 			}
 		}
 		if len(missing) > 0 {
-			return false, core.ReasonStageExitTruthMissing, "package four-piece set is not drafted on disk; missing: " + strings.Join(missing, ", "), nil, nil
+			return false, core.ReasonStageExitTruthMissing, "required package members are not drafted on disk; missing: " + strings.Join(missing, ", "), nil, nil
 		}
 		bi := e.branchInfo(fc.Project.RootPath)
 		if bi.IsGit && bi.BranchCheck != BranchCheckOK {
@@ -196,7 +193,7 @@ func (e *Engine) flowCriterion(run store.Run, m *runMeta, slug, step string) (ok
 		if bi.IsGit {
 			where = "canonical branch " + bi.CanonicalBranch
 		}
-		return true, "", "four-piece package drafted on the canonical branch (" + where + ")", nil, nil
+		return true, "", "required package members drafted on the canonical branch (" + where + ")", nil, nil
 	case FlowStepRefreeze:
 		// Fact: a freeze/refreeze event is on the trail AND the
 		// shared frozen determination says frozen.

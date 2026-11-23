@@ -267,6 +267,15 @@ func (e *Engine) IntentState(ctx store.FeatureContext) (IntentView, error) {
 		}
 		v.BlockReasons = append(v.BlockReasons, f.ReasonCode+": "+f.Detail)
 	}
+	if pkg.Contract == SDDContract {
+		findings := e.sddRecordedReviewFindings(ctx, pkg, v.Confirmed)
+		for _, f := range findings {
+			v.BlockReasons = append(v.BlockReasons, f.ReasonCode+": "+f.Detail)
+		}
+		if len(findings) > 0 {
+			v.Confirmed = false
+		}
+	}
 	v.Ready = v.Confirmed && len(v.BlockReasons) == 0
 	return v, nil
 }
@@ -343,11 +352,20 @@ func (e *Engine) ConfirmIntent(ctx store.FeatureContext, by string) (IntentView,
 		}
 		reasons = append(reasons, f.Kind+": "+f.Detail)
 	}
+	if pkg.Contract == SDDContract {
+		for _, f := range e.sddRecordedReviewFindings(ctx, pkg, false) {
+			reasons = append(reasons, f.Kind+": "+f.Detail)
+		}
+	}
 	if len(reasons) > 0 {
 		return IntentView{}, core.NewError(core.ReasonIntentNotConfirmed, "truth.Confirm",
 			"intent is not ready to sign: "+strings.Join(reasons, "; "))
 	}
 	out, _ := setFrontmatterScalar(text, "intent_confirmed", "true")
+	if pkg.Contract == SDDContract {
+		out, _ = setFrontmatterScalar(out, "intent_confirmation_fingerprint", gate.SDDReviewFingerprint(pkg))
+		out, _ = setFrontmatterScalar(out, "intent_confirmation_by", by)
+	}
 	if err := writeTruthText(ctx, out); err != nil {
 		return IntentView{}, err
 	}

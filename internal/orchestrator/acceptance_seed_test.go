@@ -4,9 +4,9 @@
 // delivery: every one of them FAILS on main today and must be turned
 // green by the implement round without editing what they assert.
 //
-//   AC-001  a proposal whose acceptance_seed is prose is refused
-//   AC-002  harvest refuses a result that only carries test artifacts
-//   AC-003  harvest refuses a result that cannot show the red baseline
+//	AC-001  a proposal whose acceptance_seed is prose is refused
+//	AC-002  harvest refuses a result that only carries test artifacts
+//	AC-003  harvest refuses a result that cannot show the red baseline
 //
 // They use only behaviour that already exists (ValidateLakeProposal,
 // HarvestLaneResult, the lane/harvest fixtures), so they compile

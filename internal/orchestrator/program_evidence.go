@@ -43,15 +43,15 @@ func (e *Engine) programRequirementFP(root, runID string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	truth, err := os.ReadFile(resolvePkgPath(root, feat.TruthPath))
-	if err != nil {
-		return "", err
+	pkg := e.packageFiles(store.FeatureContext{Project: store.Project{RootPath: root}, Feature: feat})
+	coverage := pkg.CoverageFile()
+	if !pkg.Truth.Present {
+		return "", fmt.Errorf("requirement truth missing: %s", pkg.Truth.Path)
 	}
-	tests, err := os.ReadFile(resolvePkgPath(root, feat.TestsPath))
-	if err != nil {
-		return "", err
+	if !coverage.Present {
+		return "", fmt.Errorf("requirement coverage missing: %s", coverage.Path)
 	}
-	return core.PackageFingerprint(truth, tests), nil
+	return core.PackageFingerprint([]byte(pkg.Truth.Text), []byte(coverage.Text)), nil
 }
 
 func (e *Engine) lakeQADigest(root, runID string, refs []string) (string, error) {

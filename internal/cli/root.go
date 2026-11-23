@@ -72,7 +72,7 @@ import (
 // streaming forwards real deltas, benchmark and file-size gates exist,
 // and the frozen feature packages are reconciled (docs/changes/change-audit-2026-10-29.md).
 // Development builds between exits carried a dev suffix.
-const Version = "2.0.0-go.15"
+const Version = "2.0.0-go.16"
 
 // NewRootCmd builds the beacon root command with the six first-class
 // abilities as real command groups (P4a convergence): goal (the loop

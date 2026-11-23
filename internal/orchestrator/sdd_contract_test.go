@@ -11,7 +11,7 @@ import (
 
 func sddTruthFixture(acs int, negPerAC int, withFSM bool, plan string) string {
 	var b strings.Builder
-	b.WriteString("---\nslug: demo\nversion: v0.0.1\npackage_contract: truth-tasks\ntraceability_required: true\n---\n\n")
+	b.WriteString("---\nslug: demo\nversion: v0.0.1\npackage_contract: truth-tasks\ntraceability_required: true\nfsm_required: false\nnegative_required: false\n---\n\n")
 	b.WriteString("# Requirement Truth: demo\n\n")
 	b.WriteString("## User Intent Snapshot\n\n```yaml\nutterance: \"订单审批流程：从待支付到已发布，带发布部署\"\ngoal: g\nnon_goals: n\nconstraints: c\n```\n\n")
 	if withFSM {
@@ -43,51 +43,42 @@ func findingCodes(fs []gate.Finding) map[string]bool {
 }
 
 func TestSDDContractPasses(t *testing.T) {
-	plan := "business-analyst\nproduct-manager\ndomain-fsm-architect\ndevops-engineer\nsecurity-engineer\ntest-automator\ntask-distributor\narchitect-reviewer"
-	pkg := gate.PackageFiles{
-		Contract: SDDContract,
-		Truth:    gate.PackageFile{Path: "truth.md", Present: true, Text: sddTruthFixture(5, 2, true, plan)},
-		Tasks:    gate.PackageFile{Path: "tasks.md", Present: true, Text: "## Task Ledger\n"},
-	}
+	text := sddTruthFixture(1, 1, false, "")
+	pkg := gate.PackageFiles{Contract: SDDContract, Truth: gate.PackageFile{Path: "truth.md", Present: true, Text: text}}
 	if fs := sddFreezeFindings(pkg); len(fs) != 0 {
-		t.Fatalf("valid SDD package blocked: %+v", fs)
+		t.Fatalf("small stateless contract blocked: %+v", fs)
 	}
 }
 
-func TestSDDContractRejectsThinCounts(t *testing.T) {
-	plan := "business-analyst\nproduct-manager\ndomain-fsm-architect\ndevops-engineer\nsecurity-engineer\ntest-automator\ntask-distributor\narchitect-reviewer"
-	pkg := gate.PackageFiles{Contract: SDDContract,
-		Truth: gate.PackageFile{Path: "truth.md", Present: true, Text: sddTruthFixture(4, 2, true, plan)}}
-	if !findingCodes(sddFreezeFindings(pkg))[core.ReasonSDDACMin] {
-		t.Fatal("4 ACs must trip sdd_ac_min")
+func TestSDDContractRejectsDuplicateTC(t *testing.T) {
+	text := strings.Replace(sddTruthFixture(5, 2, true, "business-analyst product-manager domain-fsm-architect devops-engineer security-engineer test-automator task-distributor architect-reviewer"), "TC-012", "TC-011", 1)
+	pkg := gate.PackageFiles{Contract: SDDContract, Truth: gate.PackageFile{Path: "truth.md", Present: true, Text: text}}
+	if !findingCodes(sddFreezeFindings(pkg))["sdd_tc_duplicate"] {
+		t.Fatal("duplicate TC identity must be refused")
 	}
-	pkg.Truth.Text = sddTruthFixture(5, 1, true, plan)
-	if !findingCodes(sddFreezeFindings(pkg))[core.ReasonSDDNegativeMin] {
-		t.Fatal("1 negative per AC must trip sdd_negative_tc_min")
+}
+
+func TestSDDContractRejectsTrivialCommand(t *testing.T) {
+	text := strings.ReplaceAll(sddTruthFixture(5, 2, true, "business-analyst product-manager domain-fsm-architect devops-engineer security-engineer test-automator task-distributor architect-reviewer"), "go test ./x -run T1 -count=1", "true")
+	pkg := gate.PackageFiles{Contract: SDDContract, Truth: gate.PackageFile{Path: "truth.md", Present: true, Text: text}}
+	if !findingCodes(sddFreezeFindings(pkg))["sdd_tc_not_executable"] {
+		t.Fatal("a success-only command is not verification")
 	}
 }
 
 func TestSDDContractRequiresFSM(t *testing.T) {
-	plan := "business-analyst\nproduct-manager\ndomain-fsm-architect\ndevops-engineer\nsecurity-engineer\ntest-automator\ntask-distributor\narchitect-reviewer"
-	pkg := gate.PackageFiles{Contract: SDDContract,
-		Truth: gate.PackageFile{Path: "truth.md", Present: true, Text: sddTruthFixture(5, 2, false, plan)}}
+	text := strings.Replace(sddTruthFixture(5, 2, false, ""), "fsm_required: false", "fsm_required: true", 1)
+	pkg := gate.PackageFiles{Contract: SDDContract, Truth: gate.PackageFile{Path: "truth.md", Present: true, Text: text}}
 	if !findingCodes(sddFreezeFindings(pkg))[core.ReasonSDDFSMRequired] {
-		t.Fatal("missing FSM must trip sdd_fsm_required")
+		t.Fatal("declared stateful work must have a model")
 	}
 }
 
 func TestSDDContractRejectsPlaceholder(t *testing.T) {
-	text := strings.Replace(sddTruthFixture(5, 2, true, "business-analyst\nproduct-manager\ntest-automator\ntask-distributor\narchitect-reviewer"), "criterion 1", "（一句话说清）", 1)
-	pkg := gate.PackageFiles{Contract: SDDContract, Truth: gate.PackageFile{Path: "truth.md", Present: true, Text: text}}
+	files := truthSkeletonSDD("demo", "v0.0.1", "docs/demo")
+	text := strings.Replace(files["truth.md"], `utterance: ""`, `utterance: "round prices"`, 1)
+	pkg := gate.PackageFiles{Contract: SDDContract, Truth: gate.PackageFile{Path: "truth.md", Present: true, Text: text}, Tasks: gate.PackageFile{Text: files["tasks.md"]}}
 	if !findingCodes(sddFreezeFindings(pkg))[core.ReasonSDDPlaceholder] {
-		t.Fatal("placeholder text must trip sdd_placeholder")
-	}
-}
-
-func TestSDDContractRequiresPlannedRoles(t *testing.T) {
-	pkg := gate.PackageFiles{Contract: SDDContract,
-		Truth: gate.PackageFile{Path: "truth.md", Present: true, Text: sddTruthFixture(5, 2, true, "business-analyst")}}
-	if !findingCodes(sddFreezeFindings(pkg))[core.ReasonSDDRolesRequired] {
-		t.Fatal("missing planned roles must trip sdd_roles_required")
+		t.Fatal("recording intent must not make generated scaffold freezable")
 	}
 }

@@ -447,22 +447,28 @@ func ValidateFeaturePackage(pkg PackageFiles, resolveRef func(string) string, fi
 		}
 	}
 
-	if pkg.Tests.Present {
-		rows := extractTestRowsFP(pkg.Tests.Text)
+	matrix := pkg.CoverageFile()
+	if matrix.Present {
+		rows := extractTestRowsFP(matrix.Text)
 		if len(rows) == 0 {
-			add(pkg.Tests.Path, "tests_coverage_table_missing")
+			add(matrix.Path, "tests_coverage_table_missing")
 		}
 		for _, row := range rows {
 			combined := row.Command + " " + row.Assertion
 			if strings.TrimSpace(row.Command) == "" && !strings.Contains(combined, "BLOCKED:") {
-				add(pkg.Tests.Path, "test_command_missing_or_blocked")
+				add(matrix.Path, "test_command_missing_or_blocked")
 			} else if extSoftCellRe.MatchString(strings.TrimSpace(row.Command)) && !fpHardCmdRe.MatchString(combined) {
-				add(pkg.Tests.Path, "soft_test_command_only")
+				add(matrix.Path, "soft_test_command_only")
 			}
 		}
 	}
 
-	if pkg.Tasks.Present {
+	if pkg.Tasks.Present && pkg.Contract == "truth-tasks" {
+		if _, err := ParseTaskDAG(pkg.Tasks.Text, DefinedACs(pkg.Truth.Text)); err != nil {
+			add(pkg.Tasks.Path, err.Error())
+		}
+	}
+	if pkg.Tasks.Present && pkg.Contract != "truth-tasks" {
 		count, bad := parseCheckboxesFP(pkg.Tasks.Text)
 		for _, line := range bad {
 			findings = append(findings, Finding{

@@ -1,5 +1,5 @@
 // Truth Integrity Gate service (P3a, AC-101): gathers one feature
-// package (four-piece set) + the feature's registered artifact
+// package (contract-required members) + the feature's registered artifact
 // pointers, runs gate.CheckIntegrity, and persists the verdict under
 // gate_type=truth_integrity.
 package orchestrator
@@ -28,14 +28,13 @@ type IntegrityView struct {
 	RepairRoute  string         `json:"repair_route,omitempty"`
 }
 
-// packageFiles gathers the four-piece package for the integrity
-// check: truth/tests paths come from the feature row (tests falling
-// back to the sibling file), tasks/evidence from the truth
-// frontmatter's canonical_refs when declared, else siblings.
+// packageFiles gathers package members from registered paths and canonical_refs.
+// SDD coverage always comes from truth.md, regardless of a legacy TestsPath.
 func (e *Engine) packageFiles(ctx store.FeatureContext) gate.PackageFiles {
 	root := ctx.Project.RootPath
 	feat := ctx.Feature
 	pkg := gate.PackageFiles{Slug: feat.Slug, Truth: readPkgFile(root, feat.TruthPath)}
+	pkg.Contract = packageContract(pkg.Truth.Text)
 	testsPath, tasksPath, evidencePath := feat.TestsPath, siblingPkgPath(feat.TruthPath, "tasks.md"), siblingPkgPath(feat.TruthPath, "evidence.md")
 	if pkg.Truth.Present {
 		_, refs, ok := gate.ParseFrontmatter(pkg.Truth.Text)
@@ -54,11 +53,14 @@ func (e *Engine) packageFiles(ctx store.FeatureContext) gate.PackageFiles {
 	if testsPath == "" {
 		testsPath = siblingPkgPath(feat.TruthPath, "tests.md")
 	}
-	pkg.Tests = readPkgFile(root, testsPath)
+	if pkg.Contract == SDDContract {
+		pkg.Tests = pkg.CoverageFile()
+	} else {
+		pkg.Tests = readPkgFile(root, testsPath)
+	}
 	pkg.Tasks = readPkgFile(root, tasksPath)
 	pkg.Evidence = readPkgFile(root, evidencePath)
 	pkg.Restatement = readPkgFile(root, siblingPkgPath(feat.TruthPath, gate.RestatementFile))
-	pkg.Contract = packageContract(pkg.Truth.Text)
 	return pkg
 }
 

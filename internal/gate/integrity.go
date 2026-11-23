@@ -223,9 +223,11 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 			lowered[j] = strings.ToLower(c)
 		}
 		if containsCell(lowered, "ac id") {
-			inMatrix = true
+			inMatrix = containsCell(lowered, "tc id")
+			if !inMatrix {
+				continue
+			}
 			ok = true
-			rows = nil // the last AC ID table wins; an AC table has no TC rows
 			evidenceCol = -1
 			requiredCol = -1
 			layerCol = -1
@@ -240,9 +242,7 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 					layerCol = j
 				}
 			}
-			if evidenceCol >= 0 {
-				hasEvidenceColumn = true
-			}
+			hasEvidenceColumn = hasEvidenceColumn || evidenceCol >= 0
 			continue
 		}
 		if !inMatrix || len(cells) == 0 {
@@ -517,27 +517,11 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 		findings = append(findings, f)
 	}
 	sdd := in.Pkg.Contract == "truth-tasks"
-	files := []struct {
-		key string
-		pf  PackageFile
-	}{
-		{"truth", in.Pkg.Truth}, {"tasks", in.Pkg.Tasks},
-	}
-	if !sdd {
-		files = append(files, struct {
-			key string
-			pf  PackageFile
-		}{"tests", in.Pkg.Tests}, struct {
-			key string
-			pf  PackageFile
-		}{"evidence", in.Pkg.Evidence})
-	}
-	// 1. Package validation: the four-piece set must be complete and
-	// the truth frontmatter must parse.
-	for _, f := range files {
-		if !f.pf.Present {
-			add(Finding{Kind: "missing_" + f.key, ReasonCode: core.ReasonIntegrityPackageIncomplete,
-				File: f.pf.Path, Detail: "package member " + f.key + " is missing"})
+	// Required authored members depend on the declared package contract.
+	for _, member := range in.Pkg.RequiredMembers() {
+		if !member.File.Present {
+			add(Finding{Kind: "missing_" + member.Name, ReasonCode: core.ReasonIntegrityPackageIncomplete,
+				File: member.File.Path, Detail: "package member " + member.Name + " is missing"})
 		}
 	}
 	var tasksSlug string
@@ -553,7 +537,7 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 			add(f)
 		}
 	}
-	if in.Pkg.Tasks.Present {
+	if in.Pkg.Tasks.Present && !sdd {
 		scalars, _, ok := ParseFrontmatter(in.Pkg.Tasks.Text)
 		if ok {
 			tasksSlug = scalars["slug"]
@@ -561,10 +545,8 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 	}
 
 	// 2+3. tests <-> truth AC cross-reference + soft TCs.
-	matrixText, matrixFile := in.Pkg.Tests.Text, in.Pkg.Tests.Path
-	if sdd {
-		matrixText, matrixFile = in.Pkg.Truth.Text, in.Pkg.Truth.Path
-	}
+	matrix := in.Pkg.CoverageFile()
+	matrixText, matrixFile := matrix.Text, matrix.Path
 	if in.Pkg.Truth.Present && (in.Pkg.Tests.Present || sdd) {
 		defined := DefinedACs(in.Pkg.Truth.Text)
 		rows := ParseCoverageRows(matrixText)
@@ -612,9 +594,9 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 	}
 
 	// 5. Fake delivery across the package.
-	for _, f := range files {
-		if f.pf.Present {
-			findings = append(findings, scanFakeDelivery(f.pf.Path, f.pf.Text)...)
+	for _, member := range in.Pkg.RequiredMembers() {
+		if member.File.Present {
+			findings = append(findings, scanFakeDelivery(member.File.Path, member.File.Text)...)
 		}
 	}
 
@@ -640,8 +622,8 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 		}
 	}
 
-	// 7. tasks slug consistency.
-	if in.Pkg.Tasks.Present && tasksSlug != in.Pkg.Slug {
+	// Legacy checkbox ledgers carry their own slug; SDD uses its parsed task graph.
+	if in.Pkg.Tasks.Present && !sdd && tasksSlug != in.Pkg.Slug {
 		add(Finding{Kind: "slug_mismatch", ReasonCode: core.ReasonIntegritySlugMismatch,
 			File:   in.Pkg.Tasks.Path,
 			Detail: "tasks.md frontmatter slug " + orMissing(tasksSlug) + " != package slug " + in.Pkg.Slug})
@@ -651,12 +633,12 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 	// the Python TIG's aggregation order: clarity scan of the four
 	// files, the domain FSM authority, the extension scan, the
 	// determinism scan, and feature-package validation.
-	for _, f := range files {
-		if f.pf.Present {
-			findings = append(findings, scanClarityFile(f.pf)...)
+	for _, member := range in.Pkg.RequiredMembers() {
+		if member.File.Present {
+			findings = append(findings, scanClarityFile(member.File)...)
 		}
 	}
-	if in.Pkg.Truth.Present {
+	if in.Pkg.Truth.Present && !sdd {
 		if required, df := EvaluateDomainFSM(in.Pkg.Truth.Text, in.Pkg.Tests.Text); required {
 			for _, d := range df {
 				findings = append(findings, Finding{
@@ -667,9 +649,9 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 		}
 	}
 	findings = append(findings, scanExtensionFiles(in.Pkg)...)
-	for _, f := range files {
-		if f.pf.Present {
-			findings = append(findings, scanDeterminismFile(f.pf)...)
+	for _, member := range in.Pkg.RequiredMembers() {
+		if member.File.Present {
+			findings = append(findings, scanDeterminismFile(member.File)...)
 		}
 	}
 	nonTrivial := in.FileNonTrivial

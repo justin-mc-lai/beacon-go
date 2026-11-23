@@ -22,11 +22,12 @@ import (
 
 // FSMTransition is one five-tuple row (State|Event|Guard|To|Action).
 type FSMTransition struct {
-	State  string `json:"state"`
-	Event  string `json:"event"`
-	Guard  string `json:"guard"`
-	To     string `json:"to"`
-	Action string `json:"action"`
+	State     string `json:"state"`
+	Event     string `json:"event"`
+	Guard     string `json:"guard"`
+	To        string `json:"to"`
+	Action    string `json:"action"`
+	Aggregate string `json:"aggregate,omitempty"`
 }
 
 // IllegalSlot is one illegal-transition entry. From/To are populated
@@ -36,6 +37,7 @@ type IllegalSlot struct {
 	Description string `json:"description"`
 	From        string `json:"from,omitempty"`
 	To          string `json:"to,omitempty"`
+	Aggregate   string `json:"aggregate,omitempty"`
 }
 
 // FSMProjection is the normalized FSM contract of one truth document.
@@ -138,60 +140,43 @@ func headerJoin(row []string) string {
 // ---- five-tuple extraction (truth_review_gate.extract_fsm_five_tuple) ----
 
 func extractFSMFiveTuple(truthMD string) (transitions []FSMTransition, present bool, illegalPresent bool) {
-	for _, block := range mdTableBlocks(truthMD) {
-		if len(block) == 0 {
+	for _, sec := range fsmSections(truthMD) {
+		if !sec.Model || sec.Illegal {
 			continue
 		}
-		header := headerJoin(block[0])
-		if !strings.Contains(header, "state") || !strings.Contains(header, "event") {
-			continue
-		}
-		if !strings.Contains(header, "to") && !strings.Contains(header, "guard") {
-			continue
-		}
-		headers := make([]string, len(block[0]))
-		for i, c := range block[0] {
-			headers[i] = strings.ReplaceAll(strings.ToLower(c), " ", "_")
-		}
-		get := func(row []string, idx int, names ...string) string {
-			for _, n := range names {
-				for i, h := range headers {
-					if h == n {
-						if i < len(row) {
-							return row[i]
-						}
-						return ""
-					}
-				}
-			}
-			if idx < len(row) {
-				return row[idx]
-			}
-			return ""
-		}
-		for _, row := range block[1:] {
-			if len(row) == 0 {
+		for _, block := range mdTableBlocks(sec.Body) {
+			if len(block) == 0 {
 				continue
 			}
-			state := strings.TrimSpace(get(row, 0, "state", "from"))
-			event := strings.TrimSpace(get(row, 1, "event"))
-			guard := strings.TrimSpace(get(row, 2, "guard"))
-			to := strings.TrimSpace(get(row, 3, "to", "to_state"))
-			action := strings.TrimSpace(get(row, 4, "action"))
-			if state == "" || strings.ToLower(state) == "state" || strings.ToLower(state) == "from" {
+			headers := fsmColumns(block[0])
+			_, hasState := headers["state"]
+			_, hasFrom := headers["from"]
+			_, hasEvent := headers["event"]
+			_, hasTrigger := headers["trigger"]
+			_, hasTo := headers["to"]
+			_, hasToState := headers["to_state"]
+			_, hasGuard := headers["guard"]
+			_, hasAction := headers["action"]
+			_, hasSideEffect := headers["side_effect"]
+			if (!hasState && !hasFrom) || (!hasEvent && !hasTrigger) || (!hasTo && !hasToState) || (!hasGuard && !hasAction && !hasSideEffect) {
 				continue
 			}
-			if event == "" || strings.ToLower(event) == "event" {
-				continue
+			present = true
+			for _, row := range block[1:] {
+				transitions = append(transitions, FSMTransition{
+					State:     fsmCell(row, headers, "from", "state"),
+					Event:     fsmCell(row, headers, "event", "trigger"),
+					Guard:     fsmCell(row, headers, "guard"),
+					To:        fsmCell(row, headers, "to", "to_state"),
+					Action:    fsmCell(row, headers, "action", "side_effect"),
+					Aggregate: sec.Aggregate,
+				})
 			}
-			transitions = append(transitions, FSMTransition{
-				State: state, Event: event, Guard: guard, To: to, Action: action,
-			})
 		}
 	}
 	illegalPresent = fsmIllegalHeadingRe.MatchString(truthMD) ||
 		fsmInvalidColonRe.MatchString(truthMD) || fsmIllegalColonRe.MatchString(truthMD)
-	return transitions, len(transitions) > 0, illegalPresent
+	return transitions, present, illegalPresent
 }
 
 var (
@@ -261,35 +246,33 @@ var illegalTableHeaderCells = map[string]bool{
 // phantom illegal edge.
 func parseIllegalSlots(truthMD string) []IllegalSlot {
 	var slots []IllegalSlot
-	for _, sec := range extractMDSections(truthMD) {
-		title := normalizeHeading(sec.Title)
-		matched := illegalSectionExactTitles[title]
-		if !matched {
-			for _, tok := range illegalSectionTitles {
-				if strings.Contains(title, tok) {
-					matched = true
-					break
-				}
-			}
-		}
-		if !matched {
+	for _, sec := range fsmSections(truthMD) {
+		if !sec.Illegal {
 			continue
+		}
+		for _, block := range mdTableBlocks(sec.Body) {
+			if len(block) < 2 {
+				continue
+			}
+			headers := fsmColumns(block[0])
+			for _, row := range block[1:] {
+				from := fsmCell(row, headers, "from", "state", "源", "从", "起始", "起始状态")
+				to := fsmCell(row, headers, "to", "to_state", "目标", "目标状态")
+				description := strings.Join(row, " | ")
+				if from == "" && to == "" {
+					if m := illegalArrowRe.FindStringSubmatch(fsmCell(row, headers, "description")); m != nil {
+						from, to = m[1], m[2]
+					}
+				}
+				aggregate := fsmCell(row, headers, "aggregate")
+				if aggregate == "" {
+					aggregate = sec.Aggregate
+				}
+				slots = append(slots, IllegalSlot{Description: description, From: from, To: to, Aggregate: aggregate})
+			}
 		}
 		for _, line := range strings.Split(sec.Body, "\n") {
 			stripped := strings.TrimSpace(line)
-			if strings.HasPrefix(stripped, "|") {
-				cells := splitRowNaive(stripped)
-				if len(cells) < 2 || cells[0] == "" {
-					continue
-				}
-				if isSepCell(cells[0]) || illegalTableHeaderCells[strings.ToLower(cells[0])] {
-					continue
-				}
-				slots = append(slots, IllegalSlot{
-					Description: strings.Join(cells, " | "), From: cells[0], To: cells[1],
-				})
-				continue
-			}
 			if !strings.HasPrefix(stripped, "-") && !strings.HasPrefix(stripped, "*") && !strings.HasPrefix(stripped, "•") {
 				continue
 			}
@@ -303,18 +286,17 @@ func parseIllegalSlots(truthMD string) []IllegalSlot {
 					from, to = a[1], a[2]
 				}
 			}
-			slots = append(slots, IllegalSlot{Description: text, From: from, To: to})
+			slots = append(slots, IllegalSlot{Description: text, From: from, To: to, Aggregate: sec.Aggregate})
 		}
 	}
 	seen := map[string]bool{}
 	var out []IllegalSlot
 	for _, s := range slots {
-		key := strings.ToLower(s.Description)
-		if seen[key] {
-			continue
+		key := strings.ToLower(s.Description + "\x00" + s.Aggregate)
+		if !seen[key] {
+			seen[key] = true
+			out = append(out, s)
 		}
-		seen[key] = true
-		out = append(out, s)
 	}
 	return out
 }
@@ -399,6 +381,9 @@ func parseTerminalStates(truthMD string) map[string]bool {
 // truth document into the normalized projection.
 func ParseTruthFSM(truthMD string) FSMProjection {
 	transitions, present, illegalRe := extractFSMFiveTuple(truthMD)
+	if !present {
+		transitions, present = legacyFSMTransitions(truthMD)
+	}
 	stateSet := map[string]bool{}
 	fromSet := map[string]bool{}
 	toSet := map[string]bool{}
@@ -449,6 +434,9 @@ func ValidateTruthFSM(p FSMProjection) (findings []FSMFinding, blocked bool) {
 	if !p.FiveTuplePresent {
 		return nil, false
 	}
+	if len(p.Transitions) == 0 {
+		return []FSMFinding{{Kind: "fsm_model_missing", Severity: "error", Text: "FSM table contains no transitions"}}, true
+	}
 	states := map[string]bool{}
 	for _, s := range p.States {
 		states[strings.TrimSpace(s)] = true
@@ -470,6 +458,9 @@ func ValidateTruthFSM(p FSMProjection) (findings []FSMFinding, blocked bool) {
 	for _, t := range p.Transitions {
 		src := strings.TrimSpace(t.State)
 		dst := strings.TrimSpace(t.To)
+		if src == "" {
+			findings = append(findings, FSMFinding{Kind: "transition_source_missing", Severity: "error", Text: "transition has no source state"})
+		}
 		if dst == "" {
 			name := src
 			if name == "" {
@@ -533,13 +524,20 @@ func ValidateTruthFSM(p FSMProjection) (findings []FSMFinding, blocked bool) {
 			Text: "FSM five-tuple requires an Illegal transitions section (fail-closed on missing illegal)",
 		})
 	} else {
-		legal := map[[2]string]bool{}
+		legal := map[[2]string][]string{}
 		for _, t := range p.Transitions {
-			legal[[2]string{strings.TrimSpace(t.State), strings.TrimSpace(t.To)}] = true
+			key := [2]string{strings.TrimSpace(t.State), strings.TrimSpace(t.To)}
+			legal[key] = append(legal[key], t.Aggregate)
 		}
 		for _, item := range p.Illegal {
 			src, dst := strings.TrimSpace(item.From), strings.TrimSpace(item.To)
-			if src != "" && dst != "" && legal[[2]string{src, dst}] {
+			contradiction := false
+			for _, aggregate := range legal[[2]string{src, dst}] {
+				if item.Aggregate == "" || aggregate == "" || strings.EqualFold(item.Aggregate, aggregate) {
+					contradiction = true
+				}
+			}
+			if src != "" && dst != "" && contradiction {
 				findings = append(findings, FSMFinding{
 					Kind: "illegal_declared_as_legal", Severity: "error",
 					Text: "explicit illegal transition " + src + " -> " + dst + " is also declared as a legal transition",

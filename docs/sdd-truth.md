@@ -11,26 +11,73 @@
 `evidence/` and is referenced from tasks and the coverage matrix. Old four-piece
 packages keep working unchanged.
 
-## Freeze floors
+## Freeze contract
 
-The SDD contract is blocked at freeze unless all hold:
+Creation produces an unfilled scaffold, never a pre-approved requirement. Fill the
+intent, grounding table (`Source | Reference | Supports`), assumptions, AC/TC
+matrix and executable task graph. Declare `package_author`, `fsm_required` and
+`negative_required` explicitly. SDD evidence traceability cannot be disabled.
 
-1. At least 5 acceptance criteria.
-2. At least 3 executable TCs per AC, with at least 2 negative TCs per AC.
-3. A `## FSM` section with a Mermaid `stateDiagram` and a From/To table of at least 3 transitions.
-4. A `## Subagent Plan` whose roles cover the utterance plan (`beacon truth roles`).
-5. No placeholder phrases.
+Every AC needs a positive behavior case. When `negative_required: true`, each AC
+also needs a negative case. TC IDs must be unique; empty, documentation-only and
+success-only commands do not prove behavior. Counts are not a substitute for coverage.
+Stateful requirements carry a normalized FSM plus `Transition Coverage` rows:
+`From | To | Trigger | TC ID`. Stateless work declares `fsm_required: false`.
+For identical transition triples in different aggregates, prepend an `Aggregate`
+column and bind each aggregate separately. Optional prose-only FSM rationale is
+not a model; a present malformed transition table still blocks.
 
-## Flow
+Before confirmation, an independent reviewer supplies a JSON receipt:
 
-```bash
-beacon truth create --project . --slug order-flow --sdd
-beacon truth roles --utterance "订单审批流程..."      # see which roles must appear
-# fill truth.md and tasks.md
-beacon truth intent --project . --feature order-flow --utterance ... --goal ... --non-goals ... --constraints ...
-beacon truth confirm --project . --feature order-flow --by <name>
-beacon truth freeze  --project . --feature order-flow --by <name>
+```json
+{"fingerprint":"<current fingerprint>","reviewer":"checker","verdict":"pass","findings":[],"summary":"What was reviewed and why the requirements agree with the grounded intent"}
 ```
+
+Inspect the fingerprint with `beacon truth semantic-review --project . --feature
+<slug> --json`; record the external receipt with the same command plus `--file
+review.json`. Then use `truth confirm --by <owner>` and `truth freeze`. The kernel
+records the receipt on its event trail. Editing truth or task definitions invalidates
+the review and confirmation. Identities are caller-attested, not authenticated;
+the kernel does not perform semantic judgment or call a model.
+
+## Task execution
+
+`tasks.md` uses the exact table:
+
+```text
+TASK | Action | Depends | AC | Command | Verify | Evidence | Auto
+```
+
+Dependencies and ACs are comma-separated; `-` means no dependency. Cycles,
+unknown dependencies, duplicate task IDs and unknown ACs are refused. Use
+`beacon implement tasks run --run-id <id>` after admission. The runner executes
+Command then Verify in deterministic dependency order and stops on failure.
+`beacon implement tasks status --run-id <id>` reads the latest bound report.
+Before success, every verification runs again against the final candidate so a
+later task cannot silently invalidate an earlier task. Evidence files are copied
+to immutable invocation/task snapshots; shared authored evidence paths do not
+overwrite history. Candidate hashes cover project inputs with explicit recorded
+runtime/output exclusions. Direct `go test` verification forces fresh verbose
+execution and rejects zero tests or skipped cases; other custom commands remain
+trusted verification programs, not a proof of semantic assertion quality.
+
+Repair is disabled by default. Opt in with `--repair-cmd <program>`, repeatable
+`--repair-arg`, `--max-repairs 1..5` and `--timeout-sec`. The external repair
+receives pointers to failed result/stdout/stderr through environment variables.
+Each attempt is retained under `.beacon/task-runs/` and registered by hash.
+Repairing the requirement contract, stale candidates, cancellation, timeout and
+exhaustion fail rather than becoming completion. No automatic release or install
+lane is provided. Executables are trusted project code; this is workdir isolation,
+not a container or security sandbox.
+
+## FSM runtime
+
+Both `State | Event | Guard | To | Action` and
+`From | To | Trigger | Guard | Side effect` normalize to the same graph.
+`truth fsm check` validates the graph; `fsm transition --from A --to B` refuses
+missing, invalid or ambiguous edges. Use `--event` to disambiguate and repeat
+`--guard '<exact text>'` for caller-attested satisfied guards. This is not an
+evaluation of live business state. Refusals emit structured output and exit nonzero.
 
 ## Compatibility
 
