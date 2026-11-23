@@ -310,10 +310,6 @@ func (e *Engine) buildSeas(root string, m versionmanifest.Manifest) []versionman
 	for _, l := range m.Lakes {
 		lakes[l.Slug] = l.Package
 	}
-	proj, err := e.store.Projects().GetByRootPath(root)
-	if err != nil {
-		return nil
-	}
 	runs, err := e.store.Runs().ListAll()
 	if err != nil {
 		return nil
@@ -344,13 +340,9 @@ func (e *Engine) buildSeas(root string, m versionmanifest.Manifest) []versionman
 		if err != nil {
 			continue
 		}
-		pv, err := e.store.Projects().GetVersionByID(feat.ProjectVersionID)
-		if err != nil || pv.ProjectID != proj.ID {
-			continue
-		}
-		// The run may be bound to an older feature row; the sea belongs
-		// to this version when its host slug is part of the manifest's
-		// lake set (inherited lakes have no store row in the new line).
+		// The run may be bound to an older feature row or another
+		// project registration; the sea belongs to this version when its
+		// host slug is part of the manifest's lake set.
 		if _, ok := lakes[feat.Slug]; !ok {
 			continue
 		}
