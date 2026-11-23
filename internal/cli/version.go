@@ -21,7 +21,7 @@ func newVersionCmd() *cobra.Command {
 	c.AddCommand(
 		newVersionBaselineCmd(), newVersionOpenCmd(), newVersionStatusCmd(),
 		newVersionFreezeCmd(), newVersionReleaseCmd(), newVersionCompatCmd(),
-		newVersionPlanCmd(),
+		newVersionPlanCmd(), newVersionReconcileCmd(),
 	)
 	return c
 }
@@ -262,5 +262,36 @@ func newVersionPlanCmd() *cobra.Command {
 	c.Flags().StringVar(&from, "from", "", "version to plan from (default: current)")
 	c.Flags().BoolVar(&apply, "apply", false, "open the next line when the current manifest is not draft")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	return c
+}
+
+func newVersionReconcileCmd() *cobra.Command {
+	var project, version string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "reconcile",
+		Short: "Close manifest changes whose store package no longer reports them pending",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			st, err := openWriteStore()
+			if err != nil {
+				return err
+			}
+			defer st.Close()
+			m, err := orchestrator.NewEngine(st).ReconcileVersion(project, version)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				return printJSON(cmd, m)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "reconciled %s\n", m.Version)
+			return nil
+		},
+	}
+	c.Flags().StringVar(&project, "project", ".", "project root path")
+	c.Flags().StringVar(&version, "version", "", "docs version (required)")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("version")
 	return c
 }

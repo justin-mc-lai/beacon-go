@@ -214,3 +214,28 @@ func TestVersionPlanAndCompat(t *testing.T) {
 		t.Fatalf("compat missing = %v", missing)
 	}
 }
+
+func TestReconcileClosesStaleManifestChange(t *testing.T) {
+	env := newTestEnv(t, "frozen")
+	writeVersionFixture(t, env.root)
+	if _, err := env.eng.BaselineVersion(env.root, "v2.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.OpenVersion(env.root, "v2.0.0", "patch"); err != nil {
+		t.Fatal(err)
+	}
+	fc, err := env.eng.featureContext(env.feature.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := env.eng.MarkVersionChange(fc, "chg_stale"); err != nil {
+		t.Fatal(err)
+	}
+	m, err := env.eng.ReconcileVersion(env.root, "v2.0.1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(m.Changes) != 1 || m.Changes[0].Status != "closed" {
+		t.Fatalf("reconcile = %+v", m.Changes)
+	}
+}

@@ -656,6 +656,16 @@ func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload
 	// this never changes existing freeze behavior.
 	if fp, ok := payload["surface_fingerprint"].(string); ok && fp != "" {
 		ids := []string{}
+		switch v := payload["change_ids"].(type) {
+		case []string:
+			ids = append(ids, v...)
+		case []any:
+			for _, x := range v {
+				if s, ok := x.(string); ok {
+					ids = append(ids, s)
+				}
+			}
+		}
 		if cid, ok := payload["change_id"].(string); ok && cid != "" {
 			ids = append(ids, cid)
 		}

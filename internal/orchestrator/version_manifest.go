@@ -575,3 +575,45 @@ func (e *Engine) PlanVersion(root, from string) (VersionPlan, error) {
 	}
 	return out, nil
 }
+
+// ReconcileVersion closes manifest changes whose store package no longer
+// reports them pending. It is the repair path after a refreeze written
+// by a build that did not carry the change id into the manifest.
+func (e *Engine) ReconcileVersion(root, version string) (versionmanifest.Manifest, error) {
+	root = store.ResolveRootPath(root)
+	m, err := versionmanifest.LoadVersion(root, version)
+	if err != nil {
+		return versionmanifest.Manifest{}, err
+	}
+	if m.Status != versionmanifest.StatusDraft {
+		return m, core.NewError("version_not_draft", "version.Reconcile",
+			"manifest "+version+" is "+m.Status+", not draft")
+	}
+	for i := range m.Changes {
+		c := &m.Changes[i]
+		if c.Status == "closed" || len(c.Lakes) == 0 {
+			continue
+		}
+		feat, err := e.store.Features().FindBySlug(c.Lakes[0])
+		if err != nil {
+			continue
+		}
+		pending, err := e.pendingChangeIDs(feat.ID)
+		if err != nil {
+			continue
+		}
+		found := false
+		for _, id := range pending {
+			if id == c.ChangeID {
+				found = true
+			}
+		}
+		if !found {
+			c.Status = "closed"
+		}
+	}
+	if err := versionmanifest.Save(versionmanifest.Path(root, version), m); err != nil {
+		return versionmanifest.Manifest{}, err
+	}
+	return m, nil
+}
