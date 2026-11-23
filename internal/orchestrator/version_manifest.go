@@ -349,12 +349,11 @@ func (e *Engine) buildSeas(root string, m versionmanifest.Manifest) []versionman
 			continue
 		}
 		// The run may be bound to an older feature row; the sea belongs
-		// to this version when its host slug exists in the manifest.
-		host, err := e.store.ResolveFeature(root, feat.Slug, m.Version)
-		if err != nil {
+		// to this version when its host slug is part of the manifest's
+		// lake set (inherited lakes have no store row in the new line).
+		if _, ok := lakes[feat.Slug]; !ok {
 			continue
 		}
-		feat = host.Feature
 		if seen[meta.Program.Slug] {
 			continue
 		}
