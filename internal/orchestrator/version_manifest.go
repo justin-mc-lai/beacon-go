@@ -129,13 +129,27 @@ func (e *Engine) FreezeVersion(root, version string) (versionmanifest.Manifest, 
 		return m, core.NewError("version_not_draft", "version.Freeze",
 			"manifest "+version+" is "+m.Status+", not draft")
 	}
-	for _, l := range m.Lakes {
-		if l.Status == versionmanifest.LakeChanged || l.Status == versionmanifest.LakeNew || l.Status == versionmanifest.LakeDirty {
-			if l.Gates == nil || l.Gates["qa"] != "pass" {
-				return m, core.NewError("version_lake_qa_missing", "version.Freeze",
-					"lake "+l.Slug+" is "+l.Status+" without a passing qa gate")
-			}
+	for i := range m.Lakes {
+		l := &m.Lakes[i]
+		if l.Status != versionmanifest.LakeChanged && l.Status != versionmanifest.LakeNew && l.Status != versionmanifest.LakeDirty {
+			continue
 		}
+		feat, err := e.store.Features().FindBySlug(l.Slug)
+		if err != nil {
+			return m, core.NewError("version_lake_missing", "version.Freeze", "lake "+l.Slug+" has no feature package")
+		}
+		if !e.gatePass(feat.ID, "qa") {
+			return m, core.NewError("version_lake_qa_missing", "version.Freeze",
+				"lake "+l.Slug+" is "+l.Status+" without a passing qa gate")
+		}
+		if !e.featureHasVerifier(feat.ID) {
+			return m, core.NewError("version_lake_verifier_missing", "version.Freeze",
+				"lake "+l.Slug+" is "+l.Status+" without an independent verifier")
+		}
+		if l.Gates == nil {
+			l.Gates = map[string]string{}
+		}
+		l.Gates["qa"] = "pass"
 	}
 	for _, c := range m.Changes {
 		if c.Status != "closed" {
@@ -161,6 +175,16 @@ func (e *Engine) ReleaseVersion(root, version string) (versionmanifest.Manifest,
 	if m.Status != versionmanifest.StatusFrozen {
 		return m, core.NewError("version_not_frozen", "version.Release",
 			"manifest "+version+" is "+m.Status+", not frozen")
+	}
+	for _, l := range m.Lakes {
+		if l.Status != versionmanifest.LakeChanged && l.Status != versionmanifest.LakeNew && l.Status != versionmanifest.LakeDirty {
+			continue
+		}
+		feat, err := e.store.Features().FindBySlug(l.Slug)
+		if err != nil || !e.gatePass(feat.ID, "release") {
+			return m, core.NewError("version_lake_release_missing", "version.Release",
+				"lake "+l.Slug+" has no passing release gate")
+		}
 	}
 	m.Status = versionmanifest.StatusReleased
 	m.ReleasedAt = time.Now().UTC().Format(time.RFC3339)
@@ -219,6 +243,11 @@ func (e *Engine) RecordVersionPackage(ctx store.FeatureContext, hash string, cha
 	m.Lakes[idx].Status = versionmanifest.LakeChanged
 	for _, id := range changeIDs {
 		m.Lakes[idx].Changes = appendUnique(m.Lakes[idx].Changes, id)
+		for i := range m.Changes {
+			if m.Changes[i].ChangeID == id {
+				m.Changes[i].Status = "closed"
+			}
+		}
 	}
 	return versionmanifest.Save(path, m)
 }
@@ -336,4 +365,213 @@ func (e *Engine) buildSeas(root string, m versionmanifest.Manifest) []versionman
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].Slug < out[j].Slug })
 	return out
+}
+
+// ---- phase 3: seas in the manifest ----
+
+// effectiveProgramPlan prefers the current draft manifest's sea graph.
+// Run bindings (goal run ids, admissions) still come from the snapshot.
+func (e *Engine) effectiveProgramPlan(run store.Run, m *runMeta) (*ProgramState, string) {
+	if m.Program == nil {
+		return m.Program, "run"
+	}
+	fc, err := e.featureContext(run.FeatureID)
+	if err != nil {
+		return m.Program, "run"
+	}
+	man, err := versionmanifest.Load(e.targetManifestPath(fc))
+	if err != nil || man.Status != versionmanifest.StatusDraft {
+		return m.Program, "run"
+	}
+	var sea *versionmanifest.Sea
+	for i := range man.Seas {
+		if man.Seas[i].Slug == m.Program.Slug {
+			sea = &man.Seas[i]
+			break
+		}
+	}
+	if sea == nil {
+		return m.Program, "run"
+	}
+	cp := *m.Program
+	cp.Frozen = sea.Frozen
+	cp.Lakes = nil
+	for _, sl := range sea.Lakes {
+		l := ProgramLake{Slug: sl.Slug, DependsOn: sl.DependsOn}
+		if old := m.Program.lake(sl.Slug); old != nil {
+			l = *old
+			l.DependsOn = sl.DependsOn
+		}
+		cp.Lakes = append(cp.Lakes, l)
+	}
+	return &cp, "manifest"
+}
+
+// syncProgramSea writes the plan's lake graph into the current draft
+// manifest. Legacy trees without a manifest are a no-op.
+func (e *Engine) syncProgramSea(run store.Run, m *runMeta) {
+	if m.Program == nil {
+		return
+	}
+	fc, err := e.featureContext(run.FeatureID)
+	if err != nil {
+		return
+	}
+	path := e.targetManifestPath(fc)
+	man, err := versionmanifest.Load(path)
+	if err != nil || man.Status != versionmanifest.StatusDraft {
+		return
+	}
+	lakePkg := map[string]string{}
+	for _, l := range man.Lakes {
+		lakePkg[l.Slug] = l.Package
+	}
+	sea := versionmanifest.Sea{Slug: m.Program.Slug, HostFeature: fc.Feature.Slug, Frozen: m.Program.Frozen}
+	if m.LakeProposal != nil {
+		sea.Proposal = m.LakeProposal.ProposalID
+	}
+	for _, l := range m.Program.Lakes {
+		sea.Lakes = append(sea.Lakes, versionmanifest.SeaLake{
+			Slug: l.Slug, Package: lakePkg[l.Slug], DependsOn: l.DependsOn,
+		})
+	}
+	found := false
+	for i := range man.Seas {
+		if man.Seas[i].Slug == sea.Slug {
+			man.Seas[i] = sea
+			found = true
+			break
+		}
+	}
+	if !found {
+		man.Seas = append(man.Seas, sea)
+	}
+	_ = versionmanifest.Save(path, man)
+}
+
+// ---- phase 4: formal gates + compatibility ----
+
+func (e *Engine) gatePass(featureID, gateType string) bool {
+	g, err := e.store.Gates().Latest(featureID, gateType)
+	return err == nil && g.Verdict == "pass"
+}
+
+func (e *Engine) featureHasVerifier(featureID string) bool {
+	runs, err := e.store.Runs().ListByFeature(featureID)
+	if err != nil || len(runs) == 0 {
+		return false
+	}
+	var meta struct {
+		Verifier *struct {
+			Present bool `json:"present"`
+		} `json:"verifier"`
+	}
+	if json.Unmarshal(runs[len(runs)-1].Metadata, &meta) != nil {
+		return false
+	}
+	return meta.Verifier != nil && meta.Verifier.Present
+}
+
+// CompatVersion materializes inherited lakes as ordinary files under
+// docs/beacon/<v>/features/<slug>/ so older readers keep working. It
+// is opt-in: the manifest remains the source of truth.
+func (e *Engine) CompatVersion(root, version string, write bool) ([]string, error) {
+	root = store.ResolveRootPath(root)
+	man, err := versionmanifest.LoadVersion(root, version)
+	if err != nil {
+		return nil, err
+	}
+	var out []string
+	for _, l := range man.Lakes {
+		if l.Package == "" {
+			continue
+		}
+		dst := filepath.Join(root, "docs", "beacon", version, "features", l.Slug)
+		if _, err := os.Stat(dst); err == nil {
+			continue
+		}
+		src := versionmanifest.PackageDir(root, l.Slug, l.Package)
+		for _, name := range []string{"truth.md", "tests.md", "tasks.md", "restatement.md", "evidence.md"} {
+			body, err := os.ReadFile(filepath.Join(src, name))
+			if err != nil {
+				continue
+			}
+			if write {
+				if err := os.MkdirAll(dst, 0o755); err != nil {
+					return out, err
+				}
+				if err := os.WriteFile(filepath.Join(dst, name), body, 0o644); err != nil {
+					return out, err
+				}
+			}
+		}
+		out = append(out, dst)
+	}
+	return out, nil
+}
+
+// ---- phase 5: version plan ----
+
+type VersionPlan struct {
+	From           string   `json:"from"`
+	SuggestedLevel string   `json:"suggested_level"`
+	NextVersion    string   `json:"next_version"`
+	Draft          bool     `json:"draft"`
+	LakesChanged   int      `json:"lakes_changed"`
+	LakesNew       int      `json:"lakes_new"`
+	OpenChanges    int      `json:"open_changes"`
+	Reasons        []string `json:"reasons"`
+}
+
+func (e *Engine) PlanVersion(root, from string) (VersionPlan, error) {
+	root = store.ResolveRootPath(root)
+	if from == "" {
+		p, err := e.store.Projects().GetByRootPath(root)
+		if err != nil {
+			return VersionPlan{}, err
+		}
+		cur, err := e.store.Projects().CurrentVersion(p.ID)
+		if err != nil {
+			return VersionPlan{}, err
+		}
+		from = cur.Version
+	}
+	man, err := versionmanifest.LoadVersion(root, from)
+	if err != nil {
+		return VersionPlan{}, err
+	}
+	out := VersionPlan{From: man.Version, Draft: man.Status == versionmanifest.StatusDraft}
+	for _, l := range man.Lakes {
+		switch l.Status {
+		case versionmanifest.LakeChanged, versionmanifest.LakeDirty:
+			out.LakesChanged++
+		case versionmanifest.LakeNew:
+			out.LakesNew++
+		}
+	}
+	for _, c := range man.Changes {
+		if c.Status != "closed" {
+			out.OpenChanges++
+		}
+	}
+	level := "patch"
+	if out.LakesNew > 0 {
+		level = "minor"
+	}
+	out.SuggestedLevel = level
+	if next, err := BumpDocsVersion(man.Version, level); err == nil {
+		out.NextVersion = next
+	}
+	switch {
+	case out.LakesNew > 0:
+		out.Reasons = append(out.Reasons, "new lakes present: minor")
+	case out.LakesChanged > 0 || out.OpenChanges > 0:
+		out.Reasons = append(out.Reasons, "changed lakes or open changes: patch")
+	default:
+		out.Reasons = append(out.Reasons, "no open change; a new version would be a no-op until a change lands")
+	}
+	if out.Draft {
+		out.Reasons = append(out.Reasons, "current manifest is already draft; finish it before opening another line")
+	}
+	return out, nil
 }

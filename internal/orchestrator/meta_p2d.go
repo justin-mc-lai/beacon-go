@@ -170,6 +170,7 @@ type ProgramRouteView struct {
 	RunID       string      `json:"run_id"`
 	ProgramSlug string      `json:"program_slug"`
 	Frozen      bool        `json:"frozen"`
+	LakesSource string      `json:"lakes_source,omitempty"` // manifest | run
 	Lakes       []LakeRoute `json:"lakes"`
 	NextBatch   []string    `json:"next_batch"`
 	// NextActions is the executable order (K4): every unfinished lake's

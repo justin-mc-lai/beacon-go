@@ -294,6 +294,7 @@ func (e *Engine) ProgramPlan(runID string, in ProgramPlanInput) (ProgramState, e
 	if err := e.saveRun(run, m); err != nil {
 		return ProgramState{}, err
 	}
+	e.syncProgramSea(run, m)
 	return *st, nil
 }
 
@@ -320,6 +321,7 @@ func (e *Engine) ProgramFreeze(runID string) (ProgramState, error) {
 	if err := e.saveRun(run, m); err != nil {
 		return ProgramState{}, err
 	}
+	e.syncProgramSea(run, m)
 	return *m.Program, nil
 }
 
@@ -367,6 +369,7 @@ func (e *Engine) ProgramChange(runID, note string, lakes []ProgramLakeInput, rep
 	if err := e.saveRun(run, m); err != nil {
 		return ProgramState{}, err
 	}
+	e.syncProgramSea(run, m)
 	return *m.Program, nil
 }
 

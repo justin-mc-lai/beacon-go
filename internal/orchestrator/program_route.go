@@ -142,13 +142,13 @@ func (e *Engine) ProgramRoute(runID string) (ProgramRouteView, error) {
 		return ProgramRouteView{}, core.NewError(core.ReasonProgramPlanMissing, "program.Route",
 			"run "+runID+" has no program plan")
 	}
-	plan := m.Program
+	plan, lakesSource := e.effectiveProgramPlan(run, m)
 	order, ok := TopoOrder(plan.Lakes)
 	if !ok {
 		return ProgramRouteView{}, core.NewError(core.ReasonProgramDependencyCycle, "program.Route",
 			"recorded program graph has a cycle")
 	}
-	view := ProgramRouteView{RunID: runID, ProgramSlug: plan.Slug, Frozen: plan.Frozen, AllComplete: len(order) > 0}
+	view := ProgramRouteView{RunID: runID, ProgramSlug: plan.Slug, Frozen: plan.Frozen, LakesSource: lakesSource, AllComplete: len(order) > 0}
 	integrated := plan.Mode == ProgramModeIntegrated
 	if integrated {
 		// Live revalidation: a handoff cached in the snapshot only

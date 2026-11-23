@@ -2,7 +2,7 @@
   "schema": "beacon-version-manifest.v1",
   "version": "v2.1.0",
   "parent": "v2.0.0",
-  "status": "draft",
+  "status": "released",
   "lakes": [
     {
       "slug": "acceptance-seed-red-test",
@@ -262,5 +262,7 @@
       ]
     }
   ],
-  "created_at": "2026-11-23T08:51:09Z"
+  "created_at": "2026-11-23T08:51:09Z",
+  "frozen_at": "2026-11-23T09:11:48Z",
+  "released_at": "2026-11-23T09:11:48Z"
 }

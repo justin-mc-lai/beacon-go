@@ -20,7 +20,8 @@ func newVersionCmd() *cobra.Command {
 	}
 	c.AddCommand(
 		newVersionBaselineCmd(), newVersionOpenCmd(), newVersionStatusCmd(),
-		newVersionFreezeCmd(), newVersionReleaseCmd(),
+		newVersionFreezeCmd(), newVersionReleaseCmd(), newVersionCompatCmd(),
+		newVersionPlanCmd(),
 	)
 	return c
 }
@@ -183,5 +184,83 @@ func newVersionReleaseCmd() *cobra.Command {
 	c.Flags().StringVar(&version, "version", "", "docs version (required)")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("version")
+	return c
+}
+
+func newVersionCompatCmd() *cobra.Command {
+	var project, version string
+	var write, asJSON bool
+	c := &cobra.Command{
+		Use:   "compat",
+		Short: "Materialize inherited lakes as ordinary feature files (opt-in compatibility view)",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			st, err := openWriteStore()
+			if err != nil {
+				return err
+			}
+			defer st.Close()
+			missing, err := orchestrator.NewEngine(st).CompatVersion(project, version, write)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				return printJSON(cmd, map[string]any{"version": version, "write": write, "features": missing})
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "compat %s: missing=%d write=%v\n", version, len(missing), write)
+			for _, path := range missing {
+				fmt.Fprintf(cmd.OutOrStdout(), "  %s\n", path)
+			}
+			return nil
+		},
+	}
+	c.Flags().StringVar(&project, "project", ".", "project root path")
+	c.Flags().StringVar(&version, "version", "", "docs version (required)")
+	c.Flags().BoolVar(&write, "write", false, "write the missing feature files (default: dry run)")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	_ = c.MarkFlagRequired("version")
+	return c
+}
+
+func newVersionPlanCmd() *cobra.Command {
+	var project, from string
+	var apply, asJSON bool
+	c := &cobra.Command{
+		Use:   "plan",
+		Short: "Suggest the next delivery line from changed/new lakes and open changes",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			st, err := openWriteStore()
+			if err != nil {
+				return err
+			}
+			defer st.Close()
+			eng := orchestrator.NewEngine(st)
+			plan, err := eng.PlanVersion(project, from)
+			if err != nil {
+				return err
+			}
+			if apply && !plan.Draft {
+				m, err := eng.OpenVersion(project, plan.From, plan.SuggestedLevel)
+				if err != nil {
+					return err
+				}
+				plan.NextVersion = m.Version
+			}
+			if asJSON {
+				return printJSON(cmd, plan)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "plan %s -> %s (%s): changed=%d new=%d open=%d draft=%v\n",
+				plan.From, plan.NextVersion, plan.SuggestedLevel, plan.LakesChanged, plan.LakesNew, plan.OpenChanges, plan.Draft)
+			for _, r := range plan.Reasons {
+				fmt.Fprintf(cmd.OutOrStdout(), "  %s\n", r)
+			}
+			return nil
+		},
+	}
+	c.Flags().StringVar(&project, "project", ".", "project root path")
+	c.Flags().StringVar(&from, "from", "", "version to plan from (default: current)")
+	c.Flags().BoolVar(&apply, "apply", false, "open the next line when the current manifest is not draft")
+	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	return c
 }

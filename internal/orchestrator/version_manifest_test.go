@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"beacon-go/internal/store"
 	"beacon-go/internal/versionmanifest"
 )
 
@@ -96,5 +97,120 @@ func TestMarkAndRecordVersionLake(t *testing.T) {
 	}
 	if base.Lakes[0].Package == "newhash" || base.Status != versionmanifest.StatusBaseline {
 		t.Fatalf("baseline was rewritten: %+v", base.Lakes[0])
+	}
+}
+
+func TestProgramSeaSyncAndRouteSource(t *testing.T) {
+	env := newTestEnv(t, "frozen")
+	writeVersionFixture(t, env.root)
+	if _, err := env.eng.BaselineVersion(env.root, "v2.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.OpenVersion(env.root, "v2.0.0", "patch"); err != nil {
+		t.Fatal(err)
+	}
+	host := env.createRun(t)
+	if _, err := env.eng.ProgramPlan(host.RunID, ProgramPlanInput{
+		Slug: "sea", Freeze: true,
+		Lakes: []ProgramLakeInput{{Slug: env.feature.Slug}},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	man, err := versionmanifest.LoadVersion(env.root, "v2.0.1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(man.Seas) != 1 || man.Seas[0].Slug != "sea" || man.Seas[0].HostFeature != env.feature.Slug {
+		t.Fatalf("seas = %+v", man.Seas)
+	}
+	view, err := env.eng.ProgramRoute(host.RunID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if view.LakesSource != "manifest" {
+		t.Fatalf("route source = %q, want manifest", view.LakesSource)
+	}
+}
+
+func TestVersionFreezeReleaseFormalGates(t *testing.T) {
+	env := newTestEnv(t, "frozen")
+	writeVersionFixture(t, env.root)
+	if _, err := env.eng.BaselineVersion(env.root, "v2.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.OpenVersion(env.root, "v2.0.0", "patch"); err != nil {
+		t.Fatal(err)
+	}
+	fc, err := env.eng.featureContext(env.feature.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := env.eng.MarkVersionChange(fc, "chg_1"); err != nil {
+		t.Fatal(err)
+	}
+	if err := env.eng.RecordVersionPackage(fc, "newhash", []string{"chg_1"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.FreezeVersion(env.root, "v2.0.1"); err == nil {
+		t.Fatal("freeze without qa must fail")
+	}
+	if _, err := env.st.Gates().Record(store.GateResult{FeatureID: env.feature.ID, GateType: "qa", Verdict: "pass"}); err != nil {
+		t.Fatal(err)
+	}
+	host := env.createRun(t)
+	r, m, _, err := env.eng.loadRun(host.RunID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m.Verifier = &VerifierInfo{Present: true}
+	if err := env.eng.saveRun(r, m); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.FreezeVersion(env.root, "v2.0.1"); err != nil {
+		t.Fatalf("freeze with qa+verifier: %v", err)
+	}
+	if _, err := env.eng.ReleaseVersion(env.root, "v2.0.1"); err == nil {
+		t.Fatal("release without release gate must fail")
+	}
+	if _, err := env.st.Gates().Record(store.GateResult{FeatureID: env.feature.ID, GateType: "release", Verdict: "pass"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.ReleaseVersion(env.root, "v2.0.1"); err != nil {
+		t.Fatalf("release with gate: %v", err)
+	}
+}
+
+func TestVersionPlanAndCompat(t *testing.T) {
+	env := newTestEnv(t, "frozen")
+	writeVersionFixture(t, env.root)
+	if _, err := env.eng.BaselineVersion(env.root, "v2.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.OpenVersion(env.root, "v2.0.0", "patch"); err != nil {
+		t.Fatal(err)
+	}
+	fc, err := env.eng.featureContext(env.feature.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := env.eng.MarkVersionChange(fc, "chg_1"); err != nil {
+		t.Fatal(err)
+	}
+	if err := env.eng.RecordVersionPackage(fc, "newhash", []string{"chg_1"}); err != nil {
+		t.Fatal(err)
+	}
+	plan, err := env.eng.PlanVersion(env.root, "v2.0.1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if plan.SuggestedLevel != "patch" || plan.LakesChanged != 1 {
+		t.Fatalf("plan = %+v", plan)
+	}
+	missing, err := env.eng.CompatVersion(env.root, "v2.0.1", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(missing) != 1 {
+		t.Fatalf("compat missing = %v", missing)
 	}
 }
