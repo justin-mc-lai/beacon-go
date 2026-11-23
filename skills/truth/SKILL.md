@@ -13,7 +13,8 @@ The chain is **ask -> sign -> freeze -> govern -> self-check**:
 3. `beacon truth answer --feature <slug> --id Q1 --answer "..."`
 4. `beacon truth intent --feature <slug> --utterance "..." --goal "..." --non-goals "..." --constraints "..."`
 5. `beacon truth confirm --feature <slug>` — refuses while any intent finding remains.
-6. `beacon truth freeze --feature <slug>` — four-piece completeness + integrity + intent gate.
+6. `beacon truth freeze --feature <slug>` — completeness + integrity + intent gate;
+   SDD packages add the two-file gates below.
 7. `beacon truth change --feature <slug> --summary "..."` then edit, then
    `beacon truth refreeze` (or `beacon truth rebase --change <id> --accept-current`
    after a parallel change landed).
@@ -30,6 +31,33 @@ keeps pointers and events, never the body. Freeze is canonical-branch only.
 - `truth create --version auto` = current; `latest` = largest registered line.
 - Docs versions are pure `vX.Y.Z`; runtime lines (`2.0.0-go.12`) are a separate
   axis and are refused as docs versions.
+
+## SDD two-file contract
+
+`beacon truth create --sdd` writes only `truth.md` + `tasks.md`:
+
+- `truth.md` is the Spec: intent snapshot, open questions, intent coverage,
+  subagent plan, FSM (Mermaid `stateDiagram` + From/To table), acceptance
+  criteria, AC/TC matrix, out-of-scope.
+- `tasks.md` is the task DAG with dependencies, AC bindings and evidence paths.
+- `tests.md`, `evidence.md` and `restatement.md` are optional. Evidence lives in
+  `evidence/` and is referenced from tasks and the matrix.
+
+Freeze floors for an SDD package:
+
+1. At least 5 acceptance criteria.
+2. At least 3 executable TCs per AC, at least 2 of them negative.
+3. A `## FSM` section with a Mermaid `stateDiagram` and a From/To transition
+   table of at least 3 rows.
+4. A `## Subagent Plan` covering the roles `beacon truth roles` selects.
+5. No placeholder phrases.
+
+`beacon truth roles --utterance "..."` prints the on-demand subagent plan:
+stages, selected roles, deferred specialists and coverage. A workflow utterance
+without `domain-fsm-architect` is not ready.
+
+Legacy four-piece packages keep the old contract; only packages declaring
+`package_contract: truth-tasks` use the two-file gates.
 
 ## Integrity and feature map
 
