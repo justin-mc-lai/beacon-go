@@ -82,4 +82,19 @@ evaluation of live business state. Refusals emit structured output and exit nonz
 ## Compatibility
 
 - Legacy packages (no `package_contract: truth-tasks`) still require the four-piece set.
-- Migration of old packages is out of scope for this version; they remain readable and freezable.
+- `truth migrate --dry-run` previews legacy-to-SDD adoption; `--tasks-file` supplies an authored executable DAG when a checkbox ledger cannot be translated without guessing. Original tests/evidence/restatement files remain intact and truth/tasks are backed up. Migration invalidates old confirmation and requires normal completion/review/signing again. See `docs/beacon/v2.1.5/sdd-migration-examples.md`.
+
+## Deterministic draft intake
+
+`truth decompose` performs non-LLM rule matching and reports `semantic_ready: false`.
+For SDD it updates only its own suggestions section and a runtime decomposition
+artifact. It does not replace authored ACs, coverage or tasks, and it never
+turns a discovered test command into claimed semantic coverage.
+
+## Content-bearing lake proposals
+
+Opt in with proposal `package_contract: truth-tasks` and each lake's authored
+`truth` / `tasks` strings. The proposal validates applicability, AC/TC/DAG references
+and applicable state models, but reports `sdd_content_validated_draft`, not frozen.
+Legacy proposals report `legacy_shape_only`. Selection creates two-file drafts;
+every selected SDD package must pass its own reviewed freeze before program freeze.

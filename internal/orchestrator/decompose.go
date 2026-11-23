@@ -57,6 +57,8 @@ type DecomposeView struct {
 	Materialized  []string           `json:"materialized_acs"`
 	ArtifactPath  string             `json:"artifact_path"`
 	Warnings      []string           `json:"warnings,omitempty"`
+	Method        string             `json:"method"`
+	SemanticReady bool               `json:"semantic_ready"`
 }
 
 // acSeedVagueRewrite normalizes ONE built-in journey seed when
@@ -154,6 +156,9 @@ func (e *Engine) DecomposeTruthPackage(ctx store.FeatureContext, utterance strin
 	text, err := readTruthText(ctx)
 	if err != nil {
 		return DecomposeView{}, err
+	}
+	if packageContract(text) == SDDContract {
+		return e.decomposeSDDDraft(ctx, d, by)
 	}
 	var warnings []string
 	var acIDs []string
@@ -274,6 +279,7 @@ func (e *Engine) DecomposeTruthPackage(ctx store.FeatureContext, utterance strin
 		Slug: ctx.Feature.Slug, Version: ctx.Version.Version,
 		Decomposition: d, Materialized: acIDs,
 		ArtifactPath: artifactRel, Warnings: warnings,
+		Method: "deterministic_non_llm", SemanticReady: false,
 	}, nil
 }
 
