@@ -10,5 +10,5 @@ materials_status: current
 |-------|-------|-------|---------|-----------|
 | AC-001 | TC-001 | behavior | `go test -json ./internal/orchestrator ./internal/cli -run TestSDDDecompose -count=1` | SDD decompose preserves contract and refuses fake readiness |
 | AC-002 | TC-002 | behavior | `go test -json ./internal/orchestrator -run TestSDDProposal -count=1` | content proposal validation and SDD selection |
-| AC-003 | TC-003 | behavior | `go test -json ./internal/orchestrator ./internal/cli -run TestSDDMigrate -count=1` | migration preserves original commands and refuses conflict |
-| AC-004 | TC-004 | behavior | `go test -json ./internal/cli -run TestSDDClosureCLI -count=1` | real command success and refusal without issue false closure |
+| AC-003 | TC-003 | behavior | `go test -json ./internal/orchestrator ./internal/cli -run 'TestSDDMigr|TestMigrationReadStore' -count=1` | migration preserves commands and SQLite committed snapshot, refuses conflict |
+| AC-004 | TC-004 | behavior | `go test -json ./internal/cli ./internal/orchestrator -run 'TestSDDClosureCLI|TestSDDProgram|TestSDDDecomposeFreezeNormalizes' -count=1` | entry success/refusal and legitimate governed refreeze |

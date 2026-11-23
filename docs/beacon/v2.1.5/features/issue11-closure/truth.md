@@ -34,7 +34,7 @@ source: user_intent
 utterance: "先安全收口原工作区，再把缺口逐项绑定到 #11 完成清单，真实入口验收后才关闭 issue"
 goal: "补齐拆解和迁移入口与提案内容校验，给出可运行样例并独立验收"
 non_goals: "不改已发布记录，不自动删除旧文档，不把本地工作目录冒充安全沙箱"
-constraints: "内核不调用 LLM；旧包兼容；用户确认和独立评审不能绕过；安全沙箱边界未确认前 issue 保持开放"
+constraints: "内核不调用 LLM；旧包兼容；用户确认和独立评审不能绕过；owner 选择选项2，安全沙箱由 #1 承接，不作 #11 关闭前置"
 scope_mode: focused
 ```
 
@@ -60,7 +60,7 @@ scope_mode: focused
 | AC-001 | decompose 帮助与 JSON 明示确定性非 LLM 候选；SDD 分支不覆写 truth 为测试文档、不生成 tests.md、不伪造测试断言；保留开放问题与人工来源旅程边界，生成的草稿仍不可冻结。 surface=cli restates=1 |
 | AC-002 | 新 SDD 提案合同显式绑定 AC 与状态适用性；校验缺项、未知引用和非法图；选择只生成 SDD 草稿，冻结沿既有单包门禁；旧提案明确标注 legacy 而非新合同合格。 surface=cli restates=2 |
 | AC-003 | truth migrate 支持 dry-run，保留原文件与备份，冲突拒绝，冻结包必须先 change；迁移后旧确认失效且需独立评审，命令不得丢失真实测试命令断言与任务依赖。 surface=cli restates=3 |
-| AC-004 | stateless、workflow、decompose、legacy migration 样例通过真实 CLI 成功和拒绝链，独立验收绑定源码与命令输出；未解决的安全隔离边界不得计完成，不得关闭 issue。 surface=cli restates=4 |
+| AC-004 | stateless、workflow、decompose、legacy migration 样例通过真实 CLI 成功和拒绝链，独立验收绑定源码与命令输出；正式门禁通过后按 owner 选项2关闭 #11，容器安全隔离由 #1 承接且不宣称完成。 surface=cli restates=4 |
 
 ## Grounding
 
@@ -68,4 +68,4 @@ scope_mode: focused
 
 ## 边界
 
-有界外部修复已在 go.16 发布。容器安全隔离属于尚未确认的边界，不以简单 denylist 冒充；其是否为 #11 关闭前置需用户明确。此处不自行豁免。
+有界外部修复已在 go.16 发布。owner 于本轮明确选择选项2：容器安全隔离由 #1 承接，不属于 #11 关闭前置；本轮仍必须完成真实入口验收和正式 QA/release。dry-run 不改人工需求和账本数据；SQLite lock/index sidecar 可能创建，已明确披露。
