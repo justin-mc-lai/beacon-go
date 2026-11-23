@@ -291,6 +291,16 @@ func (e *Engine) TruthPackage(ctx store.FeatureContext) (TruthPackageView, error
 // feature_packages row, the Think/NotStarted lifecycle snapshot and
 // the truth_created trail event.
 func (e *Engine) CreateTruthPackage(projectRoot, version, slug string) (TruthPackageView, error) {
+	return e.createTruthPackage(projectRoot, version, slug, false)
+}
+
+// CreateTruthPackageSDD creates the two-file SDD package: truth.md
+// (Spec + AC/TC matrix + FSM + subagent plan) and tasks.md (DAG).
+func (e *Engine) CreateTruthPackageSDD(projectRoot, version, slug string) (TruthPackageView, error) {
+	return e.createTruthPackage(projectRoot, version, slug, true)
+}
+
+func (e *Engine) createTruthPackage(projectRoot, version, slug string, sdd bool) (TruthPackageView, error) {
 	if !slugRe.MatchString(slug) {
 		return TruthPackageView{}, core.NewError(ReasonTruthSlugInvalid, "truth.Create",
 			"slug "+slug+" is not a valid package slug (lowercase letters, digits, - and _)")
@@ -388,16 +398,25 @@ func (e *Engine) CreateTruthPackage(projectRoot, version, slug string) (TruthPac
 	if err := os.MkdirAll(absDir, 0o755); err != nil {
 		return TruthPackageView{}, err
 	}
-	files := truthSkeleton(slug, ver.Version, filepath.ToSlash(pkgRel))
+	var files map[string]string
+	if sdd {
+		files = truthSkeletonSDD(slug, ver.Version, filepath.ToSlash(pkgRel))
+	} else {
+		files = truthSkeleton(slug, ver.Version, filepath.ToSlash(pkgRel))
+	}
 	for name, text := range files {
 		if err := os.WriteFile(filepath.Join(absDir, name), []byte(text), 0o644); err != nil {
 			return TruthPackageView{}, err
 		}
 	}
+	testsPath := filepath.Join(pkgRel, "tests.md")
+	if sdd {
+		testsPath = filepath.Join(pkgRel, "truth.md")
+	}
 	feat, err := e.store.Features().CreatePackage(store.FeaturePackage{
 		ProjectVersionID: ver.ID, Slug: slug,
 		TruthPath: filepath.Join(pkgRel, "truth.md"),
-		TestsPath: filepath.Join(pkgRel, "tests.md"),
+		TestsPath: testsPath,
 		Status:    "draft",
 	})
 	if err != nil {
@@ -435,11 +454,24 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string, firstFreeze
 		return TruthPackageView{}, false, err
 	}
 	pkg := e.packageFiles(ctx)
+	sdd := pkg.Contract == SDDContract
 	members := []struct {
 		name string
 		pf   gate.PackageFile
 	}{
-		{"truth", pkg.Truth}, {"tests", pkg.Tests}, {"tasks", pkg.Tasks}, {"evidence", pkg.Evidence},
+		{"truth", pkg.Truth}, {"tasks", pkg.Tasks},
+	}
+	if !sdd {
+		members = append(members,
+			struct {
+				name string
+				pf   gate.PackageFile
+			}{"tests", pkg.Tests},
+			struct {
+				name string
+				pf   gate.PackageFile
+			}{"evidence", pkg.Evidence},
+		)
 	}
 	for _, m := range members {
 		if !m.pf.Present || strings.TrimSpace(m.pf.Text) == "" {
@@ -450,6 +482,20 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string, firstFreeze
 				File: m.pf.Path, Detail: "package member " + m.name + " is missing or empty",
 				RepairRoute: gate.DefaultRepairRoute,
 			}}
+			return view, false, nil
+		}
+	}
+	if sdd {
+		if findings := sddFreezeFindings(pkg); len(findings) > 0 {
+			view.Blocked = true
+			view.Findings = findings
+			seen := map[string]bool{}
+			for _, f := range findings {
+				if !seen[f.ReasonCode] {
+					view.BlockReasons = append(view.BlockReasons, f.ReasonCode)
+					seen[f.ReasonCode] = true
+				}
+			}
 			return view, false, nil
 		}
 	}
@@ -487,7 +533,10 @@ func (e *Engine) freezePrecheck(ctx store.FeatureContext, by string, firstFreeze
 	if rerr != nil {
 		return TruthPackageView{}, false, rerr
 	}
-	if codes := gate.ValidateRestatementForFreeze(rest, firstFreeze); len(codes) > 0 {
+	if sdd && !rest.Present {
+		// SDD packages carry confirmed_by/confirmed_at/hash in truth.md
+		// frontmatter; the fifth file is not required.
+	} else if codes := gate.ValidateRestatementForFreeze(rest, firstFreeze); len(codes) > 0 {
 		view.Blocked = true
 		view.BlockReasons = codes
 		for _, code := range codes {

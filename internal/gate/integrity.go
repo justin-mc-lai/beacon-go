@@ -40,7 +40,11 @@ type PackageFile struct {
 // v1.5.2 package-authoritative model): truth / tests / tasks /
 // evidence.
 type PackageFiles struct {
-	Slug     string
+	Slug string
+	// Contract is the package contract version. Empty means the legacy
+	// four-piece set; "truth-tasks" means the SDD two-file set (tests.md
+	// and evidence.md are not required).
+	Contract string
 	Truth    PackageFile
 	Tests    PackageFile
 	Tasks    PackageFile
@@ -174,6 +178,7 @@ type TCRow struct {
 	Command       string
 	Assertion     string
 	Evidence      string
+	Layer         string
 	RequiredTests []string
 	Line          int
 }
@@ -203,6 +208,7 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 	inMatrix := false
 	evidenceCol := -1
 	requiredCol := -1
+	layerCol := -1
 	for i, line := range strings.Split(tests, "\n") {
 		trimmed := strings.TrimSpace(line)
 		if !strings.HasPrefix(trimmed, "|") {
@@ -219,14 +225,19 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 		if containsCell(lowered, "ac id") {
 			inMatrix = true
 			ok = true
+			rows = nil // the last AC ID table wins; an AC table has no TC rows
 			evidenceCol = -1
 			requiredCol = -1
+			layerCol = -1
 			for j, c := range lowered {
 				if c == "evidence" {
 					evidenceCol = j
 				}
 				if c == "required tests" {
 					requiredCol = j
+				}
+				if c == "layer" {
+					layerCol = j
 				}
 			}
 			if evidenceCol >= 0 {
@@ -249,6 +260,11 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 		}
 		if len(cells) > 3 {
 			row.Command = cells[3]
+		}
+		if layerCol >= 0 && layerCol < len(cells) {
+			row.Layer = strings.TrimSpace(cells[layerCol])
+		} else if len(cells) > 2 {
+			row.Layer = strings.TrimSpace(cells[2])
 		}
 		if len(cells) > 4 {
 			row.Assertion = cells[4]
@@ -500,12 +516,21 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 		}
 		findings = append(findings, f)
 	}
+	sdd := in.Pkg.Contract == "truth-tasks"
 	files := []struct {
 		key string
 		pf  PackageFile
 	}{
-		{"truth", in.Pkg.Truth}, {"tests", in.Pkg.Tests},
-		{"tasks", in.Pkg.Tasks}, {"evidence", in.Pkg.Evidence},
+		{"truth", in.Pkg.Truth}, {"tasks", in.Pkg.Tasks},
+	}
+	if !sdd {
+		files = append(files, struct {
+			key string
+			pf  PackageFile
+		}{"tests", in.Pkg.Tests}, struct {
+			key string
+			pf  PackageFile
+		}{"evidence", in.Pkg.Evidence})
 	}
 	// 1. Package validation: the four-piece set must be complete and
 	// the truth frontmatter must parse.
@@ -536,15 +561,19 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 	}
 
 	// 2+3. tests <-> truth AC cross-reference + soft TCs.
-	if in.Pkg.Truth.Present && in.Pkg.Tests.Present {
+	matrixText, matrixFile := in.Pkg.Tests.Text, in.Pkg.Tests.Path
+	if sdd {
+		matrixText, matrixFile = in.Pkg.Truth.Text, in.Pkg.Truth.Path
+	}
+	if in.Pkg.Truth.Present && (in.Pkg.Tests.Present || sdd) {
 		defined := DefinedACs(in.Pkg.Truth.Text)
-		rows := ParseCoverageRows(in.Pkg.Tests.Text)
+		rows := ParseCoverageRows(matrixText)
 		covered := map[string]bool{}
 		for _, row := range rows {
 			covered[row.AC] = true
 			if !defined[row.AC] {
 				add(Finding{Kind: "tests_unknown_ac", ReasonCode: core.ReasonIntegrityTestsUnknownAC,
-					File: in.Pkg.Tests.Path, Line: row.Line,
+					File: matrixFile, Line: row.Line,
 					Detail: "tests references " + row.AC + " which truth does not define"})
 			}
 			if row.IsSoft() {

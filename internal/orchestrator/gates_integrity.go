@@ -58,6 +58,7 @@ func (e *Engine) packageFiles(ctx store.FeatureContext) gate.PackageFiles {
 	pkg.Tasks = readPkgFile(root, tasksPath)
 	pkg.Evidence = readPkgFile(root, evidencePath)
 	pkg.Restatement = readPkgFile(root, siblingPkgPath(feat.TruthPath, gate.RestatementFile))
+	pkg.Contract = packageContract(pkg.Truth.Text)
 	return pkg
 }
 

@@ -41,6 +41,7 @@ func newTruthCmd() *cobra.Command {
 		newTruthDecomposeCmd(), newTruthBrainstormCmd(),
 		newTruthCode2TruthCmd(), newTruthReopenCmd(),
 		newTruthFSMCmd(),
+		newTruthRolesCmd(),
 	)
 	return c
 }
@@ -125,10 +126,10 @@ func printTruthView(cmd *cobra.Command, v orchestrator.TruthPackageView, asJSON 
 
 func newTruthCreateCmd() *cobra.Command {
 	var project, version, slug string
-	var asJSON bool
+	var asJSON, sdd bool
 	c := &cobra.Command{
 		Use:   "create",
-		Short: "Create a draft feature package (four-piece skeleton + store registration)",
+		Short: "Create a draft feature package (four-piece or SDD two-file skeleton)",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			st, err := openWriteStore()
@@ -137,7 +138,12 @@ func newTruthCreateCmd() *cobra.Command {
 			}
 			defer st.Close()
 			eng := orchestrator.NewEngine(st)
-			v, err := eng.CreateTruthPackage(project, version, slug)
+			var v orchestrator.TruthPackageView
+			if sdd {
+				v, err = eng.CreateTruthPackageSDD(project, version, slug)
+			} else {
+				v, err = eng.CreateTruthPackage(project, version, slug)
+			}
 			if err != nil {
 				return err
 			}
@@ -148,6 +154,7 @@ func newTruthCreateCmd() *cobra.Command {
 	c.Flags().StringVar(&version, "version", "", "docs version (default: the project's current version)")
 	c.Flags().StringVar(&slug, "slug", "", "feature package slug (required)")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
+	c.Flags().BoolVar(&sdd, "sdd", false, "create the SDD two-file package (truth.md + tasks.md)")
 	_ = c.MarkFlagRequired("slug")
 	return c
 }

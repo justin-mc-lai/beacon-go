@@ -661,6 +661,13 @@ const (
 	ReasonLakeProposalUnknownLake      = "lake_proposal_unknown_lake"
 	ReasonLakeProposalDepNotSelected   = "lake_proposal_dependency_not_selected"
 	ReasonLakeProposalRequired         = "lake_proposal_required"
+	ReasonSDDPlaceholder               = "sdd_placeholder"
+	ReasonSDDACMin                     = "sdd_ac_min"
+	ReasonSDDMatrixMissing             = "sdd_matrix_missing"
+	ReasonSDDTCPerAC                   = "sdd_tc_per_ac_min"
+	ReasonSDDNegativeMin               = "sdd_negative_tc_min"
+	ReasonSDDFSMRequired               = "sdd_fsm_required"
+	ReasonSDDRolesRequired             = "sdd_roles_required"
 	ReasonProgramLakeNotReady          = "program_lake_not_ready"
 	ReasonProgramBlocked               = "program_blocked"
 	ReasonFeatureMapStale              = "feature_map_stale"
@@ -770,7 +777,7 @@ func IsKnownReasonCode(code string) bool {
 	if _, ok := ReasonCatalog[code]; ok {
 		return true
 	}
-	for _, prefix := range []string{"stage_exit_", "goal_implement_", "implement_", "main_", "freeze_", "release_", "program_", "hotfix_", "multi_version_", "main_axis_", "gate_", "truth_integrity_", "traceability_", "design_binding_", "truth_change_", "truth_canonical_", "truth_", "canonical_", "empty_", "revision_", "stale_", "qa_", "executor_", "ralph_", "worktree_", "planner_", "acp_", "skill_", "standard_flow_", "truth_baseline_", "workspace_admission_", "unscoped_", "git_diff_", "topology_gate_", "topology_scope_", "gitscope_", "satellite_", "multi_git_", "monorepo_", "ac_vague_", "materials_", "feature_package_", "requirement_clarity_", "unapproved_", "scope_mode_", "domain_", "entity_", "illegal_", "orphan_", "placeholder_", "alignment_", "user_intent_", "TRUTH_DETERMINISM_", "health_", "operator_gate_", "evidence_wait", "focus_wait", "gate_unresolved", "already_resolved", "release_", "feature_package_", "machine_json_", "review_", "autotest_", "qa9_", "auto_test_", "tc_declared_", "skill_install_", "state_snapshot_", "archive_", "hook_", "invalid_project_mode", "agent_eval_", "boundary_", "route_probe_", "prompt_fixture_", "catalog_", "live_skill_", "brainstorm_", "decompose_", "code2truth_", "qa_strategy_"} {
+	for _, prefix := range []string{"stage_exit_", "goal_implement_", "implement_", "main_", "freeze_", "release_", "program_", "hotfix_", "multi_version_", "main_axis_", "gate_", "truth_integrity_", "traceability_", "design_binding_", "truth_change_", "truth_canonical_", "truth_", "canonical_", "empty_", "revision_", "stale_", "qa_", "executor_", "ralph_", "worktree_", "planner_", "acp_", "skill_", "standard_flow_", "truth_baseline_", "workspace_admission_", "unscoped_", "git_diff_", "topology_gate_", "topology_scope_", "gitscope_", "satellite_", "multi_git_", "monorepo_", "ac_vague_", "materials_", "feature_package_", "requirement_clarity_", "unapproved_", "scope_mode_", "domain_", "entity_", "illegal_", "orphan_", "placeholder_", "alignment_", "user_intent_", "TRUTH_DETERMINISM_", "health_", "operator_gate_", "evidence_wait", "focus_wait", "gate_unresolved", "already_resolved", "release_", "feature_package_", "machine_json_", "review_", "autotest_", "qa9_", "auto_test_", "tc_declared_", "skill_install_", "state_snapshot_", "archive_", "hook_", "invalid_project_mode", "agent_eval_", "boundary_", "route_probe_", "prompt_fixture_", "catalog_", "live_skill_", "brainstorm_", "decompose_", "code2truth_", "qa_strategy_", "sdd_"} {
 		if strings.HasPrefix(code, prefix) {
 			return true
 		}
