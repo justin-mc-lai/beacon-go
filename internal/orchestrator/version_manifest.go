@@ -380,7 +380,7 @@ func (e *Engine) effectiveProgramPlan(run store.Run, m *runMeta) (*ProgramState,
 		return m.Program, "run"
 	}
 	man, err := versionmanifest.Load(e.targetManifestPath(fc))
-	if err != nil || man.Status != versionmanifest.StatusDraft {
+	if err != nil {
 		return m.Program, "run"
 	}
 	var sea *versionmanifest.Sea
