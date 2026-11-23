@@ -730,6 +730,18 @@ func (e *Engine) FreezeTruthPackage(ctx store.FeatureContext, by string) (TruthP
 			"package "+view.Slug+" has a pending change; close it with `beacon truth refreeze`")
 	}
 	if view.Frozen {
+		pkg := e.packageFiles(ctx)
+		if pkg.Contract == SDDContract {
+			findings := e.sddRecordedReviewFindings(ctx, pkg, true)
+			if len(findings) > 0 {
+				view.Blocked = true
+				view.Findings = findings
+				for _, f := range findings {
+					view.BlockReasons = append(view.BlockReasons, f.ReasonCode)
+				}
+				return view, freezeBlockedError("truth.Freeze", view)
+			}
+		}
 		// Idempotent re-freeze: reconcile the lifecycle snapshot
 		// if it drifted, but never rewrite the document or stack
 		// duplicate freeze events when nothing changed.

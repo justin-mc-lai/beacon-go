@@ -47,7 +47,7 @@ func TestContractEditStillDriftsPackageSurface(t *testing.T) {
 	truth, tests, tasks, restatement, evidence := lakeSurfaceFixture()
 	frozen := core.PackageContractFingerprint(truth, tests, tasks, restatement)
 	cases := []struct {
-		name                     string
+		name                      string
 		truth, tests, tasks, rest []byte
 	}{
 		{"truth", append(append([]byte{}, truth...), []byte("- **AC-002**：added\n")...), tests, tasks, restatement},
