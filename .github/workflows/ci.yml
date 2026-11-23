@@ -18,6 +18,9 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+      - name: Install shell interpreter required by shell TC contract
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zsh
       - run: go mod verify
       - run: go build ./...
       - run: go vet ./...

@@ -29,6 +29,25 @@ until it is either split or added here with a reason. This is the "ADR
 | `internal/orchestrator/bundle.go` | 528 | Verification bundle assembly: admission + topology + evidence in one artifact shape. |
 | `internal/orchestrator/truth.go` | 522 | The freeze/refreeze service: precheck, write, fingerprint and baseline in one transaction. |
 
+### Release review 2026-11-23
+
+The following existing units are retained for this release. New task-DAG and
+semantic-review code is split into separate files; this entry does not permit
+unbounded growth. Splitting these unrelated stateful services during release
+would broaden the change beyond the tested SDD cutover.
+
+| File | Lines | Why retained as one unit |
+|---|---:|---|
+| `internal/cli/goal_program.go` | 555 | Existing program command constructors share flag and engine routing; no SDD task execution was added here. |
+| `internal/gate/pkgvalidate.go` | 546 | Legacy package validation and its contract-specific DAG dispatch share diagnostic generation; the DAG parser itself is separate. |
+| `internal/orchestrator/autotest.go` | 514 | Existing discovery/execution/registration transaction; task repair was implemented separately rather than expanding this unit. |
+| `internal/orchestrator/intent.go` | 506 | Existing intent ledger mutations and signing order; independent receipt parsing and fingerprint code live in separate units. |
+| `internal/orchestrator/program_integrated.go` | 1146 | Existing multi-lake integration state machine predates this repair; splitting requires its own transaction-boundary review. |
+| `internal/orchestrator/truth_change.go` | 601 | Existing governed change/refreeze transaction; not expanded by the SDD task runner. |
+| `internal/orchestrator/engine.go` | 565 | Existing goal-run lifecycle and persistence entry points; no new task execution loop added here. |
+| `internal/orchestrator/version_manifest.go` | 637 | Existing immutable delivery-line manifest lifecycle; outside the SDD runtime cutover. |
+| `internal/orchestrator/delivery_paradigm.go` | 688 | Existing conformance evidence composition; this repair changes its coverage source/default, not its workflow shape. |
+
 ## Consequences
 
 - Splitting any of these is still welcome; it must first prove the result is
