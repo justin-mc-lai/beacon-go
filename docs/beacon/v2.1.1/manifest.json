@@ -1,0 +1,284 @@
+{
+  "schema": "beacon-version-manifest.v1",
+  "version": "v2.1.1",
+  "parent": "v2.1.0",
+  "status": "released",
+  "lakes": [
+    {
+      "slug": "acceptance-seed-red-test",
+      "package": "3a0b34ebc85b8e1a6bbd3674cd7a12ef65b13c01d064d82fb7be6f16bb7ed666",
+      "status": "inherited"
+    },
+    {
+      "slug": "agent-desktop-workspace",
+      "package": "56915fa136091957ebe51ed9d2254b782fdbc9c2ee35f21370d6b68749c98abe",
+      "status": "inherited"
+    },
+    {
+      "slug": "agent-runtime-dual-mode",
+      "package": "853d4e74d689caa0aaae5ca1467987adabe4fc217b4c933d349eb173ddd61365",
+      "status": "inherited"
+    },
+    {
+      "slug": "agent-session-streaming",
+      "package": "6bc23f4a200c0e3c63357fa14d34b9829101f573cc55601aa004314c95268068",
+      "status": "inherited"
+    },
+    {
+      "slug": "artifact-upsert",
+      "package": "69ced13638810844593748ba31568185a4d92048c775ea59d5674d443481cd99",
+      "status": "inherited"
+    },
+    {
+      "slug": "beacon-plan-pln-fsm-integration",
+      "package": "727f62d0228d7ba5ea929cef6787dc51d90deab387a01843951522d40e6710e0",
+      "status": "inherited"
+    },
+    {
+      "slug": "delivery-paradigm",
+      "package": "755c2cd81ff5035902744d3239f808e9b0b80776756a78a636be2df265efac5f",
+      "status": "inherited"
+    },
+    {
+      "slug": "feature-map-verification",
+      "package": "93e0d3f4bba17247baca655a43add86afa6b28aecec438b41521fcd887041a73",
+      "status": "inherited"
+    },
+    {
+      "slug": "gate-strict-integrity",
+      "package": "7d5ca89a6fecf6d5a0f82f8a1f91da565bc4fe2360d44ac6e126bc6ba3fef159",
+      "status": "inherited"
+    },
+    {
+      "slug": "general-domain-fsm-engine",
+      "package": "dca41049654f5cae7bb5f36d788e088507c3c0b88a4b20c398d150e81244d16a",
+      "status": "inherited"
+    },
+    {
+      "slug": "implement-work-gate",
+      "package": "34fde4033d3785266f802445d21a4ee41aee50228b1df4107a0ff42bf33000dd",
+      "status": "inherited"
+    },
+    {
+      "slug": "intent-contract-bridge",
+      "package": "40a9dec16d7c9a762ea042dab604b5eef45cdfd34ee794fff00e1032c99919a8",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-autotest-shell-tc",
+      "package": "1817f8326999868e164945c381ad405712b9f4f63a9e97f865094b5835dd39cf",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-change-quality",
+      "package": "14746742eac0c88a6f0311ab144b951d593d24d5613042c51b1ad2a43a3ab674",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-effect-journal",
+      "package": "f590a188793ea691264d0c84fbefda6c44a2604f3bb36f324758d6dfd611442e",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-eval-gate",
+      "package": "b1861674bb8337495389cfba2c5232f324acd16685c1d51635a627ccfbbbc5f6",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-external-stage-evidence",
+      "package": "8bf2838bee9bf8b58534802f078592ac98b35cf27c8487968377def879f77332",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-goal-advise",
+      "package": "bb0af895ee57ccf3082de02f4559cacfed0f76e72d122e1218b58cfb257c9d6a",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-lake-freeze-closure",
+      "package": "5442b6c70e46296d78537c07deee2c5ba463dfbff14f61f941e492ef7842f5cf",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-local-release-closure",
+      "package": "088ae446c4beb45e7bd7aa819c74eaa25fe1de06b4b11bc8f8be7b1c1a51f304",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-progress-drift",
+      "package": "f949ae78095a40596b4ced71eb24914ee6f4c83ecbfce9b069d2c93b2e946f74",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-qa-evidence-hardening",
+      "package": "2d25e07fbe58aa185fb22a5987e8f28426a6e20c1858047e1a5015544eb7e7f6",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-readonly-http-api",
+      "package": "9a51864a1730acc9cfd9b6cb4da29eb1b45f130efc61ea705c08587f72ba6482",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-recover-guard-scope",
+      "package": "d5cd8c551b08898790b7f1e18dc36ae00279c6f9f584e40cccef2ac9e60dc69f",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-recovery-qa-bridge",
+      "package": "36c426fd2caae49a1ecce29c57b980a67b4c3d323504bec4e925c5280a076fde",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-refreeze-accept-current",
+      "package": "5600df94748259cc53440ec1dbced9dd85306e13d1c286d193572e20d0b0b6a7",
+      "status": "changed",
+      "gates": {
+        "qa": "pass"
+      },
+      "changes": [
+        "chg_d880b755f7c7"
+      ]
+    },
+    {
+      "slug": "kernel-stride-control",
+      "package": "1292567b848e1979d53582006b427323b772612ad28b0f6914f4a6c77c0676af",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-truth-change-cancel",
+      "package": "2f56377b024181cb84193febb739c85166b1780515fe5cc9a661ec32f7017806",
+      "status": "inherited"
+    },
+    {
+      "slug": "kernel-truth-traceability",
+      "package": "c3f9ab307a0f4f2597647021e7c0ed0f46d562158ed3de8225a91debabf519a5",
+      "status": "inherited"
+    },
+    {
+      "slug": "lifecycle-monotonic",
+      "package": "f61713bdf5b9ebc609d05441038855100ed46b9c837d19035b6b356c66f82faf",
+      "status": "inherited"
+    },
+    {
+      "slug": "p0-executor-desktop",
+      "package": "902f4d609d2415e97acd71d87700f2513c802794879fa2014b2b894d31f04f73",
+      "status": "inherited"
+    },
+    {
+      "slug": "p1-skill-router-acp",
+      "package": "d92cc89d288582cee7721273555d8f608796102efd6dac2339df8a2e7194e488",
+      "status": "inherited"
+    },
+    {
+      "slug": "package-task-binding",
+      "package": "6bef48b6968682495b91712ad46eb619d6a05ee316d4fa67dff9fc6b74b4bb67",
+      "status": "inherited"
+    },
+    {
+      "slug": "program-drive",
+      "package": "4766222c6e7848409bb6a35929b1a7d816dee7511ae5d00e00a07d7e37e9d823",
+      "status": "inherited"
+    },
+    {
+      "slug": "program-file-graph",
+      "package": "7afa60832bdf6a6e2861c2dda7e6a95256b08f6a0bb071b8b7d2304200a4a6dd",
+      "status": "inherited"
+    },
+    {
+      "slug": "program-integrated-delivery",
+      "package": "66c4e90a92536ccd2fe19e21e827241c3d83f8ee856c2c83b8c599fa4a3513d2",
+      "status": "inherited"
+    },
+    {
+      "slug": "program-sea-complete",
+      "package": "f6b48fd178443e35ac02516037f0b58447b677fbb1c1e505256ed6afbbee1be6",
+      "status": "inherited"
+    },
+    {
+      "slug": "qa-surface-e2e",
+      "package": "e8d5cb2f8dad3c1cc37e009234b9d9d09e0303ba8b4cedfb86aebab9a106918f",
+      "status": "inherited"
+    },
+    {
+      "slug": "release-policy-shadow",
+      "package": "660c48bb45b7cff963a53a4e59942c4d18c87638216140816d1b69374368959e",
+      "status": "inherited"
+    },
+    {
+      "slug": "restatement-gate",
+      "package": "169cff869fde4e2f693a84f98de2c2083ca9baec8704dd84ef7b37fed464e8a5",
+      "status": "inherited"
+    },
+    {
+      "slug": "sea-to-lake-proposal",
+      "package": "f45c48d55e5cf35b68ba10bfa971f0b7da85b7abb88fba245d8938bfc71944ab",
+      "status": "inherited"
+    },
+    {
+      "slug": "skills-distribution",
+      "package": "53bbe15595127356385e96f8e89aeb1ef4ea52446a82b3decaa86d432b1f73ae",
+      "status": "inherited"
+    },
+    {
+      "slug": "truth-version-iteration",
+      "package": "4c28d28900e0563e7d3afb523ce9551ca73674446133cde3df343123ab60c16f",
+      "status": "inherited"
+    }
+  ],
+  "seas": [
+    {
+      "slug": "sea-2026-11",
+      "host_feature": "gate-strict-integrity",
+      "frozen": true,
+      "lakes": [
+        {
+          "slug": "gate-strict-integrity",
+          "package": "7d5ca89a6fecf6d5a0f82f8a1f91da565bc4fe2360d44ac6e126bc6ba3fef159"
+        },
+        {
+          "slug": "release-policy-shadow",
+          "package": "660c48bb45b7cff963a53a4e59942c4d18c87638216140816d1b69374368959e",
+          "depends_on": [
+            "gate-strict-integrity"
+          ]
+        },
+        {
+          "slug": "program-drive",
+          "package": "4766222c6e7848409bb6a35929b1a7d816dee7511ae5d00e00a07d7e37e9d823"
+        },
+        {
+          "slug": "feature-map-verification",
+          "package": "93e0d3f4bba17247baca655a43add86afa6b28aecec438b41521fcd887041a73",
+          "depends_on": [
+            "gate-strict-integrity"
+          ]
+        },
+        {
+          "slug": "skills-distribution",
+          "package": "53bbe15595127356385e96f8e89aeb1ef4ea52446a82b3decaa86d432b1f73ae",
+          "depends_on": [
+            "feature-map-verification"
+          ]
+        },
+        {
+          "slug": "program-sea-complete",
+          "package": "f6b48fd178443e35ac02516037f0b58447b677fbb1c1e505256ed6afbbee1be6"
+        }
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "change_id": "chg_d880b755f7c7",
+      "lakes": [
+        "kernel-refreeze-accept-current"
+      ],
+      "source": "truth",
+      "status": "closed"
+    }
+  ],
+  "created_at": "2026-11-23T09:27:50Z",
+  "frozen_at": "2026-11-23T09:35:57Z",
+  "released_at": "2026-11-23T09:35:57Z"
+}

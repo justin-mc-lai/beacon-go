@@ -40,7 +40,7 @@ scope_mode: focused
 
 | AC ID | 说明 | 级别 |
 |-------|------|------|
-| AC-001 | 正文在 change 打开前已移动时，plain `truth refreeze` 拒绝并给出 `revision_authority_drift`，包停在待收口状态；带上 `--accept-current` 后同一命令成功，包回到 `frozen`、待收口列表清空，并追加一条 `truth_refrozen` 事件 | Must |
+| AC-001 | 正文在 change 打开前已移动时，plain `truth refreeze` 拒绝并给出 `revision_authority_drift`，包停在待收口状态；带上 `--accept-current` 后同一命令成功，包回到 `frozen`、待收口列表清空，并追加一条 `truth_refrozen` 事件；事件记录新的包指纹与 truth sha，便于追溯。 | Must |
 | AC-002 | 无挂起变更时 `truth refreeze --accept-current` 以非 0 退出、提示没有待收口的变更，状态不变，且不写任何 freeze 事件（该标志不能凭空制造一次冻结） | Must |
 | AC-003 | 严格路径不回退：正文未移动且 base 有效时，plain `truth refreeze` 仍然成功收口，不需要该标志 | Must |
 
