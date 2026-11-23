@@ -1,0 +1,23 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "program-file-graph",
+  "contract_hash": "7afa60832bdf6a6e2861c2dda7e6a95256b08f6a0bb071b8b7d2304200a4a6dd",
+  "files": {
+    "evidence.md": "09cf2c5f7a7d628518cd00072f5dd4da49975e50c04a35e93ef4da89225e9dfb",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "c8d1534fa9ca915f15c0d5191c5396803983b6e05a7583a891c5c9fead5d1da1",
+    "tests.md": "d75dab6d683992192da108fd32762e53e5c2ae8dc21fca5f3573f66b81571608",
+    "truth.md": "2d7ae417c1adf038608b3f89854de89236b986b82678605dcead76c38a7b3262"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "e55381eb70695aee720b5098d277da19088d2992f09ccf2ebe3b19179c42d734",
+    "AC-002": "8ed16b961586888f39f43b409f93cedb5e8e1026ae0864a1e66a9ca8698654f7",
+    "AC-003": "7e9977c907c294a18903fb92155c3c7058c74a22d4ff3d9508bf9b801e41c5ed",
+    "AC-004": "e5c90f2fd388ba9d6502bc41b82714580fda89ff0a5ca3f7f2bd6edce680c881",
+    "AC-005": "52aca91cf10fead27cd43acebb8a6eb78eeb51bae42fa227220bb8ff67a4aba5",
+    "AC-006": "7338e6e218768bf72dbed30ef425e8bbfddb21bb01985c072a057df8dd1cbd8f",
+    "AC-007": "e74256f72d9fdad23222e415d5e3958fb0adc7acc35edb38da49712ff17b8085"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

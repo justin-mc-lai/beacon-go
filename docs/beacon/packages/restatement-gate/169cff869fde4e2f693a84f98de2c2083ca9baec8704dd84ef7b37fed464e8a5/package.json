@@ -1,0 +1,24 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "restatement-gate",
+  "contract_hash": "169cff869fde4e2f693a84f98de2c2083ca9baec8704dd84ef7b37fed464e8a5",
+  "files": {
+    "evidence.md": "c9364f6a47bdad2f0b6b4ddbf9bdac58df46264d0cf9f7fb7074183bef14d3f0",
+    "restatement.md": "3484b09075c3600e41c0b8559bdb1fb9380932931db034a78ee32b1208be9c57",
+    "tasks.md": "dc47dede34fb50a062d4d243bac1af76780a35e9cbe186c782ea52551d5cdf3e",
+    "tests.md": "9b9a98fc9d39f77e4800815b7998379b8e9effb7ca3050687f9cdd36c67eb96e",
+    "truth.md": "8521405c5accffc92698200c00506f76c1092680fdffbb88e9de7c29fd1ef0bc"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "48fc2de3b327afe695b5a981636dc66aa6b692828cfa008b8f2c5d6645bca2b6",
+    "AC-002": "d12dac0d297a5c33bb0646d4b23b46a5eda13ab3b8a4566991210b995a5525bc",
+    "AC-003": "b7aa780fcc314a1db585771889690e30d4c904409f596eb92ad538cff699c610",
+    "AC-004": "496099d353a81be04368749e050ac2de448ba3dc1cd1683beaa69ef818a3281b",
+    "AC-005": "143b0d778ffb22eb9805c3c9671b32fd7a5ec03f0d3260dbd8c9d389eb264f55",
+    "AC-006": "cce7f4e53e64cc48b92f1ead566435d743bc06a6df7394882c539ab4f44a80ea",
+    "AC-007": "aaa201c62310bbc43cca8532af32b410f0b2ce557280d7ec7e2d2fef07a4e4c8",
+    "AC-008": "9cec7b422f2919d846cbae64fe6da4f5dcb85e469031812838a090216c6a7b50"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

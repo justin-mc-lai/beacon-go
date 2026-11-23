@@ -1,0 +1,19 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "program-integrated-delivery",
+  "contract_hash": "66c4e90a92536ccd2fe19e21e827241c3d83f8ee856c2c83b8c599fa4a3513d2",
+  "files": {
+    "evidence.md": "8db974f41c94af9a4e7a4ae9ea4134e6573fea81c9558f5fd394fb68411cbbbc",
+    "restatement.md": "2b6735652e140fa6448fd3d8a0cba3c921dc1fc44edadc380dff66b401d88d22",
+    "tasks.md": "8fb76aca803bd04b4225e5590ee1422bf07d83b603ea7010b833dcaff86cac85",
+    "tests.md": "9d2e76d5ce40b55d6df6808b2b40a196053668e3aae82bb3e10127368410c492",
+    "truth.md": "e0dd7fe319c3e2523e601af0cf9785f4d31a2209eb268d566099d35a18115e5c"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "59f8883f5bab05c2ff6804f45bc06269a1efd71e9dabd8e0e9f8a534bb815108",
+    "AC-002": "9d856b76af56727f4e5e9470807c012b2ca4e9f528c2674ac742b2c11f3564a8",
+    "AC-003": "93d8358efd8beb5fe654645abbbbe53874b47ac8ae6082e7f5e5640afce62cb1"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

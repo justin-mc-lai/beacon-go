@@ -1,0 +1,26 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "qa-surface-e2e",
+  "contract_hash": "e8d5cb2f8dad3c1cc37e009234b9d9d09e0303ba8b4cedfb86aebab9a106918f",
+  "files": {
+    "evidence.md": "4b3c5ccae1baacdc666202e6dbcefb9f33d568873b1897103774e599db9435d9",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "2ba2571d628f3416752342956a2ac808697a4cbf5742da08c21c1c95d3087505",
+    "tests.md": "f6975ea471584949fd75bc9425a165dca23964e7e18e862524bf1b9f35c0bfde",
+    "truth.md": "376e2a36bdf8368ee119468ef487b76324b76f14383970dd2c178c9c1a33a54b"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "79f915b0434ef27802b8b0e5e8c16177c7934167f5f8422f67bc31f495becfd9",
+    "AC-002": "9af418edaae0516efe32a08c97e7b2db23bb51af576e3c24d4f6b97c604a7936",
+    "AC-003": "d632c7070521cab401d188b4cb9ba9c660bfe65e757e3de63fa08cf8be406ca3",
+    "AC-004": "60e19d3999039e4f8c8b6330d4a7b5de59faba51489a75c3a530463d4325ae39",
+    "AC-005": "3d43026ca2a7ae815189fad3d1dacde0e1444b7b420dbcc1b81c5a2415a54f05",
+    "AC-006": "caa38454e27986c9e0d195994fc0fc6a90f9626a94d5e0429d643ca50e4556e9",
+    "AC-007": "da0b453de2110a6bd582c7d343999177e6e994a0fe98a1d4c1211b81b708f954",
+    "AC-008": "796931be0c2f82f5d40515046aef2476ceefd4bcc2ef0c0f9fd305669ed1513a",
+    "AC-009": "17e4cbc974abfa22f10ae42c05eaecf43043ba52cde7e131b253c8bc921e1b70",
+    "AC-010": "6c0a8793b8685905146bf061954eee74959f6a7e92c203504073b0bb573482b6"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

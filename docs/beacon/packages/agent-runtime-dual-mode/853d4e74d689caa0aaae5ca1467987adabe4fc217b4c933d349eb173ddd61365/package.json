@@ -1,0 +1,22 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "agent-runtime-dual-mode",
+  "contract_hash": "853d4e74d689caa0aaae5ca1467987adabe4fc217b4c933d349eb173ddd61365",
+  "files": {
+    "evidence.md": "43d0f8ec9c1c5069102eabab295c42a5440f0072ed3ba936adcdd3a4de4d87ab",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "acd42e3655634597c88f27763d98d70f0766a94bf5c2224fbfe4af95bdf47bd2",
+    "tests.md": "ff8386f6166562a84af548909455b2230024355c84a09307d4f66fce56264ce1",
+    "truth.md": "9e3ab724c3b6fe8a7e58a69a184cf9eaee970cb4eeaed8050a2c35c043fe9938"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "33caf264ea7e3066195a394f46f414ec7651295891521493e14e63014924c19e",
+    "AC-002": "a9262a0b3284b5efbe328cc17a9f26b42be83db0e8e1213e7146caf73715b827",
+    "AC-003": "51e220546ccd9b6d196a930b51994830064f3b5c0c27525996364c29a8b4e37d",
+    "AC-004": "b401a7fe91b0e33aa73a58b0186115aec297495a1e4685f2615d6e4d069cee83",
+    "AC-005": "5797f83954eb9f57d64230b759918c42a7364c580c4c49c352845b1799dd6c59",
+    "AC-006": "df36ad6fbfffe5584a44af5f1599575f94e1e864516c817ed751257b187ac902"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

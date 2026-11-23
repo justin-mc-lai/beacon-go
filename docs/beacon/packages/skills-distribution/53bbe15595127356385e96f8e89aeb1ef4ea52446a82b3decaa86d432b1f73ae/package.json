@@ -1,0 +1,20 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "skills-distribution",
+  "contract_hash": "53bbe15595127356385e96f8e89aeb1ef4ea52446a82b3decaa86d432b1f73ae",
+  "files": {
+    "evidence.md": "9f9648f32fd881bfa1f20b9894007b0d650b2275e78d43c913d4f5d6c1ffd882",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "7055ef1574d79a22526077c9a3a1e766e67fe7e5d637218a8cccc7981f62ebe0",
+    "tests.md": "1da639fb8a8e251b3c13c48943a70798bd4f09dbfec3edce5f143983446b90c9",
+    "truth.md": "f2a711d877f511f4fe320f23227785f87bc6921afe42c17c07b0bec912344381"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "7a0b4bc77d4cdbc1e2c4c5baed23492f4520f37d11c04137e2f3f7af6d8675bf",
+    "AC-002": "0f549063d23fe4e6e6ae6dc892819c6051b9082db5abefb0abb231b2f21d1f1a",
+    "AC-003": "364ab1e8844e17efd3c3aa0acb830115eaf0451059e7630183075ec81e13344c",
+    "AC-004": "d5fad7293f30291b8a6956d5d8dde8ce750790e87d144f911fa3cf5a83517c06"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "kernel-refreeze-accept-current",
+  "contract_hash": "734c4cb752a63cc77168e5cb6ec49e45ad48c314dbd9d7fad36de44e34f7aa81",
+  "files": {
+    "evidence.md": "081e00dd3824dd7f7169cdb13b0d950d766ccfc53fd58a90f8dbcd9013f8494d",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "987e025b5cb49e9fdfd67b802db784feffcc57645756e53d71b6824f91930476",
+    "tests.md": "8a7591e4213d4dc1c05c7086800f928ff67e2b6dff9e133618b97009d5ea6844",
+    "truth.md": "63ce25e0a4044890e11708d4f26fb7e768b21fa208459c6ece894bb0b117eec7"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "e30333f11f16492ce72cc838f8d90dc852f2fd1256fb39b7798adf0c962875f6",
+    "AC-002": "4fe1a7f24fe9bdaf38ec36b7f2cee187c76ab63a8e434f1f310ec5e67fa9ea87",
+    "AC-003": "bca9ef0a8a4b7051dff95b996fde7fa21bac809daa4c16190fdd98c0ea2d0de0"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

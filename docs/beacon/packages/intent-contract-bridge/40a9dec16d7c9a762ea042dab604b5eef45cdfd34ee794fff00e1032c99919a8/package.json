@@ -1,0 +1,19 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "intent-contract-bridge",
+  "contract_hash": "40a9dec16d7c9a762ea042dab604b5eef45cdfd34ee794fff00e1032c99919a8",
+  "files": {
+    "evidence.md": "c80928454911d3eb5770b5b3a6ac213edf17c773fc994540039ef624a309bfe6",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "dd3905c57c7e9575a8e78ecc652f3703eb675182259ec352138596aade1ea5ed",
+    "tests.md": "c5921a0c6543f4a59a50c0a88acbfd84abb133175fc8ceabbbbc46c338a6fea3",
+    "truth.md": "0bb6dba67c70422213bd8778071083d677b41646c4c3406db4fb47a29f3dda7d"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "e764d4329cdb3a659f7ee64185354c35768ff81cb36a64836e2ff716cbb4a03a",
+    "AC-002": "430bcb3de3446348e4ded16c4c2a7f87c7430149f94ba86459b6cc17fa7b9014",
+    "AC-003": "d0668a78fd34120da636c61d1206d5b9fa6dc221092e9afcdc026e28f57b9426"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "program-drive",
+  "contract_hash": "4766222c6e7848409bb6a35929b1a7d816dee7511ae5d00e00a07d7e37e9d823",
+  "files": {
+    "evidence.md": "7fda65b7031fb49af4424db9398f51d5e16d0bccdd7ee70402d61bfa9a76b448",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "a28d6aa3e587e9267b663f48a81150669b6f4526e1c48d876f5b040342e09977",
+    "tests.md": "da78139455e618fa4b049d5e9141e98893a72671dd912b5d9eac435e89679c00",
+    "truth.md": "79635a5cd117c3e89084687db6b6b5fc8c1d22aa5a18543f53404cdfa223cf33"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "575c1a4ec2f265eaffa3fbd9bc15107c9644c8eef15ff5c12855ca8e41e25f7a",
+    "AC-002": "89c7087e184bbcc99170330c4d1c7860d624b3137cc241cc02a354d31abc6daa",
+    "AC-003": "5cff876445a7921809a79e7df9856379c50c352ee03d4fc42c7820dab9e289b1",
+    "AC-004": "1cc92045820c59313f21638a28bce6215996d5094e39cb1ac3b00fe6b85b67f4",
+    "AC-005": "94c7c93e6584a73746015ce19446da2ed12e8c85881c4b5d7fd6923a65b04db0",
+    "AC-006": "03fa92a7fb66a2d29ba169e0f8726843c76842daf73849c84f9d27ed32e439b2",
+    "AC-007": "e8b3036a57172e95278b143d4cc59de0f991a01bba54c8f684f32eff420b5981",
+    "AC-008": "2eb3ed03da34aa79c5584e3cabe636745a46116af7ca3aacfbd4ea31b6aa0985"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

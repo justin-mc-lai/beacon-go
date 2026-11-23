@@ -1,0 +1,19 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "kernel-progress-drift",
+  "contract_hash": "f949ae78095a40596b4ced71eb24914ee6f4c83ecbfce9b069d2c93b2e946f74",
+  "files": {
+    "evidence.md": "534f565de3e1741591b083dc4eecfd16762d94194db9a096b3abd2ef05864821",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "de08a1f727162c60228f25b33e4ae85eb9a90ac2dd479a359b0a99b70b27e73e",
+    "tests.md": "d59ac68af287c99ca73b24ee3e7d31210fc4fd3609b72b77792ed6456571a83a",
+    "truth.md": "b71213481865e1e1c4dea3daa8e316397018628c638c5c09f5307d24b0ecc613"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "be9d1868161e3a7198329ff55c375e9fda41161b53eee099a49c21e83e13b8a1",
+    "AC-002": "287fdec51e884d665c3f11b3091585f75df749ce7fc8affec2d7cb33f4b76ac7",
+    "AC-003": "7c44c135798414d5b674244e84f8ced9287b719b5f87c665122e1a52002c8afe"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "kernel-stride-control",
+  "contract_hash": "1292567b848e1979d53582006b427323b772612ad28b0f6914f4a6c77c0676af",
+  "files": {
+    "evidence.md": "986574691aba63202f893d107f15bb52c737769ed07d85057107c80ce75571fb",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "ee8b6a93f080ad6e1f238a2f7bd453d4bbe2f9e5b7646b0a0212ee87f1f93589",
+    "tests.md": "5b9a1fc9011baf5854158e77acb7123eeb02aa80ba66ea551bc4b49e0c2a8468",
+    "truth.md": "ecab6edfc5be22cc129e1c3b69c665e68a258992b9a0dd3d1bf3e15bd64df4a3"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "9e9a6f8f04d6faf0de0bbd59f7d80b61b582c8d31b8eb0bfe805ba464e8dcd86",
+    "AC-002": "12ec27e55669e33698e88fbe6788832162c6aa900b606b992dd1cd45c3c26a94",
+    "AC-003": "ec04a3ea3d88e55ff04c06168c525a83a7b571d7c94db83d7e00bb300987d01b",
+    "AC-004": "6584973c819798956cdd330ebd6e0c746ba801418209a0220ac787b72a831858"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

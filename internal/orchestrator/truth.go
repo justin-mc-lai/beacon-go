@@ -651,6 +651,16 @@ func (e *Engine) applyFreeze(ctx store.FeatureContext, eventType string, payload
 	if err := e.appendFeatureEvent(ctx.Feature.ID, eventType, payload); err != nil {
 		return TruthPackageView{}, err
 	}
+	// Phase 2: also snapshot the frozen contract into the current draft
+	// version manifest. A legacy tree without a manifest is a no-op, so
+	// this never changes existing freeze behavior.
+	if fp, ok := payload["surface_fingerprint"].(string); ok && fp != "" {
+		ids := []string{}
+		if cid, ok := payload["change_id"].(string); ok && cid != "" {
+			ids = append(ids, cid)
+		}
+		_ = e.RecordVersionPackage(ctx, fp, ids)
+	}
 	view, err := e.TruthPackage(ctx)
 	if err != nil {
 		return TruthPackageView{}, err

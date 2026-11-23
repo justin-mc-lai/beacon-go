@@ -1,0 +1,19 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "agent-desktop-workspace",
+  "contract_hash": "56915fa136091957ebe51ed9d2254b782fdbc9c2ee35f21370d6b68749c98abe",
+  "files": {
+    "evidence.md": "69fc89fb62b130625a31b17325eedcf25a3305c0c5131ca05d51f92a42f4e0cb",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "3060c1ce4d6cf80ab880d9c26fbbc2fa9b7feaabd9ed37f9d5a7df0cb71045ef",
+    "tests.md": "9a5d45f37be81821f43c544ed02fd0320d94764ba2eb6c3c4e991e16870e691a",
+    "truth.md": "f60f6d7485371b8dceb7661d002132b7f38131132feea31bd73382c3f6f093fa"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "744030ff20011087bff179732ddbe6067aa44b4e9e6d25cb24201cbe3f0d1a53",
+    "AC-002": "8c4f60e69b1f2ed690a0906f9f0f9d22fb1c22e049f83458899c3feb712c8036",
+    "AC-003": "e2df4bca2facf212401d2887a67cb049f4df8a556ddf3e4bdd1f807995ffd5fb"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

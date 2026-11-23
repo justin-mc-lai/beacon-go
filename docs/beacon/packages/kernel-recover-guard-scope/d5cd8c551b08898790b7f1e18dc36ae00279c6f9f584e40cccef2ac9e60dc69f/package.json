@@ -1,0 +1,20 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "kernel-recover-guard-scope",
+  "contract_hash": "d5cd8c551b08898790b7f1e18dc36ae00279c6f9f584e40cccef2ac9e60dc69f",
+  "files": {
+    "evidence.md": "93d65f6190e6c3b15a6d3134c3c11df8ac8598977ac41928b42f80b02d9ef517",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "ff2acbbf3482597816d662a67cea2196d3be5265054f6f358cbc7471d1e3d359",
+    "tests.md": "e14f716adb7508499a1a5155232cec1f4723b8d026ab5679e33d27574b20a000",
+    "truth.md": "93adff7b5422ac2915c34c600744df908cb44403ff523dcd274045c2e06292d7"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "9752f2d1f658680b14edfb5d6d45f22eac1908c1c68db06814fecf981d6d4d9f",
+    "AC-002": "7e9f35f562d2b91c2cbfc3e8e86ecf53080157b45aadfda009af51fada8a380a",
+    "AC-003": "dcd242a871ef52749c9968fff85a25ee8faec97e139bdec6f2a450fd416eb977",
+    "AC-004": "810186c6a6c64d3c27084f6b32e13d50eb98b9a9ef707db77e5b34d77c94a758"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

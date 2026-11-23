@@ -1,0 +1,21 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "release-policy-shadow",
+  "contract_hash": "660c48bb45b7cff963a53a4e59942c4d18c87638216140816d1b69374368959e",
+  "files": {
+    "evidence.md": "4d0b806b5fbb85a9746243b26667b8544e0e5826449ba25c9440ef45da399b67",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "a56b00d75d4589862f1b35805a800ea6b775cf00eb2dbde05fbfc8588fc875b4",
+    "tests.md": "ebcf203147db4c58af3849bae586584a26014be69148d25f897eca8c7e145423",
+    "truth.md": "20676c99474a7ccbcd55b993c27e7944f5888d6b1da0b5a56d19c3676bba91fe"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "48d89ef90ea32723a14467a05b7f91b088d710a4d4b8378442abbd9be18e87c2",
+    "AC-002": "5e3d07149f9ef9d0231844dc1ae544f2ccd701a2fb57cd2d83958b30f86267b6",
+    "AC-003": "be8181493652ced2cd189c5c92280fc99c05522a2bc3ee587a4466cdb57adefb",
+    "AC-004": "5e0126a92ad7d4c77823766a7da6146fb3b806050c34f622ca1d965e170ba344",
+    "AC-005": "88c6e7f3d686666cb8c518af9336ead5169843a98dceab0d239986f93d4506c5"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

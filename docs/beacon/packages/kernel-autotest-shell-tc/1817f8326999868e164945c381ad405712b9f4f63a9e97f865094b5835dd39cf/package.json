@@ -1,0 +1,21 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "kernel-autotest-shell-tc",
+  "contract_hash": "1817f8326999868e164945c381ad405712b9f4f63a9e97f865094b5835dd39cf",
+  "files": {
+    "evidence.md": "cefc87892d856a2b48ecc747182bb6493cfa2d1c559830320fa0cd073770bbf1",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "f12a8ca168f56a99aaa9accc3208898702954e736af8c4d35eb667ac890d294e",
+    "tests.md": "65d7cacb1b2f9da41ca2fb8a544436ba09651410d16d92edbc097451b81cd0a1",
+    "truth.md": "d9cad82ad610d414638d009f70b008c8639102ef7ce05576fcc480ac96daaccd"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "21947c702f89d50e74abfc849952ddf33842b52658f8355594bb694005f2cab5",
+    "AC-002": "ceedf14b5d7ab1f93d68a5233a8edd9f02271f6a10658be5e29f6326437aec20",
+    "AC-003": "ed506264d6a74aa65d5e6ec17226c6ff536888b341f3376d72fab255230ab864",
+    "AC-004": "db8b0ce92113d36b77b8fd45c8b4959488df232ccce1d315b432f0d08ae7a513",
+    "AC-005": "01472a1d3fe57835104004158c9147d48b6e8337553148880459fe516454069b"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "kernel-goal-advise",
+  "contract_hash": "bb0af895ee57ccf3082de02f4559cacfed0f76e72d122e1218b58cfb257c9d6a",
+  "files": {
+    "evidence.md": "a24299e2f8590010f6304e2329de585b038cfc88bcc68367c56034d82423b2cb",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "b5f5d77c8bf30a0e9232c3b7fcf95e6255ab8a99d3952ab95013aef59c46639a",
+    "tests.md": "9fe2972ae8662b7b7c44bb73d72f5a4d3ed68164d36329557a5c8fefb0dedb21",
+    "truth.md": "4ac03ab64f518b6a54bfa1b5d84a053b6e6f569c069231aeca1b56a9ee7a68c0"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "779fd68a5412408c62d220fedc8ec1f6b41763d902f59708187233101feff922",
+    "AC-002": "93347be92d1a04e6acf62144f0224901b69382481336e00e498f0919555eca43",
+    "AC-003": "1a7989c28c7e37a7c6aaa432bb631bd879b2835103a8d1cea03b7b6c0323afd0"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

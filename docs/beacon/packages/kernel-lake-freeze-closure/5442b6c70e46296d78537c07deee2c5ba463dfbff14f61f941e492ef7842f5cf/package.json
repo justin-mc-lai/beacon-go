@@ -1,0 +1,20 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "kernel-lake-freeze-closure",
+  "contract_hash": "5442b6c70e46296d78537c07deee2c5ba463dfbff14f61f941e492ef7842f5cf",
+  "files": {
+    "evidence.md": "ba0bdaa97d65820067af418015e2776ffb4ea2c82a15b166760b65fac9bc227b",
+    "restatement.md": "94c59719118765b0393eb5a3bcb55033edcb2356a82cba7baf082438c3ec72b4",
+    "tasks.md": "65538b3d3c93d129899b22d4ba752be4d1cc9c053bede10374f4c0e66fbed238",
+    "tests.md": "370b6e4c512388514718dcbbf63506ced71cdc98e41bf027ae19c9f8d606b354",
+    "truth.md": "4eeaad31b3428473b018b262dfaa9e1251800806027f021415b6f425532dac2e"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "ba316deecf844fc72d37ce0bf4d862e3b7b1adbcbe77a33318133f034bf08f6b",
+    "AC-002": "ef873b62ade14af381285d1697ed20752b8e224ad3c11ad5c04910ca4694626b",
+    "AC-003": "1eb61bb60d0fe898e2e3ae9b00c3897d80fdddd3937fce1d80b4221d2eef977a",
+    "AC-004": "1743d8e5dfd2cb5bd16cd9771cc3ec067467e13c07a6ba1c425425ae968a777e"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

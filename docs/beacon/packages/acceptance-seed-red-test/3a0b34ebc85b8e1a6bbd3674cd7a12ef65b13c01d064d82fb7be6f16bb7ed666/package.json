@@ -1,0 +1,19 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "acceptance-seed-red-test",
+  "contract_hash": "3a0b34ebc85b8e1a6bbd3674cd7a12ef65b13c01d064d82fb7be6f16bb7ed666",
+  "files": {
+    "evidence.md": "aba0a8d45c8bcce980e573eb6608723bad84ac8665fc81cce4f672f9f07b720a",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "1e6ee6a890a527d3cfbc5a63ed1307b0a67db35f641c899ace87b73f418ebea6",
+    "tests.md": "6dbce3bdc3c1cefd44a63fcc322d2b132cf46f97555256bd72683398e2d87f0f",
+    "truth.md": "b7af65411f85a98405dacb77cdd2e388d70302b10f4c0b854def7323f05a9c83"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "79b7dafc7b5fd93f5913bf13af59fba7e9b52f1ca044e080cb7944902cd6653c",
+    "AC-002": "906395ccaf72de41b700c8a36e1865449f948cd74273e7dfff1c4b766834d060",
+    "AC-003": "47b3ad94b0c6b2d79f5d63054ae42fae24a1fb7554913b7b9b5dbac6a08215b1"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

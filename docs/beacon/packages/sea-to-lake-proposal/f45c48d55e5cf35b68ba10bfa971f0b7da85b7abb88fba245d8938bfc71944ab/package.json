@@ -1,0 +1,25 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "sea-to-lake-proposal",
+  "contract_hash": "f45c48d55e5cf35b68ba10bfa971f0b7da85b7abb88fba245d8938bfc71944ab",
+  "files": {
+    "evidence.md": "88dd2e7ab3725b898651cb1ae7c66a5e2402585a664b7086034a17618b1b8c94",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "cf4e8487e7c0360d00d4a53e5457cbb6a216a1eeea75d7392414df0f4b3fdb2e",
+    "tests.md": "b5bc5e711365563ced77d4d03584298031f7b31942e464ab3a0609cc54ba6650",
+    "truth.md": "51b56333a7cecb1003d6b5b972042d91cd14c110928cb1e347e509a8bb012c5a"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "f7dd988c16e747070afc8505de85c303b4dc018c8597701330c6ec0fbdc0aec2",
+    "AC-002": "de6acf2df1d2471b9e79bb8c03f7dec974b9d4dc103618d0aeac19ac6e22f21b",
+    "AC-003": "feb5dd40d6c79f82ef6cc8312000226bf16923be36a4c1c371af4fed752f423d",
+    "AC-004": "21a52962d7b25a2de58dadfa01982b370c95a2e49796b90f8bdbcae18c296528",
+    "AC-005": "4e90da16c33ba31cdad4ccbfc90bd51c6120496130b3b4f7580dae1ecce44452",
+    "AC-006": "5687a6da8e52a3cd5aa35575c157b83927fa9deed530b1e51ce2113fdacffac6",
+    "AC-007": "e2ea3a8875b2ed4702899f6f4dcd5e4f15942ec5b08bc58e1b45392fe6aaebe5",
+    "AC-008": "7746048126533cd89df8e7ca2965366dd5ef31479695cda875e22d754b947319",
+    "AC-009": "48ba0164075b4f02ef70d6901f2cae9ff928b99a92dd1351d3c5569f342dd5d5"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

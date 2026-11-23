@@ -1,0 +1,22 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "artifact-upsert",
+  "contract_hash": "69ced13638810844593748ba31568185a4d92048c775ea59d5674d443481cd99",
+  "files": {
+    "evidence.md": "422a862589a3260127387de34614eae150d4e3c6fa9fa887b85f72d89ecdd84e",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "fbabb21eb856805840b4202bd52e5cc4af821ac9fcbb5b919ff40ce71f0822ec",
+    "tests.md": "7f193df57fdb54ac65444292f29cf08eb2bb588dc162eda881ffbea8dcda2c8b",
+    "truth.md": "e7b2dbd0b18739b7f362d408d8382f8e8f3ba38d73799f8997070e49023b875f"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "db3a64ab4a44ed405fab620c72e7706b380ed6205e6c7e1cf3b6c9a08923b1bd",
+    "AC-002": "04f5facb559a436fe4807bed5538a4ea06243885b09c860563b978e0e26ac032",
+    "AC-003": "037d5e390b9e620cb9c1cfa93b64193c5c47058392b373a6bc5126d897edde18",
+    "AC-004": "a6e610993d0e8e9ccd8f56e41842c2ea5997a18848181d22188e9eae1664cd84",
+    "AC-005": "c62977312a59f6957231d9fd7bc975e21cd4d4faf7dcc95cdd1363b6bdcc4f2a",
+    "AC-006": "fb149c01e273d0421e7d01c9d9a5f833e1172ed909f6c2a586164395fae7da3e"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

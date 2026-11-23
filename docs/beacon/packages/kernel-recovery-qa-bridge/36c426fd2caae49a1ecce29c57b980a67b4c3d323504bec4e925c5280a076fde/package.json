@@ -1,0 +1,21 @@
+{
+  "schema": "beacon-package.v1",
+  "slug": "kernel-recovery-qa-bridge",
+  "contract_hash": "36c426fd2caae49a1ecce29c57b980a67b4c3d323504bec4e925c5280a076fde",
+  "files": {
+    "evidence.md": "7c5f91cea3d2683c7f3f86f0736eaba698a2ae1215cc971c003855fe0e351968",
+    "restatement.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tasks.md": "e534836b1be35f7a86140bf98a594ddffb7472d28c84a14f9d5b8c95db7712b3",
+    "tests.md": "1c3808573cb1e3b3aaf54bd1349ff5cc656e8cfc50738f08954cf41ea26684ed",
+    "truth.md": "bfb60aeef632c4c4227741c0a80488746c76f55b0dd9a682501d210d1fe022b2"
+  },
+  "requirement_fingerprints": {
+    "AC-001": "be50811f160e297ce81e28bcc44aefd6dc4bbf34714ac1ee787cdab2cc2a4c42",
+    "AC-002": "49f951236d4a3bac69ff04d07beebbe9a6cdf1f91768c48d5b443961fa3990e7",
+    "AC-003": "91cc62bfa09e88a35f6aed001616a01a416d01d34ba980969a2e8b0de25972fe",
+    "AC-004": "43d1685765fedf6ac1e337dc0a01644d0760111f95332717366cab5de12091f7",
+    "AC-005": "d0e5e964941802f58275ba85066b7535a59627ce9cf26b6baf7c27ffc9b643c4"
+  },
+  "source_version": "v2.0.0",
+  "created_at": "2026-11-23T08:50:46Z"
+}

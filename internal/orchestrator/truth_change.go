@@ -220,6 +220,9 @@ Edit the package truth (and its tests/tasks/evidence as needed), then close this
 	}); err != nil {
 		return TruthPackageView{}, err
 	}
+	// Phase 2: mark the lake dirty in the current draft manifest.
+	// A legacy tree without a manifest is a no-op.
+	_ = e.MarkVersionChange(ctx, changeID)
 	out, err := e.TruthPackage(ctx)
 	if err != nil {
 		return TruthPackageView{}, err
