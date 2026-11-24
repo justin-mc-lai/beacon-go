@@ -12,15 +12,6 @@ import (
 	"beacon-go/internal/store"
 )
 
-type proposedChild struct {
-	Kind  string `json:"kind"`
-	Title string `json:"title"`
-}
-
-type expandProposal struct {
-	Children []proposedChild `json:"children"`
-}
-
 // newPlanExpandCmd validates an LLM/host expansion proposal against the
 // schema DAG. It is read-only: the caller writes node files after a
 // successful check, never the kernel.
@@ -68,12 +59,9 @@ func newPlanExpandCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			var proposal expandProposal
+			var proposal intenttree.Proposal
 			if err := json.Unmarshal(raw, &proposal); err != nil {
 				return core.NewError("tree_proposal_invalid", "plan expand", err.Error())
-			}
-			if len(proposal.Children) == 0 {
-				return core.NewError("tree_proposal_empty", "plan expand", "children must not be empty")
 			}
 			existing := 0
 			for _, n := range idx.Nodes {
@@ -86,14 +74,11 @@ func newPlanExpandCmd() *cobra.Command {
 					fmt.Sprintf("existing %d + proposed %d exceeds the per-expansion cap %d",
 						existing, len(proposal.Children), intenttree.MaxChildren))
 			}
-			for _, ch := range proposal.Children {
-				if err := intenttree.ValidateChild(parent.Kind, intenttree.Kind(ch.Kind)); err != nil {
-					_ = printJSON(cmd, map[string]any{
-						"allowed": false, "parent_id": nodeID, "reason_code": intenttree.ReasonInvalidChildKind,
-						"detail": ch.Kind + " under " + string(parent.Kind),
-					})
-					return err
-				}
+			if err := intenttree.ValidateProposal(parent.Kind, proposal); err != nil {
+				_ = printJSON(cmd, map[string]any{
+					"allowed": false, "parent_id": nodeID, "detail": err.Error(),
+				})
+				return err
 			}
 			_ = dir
 			_ = asJSON

@@ -38,6 +38,7 @@ const (
 	ReasonNodeNotDraft        = "tree_node_not_draft"
 	ReasonParentNotFrozen     = "tree_parent_not_frozen"
 	ReasonACMissing           = "tree_ac_missing"
+	ReasonLeafHasChildren     = "tree_leaf_has_children"
 )
 
 // Kind is one of the four frozen node kinds.
@@ -152,6 +153,26 @@ func Fingerprint(n Node) (string, error) {
 	}
 	sum := sha256.Sum256(raw)
 	return hex.EncodeToString(sum[:]), nil
+}
+
+// fingerprintVerifiers dispatches by the alg recorded on the node, so a
+// historical algorithm can be verified without rewriting old records.
+var fingerprintVerifiers = map[string]func(Node) (string, error){
+	FingerprintAlg: Fingerprint,
+}
+
+// VerifyFingerprint checks a node with the algorithm it records.
+func VerifyFingerprint(n Node) (bool, error) {
+	fn, ok := fingerprintVerifiers[n.FingerprintAlg]
+	if !ok {
+		return false, core.NewError(ReasonSchemaUnknown, "intenttree.VerifyFingerprint",
+			"unknown fingerprint alg "+n.FingerprintAlg)
+	}
+	got, err := fn(n)
+	if err != nil {
+		return false, err
+	}
+	return got == n.Fingerprint, nil
 }
 
 // Stamp computes and stamps the fingerprint + algorithm on a node.

@@ -79,14 +79,11 @@ func ReadNode(dir, id string) (Node, error) {
 	if n.ID != id {
 		return n, core.NewError(ReasonInvalidIndex, "intenttree.ReadNode", "node id mismatch: "+id)
 	}
-	if n.FingerprintAlg != FingerprintAlg {
-		return n, core.NewError(ReasonSchemaUnknown, "intenttree.ReadNode", "unknown fingerprint alg "+n.FingerprintAlg)
-	}
-	got, err := Fingerprint(n)
+	ok, err := VerifyFingerprint(n)
 	if err != nil {
 		return n, err
 	}
-	if got != n.Fingerprint {
+	if !ok {
 		return n, core.NewError(ReasonInvalidIndex, "intenttree.ReadNode", "fingerprint drift on "+id)
 	}
 	return n, nil

@@ -185,3 +185,46 @@ func TestPlanApplyThenFreezeWholeTree(t *testing.T) {
 		t.Fatalf("audit failed after freeze: %s", out)
 	}
 }
+
+func TestPlanApplyRejections(t *testing.T) {
+	proj := treeTestEnv(t)
+	mustRun(t, "truth", "create", "--project", proj, "--slug", "demo", "--json")
+	rep := parseDoc(t, mustRun(t, "migrate", "tree", "--project", proj, "--json"))
+	rootID := rep["root_id"].(string)
+	doc := parseDoc(t, mustRun(t, "plan", "tree", "--project", proj, "--json"))
+	var featureID string
+	for _, n := range doc["nodes"].([]any) {
+		m := n.(map[string]any)
+		if m["kind"] == "feature" {
+			featureID = m["id"].(string)
+		}
+	}
+	if featureID == "" {
+		t.Fatal("migrated feature missing")
+	}
+	base := t.TempDir()
+	apply := func(parent, body string) error {
+		p := filepath.Join(base, "p.json")
+		if err := os.WriteFile(p, []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		_, err := runCLI(t, "plan", "apply", "--project", proj, "--node", parent, "--proposal", p, "--json")
+		return err
+	}
+	eight := `{"children":[` + strings.Repeat(`{"kind":"module","title":"m"},`, 7) + `{"kind":"module","title":"m8"}]}`
+	if err := apply(rootID, eight); err == nil || !strings.Contains(err.Error(), "tree_child_limit_exceeded") {
+		t.Fatalf("8 children: %v", err)
+	}
+	if err := apply(featureID, `{"children":[{"kind":"touchpoint","title":"no-ac","verification":{"type":"test","spec":"when x then y"}}]}`); err == nil || !strings.Contains(err.Error(), "tree_ac_missing") {
+		t.Fatalf("missing AC: %v", err)
+	}
+	if err := apply(featureID, `{"children":[{"kind":"touchpoint","title":"no-verify","acs":[{"id":"a","text":"x"}]}]}`); err == nil || !strings.Contains(err.Error(), "tree_verification_missing") {
+		t.Fatalf("missing verification: %v", err)
+	}
+	if err := apply(rootID, `{"children":[{"kind":"module","title":""}]}`); err == nil || !strings.Contains(err.Error(), "tree_index_invalid") {
+		t.Fatalf("empty title: %v", err)
+	}
+	if _, err := freeze(t, proj, "nope"); err == nil || !strings.Contains(err.Error(), "tree_node_not_found") {
+		t.Fatalf("missing node freeze: %v", err)
+	}
+}
