@@ -16,7 +16,7 @@ func newMigrateCmd() *cobra.Command {
 		Use:   "migrate",
 		Short: "One-way data migration into the global store",
 	}
-	c.AddCommand(newMigrateV1Cmd())
+	c.AddCommand(newMigrateV1Cmd(), newMigrateTreeCmd())
 	return c
 }
 

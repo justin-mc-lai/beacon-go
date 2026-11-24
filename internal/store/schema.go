@@ -1,4 +1,4 @@
-// Nine-table schema contract (AC-067..075) and its drift check (AC-161).
+// Runtime-table schema contract (AC-067..075 + intent-tree tables) and its drift check (AC-161).
 package store
 
 import (
@@ -24,6 +24,9 @@ var SchemaContract = map[string][]string{
 	"gate_results":      {"id", "feature_id", "gate_type", "verdict", "reason_codes_json", "evaluated_at"},
 	"artifact_refs":     {"id", "run_id", "kind", "abs_path", "content_hash", "size_bytes", "created_at"},
 	"checkpoints":       {"id", "run_id", "iteration", "state_json", "created_at"},
+	"tree_nodes": {"id", "project_version_id", "parent_id", "kind", "path", "status",
+		"title", "fingerprint", "fingerprint_alg", "doc_path", "created_at", "updated_at"},
+	"tree_migrations": {"id", "project_version_id", "source", "snapshot_path", "node_count", "created_at"},
 }
 
 // internalTables are bookkeeping tables excluded from the nine-table
@@ -128,6 +131,33 @@ func schemaDDL() []string {
 			state_json TEXT NOT NULL DEFAULT '{}',
 			created_at TEXT NOT NULL,
 			UNIQUE (run_id, iteration)
+		)`,
+		// Intent-tree index cache (mirrors the repo's canonical JSON; a
+		// cache, never the truth source). Bodies stay in Markdown/JSON
+		// files, so no truth-body column lives here (AC-005).
+		`CREATE TABLE IF NOT EXISTS tree_nodes (
+			id TEXT PRIMARY KEY,
+			project_version_id TEXT NOT NULL REFERENCES project_versions(id),
+			parent_id TEXT,
+			kind TEXT NOT NULL,
+			path TEXT NOT NULL,
+			status TEXT NOT NULL,
+			title TEXT NOT NULL,
+			fingerprint TEXT NOT NULL,
+			fingerprint_alg TEXT NOT NULL,
+			doc_path TEXT NOT NULL,
+			created_at TEXT NOT NULL,
+			updated_at TEXT NOT NULL
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_tree_nodes_version ON tree_nodes(project_version_id)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS idx_tree_nodes_version_path ON tree_nodes(project_version_id, path)`,
+		`CREATE TABLE IF NOT EXISTS tree_migrations (
+			id TEXT PRIMARY KEY,
+			project_version_id TEXT NOT NULL UNIQUE REFERENCES project_versions(id),
+			source TEXT NOT NULL,
+			snapshot_path TEXT NOT NULL,
+			node_count INTEGER NOT NULL,
+			created_at TEXT NOT NULL
 		)`,
 	}
 }

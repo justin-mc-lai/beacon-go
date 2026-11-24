@@ -1,0 +1,11 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<!-- source: 88a62c37ac5263e09450e470fbe42f0faf51dd555892de0331318dd81ded3f0c -->
+<title>Requirement tree</title><style>
+body{font:14px/1.6 sans-serif;margin:32px;max-width:1100px}details{margin-left:18px}summary{cursor:pointer;font-weight:600}code{font-size:12px;color:#555}
+</style></head><body>
+<h1>Requirement tree · v0.1.0</h1><p><code>beacon-intent-tree-v1</code> · 2 nodes</p>
+<details open><summary>root <code>root</code> <code>intent/draft</code></summary>
+</details>
+<details open><summary>copy <code>root</code> <code>intent/draft</code></summary>
+</details>
+</body></html>

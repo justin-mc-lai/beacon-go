@@ -43,7 +43,7 @@ func newTruthCmd() *cobra.Command {
 		newTruthFSMCmd(),
 		newTruthRolesCmd(),
 		newTruthSemanticReviewCmd(),
-		newTruthMigrateCmd(),
+		newTruthMigrateCmd(), newTruthTreeCmd(),
 	)
 	return c
 }

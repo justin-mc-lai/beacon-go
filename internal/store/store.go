@@ -41,11 +41,13 @@ const (
 	ReasonLifecycleBlockedCodes = core.ReasonBlockedMissingReasons
 )
 
-// Tables is the frozen nine-table contract (AC-067..075), kept for callers
-// that only need the names; the column contract lives in schema.go.
+// Tables is the runtime-table contract (AC-067..075 + intent-tree cache),
+// kept for callers that only need the names; the column contract lives in
+// schema.go.
 var Tables = []string{
 	"projects", "project_versions", "feature_packages", "feature_lifecycle",
 	"runs", "lifecycle_events", "gate_results", "artifact_refs", "checkpoints",
+	"tree_nodes", "tree_migrations",
 }
 
 // DefaultPath resolves the global DB path: $BEACON_STORE_PATH when set,

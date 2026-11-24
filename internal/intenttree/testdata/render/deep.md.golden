@@ -1,0 +1,20 @@
+# Requirement tree: v0.1.0
+
+Schema: `beacon-intent-tree-v1` · root: `r` · nodes: 5
+Source hash: `8ae3acbe57d563ecca9b94c42eb6d67ae4314ece8b35f33154c447abee7d81a0`
+
+| id | kind | status | title | fingerprint |
+|---|---|---|---|---|
+| `r` | intent | draft | root | `a1` |
+| `i2` | intent | draft | sub intent | `b2` |
+| `m3` | module | draft | module | `c3` |
+| `f4` | feature | draft | feature | `d4` |
+| `t5` | touchpoint | draft | touch | `e5` |
+
+## Outline
+
+- [r] root (intent/draft)
+  - [i2] sub intent (intent/draft)
+    - [m3] module (module/draft)
+      - [f4] feature (feature/draft)
+        - [t5] touch (touchpoint/draft)

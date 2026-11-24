@@ -1,0 +1,12 @@
+# Requirement tree: v0.1.0
+
+Schema: `beacon-intent-tree-v1` · root: `root` · nodes: 1
+Source hash: `7a317dfa97884d6bfa29209ed9086c725fc842580a84d81e196f9b5eecbeb12e`
+
+| id | kind | status | title | fingerprint |
+|---|---|---|---|---|
+| `root` | intent | draft | only | `aa` |
+
+## Outline
+
+- [root] only (intent/draft)

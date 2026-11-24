@@ -20,7 +20,7 @@ func newDoctorCmd() *cobra.Command {
 		Use:   "doctor",
 		Short: "Diagnostics and projection maintenance",
 	}
-	c.AddCommand(newDoctorRebuildCmd(), newDoctorBenchGateCmd())
+	c.AddCommand(newDoctorRebuildCmd(), newDoctorBenchGateCmd(), newDoctorRebuildTreeCmd())
 	return c
 }
 
