@@ -23,22 +23,25 @@ const (
 
 // Reason codes owned by this package.
 const (
-	ReasonSchemaUnknown       = "tree_schema_unknown"
-	ReasonNodeNotFound        = "tree_node_not_found"
-	ReasonDuplicateID         = "tree_duplicate_node_id"
-	ReasonOrphanNode          = "tree_orphan_node"
-	ReasonInvalidChildKind    = "tree_invalid_child_kind"
-	ReasonChildLimit          = "tree_child_limit_exceeded"
-	ReasonInvalidIndex        = "tree_index_invalid"
-	ReasonStateConflict       = "tree_state_conflict"
-	ReasonVersionNotFound     = "tree_version_not_found"
-	ReasonAlreadyMigrated     = "tree_already_migrated"
-	ReasonVerificationMissing = "tree_verification_missing"
-	ReasonModuleEmpty         = "tree_module_empty"
-	ReasonNodeNotDraft        = "tree_node_not_draft"
-	ReasonParentNotFrozen     = "tree_parent_not_frozen"
-	ReasonACMissing           = "tree_ac_missing"
-	ReasonLeafHasChildren     = "tree_leaf_has_children"
+	ReasonSchemaUnknown        = "tree_schema_unknown"
+	ReasonNodeNotFound         = "tree_node_not_found"
+	ReasonDuplicateID          = "tree_duplicate_node_id"
+	ReasonOrphanNode           = "tree_orphan_node"
+	ReasonInvalidChildKind     = "tree_invalid_child_kind"
+	ReasonChildLimit           = "tree_child_limit_exceeded"
+	ReasonInvalidIndex         = "tree_index_invalid"
+	ReasonStateConflict        = "tree_state_conflict"
+	ReasonVersionNotFound      = "tree_version_not_found"
+	ReasonAlreadyMigrated      = "tree_already_migrated"
+	ReasonVerificationMissing  = "tree_verification_missing"
+	ReasonModuleEmpty          = "tree_module_empty"
+	ReasonNodeNotDraft         = "tree_node_not_draft"
+	ReasonParentNotFrozen      = "tree_parent_not_frozen"
+	ReasonACMissing            = "tree_ac_missing"
+	ReasonLeafHasChildren      = "tree_leaf_has_children"
+	ReasonChangeNotAllowed     = "tree_change_not_allowed"
+	ReasonChangeBaseMismatch   = "tree_change_base_mismatch"
+	ReasonChangeSummaryMissing = "tree_change_summary_missing"
 )
 
 // Kind is one of the four frozen node kinds.
@@ -55,11 +58,12 @@ const (
 type Status string
 
 const (
-	StatusDraft       Status = "draft"
-	StatusFrozen      Status = "frozen"
-	StatusImplemented Status = "implemented"
-	StatusVerified    Status = "verified"
-	StatusDeprecated  Status = "deprecated"
+	StatusDraft         Status = "draft"
+	StatusFrozen        Status = "frozen"
+	StatusImplemented   Status = "implemented"
+	StatusVerified      Status = "verified"
+	StatusChangePending Status = "change_pending"
+	StatusDeprecated    Status = "deprecated"
 )
 
 // AC is one acceptance criterion on a node.

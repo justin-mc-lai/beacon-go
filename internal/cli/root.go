@@ -135,6 +135,6 @@ func NewRootCmd() *cobra.Command {
 	// P2a: the goal command group (the loop ability's formal entry).
 	// P3a: the gate command group (formal evaluation write-back).
 	// P3b: migrate v1 (AC-077..079) + doctor rebuild (AC-011).
-	root.AddCommand(newSpineCmd(), newProjectsCmd(), newGoalCmd(), newGateCmd(), newMigrateCmd(), newDoctorCmd(), newSkillsCmd(), newReviewCmd(), newArchiveCmd(), newHooksCmd(), newUICmd(), newFSMCmd(), newVersionCmd(), newPlanCmd(), newVerifyCmd())
+	root.AddCommand(newSpineCmd(), newProjectsCmd(), newGoalCmd(), newGateCmd(), newMigrateCmd(), newDoctorCmd(), newSkillsCmd(), newReviewCmd(), newArchiveCmd(), newHooksCmd(), newUICmd(), newFSMCmd(), newVersionCmd(), newPlanCmd(), newVerifyCmd(), newChangeCmd())
 	return root
 }

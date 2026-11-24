@@ -35,9 +35,9 @@ func FreezeNode(st *store.Store, dir, versionID, nodeID string) (FreezeReport, e
 	if entry.Status == StatusFrozen {
 		return FreezeReport{NodeID: nodeID, Status: string(entry.Status), Fingerprint: entry.Fingerprint, Already: true}, nil
 	}
-	if entry.Status != StatusDraft {
+	if entry.Status != StatusDraft && entry.Status != StatusChangePending {
 		return FreezeReport{}, core.NewError(ReasonNodeNotDraft, "intenttree.FreezeNode",
-			"only draft nodes can freeze: "+nodeID+" is "+string(entry.Status))
+			"only draft or change_pending nodes can freeze: "+nodeID+" is "+string(entry.Status))
 	}
 	n, err := ReadNode(dir, nodeID)
 	if err != nil {

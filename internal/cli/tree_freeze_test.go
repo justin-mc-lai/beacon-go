@@ -228,3 +228,58 @@ func TestPlanApplyRejections(t *testing.T) {
 		t.Fatalf("missing node freeze: %v", err)
 	}
 }
+
+func TestSubtreeChangeCascadeAndRefreeze(t *testing.T) {
+	proj := treeTestEnv(t)
+	seedFreezeTree(t, proj, false)
+	for _, id := range []string{"t1", "t2", "f", "m", "root"} {
+		if _, err := freeze(t, proj, id); err != nil {
+			t.Fatalf("freeze %s: %v", id, err)
+		}
+	}
+	doc := parseDoc(t, mustRun(t, "plan", "tree", "--project", proj, "--json"))
+	base := ""
+	for _, n := range doc["nodes"].([]any) {
+		m := n.(map[string]any)
+		if m["id"] == "t1" {
+			base = m["fingerprint"].(string)
+		}
+	}
+	out := mustRun(t, "change", "request", "--project", proj, "--node", "t1", "--summary", "widen AC", "--by", "tester", "--base-fingerprint", base, "--json")
+	rec := parseDoc(t, out)
+	if rec["node_id"] != "t1" {
+		t.Fatalf("change record: %v", rec)
+	}
+	doc = parseDoc(t, mustRun(t, "plan", "tree", "--project", proj, "--json"))
+	status := map[string]string{}
+	for _, n := range doc["nodes"].([]any) {
+		m := n.(map[string]any)
+		status[m["id"].(string)] = m["status"].(string)
+	}
+	if status["t1"] != "draft" || status["root"] != "change_pending" || status["m"] != "change_pending" || status["f"] != "change_pending" {
+		t.Fatalf("cascade statuses: %v", status)
+	}
+	if got := parseDoc(t, mustRun(t, "change", "list", "--project", proj, "--json")); len(got["changes"].([]any)) != 1 {
+		t.Fatalf("change list: %v", got)
+	}
+	// The changed leaf is draft now; changing it again is refused.
+	if _, err := runCLI(t, "change", "request", "--project", proj, "--node", "t1", "--summary", "x", "--json"); err == nil || !strings.Contains(err.Error(), "tree_change_not_allowed") {
+		t.Fatalf("draft change: %v", err)
+	}
+	// Parent cannot refreeze before the changed leaf.
+	if _, err := freeze(t, proj, "root"); err == nil || !strings.Contains(err.Error(), "tree_parent_not_frozen") {
+		t.Fatalf("root before leaf refreeze: %v", err)
+	}
+	for _, id := range []string{"t1", "f", "m", "root"} {
+		if _, err := freeze(t, proj, id); err != nil {
+			t.Fatalf("refreeze %s: %v", id, err)
+		}
+	}
+	// Base mismatch is rejected after refreeze.
+	if _, err := freeze(t, proj, "t2"); err != nil {
+		t.Fatalf("freeze t2: %v", err)
+	}
+	if _, err := runCLI(t, "change", "request", "--project", proj, "--node", "t2", "--summary", "x", "--base-fingerprint", "deadbeef", "--json"); err == nil || !strings.Contains(err.Error(), "tree_change_base_mismatch") {
+		t.Fatalf("base mismatch: %v", err)
+	}
+}
