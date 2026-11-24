@@ -42,6 +42,9 @@ const (
 	ReasonChangeNotAllowed     = "tree_change_not_allowed"
 	ReasonChangeBaseMismatch   = "tree_change_base_mismatch"
 	ReasonChangeSummaryMissing = "tree_change_summary_missing"
+	ReasonNodeNotFrozen        = "tree_node_not_frozen"
+	ReasonArtifactRequired     = "tree_artifact_required"
+	ReasonOutcomeInvalid       = "tree_outcome_invalid"
 )
 
 // Kind is one of the four frozen node kinds.
@@ -79,23 +82,34 @@ type Verification struct {
 	Spec string `json:"spec"`
 }
 
+// ImplementationRecord is the leaf execution report.
+type ImplementationRecord struct {
+	By           string `json:"by"`
+	Outcome      string `json:"outcome"`
+	ArtifactPath string `json:"artifact_path,omitempty"`
+	ArtifactHash string `json:"artifact_hash,omitempty"`
+	ReasonCode   string `json:"reason_code,omitempty"`
+	At           string `json:"at"`
+}
+
 // Node is one canonical node body. Fingerprint fields are excluded from
 // the hashed bytes; everything else is contract surface.
 type Node struct {
-	ID                string        `json:"id"`
-	Kind              Kind          `json:"kind"`
-	Title             string        `json:"title"`
-	Intent            string        `json:"intent,omitempty"`
-	ParentID          string        `json:"parent_id,omitempty"`
-	Path              string        `json:"path"`
-	Status            Status        `json:"status"`
-	ACs               []AC          `json:"acs,omitempty"`
-	Verification      *Verification `json:"verification,omitempty"`
-	ChildFingerprints []string      `json:"child_fingerprints,omitempty"`
-	LegacyTruthPath   string        `json:"legacy_truth_path,omitempty"`
-	LegacyTestsPath   string        `json:"legacy_tests_path,omitempty"`
-	Fingerprint       string        `json:"fingerprint"`
-	FingerprintAlg    string        `json:"fingerprint_alg"`
+	ID                string                `json:"id"`
+	Kind              Kind                  `json:"kind"`
+	Title             string                `json:"title"`
+	Intent            string                `json:"intent,omitempty"`
+	ParentID          string                `json:"parent_id,omitempty"`
+	Path              string                `json:"path"`
+	Status            Status                `json:"status"`
+	ACs               []AC                  `json:"acs,omitempty"`
+	Verification      *Verification         `json:"verification,omitempty"`
+	ChildFingerprints []string              `json:"child_fingerprints,omitempty"`
+	Implementation    *ImplementationRecord `json:"implementation,omitempty"`
+	LegacyTruthPath   string                `json:"legacy_truth_path,omitempty"`
+	LegacyTestsPath   string                `json:"legacy_tests_path,omitempty"`
+	Fingerprint       string                `json:"fingerprint"`
+	FingerprintAlg    string                `json:"fingerprint_alg"`
 }
 
 // IndexEntry is the reviewable summary of one node. A review never

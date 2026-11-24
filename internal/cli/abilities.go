@@ -61,7 +61,7 @@ func newImplementCmd() *cobra.Command {
 	c.AddCommand(
 		newGoalImplementPlanCmd(), newGoalAdmitCmd(), newGoalDelegateRalphCmd(),
 		newGoalReceiveResultCmd(), newGoalWorktreeCmd(),
-		newImplementTasksCmd(),
+		newImplementTasksCmd(), newImplementReportCmd(),
 	)
 	return c
 }

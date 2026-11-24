@@ -283,3 +283,44 @@ func TestSubtreeChangeCascadeAndRefreeze(t *testing.T) {
 		t.Fatalf("base mismatch: %v", err)
 	}
 }
+
+func TestImplementReportFlow(t *testing.T) {
+	proj := treeTestEnv(t)
+	seedFreezeTree(t, proj, false)
+	if _, err := freeze(t, proj, "t1"); err != nil {
+		t.Fatal(err)
+	}
+	artifact := filepath.Join(t.TempDir(), "proof.txt")
+	if err := os.WriteFile(artifact, []byte("test output"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	out := mustRun(t, "implement", "report", "--project", proj, "--node", "t1", "--by", "dev", "--outcome", "done", "--artifact", artifact, "--json")
+	if parseDoc(t, out)["status"] != "implemented" {
+		t.Fatalf("report: %s", out)
+	}
+	out = mustRun(t, "implement", "report", "--project", proj, "--node", "t1", "--by", "dev", "--outcome", "done", "--artifact", artifact, "--json")
+	if parseDoc(t, out)["already"] != true {
+		t.Fatalf("repeat report must be idempotent: %s", out)
+	}
+	if _, err := runCLI(t, "implement", "report", "--project", proj, "--node", "t2", "--by", "dev", "--artifact", artifact, "--json"); err == nil || !strings.Contains(err.Error(), "tree_node_not_frozen") {
+		t.Fatalf("unfrozen leaf: %v", err)
+	}
+	if _, err := freeze(t, proj, "t2"); err != nil {
+		t.Fatal(err)
+	}
+	out = mustRun(t, "implement", "report", "--project", proj, "--node", "t2", "--by", "dev", "--outcome", "failed", "--reason", "ui_bug", "--json")
+	if parseDoc(t, out)["outcome"] != "failed" {
+		t.Fatalf("failed report: %s", out)
+	}
+	dir := filepath.Join(proj, "docs", "beacon", "v0.1.0", "tree")
+	n, err := intenttree.ReadNode(dir, "t2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n.Status != intenttree.StatusFrozen || n.Implementation == nil || n.Implementation.ReasonCode != "ui_bug" {
+		t.Fatalf("failed implementation record: %+v", n)
+	}
+	if _, err := runCLI(t, "implement", "report", "--project", proj, "--node", "t2", "--by", "dev", "--outcome", "done", "--json"); err == nil || !strings.Contains(err.Error(), "tree_artifact_required") {
+		t.Fatalf("missing artifact: %v", err)
+	}
+}
