@@ -9,6 +9,7 @@ import (
 
 	"beacon-go/internal/core"
 	"beacon-go/internal/intenttree"
+	"beacon-go/internal/store"
 )
 
 type proposedChild struct {
@@ -107,5 +108,65 @@ func newPlanExpandCmd() *cobra.Command {
 	c.Flags().StringVar(&nodeID, "node", "", "parent node id (required)")
 	c.Flags().StringVar(&childrenPath, "children", "", "JSON file with a children[] proposal")
 	c.Flags().BoolVar(&asJSON, "json", false, "JSON output (default)")
+	return c
+}
+
+func newPlanApplyCmd() *cobra.Command {
+	var project, version, nodeID, proposalPath string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "apply",
+		Short: "Apply a validated child-node proposal to the canonical tree",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			st, err := openWriteStore()
+			if err != nil {
+				return err
+			}
+			defer st.Close()
+			dir, _, idx, err := resolveTree(st, project, version)
+			if err != nil {
+				return err
+			}
+			proj, err := st.Projects().GetByRootPath(store.ResolveRootPath(project))
+			if err != nil {
+				return err
+			}
+			ver, err := resolveProjectVersion(st, proj.ID, idx.Version)
+			if err != nil {
+				return err
+			}
+			if nodeID == "" {
+				return fail("tree_node_required", "plan apply", "--node is required")
+			}
+			if proposalPath == "" {
+				return fail("tree_proposal_required", "plan apply", "--proposal <file.json> is required")
+			}
+			raw, err := os.ReadFile(proposalPath)
+			if err != nil {
+				return err
+			}
+			var p intenttree.Proposal
+			if err := json.Unmarshal(raw, &p); err != nil {
+				return core.NewError("tree_proposal_invalid", "plan apply", err.Error())
+			}
+			nodes, err := intenttree.ApplyProposal(st, dir, ver.ID, nodeID, p)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				return printJSON(cmd, map[string]any{"applied": len(nodes), "parent_id": nodeID, "nodes": nodes})
+			}
+			for _, n := range nodes {
+				fmt.Fprintf(cmd.OutOrStdout(), "draft: %s %s (%s)\n", n.ID, n.Title, n.Kind)
+			}
+			return nil
+		},
+	}
+	c.Flags().StringVar(&project, "project", ".", "project root")
+	c.Flags().StringVar(&version, "version", "", "docs version (default current)")
+	c.Flags().StringVar(&nodeID, "node", "", "parent node id (required)")
+	c.Flags().StringVar(&proposalPath, "proposal", "", "JSON proposal file (required)")
+	c.Flags().BoolVar(&asJSON, "json", false, "print JSON")
 	return c
 }

@@ -151,6 +151,32 @@ func (d *TreeDao) GetTreeNode(id string) (TreeNode, error) {
 	return n, err
 }
 
+// AppendTreeNodes adds newly applied draft nodes to the cache.
+func (s *Store) AppendTreeNodes(versionID string, nodes []TreeNode) error {
+	if err := s.checkWritable(); err != nil {
+		return err
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	if err := insertTreeNodes(tx, versionID, nodes); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+// UpdateTreeNodeStatus refreshes one cached node after a freeze.
+func (s *Store) UpdateTreeNodeStatus(id, status, fingerprint, updatedAt string) error {
+	if err := s.checkWritable(); err != nil {
+		return err
+	}
+	_, err := s.db.Exec(`UPDATE tree_nodes SET status = ?, fingerprint = ?, updated_at = ? WHERE id = ?`,
+		status, fingerprint, updatedAt, id)
+	return err
+}
+
 // DeleteTree removes the cache rows for one version (rollback = rerun
 // migrate after the repo JSON is deleted; the old flat tables stay).
 func (s *Store) DeleteTree(versionID string) error {
