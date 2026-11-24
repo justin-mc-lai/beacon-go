@@ -1,0 +1,42 @@
+{
+  "schema": "prototype.metrics.v1",
+  "reference_count": 15,
+  "models": {
+    "sea-lake": {
+      "leaf_units": 13,
+      "coverage_covered": 14,
+      "coverage_total": 15,
+      "coverage_missing": [
+        "R09"
+      ],
+      "ambiguity_points": 5,
+      "ambiguity_detail": [
+        "F-05:报名支付与退款",
+        "F-10:互动体验良好",
+        "F-10:良好",
+        "F-13:及时",
+        "F-13:及时通知"
+      ],
+      "manual_edits": 0,
+      "verified_bound": 1,
+      "verification_binding_rate": 0.0769
+    },
+    "intent-tree": {
+      "leaf_units": 26,
+      "coverage_covered": 15,
+      "coverage_total": 15,
+      "coverage_missing": [],
+      "ambiguity_points": 0,
+      "ambiguity_detail": [],
+      "manual_edits": 1,
+      "verified_bound": 26,
+      "verification_binding_rate": 1.0
+    }
+  },
+  "verdict": {
+    "no_worse_metrics": 3,
+    "required_no_worse": 3,
+    "tree_binding_complete": true,
+    "pass": true
+  }
+}

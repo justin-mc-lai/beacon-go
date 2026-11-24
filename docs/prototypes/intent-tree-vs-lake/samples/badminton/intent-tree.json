@@ -1,0 +1,905 @@
+{
+  "schema": "prototype.intent-tree.v1",
+  "model": "intent-tree",
+  "utterance": "构建一个羽毛球运动社区小程序，有赛事功能、社区功能",
+  "provenance": {
+    "authoring": "宿主 agent 按 intent→module→feature→touchpoint 四层 kind 规则展开；未使用内核 LLM 路径。",
+    "reference_list": "reference-touchpoints.json（拆解前冻结）"
+  },
+  "root": {
+    "id": "n0",
+    "kind": "intent",
+    "title": "羽毛球社区闭环",
+    "intent": "让羽毛球爱好者在微信内完成找球友、约球、参赛、交流的闭环，降低组织成本并提升赛事公平感。",
+    "parent": null,
+    "acs": [],
+    "verification": null,
+    "ambiguities": [],
+    "children": [
+      {
+        "id": "n1",
+        "kind": "intent",
+        "title": "找到水平匹配的球友与球局",
+        "intent": "用户不必依赖熟人介绍，就能在附近找到水平相近、时间合适的球友与球局。",
+        "parent": "n0",
+        "acs": [],
+        "verification": null,
+        "ambiguities": [],
+        "children": [
+          {
+            "id": "n1.1",
+            "kind": "module",
+            "title": "附近球局",
+            "intent": "覆盖发现、查看、报名、发起球局的完整路径。",
+            "parent": "n1",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n1.1.1",
+                "kind": "feature",
+                "title": "浏览与筛选球局",
+                "intent": "让用户在一屏内判断哪些球局值得参加。",
+                "parent": "n1.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n1.1.1.1",
+                    "kind": "touchpoint",
+                    "title": "按时间、距离、水平筛选球局列表",
+                    "intent": "用户选择筛选条件后看到符合条件的球局，且结果数量可预期。",
+                    "parent": "n1.1.1",
+                    "acs": [
+                      {
+                        "id": "n1.1.1.1-AC1",
+                        "text": "筛选条件变化后列表在 1 秒内刷新且只含匹配项。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户选择“今晚 + 5km + 中级”时，列表只返回满足三项的球局，空结果给空态文案。"
+                    },
+                    "covers": [],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n1.1.1.2",
+                    "kind": "touchpoint",
+                    "title": "查看球局详情",
+                    "intent": "用户在报名前一屏看清场地、时间、费用、已报名人数与水平要求。",
+                    "parent": "n1.1.1",
+                    "acs": [
+                      {
+                        "id": "n1.1.1.2-AC1",
+                        "text": "详情页展示场地、时间、费用、已报名/上限、水平要求。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "manual",
+                      "spec": "打开任一球局详情，逐项核对五个字段与报名按钮状态。"
+                    },
+                    "covers": [],
+                    "ambiguities": []
+                  }
+                ]
+              },
+              {
+                "id": "n1.1.2",
+                "kind": "feature",
+                "title": "报名与组局",
+                "intent": "用户能加入他人球局，也能自己发起球局并邀请球友。",
+                "parent": "n1.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n1.1.2.1",
+                    "kind": "touchpoint",
+                    "title": "报名加入球局（满员进候补）",
+                    "intent": "用户报名后状态明确：已报名或候补，且退出可释放名额。",
+                    "parent": "n1.1.2",
+                    "acs": [
+                      {
+                        "id": "n1.1.2.1-AC1",
+                        "text": "名额未满时为已报名，满员时进入候补并显示排位；候补转正需在 2 小时内确认，超时顺延下一位。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当第 N+1 人报名满员球局时，状态为候补且排位为 1；有人退出后候补第一人自动转正。"
+                    },
+                    "covers": [],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n1.1.2.2",
+                    "kind": "touchpoint",
+                    "title": "创建球局并邀请球友",
+                    "intent": "用户能在 1 分钟内发布一个可报名的球局。",
+                    "parent": "n1.1.2",
+                    "acs": [
+                      {
+                        "id": "n1.1.2.2-AC1",
+                        "text": "必填时间、场地、人数、费用后可直接发布。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当必填项齐全时发布成功并出现在列表；缺任一项时发布按钮禁用并提示缺失项。"
+                    },
+                    "covers": [],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "n1.2",
+            "kind": "module",
+            "title": "水平匹配",
+            "intent": "用可维护的球技等级支撑筛选与推荐，避免“水平不符”的报名。",
+            "parent": "n1",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n1.2.1",
+                "kind": "feature",
+                "title": "球技等级",
+                "intent": "用户有可更新、可展示的球技等级，并用于匹配。",
+                "parent": "n1.2",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n1.2.1.1",
+                    "kind": "touchpoint",
+                    "title": "填写与更新球技自评等级",
+                    "intent": "用户能选择等级并随时修改，修改后立即影响推荐与筛选。",
+                    "parent": "n1.2.1",
+                    "acs": [
+                      {
+                        "id": "n1.2.1.1-AC1",
+                        "text": "等级为必填单选，修改后保存成功。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户把等级从初级改为中级时，保存成功且下一次筛选默认使用新等级。"
+                    },
+                    "covers": [
+                      "R02"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n1.2.1.2",
+                    "kind": "touchpoint",
+                    "title": "按等级推荐球局与球友",
+                    "intent": "推荐结果与用户等级相关，且用户能理解推荐依据。",
+                    "parent": "n1.2.1",
+                    "acs": [
+                      {
+                        "id": "n1.2.1.2-AC1",
+                        "text": "推荐列表展示等级差与推荐理由。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户等级为中级时，推荐列表不出现“高级限定”球局，且每条带推荐理由。"
+                    },
+                    "covers": [],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "n2",
+        "kind": "intent",
+        "title": "参加或组织赛事并得到可信结果",
+        "intent": "参赛者能完成报名到成绩查看，组织者能完成发布到名单公布，结果双方可核对。",
+        "parent": "n0",
+        "acs": [],
+        "verification": null,
+        "ambiguities": [],
+        "children": [
+          {
+            "id": "n2.1",
+            "kind": "module",
+            "title": "赛事中心",
+            "intent": "覆盖赛事发现、报名、审核与名单公布。",
+            "parent": "n2",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n2.1.1",
+                "kind": "feature",
+                "title": "赛事发现",
+                "intent": "用户能找到想参加的赛事并看清关键约束。",
+                "parent": "n2.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n2.1.1.1",
+                    "kind": "touchpoint",
+                    "title": "浏览赛事列表与详情",
+                    "intent": "列表可按时间与项目筛选，详情展示规则、费用、截止时间。",
+                    "parent": "n2.1.1",
+                    "acs": [
+                      {
+                        "id": "n2.1.1.1-AC1",
+                        "text": "列表与详情字段完整，截止后报名按钮置灰。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当赛事报名截止后打开详情，报名按钮置灰并显示“已截止”。"
+                    },
+                    "covers": [
+                      "R03"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              },
+              {
+                "id": "n2.1.2",
+                "kind": "feature",
+                "title": "赛事报名",
+                "intent": "报名、支付、退款、审核、名单形成闭环且状态可见。",
+                "parent": "n2.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n2.1.2.1",
+                    "kind": "touchpoint",
+                    "title": "单人/双打报名并选择搭档",
+                    "intent": "双打报名必须绑定搭档，且搭档需确认。",
+                    "parent": "n2.1.2",
+                    "acs": [
+                      {
+                        "id": "n2.1.2.1-AC1",
+                        "text": "双打报名需选择搭档；搭档未确认时状态为待确认。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当发起双打报名并选择搭档后，搭档端收到确认请求；未确认前报名状态为待确认。"
+                    },
+                    "covers": [
+                      "R04"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n2.1.2.2",
+                    "kind": "touchpoint",
+                    "title": "报名支付与退款",
+                    "intent": "支付成功才锁定名额；取消按明确规则原路退款。",
+                    "parent": "n2.1.2",
+                    "acs": [
+                      {
+                        "id": "n2.1.2.2-AC1",
+                        "text": "支付成功锁定名额；开赛前 24h 取消全额原路退款。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户在开赛前 24h 取消报名时，系统原路全额退款并释放名额；24h 内取消按规则退 50%。"
+                    },
+                    "covers": [
+                      "R05"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n2.1.2.3",
+                    "kind": "touchpoint",
+                    "title": "查看报名审核状态与名单公布",
+                    "intent": "报名后用户随时知道审核中、通过或拒绝，名单公布可查。",
+                    "parent": "n2.1.2",
+                    "acs": [
+                      {
+                        "id": "n2.1.2.3-AC1",
+                        "text": "三种审核状态可见；名单公布后赛事页可查完整名单。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当组织者通过报名后，用户端状态从“审核中”变为“已通过”，赛事页名单包含该用户。"
+                    },
+                    "covers": [
+                      "R06"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "n2.2",
+            "kind": "module",
+            "title": "赛程与成绩",
+            "intent": "赛程、比分、排名、证书都可核对，减少争议。",
+            "parent": "n2",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n2.2.1",
+                "kind": "feature",
+                "title": "赛程",
+                "intent": "参赛者能查到自己的场次、对手与时间。",
+                "parent": "n2.2",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n2.2.1.1",
+                    "kind": "touchpoint",
+                    "title": "查看赛程与对阵表",
+                    "intent": "对阵表随比分更新，用户能定位自己的下一场。",
+                    "parent": "n2.2.1",
+                    "acs": [
+                      {
+                        "id": "n2.2.1.1-AC1",
+                        "text": "对阵表展示轮次、场次、双方与状态。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当上一轮比分确认后，对阵表自动生成下一轮并标出用户所在场次。"
+                    },
+                    "covers": [
+                      "R07"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              },
+              {
+                "id": "n2.2.2",
+                "kind": "feature",
+                "title": "比分与排名",
+                "intent": "比分需双方确认才生效，排名与证书由确认后的比分生成。",
+                "parent": "n2.2",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n2.2.2.1",
+                    "kind": "touchpoint",
+                    "title": "录入比分并双方确认",
+                    "intent": "任一方录入后另一方确认或申诉，避免单方改分。",
+                    "parent": "n2.2.2",
+                    "acs": [
+                      {
+                        "id": "n2.2.2.1-AC1",
+                        "text": "录入后状态为待确认；双方确认后生效；申诉进入处理队列。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当一方录入 21:18 后，另一方确认则比分生效；拒绝则状态为申诉中且不计入排名。"
+                    },
+                    "covers": [
+                      "R08"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n2.2.2.2",
+                    "kind": "touchpoint",
+                    "title": "查看排名与下载证书",
+                    "intent": "排名实时可查，完赛后可下载带赛事与名次的证书。",
+                    "parent": "n2.2.2",
+                    "acs": [
+                      {
+                        "id": "n2.2.2.2-AC1",
+                        "text": "排名按确认比分计算；完赛后提供证书下载。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当赛事全部比分确认后，排名页可查且证书下载返回包含姓名、名次、赛事名的文件。"
+                    },
+                    "covers": [
+                      "R09"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "n2.3",
+            "kind": "module",
+            "title": "组织者后台",
+            "intent": "组织者能独立完成发布、审核、名单与公告。",
+            "parent": "n2",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n2.3.1",
+                "kind": "feature",
+                "title": "赛事发布",
+                "intent": "组织者一次填写即可发布，后续可编辑。",
+                "parent": "n2.3",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n2.3.1.1",
+                    "kind": "touchpoint",
+                    "title": "发布/编辑赛事",
+                    "intent": "发布前校验必填项，发布后修改关键字段需二次确认。",
+                    "parent": "n2.3.1",
+                    "acs": [
+                      {
+                        "id": "n2.3.1.1-AC1",
+                        "text": "时间、场地、规则、费用、名额为必填；发布后修改时间需确认。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "manual",
+                      "spec": "以组织者身份发布一场赛事，再修改时间，确认二次确认弹窗与报名者通知。"
+                    },
+                    "covers": [
+                      "R15"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              },
+              {
+                "id": "n2.3.2",
+                "kind": "feature",
+                "title": "报名管理",
+                "intent": "组织者能审核、调整名单并通知到人。",
+                "parent": "n2.3",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n2.3.2.1",
+                    "kind": "touchpoint",
+                    "title": "审核报名、调整名单、发公告",
+                    "intent": "每次审核与调整都有记录，公告触达相关报名者。",
+                    "parent": "n2.3.2",
+                    "acs": [
+                      {
+                        "id": "n2.3.2.1-AC1",
+                        "text": "审核操作留痕；公告仅发送给本赛事报名者。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当组织者拒绝一名报名者后，操作记录可查且该用户收到拒绝通知；公告只发给报名者。"
+                    },
+                    "covers": [
+                      "R06",
+                      "R15"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "n3",
+        "kind": "intent",
+        "title": "沉淀并分享羽毛球生活",
+        "intent": "用户愿意持续发布与互动，形成可治理的社群。",
+        "parent": "n0",
+        "acs": [],
+        "verification": null,
+        "ambiguities": [],
+        "children": [
+          {
+            "id": "n3.1",
+            "kind": "module",
+            "title": "社区动态",
+            "intent": "发布、浏览、互动、举报形成闭环。",
+            "parent": "n3",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n3.1.1",
+                "kind": "feature",
+                "title": "内容发布",
+                "intent": "用户能快速发布图文并看到发布结果。",
+                "parent": "n3.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n3.1.1.1",
+                    "kind": "touchpoint",
+                    "title": "发布图文动态",
+                    "intent": "支持图片与文字，发布后立即出现在自己的动态列表。",
+                    "parent": "n3.1.1",
+                    "acs": [
+                      {
+                        "id": "n3.1.1.1-AC1",
+                        "text": "最多 9 图，文字非空即可发布，成功后有反馈。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户选择 1 张图并输入文字发布时，动态出现在信息流顶部且图片可加载。"
+                    },
+                    "covers": [
+                      "R10"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              },
+              {
+                "id": "n3.1.2",
+                "kind": "feature",
+                "title": "信息流与互动",
+                "intent": "浏览、点赞、评论、回复、举报都可完成且有反馈。",
+                "parent": "n3.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n3.1.2.1",
+                    "kind": "touchpoint",
+                    "title": "浏览信息流",
+                    "intent": "信息流按时间与关注关系排序，可分页加载。",
+                    "parent": "n3.1.2",
+                    "acs": [
+                      {
+                        "id": "n3.1.2.1-AC1",
+                        "text": "首屏 10 条，上拉加载更多，无重复。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户连续上拉三页时，每次追加 10 条且 id 无重复；到底显示“没有更多”。"
+                    },
+                    "covers": [
+                      "R11"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n3.1.2.2",
+                    "kind": "touchpoint",
+                    "title": "点赞、评论与回复",
+                    "intent": "互动即时生效，作者收到消息。",
+                    "parent": "n3.1.2",
+                    "acs": [
+                      {
+                        "id": "n3.1.2.2-AC1",
+                        "text": "点赞可取消；评论与回复展示层级；作者收到通知。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户点赞后取消，计数回到原值；评论后作者收到一条互动通知。"
+                    },
+                    "covers": [
+                      "R11",
+                      "R12"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n3.1.2.3",
+                    "kind": "touchpoint",
+                    "title": "举报内容并查看处理结果",
+                    "intent": "举报有分类、可追踪，处理结果通知举报人。",
+                    "parent": "n3.1.2",
+                    "acs": [
+                      {
+                        "id": "n3.1.2.3-AC1",
+                        "text": "举报需选分类；处理结果通知举报人；被举报内容按结果下架或保留。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户举报一条动态并选择“广告”后，举报记录可查；管理员处理后举报人收到结果通知。"
+                    },
+                    "covers": [
+                      "R12"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "n3.2",
+            "kind": "module",
+            "title": "球队与俱乐部",
+            "intent": "俱乐部可创建、加入、管理成员与角色。",
+            "parent": "n3",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n3.2.1",
+                "kind": "feature",
+                "title": "俱乐部管理",
+                "intent": "创建者成为管理员，可审批加入与分配角色。",
+                "parent": "n3.2",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n3.2.1.1",
+                    "kind": "touchpoint",
+                    "title": "创建/加入俱乐部",
+                    "intent": "用户能创建俱乐部或申请加入，状态可见。",
+                    "parent": "n3.2.1",
+                    "acs": [
+                      {
+                        "id": "n3.2.1.1-AC1",
+                        "text": "创建需名称与简介；加入需管理员审批。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户申请加入俱乐部后，状态为待审批；管理员通过后成为成员并可查看成员列表。"
+                    },
+                    "covers": [
+                      "R13"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n3.2.1.2",
+                    "kind": "touchpoint",
+                    "title": "成员与角色管理",
+                    "intent": "管理员可设管理员、移除成员，操作留痕。",
+                    "parent": "n3.2.1",
+                    "acs": [
+                      {
+                        "id": "n3.2.1.2-AC1",
+                        "text": "角色至少包含管理员/成员；移除成员需确认。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "manual",
+                      "spec": "以管理员身份把一名成员设为管理员，再移除另一名成员，核对角色与操作记录。"
+                    },
+                    "covers": [
+                      "R13"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "n4",
+        "kind": "intent",
+        "title": "建立可信的个人运动身份",
+        "intent": "账号可信、资料可维护、战绩可回看，作为匹配与参赛的基础。",
+        "parent": "n0",
+        "acs": [],
+        "verification": null,
+        "ambiguities": [],
+        "children": [
+          {
+            "id": "n4.1",
+            "kind": "module",
+            "title": "账号",
+            "intent": "登录、绑定、资料与战绩形成个人身份。",
+            "parent": "n4",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n4.1.1",
+                "kind": "feature",
+                "title": "登录与绑定",
+                "intent": "微信授权后可绑定手机号，账号唯一。",
+                "parent": "n4.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n4.1.1.1",
+                    "kind": "touchpoint",
+                    "title": "微信登录与手机号绑定",
+                    "intent": "首次登录完成绑定，后续免重复绑定。",
+                    "parent": "n4.1.1",
+                    "acs": [
+                      {
+                        "id": "n4.1.1.1-AC1",
+                        "text": "授权后若未绑定手机号则强制绑定；绑定后同一微信号不再询问。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "manual",
+                      "spec": "真机走一遍微信授权与手机号绑定，退出重进确认不再要求绑定。"
+                    },
+                    "covers": [
+                      "R01"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              },
+              {
+                "id": "n4.1.2",
+                "kind": "feature",
+                "title": "个人主页",
+                "intent": "资料可编辑，战绩可回看。",
+                "parent": "n4.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n4.1.2.1",
+                    "kind": "touchpoint",
+                    "title": "编辑个人资料与头像",
+                    "intent": "头像与昵称修改后立即展示。",
+                    "parent": "n4.1.2",
+                    "acs": [
+                      {
+                        "id": "n4.1.2.1-AC1",
+                        "text": "头像支持相册上传；昵称长度受限；保存后即时生效。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户上传新头像并保存后，个人主页与评论区头像同步更新。"
+                    },
+                    "covers": [
+                      "R02"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n4.1.2.2",
+                    "kind": "touchpoint",
+                    "title": "查看个人战绩与参赛记录",
+                    "intent": "用户能看到参赛场次、胜负与名次。",
+                    "parent": "n4.1.2",
+                    "acs": [
+                      {
+                        "id": "n4.1.2.2-AC1",
+                        "text": "记录含赛事名、名次、场次；无记录给空态。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当用户完赛一场后，个人主页出现该赛事记录与名次；新用户显示空态文案。"
+                    },
+                    "covers": [],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "n5",
+        "kind": "module",
+        "title": "消息通知",
+        "intent": "关键状态变化触达对应用户，不打扰无关用户。",
+        "parent": "n0",
+        "acs": [],
+        "verification": null,
+        "ambiguities": [],
+        "children": [
+          {
+            "id": "n5.1",
+            "kind": "feature",
+            "title": "赛事通知",
+            "intent": "报名结果与赛程变更及时触达报名者。",
+            "parent": "n5",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n5.1.1",
+                "kind": "touchpoint",
+                "title": "报名结果与赛程提醒",
+                "intent": "状态变化后报名者收到通知，未报名者不收到。",
+                "parent": "n5.1",
+                "acs": [
+                  {
+                    "id": "n5.1.1-AC1",
+                    "text": "审核结果即时通知；赛程变更通知只发给本赛事报名者。"
+                  }
+                ],
+                "verification": {
+                  "type": "test",
+                  "spec": "当组织者修改开赛时间后，仅报名者收到通知；未报名用户收不到。"
+                },
+                "covers": [
+                  "R14"
+                ],
+                "ambiguities": []
+              }
+            ]
+          },
+          {
+            "id": "n5.2",
+            "kind": "feature",
+            "title": "互动通知",
+            "intent": "评论、点赞、审核相关消息聚合触达。",
+            "parent": "n5",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n5.2.1",
+                "kind": "touchpoint",
+                "title": "评论、点赞与审核消息",
+                "intent": "用户能查看并清理消息。",
+                "parent": "n5.2",
+                "acs": [
+                  {
+                    "id": "n5.2.1-AC1",
+                    "text": "消息按类型分组；支持已读与全部已读。"
+                  }
+                ],
+                "verification": {
+                  "type": "test",
+                  "spec": "当用户收到评论与点赞后，消息中心分两组展示；点开后未读数归零。"
+                },
+                "covers": [
+                  "R14"
+                ],
+                "ambiguities": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

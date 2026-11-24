@@ -1,0 +1,12 @@
+{
+  "schema": "prototype.edit-log.v2",
+  "note": "只记录真实发生的返工。",
+  "entries": [
+    {
+      "model": "intent-tree",
+      "at": "2026-11-24",
+      "action": "为 n2.2.1.1 的 AC 补上“最多自动重试 3 次，1s/2s/4s 退避”；删除歧义记录 A-cli-01",
+      "reason": "自检发现重试次数与退避未定义，叶子验证不可判定"
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "schema": "prototype.sea-lake.v2",
+  "model": "sea-lake",
+  "domain": "cli-note-sync",
+  "utterance": "做一个命令行工具，把本地 Markdown 笔记同步到 GitHub 仓库，支持冲突处理和增量同步",
+  "provenance": {
+    "raw_engine_output": "raw-engine-lake.json",
+    "raw_engine_result": "真实内核 DecomposeIntent 对该句同样给不出 journeys/lakes（待本次运行确认）。",
+    "authoring": "按现行湖/海结构，由同一作者对同一句话手工补齐 journeys + lakes + features，作为公平对照。"
+  },
+  "scope_mode": "ocean",
+  "journeys": [
+    { "id": "J-onboard", "name": "三分钟内完成安装与首次同步", "actors": ["新用户"] },
+    { "id": "J-daily", "name": "日常增量同步与失败恢复", "actors": ["日常用户"] },
+    { "id": "J-conflict", "name": "冲突处理与回滚", "actors": ["多设备用户"] },
+    { "id": "J-ops", "name": "脚本化与排错", "actors": ["自动化用户"] }
+  ],
+  "lakes": [
+    {
+      "id": "L-install",
+      "name": "安装与配置",
+      "features": [
+        {
+          "id": "F-01",
+          "title": "安装与升级",
+          "acs": ["支持包管理器安装", "支持升级到最新版"],
+          "covers": ["R01"],
+          "verification": null
+        },
+        {
+          "id": "F-02",
+          "title": "初始化配置",
+          "acs": ["init 可配置仓库、分支、令牌", "配置错误时给出友好提示"],
+          "covers": ["R02"],
+          "verification": null
+        },
+        {
+          "id": "F-03",
+          "title": "帮助与示例",
+          "acs": ["help 列出命令", "提供可复制示例"],
+          "covers": ["R15"],
+          "verification": null
+        }
+      ]
+    },
+    {
+      "id": "L-sync",
+      "name": "同步引擎",
+      "features": [
+        {
+          "id": "F-04",
+          "title": "首次全量同步",
+          "acs": ["首次运行把本地笔记全量推送", "目录映射符合配置"],
+          "covers": ["R03"],
+          "verification": null
+        },
+        {
+          "id": "F-05",
+          "title": "增量同步",
+          "acs": ["只同步发生变化的文件", "同步结果及时反馈"],
+          "covers": ["R04"],
+          "verification": null
+        },
+        {
+          "id": "F-06",
+          "title": "忽略规则",
+          "acs": ["支持 .notesyncignore", "忽略规则对增量和全量都生效"],
+          "covers": ["R10"],
+          "verification": null
+        },
+        {
+          "id": "F-07",
+          "title": "多仓库与多目录",
+          "acs": ["可配置多个目标", "按目标分别同步"],
+          "covers": ["R11"],
+          "verification": null
+        },
+        {
+          "id": "F-08",
+          "title": "dry-run 预览",
+          "acs": ["预演模式列出将变更的文件", "不产生实际写入"],
+          "covers": ["R07"],
+          "verification": { "type": "test", "spec": "dry-run 后远端与本地均无变化，输出含文件列表" }
+        }
+      ]
+    },
+    {
+      "id": "L-conflict",
+      "name": "冲突与回滚",
+      "features": [
+        {
+          "id": "F-09",
+          "title": "冲突检测",
+          "acs": ["同步前检测远端变更", "冲突时立即提示"],
+          "covers": ["R05"],
+          "verification": null
+        },
+        {
+          "id": "F-10",
+          "title": "冲突解决",
+          "acs": ["支持保留本地、保留远端、手动合并", "解决结果可回看"],
+          "covers": ["R06"],
+          "verification": null
+        },
+        {
+          "id": "F-11",
+          "title": "回滚最近一次同步",
+          "acs": ["可撤销最近一次同步", "回滚后状态一致"],
+          "covers": ["R13"],
+          "verification": null
+        }
+      ]
+    },
+    {
+      "id": "L-ops",
+      "name": "可观测与自动化",
+      "features": [
+        {
+          "id": "F-12",
+          "title": "状态与日志",
+          "acs": ["status 显示待同步/冲突/上次结果", "日志分级，输出可读"],
+          "covers": ["R08", "R12"],
+          "verification": null
+        },
+        {
+          "id": "F-13",
+          "title": "失败重试",
+          "acs": ["断网失败后自动重试", "重试不会重复推送"],
+          "covers": ["R09"],
+          "verification": null
+        },
+        {
+          "id": "F-14",
+          "title": "退出码",
+          "acs": ["成功/冲突/网络错误返回不同退出码"],
+          "covers": ["R14"],
+          "verification": null
+        }
+      ]
+    }
+  ],
+  "sub_intents": [],
+  "ambiguities": [
+    { "id": "A-lake-01", "unit": "F-02", "text": "友好提示", "reason": "未定义提示内容与可操作性" },
+    { "id": "A-lake-02", "unit": "F-05", "text": "及时反馈", "reason": "未定义时限" },
+    { "id": "A-lake-03", "unit": "F-13", "text": "自动重试", "reason": "次数、退避与上限未定义" },
+    { "id": "A-lake-04", "unit": "F-12", "text": "日志分级", "reason": "级别集合未列出" }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "intent_decomposition.v1",
+  "generated_at": "2026-11-24T00:00:00Z",
+  "surface_ask": "构建一个羽毛球运动社区小程序，有赛事功能、社区功能",
+  "deep_want": "推进可验证交付；需补齐成功标准与失败边界。｜表层：构建一个羽毛球运动社区小程序，有赛事功能、社区功能",
+  "intents": [
+    {
+      "id": "I01",
+      "text": "构建一个羽毛球运动社区小程序，有赛事功能、社区功能",
+      "kinds": [
+        "delivery"
+      ],
+      "source_ref": "utterance_clause_1"
+    }
+  ],
+  "journeys": null,
+  "scope_mode": "lake",
+  "lakes": null,
+  "methodology": {
+    "declared_subintent": "",
+    "secondary_tracks": []
+  },
+  "signals": {
+    "capability": null,
+    "ocean": null,
+    "platform": null,
+    "source": null
+  },
+  "high_risk_domains": [],
+  "truth_readiness": {
+    "ready": true,
+    "missing": [],
+    "blocks_auto_tick_past_plan": false,
+    "requires_journey_freeze": false,
+    "user_facing": "意图拆解可进入 truth 细化。"
+  },
+  "recommended_truth_artifacts": [
+    "docs/beacon/<ver>/user-story/*-journeys.md",
+    "docs/beacon/<ver>/features/<lake>/truth.md (per lake)",
+    "docs/beacon/<ver>/.machine/user-story/*.json",
+    "domain FSM notes for payment/auth if high_risk"
+  ],
+  "status": "ok"
+}

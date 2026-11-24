@@ -1,0 +1,22 @@
+{
+  "schema": "prototype.reference-touchpoints.v1",
+  "frozen_before_decomposition": true,
+  "note": "15 个用户可见能力点是先于两套拆解固定下来的基准清单，用于公平计算叶子覆盖率。任何模型不得在拆解后修改本清单。",
+  "items": [
+    { "id": "R01", "statement": "微信登录与手机号绑定" },
+    { "id": "R02", "statement": "个人资料与球技等级维护" },
+    { "id": "R03", "statement": "浏览赛事列表与赛事详情" },
+    { "id": "R04", "statement": "赛事报名（含单人/双打与搭档）" },
+    { "id": "R05", "statement": "报名支付与退款" },
+    { "id": "R06", "statement": "报名审核状态与名单公布" },
+    { "id": "R07", "statement": "赛程与对阵表查看" },
+    { "id": "R08", "statement": "比分录入与双方确认" },
+    { "id": "R09", "statement": "成绩排名与证书下载" },
+    { "id": "R10", "statement": "图文动态发布" },
+    { "id": "R11", "statement": "信息流浏览、点赞与评论" },
+    { "id": "R12", "statement": "评论回复、举报与处理结果" },
+    { "id": "R13", "statement": "俱乐部创建、加入与成员管理" },
+    { "id": "R14", "statement": "报名结果、赛程与互动消息通知" },
+    { "id": "R15", "statement": "组织者发布赛事、审核报名与发公告" }
+  ]
+}

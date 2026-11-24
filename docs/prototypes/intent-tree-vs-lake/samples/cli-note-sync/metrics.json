@@ -1,0 +1,41 @@
+{
+  "schema": "prototype.metrics.v1",
+  "reference_count": 15,
+  "models": {
+    "sea-lake": {
+      "leaf_units": 14,
+      "coverage_covered": 15,
+      "coverage_total": 15,
+      "coverage_missing": [],
+      "ambiguity_points": 6,
+      "ambiguity_detail": [
+        "F-02:友好",
+        "F-02:友好提示",
+        "F-05:及时",
+        "F-05:及时反馈",
+        "F-12:日志分级",
+        "F-13:自动重试"
+      ],
+      "manual_edits": 0,
+      "verified_bound": 1,
+      "verification_binding_rate": 0.0714
+    },
+    "intent-tree": {
+      "leaf_units": 17,
+      "coverage_covered": 15,
+      "coverage_total": 15,
+      "coverage_missing": [],
+      "ambiguity_points": 0,
+      "ambiguity_detail": [],
+      "manual_edits": 1,
+      "verified_bound": 17,
+      "verification_binding_rate": 1.0
+    }
+  },
+  "verdict": {
+    "no_worse_metrics": 3,
+    "required_no_worse": 3,
+    "tree_binding_complete": true,
+    "pass": true
+  }
+}

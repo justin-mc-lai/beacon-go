@@ -1,0 +1,23 @@
+{
+  "schema": "prototype.reference-touchpoints.v2",
+  "frozen_before_decomposition": true,
+  "domain": "cli-note-sync",
+  "note": "15 个用户可见能力点，先于两套拆解固定；不得在拆解后修改。",
+  "items": [
+    { "id": "R01", "statement": "安装与升级（包管理器）" },
+    { "id": "R02", "statement": "初始化配置（仓库、分支、令牌）" },
+    { "id": "R03", "statement": "首次全量同步" },
+    { "id": "R04", "statement": "增量同步（仅变更文件）" },
+    { "id": "R05", "statement": "冲突检测与提示" },
+    { "id": "R06", "statement": "冲突解决策略（本地/远端/手动）" },
+    { "id": "R07", "statement": "dry-run 预览变更" },
+    { "id": "R08", "statement": "同步日志与详细输出" },
+    { "id": "R09", "statement": "断网/失败重试" },
+    { "id": "R10", "statement": "忽略规则（.notesyncignore）" },
+    { "id": "R11", "statement": "多仓库/多目录配置" },
+    { "id": "R12", "statement": "状态查看（status）" },
+    { "id": "R13", "statement": "撤销/回滚最近一次同步" },
+    { "id": "R14", "statement": "稳定退出码，脚本可判断" },
+    { "id": "R15", "statement": "帮助与可复制示例" }
+  ]
+}

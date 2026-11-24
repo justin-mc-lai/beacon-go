@@ -1,0 +1,146 @@
+{
+  "schema": "prototype.sea-lake.v1",
+  "model": "sea-lake",
+  "utterance": "构建一个羽毛球运动社区小程序，有赛事功能、社区功能",
+  "provenance": {
+    "raw_engine_output": "raw-engine-lake.json",
+    "raw_engine_result": "真实内核 DecomposeIntent 在该句上产出 journeys=null、lakes=null，scope_mode=lake，readiness.ready=true。",
+    "authoring": "真实引擎无法给出模块级拆解，因此本文件按现行湖/海结构的形状，由同一作者对同一句话手工补齐 journeys + lakes + features，作为湖海模型的公平对照。"
+  },
+  "scope_mode": "ocean",
+  "journeys": [
+    { "id": "J-participant", "name": "参赛者完成报名到查看成绩", "actors": ["参赛者"] },
+    { "id": "J-organizer", "name": "组织者发布赛事到公布名单", "actors": ["赛事组织者"] },
+    { "id": "J-community", "name": "社区成员发布与互动", "actors": ["社区成员"] },
+    { "id": "J-club", "name": "俱乐部创建与成员管理", "actors": ["俱乐部管理员"] }
+  ],
+  "lakes": [
+    {
+      "id": "L-account",
+      "name": "账号与身份",
+      "features": [
+        {
+          "id": "F-01",
+          "title": "微信登录与手机号绑定",
+          "acs": ["用户可微信授权登录", "首次登录需绑定手机号"],
+          "covers": ["R01"],
+          "verification": { "type": "manual", "spec": "真机走一遍微信授权与手机号绑定" }
+        },
+        {
+          "id": "F-02",
+          "title": "个人资料与球技等级",
+          "acs": ["用户可编辑头像、昵称、球技等级", "等级变更即时生效"],
+          "covers": ["R02"],
+          "verification": null
+        },
+        {
+          "id": "F-03",
+          "title": "个人参赛记录",
+          "acs": ["用户可查看历史参赛记录"],
+          "covers": [],
+          "verification": null
+        }
+      ]
+    },
+    {
+      "id": "L-event",
+      "name": "赛事",
+      "features": [
+        {
+          "id": "F-04",
+          "title": "赛事列表与详情",
+          "acs": ["用户可浏览赛事列表", "可查看时间、场地、规则、费用"],
+          "covers": ["R03"],
+          "verification": null
+        },
+        {
+          "id": "F-05",
+          "title": "赛事报名",
+          "acs": ["用户可提交报名并完成支付", "支持双打搭档", "组织者可审核报名并公布名单"],
+          "covers": ["R04", "R05", "R06"],
+          "verification": null
+        },
+        {
+          "id": "F-06",
+          "title": "赛程与对阵表",
+          "acs": ["参赛者可查看赛程与对阵表"],
+          "covers": ["R07"],
+          "verification": null
+        },
+        {
+          "id": "F-07",
+          "title": "比分录入与排名",
+          "acs": ["组织者可录入比分", "用户可查看排名"],
+          "covers": ["R08"],
+          "verification": null
+        },
+        {
+          "id": "F-08",
+          "title": "组织者发布赛事",
+          "acs": ["组织者可创建赛事并发布", "可编辑赛事信息"],
+          "covers": ["R15"],
+          "verification": null
+        }
+      ]
+    },
+    {
+      "id": "L-community",
+      "name": "社区",
+      "features": [
+        {
+          "id": "F-09",
+          "title": "动态发布",
+          "acs": ["用户可发布图文动态"],
+          "covers": ["R10"],
+          "verification": null
+        },
+        {
+          "id": "F-10",
+          "title": "信息流与互动",
+          "acs": ["用户可浏览信息流、点赞与评论，互动体验良好"],
+          "covers": ["R11"],
+          "verification": null
+        },
+        {
+          "id": "F-11",
+          "title": "举报与内容治理",
+          "acs": ["用户可举报内容", "管理员可处理举报"],
+          "covers": ["R12"],
+          "verification": null
+        }
+      ]
+    },
+    {
+      "id": "L-club",
+      "name": "俱乐部",
+      "features": [
+        {
+          "id": "F-12",
+          "title": "俱乐部创建与加入",
+          "acs": ["用户可创建或加入俱乐部", "管理员可管理成员"],
+          "covers": ["R13"],
+          "verification": null
+        }
+      ]
+    },
+    {
+      "id": "L-notify",
+      "name": "消息通知",
+      "features": [
+        {
+          "id": "F-13",
+          "title": "消息通知",
+          "acs": ["报名结果、赛程变更、互动消息及时通知用户"],
+          "covers": ["R14"],
+          "verification": null
+        }
+      ]
+    }
+  ],
+  "sub_intents": [],
+  "ambiguities": [
+    { "id": "A-lake-01", "unit": "F-10", "text": "互动体验良好", "reason": "无观察口径" },
+    { "id": "A-lake-02", "unit": "F-13", "text": "及时通知", "reason": "未定义时限与渠道" },
+    { "id": "A-lake-03", "unit": "F-05", "text": "报名支付与退款", "reason": "退款规则未写，覆盖声明超出 AC" }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "intent_decomposition.v1",
+  "generated_at": "2026-11-24T00:00:00Z",
+  "surface_ask": "做一个命令行工具，把本地 Markdown 笔记同步到 GitHub 仓库，支持冲突处理和增量同步",
+  "deep_want": "源码锚定：仓库｜表层：做一个命令行工具，把本地 Markdown 笔记同步到 GitHub 仓库，支持冲突处理和增量同步",
+  "intents": [
+    {
+      "id": "I01",
+      "text": "做一个命令行工具，把本地 Markdown 笔记同步到 GitHub 仓库，支持冲突处理和增量同步",
+      "kinds": [
+        "source"
+      ],
+      "source_ref": "utterance_clause_1"
+    }
+  ],
+  "journeys": null,
+  "scope_mode": "lake",
+  "lakes": null,
+  "methodology": {
+    "declared_subintent": "",
+    "secondary_tracks": [
+      "source"
+    ]
+  },
+  "signals": {
+    "capability": null,
+    "ocean": null,
+    "platform": null,
+    "source": [
+      "仓库"
+    ]
+  },
+  "high_risk_domains": [],
+  "truth_readiness": {
+    "ready": false,
+    "missing": [
+      "source_anchors_pending"
+    ],
+    "blocks_auto_tick_past_plan": true,
+    "requires_journey_freeze": false,
+    "user_facing": "海级/多旅程诉求：已生成 journey seeds，但尚未冻结用户旅程与 AC 矩阵；禁止 auto_tick 跳过 truth。"
+  },
+  "recommended_truth_artifacts": [
+    "docs/beacon/<ver>/user-story/*-journeys.md",
+    "docs/beacon/<ver>/features/<lake>/truth.md (per lake)",
+    "docs/beacon/<ver>/.machine/user-story/*.json",
+    "domain FSM notes for payment/auth if high_risk"
+  ],
+  "status": "ok"
+}

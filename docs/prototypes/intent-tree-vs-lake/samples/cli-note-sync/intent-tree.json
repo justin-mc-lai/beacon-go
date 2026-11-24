@@ -1,0 +1,667 @@
+{
+  "schema": "prototype.intent-tree.v2",
+  "model": "intent-tree",
+  "domain": "cli-note-sync",
+  "utterance": "做一个命令行工具，把本地 Markdown 笔记同步到 GitHub 仓库，支持冲突处理和增量同步",
+  "provenance": {
+    "authoring": "宿主 agent 按 intent→module→feature→touchpoint 四层 kind 规则展开；未使用内核 LLM 路径。",
+    "reference_list": "reference-touchpoints.json（拆解前冻结）"
+  },
+  "root": {
+    "id": "n0",
+    "kind": "intent",
+    "title": "终端里的安全笔记同步",
+    "intent": "让用户不离开终端，就能把本地笔记安全、可预期地同步到远端仓库；不丢数据、不猜状态、失败可退。",
+    "parent": null,
+    "acs": [],
+    "verification": null,
+    "ambiguities": [],
+    "children": [
+      {
+        "id": "n1",
+        "kind": "intent",
+        "title": "三分钟内完成安装与首次同步",
+        "intent": "新用户按文档操作，三条命令内看到第一条笔记出现在远端。",
+        "parent": "n0",
+        "acs": [],
+        "verification": null,
+        "ambiguities": [],
+        "children": [
+          {
+            "id": "n1.1",
+            "kind": "module",
+            "title": "安装与配置",
+            "intent": "安装、升级、初始化都有明确反馈。",
+            "parent": "n1",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n1.1.1",
+                "kind": "feature",
+                "title": "安装与升级",
+                "intent": "用户能装、能升级、能确认版本。",
+                "parent": "n1.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n1.1.1.1",
+                    "kind": "touchpoint",
+                    "title": "通过包管理器安装与升级",
+                    "intent": "安装命令一次成功，升级后版本号变化。",
+                    "parent": "n1.1.1",
+                    "acs": [
+                      {
+                        "id": "n1.1.1.1-AC1",
+                        "text": "安装后命令可执行；升级后 --version 输出新版本。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "在干净环境执行安装命令，运行 --version 退出码为 0；再执行升级命令，版本号变为最新。"
+                    },
+                    "covers": [
+                      "R01"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n1.1.1.2",
+                    "kind": "touchpoint",
+                    "title": "--version 输出版本与构建信息",
+                    "intent": "用户与脚本都能确认当前版本。",
+                    "parent": "n1.1.1",
+                    "acs": [
+                      {
+                        "id": "n1.1.1.2-AC1",
+                        "text": "输出包含语义化版本号；退出码为 0。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当执行 --version 时，stdout 匹配语义化版本格式且退出码为 0。"
+                    },
+                    "covers": [
+                      "R01"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              },
+              {
+                "id": "n1.1.2",
+                "kind": "feature",
+                "title": "初始化配置",
+                "intent": "init 一次问清仓库、分支、令牌，配置可校验。",
+                "parent": "n1.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n1.1.2.1",
+                    "kind": "touchpoint",
+                    "title": "init 交互式配置仓库、分支与令牌",
+                    "intent": "用户按提示输入即可生成可用配置。",
+                    "parent": "n1.1.2",
+                    "acs": [
+                      {
+                        "id": "n1.1.2.1-AC1",
+                        "text": "三项必填；令牌不回显；完成后配置文件权限为 600。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当运行 init 并输入三项后，配置文件生成且权限为 600；再次运行可读取既有配置。"
+                    },
+                    "covers": [
+                      "R02"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n1.1.2.2",
+                    "kind": "touchpoint",
+                    "title": "配置校验与可操作的错误提示",
+                    "intent": "配置错误时指到具体字段与修复命令。",
+                    "parent": "n1.1.2",
+                    "acs": [
+                      {
+                        "id": "n1.1.2.2-AC1",
+                        "text": "缺字段、格式错、令牌无效分别给不同错误码与修复建议。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当令牌被置空时，报错包含字段名与“运行 init 重新配置”的建议，退出码非 0。"
+                    },
+                    "covers": [
+                      "R02"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "n1.2",
+            "kind": "module",
+            "title": "首次同步",
+            "intent": "首次同步可预览、可完成、可确认。",
+            "parent": "n1",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n1.2.1",
+                "kind": "feature",
+                "title": "全量同步与预演",
+                "intent": "先看清要推什么，再真正推送。",
+                "parent": "n1.2",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n1.2.1.1",
+                    "kind": "touchpoint",
+                    "title": "首次全量推送并按目录映射",
+                    "intent": "本地目录结构在远端保持一致。",
+                    "parent": "n1.2.1",
+                    "acs": [
+                      {
+                        "id": "n1.2.1.1-AC1",
+                        "text": "全部 Markdown 文件推送成功；目录层级一致；失败文件列出。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当对一个含 3 层目录的笔记库执行首次同步后，远端文件路径与本地逐字一致。"
+                    },
+                    "covers": [
+                      "R03"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n1.2.1.2",
+                    "kind": "touchpoint",
+                    "title": "dry-run 预览将推送的变更",
+                    "intent": "预演不写远端，输出与真实同步一致。",
+                    "parent": "n1.2.1",
+                    "acs": [
+                      {
+                        "id": "n1.2.1.2-AC1",
+                        "text": "预演列出新增/修改/删除；远端无变化。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当执行 dry-run 后，远端 commit 数不变，输出列出与后续真实同步相同的文件集合。"
+                    },
+                    "covers": [
+                      "R07"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "n2",
+        "kind": "intent",
+        "title": "日常同步安全且可预期",
+        "intent": "只传该传的，失败能恢复，状态随时可查。",
+        "parent": "n0",
+        "acs": [],
+        "verification": null,
+        "ambiguities": [],
+        "children": [
+          {
+            "id": "n2.1",
+            "kind": "module",
+            "title": "增量同步",
+            "intent": "变更检测、忽略规则、多目标都可控。",
+            "parent": "n2",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n2.1.1",
+                "kind": "feature",
+                "title": "变更检测与忽略",
+                "intent": "只同步变化文件，忽略规则始终生效。",
+                "parent": "n2.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n2.1.1.1",
+                    "kind": "touchpoint",
+                    "title": "仅同步变更文件",
+                    "intent": "未变文件不产生提交。",
+                    "parent": "n2.1.1",
+                    "acs": [
+                      {
+                        "id": "n2.1.1.1-AC1",
+                        "text": "第二次同步只提交变更文件；无变更时零提交且退出码为 0。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当修改 1 个文件后再次同步，远端只新增 1 个 commit 且只包含该文件。"
+                    },
+                    "covers": [
+                      "R04"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n2.1.1.2",
+                    "kind": "touchpoint",
+                    "title": "忽略规则对全量与增量都生效",
+                    "intent": "被忽略文件永不推送，且用户能看到原因。",
+                    "parent": "n2.1.1",
+                    "acs": [
+                      {
+                        "id": "n2.1.1.2-AC1",
+                        "text": ".notesyncignore 命中文件被跳过；跳过清单可查。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当把 private/ 加入忽略规则后，全量与增量都不推送该目录，输出列出跳过数量。"
+                    },
+                    "covers": [
+                      "R10"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              },
+              {
+                "id": "n2.1.2",
+                "kind": "feature",
+                "title": "多目标配置",
+                "intent": "多个仓库/目录各自独立同步。",
+                "parent": "n2.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n2.1.2.1",
+                    "kind": "touchpoint",
+                    "title": "多仓库/多目录分别同步",
+                    "intent": "指定目标名即可只同步该目标。",
+                    "parent": "n2.1.2",
+                    "acs": [
+                      {
+                        "id": "n2.1.2.1-AC1",
+                        "text": "支持 --target；未指定时同步全部并汇总结果。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当配置两个目标并执行 --target work 时，只有 work 目标产生提交，另一个目标无变化。"
+                    },
+                    "covers": [
+                      "R11"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "n2.2",
+            "kind": "module",
+            "title": "失败与可观测",
+            "intent": "失败可重试、状态可查、日志可读。",
+            "parent": "n2",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n2.2.1",
+                "kind": "feature",
+                "title": "网络与重试",
+                "intent": "断网不丢进度，重试不重复推送。",
+                "parent": "n2.2",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n2.2.1.1",
+                    "kind": "touchpoint",
+                    "title": "断网失败可重试且不重复推送",
+                    "intent": "重试只补未完成部分。",
+                    "parent": "n2.2.1",
+                    "acs": [
+                      {
+                        "id": "n2.2.1.1-AC1",
+                        "text": "失败后最多自动重试 3 次（1s/2s/4s 退避）；重试成功；已推送文件不产生重复提交。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当同步中断网再恢复重试后，成功推送剩余文件，远端不出现重复内容的第二个 commit。"
+                    },
+                    "covers": [
+                      "R09"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              },
+              {
+                "id": "n2.2.2",
+                "kind": "feature",
+                "title": "状态与日志",
+                "intent": "人看日志，脚本看 status 与退出码。",
+                "parent": "n2.2",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n2.2.2.1",
+                    "kind": "touchpoint",
+                    "title": "status 显示待同步、冲突与上次结果",
+                    "intent": "一条命令回答“现在是什么状态”。",
+                    "parent": "n2.2.2",
+                    "acs": [
+                      {
+                        "id": "n2.2.2.1-AC1",
+                        "text": "status 列出待同步数、冲突数、上次同步时间与结果。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当本地有 2 个未同步文件时，status 显示待同步 2；同步后显示上次成功时间。"
+                    },
+                    "covers": [
+                      "R12"
+                    ],
+                    "ambiguities": []
+                  },
+                  {
+                    "id": "n2.2.2.2",
+                    "kind": "touchpoint",
+                    "title": "日志分级与 --json 机器可读输出",
+                    "intent": "人类可读与脚本可解析并存。",
+                    "parent": "n2.2.2",
+                    "acs": [
+                      {
+                        "id": "n2.2.2.2-AC1",
+                        "text": "默认人类可读；--json 输出单文档 JSON；同一事实两处一致。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当以 --json 运行同步时，stdout 可被 jq 解析，字段与人类输出一致。"
+                    },
+                    "covers": [
+                      "R08"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "n3",
+        "kind": "intent",
+        "title": "冲突可控、失败可退",
+        "intent": "多设备同时改同一文件时，用户知道发生了什么并能选择处理方式。",
+        "parent": "n0",
+        "acs": [],
+        "verification": null,
+        "ambiguities": [],
+        "children": [
+          {
+            "id": "n3.1",
+            "kind": "module",
+            "title": "冲突处理",
+            "intent": "检测、选择策略、留痕。",
+            "parent": "n3",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n3.1.1",
+                "kind": "feature",
+                "title": "冲突检测",
+                "intent": "同步前就发现远端已变更。",
+                "parent": "n3.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n3.1.1.1",
+                    "kind": "touchpoint",
+                    "title": "同步前检测远端变更并提示",
+                    "intent": "不覆盖远端未知修改。",
+                    "parent": "n3.1.1",
+                    "acs": [
+                      {
+                        "id": "n3.1.1.1-AC1",
+                        "text": "存在远端变更时停止推送并列出冲突文件。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当远端同一文件被他人修改后，执行同步会停止并列出该文件，退出码为冲突码。"
+                    },
+                    "covers": [
+                      "R05"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              },
+              {
+                "id": "n3.1.2",
+                "kind": "feature",
+                "title": "冲突解决",
+                "intent": "三种策略都可用，结果可回看。",
+                "parent": "n3.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n3.1.2.1",
+                    "kind": "touchpoint",
+                    "title": "选择保留本地、保留远端或手动合并",
+                    "intent": "每种选择都有明确结果与记录。",
+                    "parent": "n3.1.2",
+                    "acs": [
+                      {
+                        "id": "n3.1.2.1-AC1",
+                        "text": "--ours/--theirs/--manual 三选一；结果写入日志。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当选择 --theirs 后，远端版本覆盖本地且日志记录选择；选择 --manual 时生成可编辑的合并文件。"
+                    },
+                    "covers": [
+                      "R06"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "n3.2",
+            "kind": "module",
+            "title": "回滚",
+            "intent": "最近一次同步可撤销，回到同步前状态。",
+            "parent": "n3",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n3.2.1",
+                "kind": "feature",
+                "title": "撤销最近一次同步",
+                "intent": "撤销只影响最近一次，不误伤更早提交。",
+                "parent": "n3.2",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n3.2.1.1",
+                    "kind": "touchpoint",
+                    "title": "undo 回滚最近一次同步",
+                    "intent": "回滚后本地与远端都回到同步前。",
+                    "parent": "n3.2.1",
+                    "acs": [
+                      {
+                        "id": "n3.2.1.1-AC1",
+                        "text": "回滚仅撤销最近一次；更早提交不变。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "当执行 undo 后，远端回到上一次 commit，且更早的 commit 历史保持不变。"
+                    },
+                    "covers": [
+                      "R13"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "n4",
+        "kind": "intent",
+        "title": "可脚本化、可排错",
+        "intent": "机器能判断结果，人能照着提示修复。",
+        "parent": "n0",
+        "acs": [],
+        "verification": null,
+        "ambiguities": [],
+        "children": [
+          {
+            "id": "n4.1",
+            "kind": "module",
+            "title": "自动化契约",
+            "intent": "退出码与输出稳定。",
+            "parent": "n4",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n4.1.1",
+                "kind": "feature",
+                "title": "退出码",
+                "intent": "成功、冲突、网络错误可区分。",
+                "parent": "n4.1",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n4.1.1.1",
+                    "kind": "touchpoint",
+                    "title": "稳定退出码区分成功、冲突与网络错误",
+                    "intent": "脚本不用解析文案就能分支。",
+                    "parent": "n4.1.1",
+                    "acs": [
+                      {
+                        "id": "n4.1.1.1-AC1",
+                        "text": "成功=0；冲突=2；网络错误=3；参数错误=4。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "test",
+                      "spec": "分别构造成功、冲突、断网、参数错误四种场景，退出码依次为 0/2/3/4。"
+                    },
+                    "covers": [
+                      "R14"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "n4.2",
+            "kind": "module",
+            "title": "帮助与文档",
+            "intent": "帮用户从报错走到修复。",
+            "parent": "n4",
+            "acs": [],
+            "verification": null,
+            "ambiguities": [],
+            "children": [
+              {
+                "id": "n4.2.1",
+                "kind": "feature",
+                "title": "帮助与示例",
+                "intent": "help 能直接复制运行。",
+                "parent": "n4.2",
+                "acs": [],
+                "verification": null,
+                "ambiguities": [],
+                "children": [
+                  {
+                    "id": "n4.2.1.1",
+                    "kind": "touchpoint",
+                    "title": "help 与可复制示例",
+                    "intent": "每条子命令都有示例且示例可执行。",
+                    "parent": "n4.2.1",
+                    "acs": [
+                      {
+                        "id": "n4.2.1.1-AC1",
+                        "text": "help 覆盖全部子命令；示例在空配置下能给出可理解结果。"
+                      }
+                    ],
+                    "verification": {
+                      "type": "manual",
+                      "spec": "逐条复制 help 中的示例执行，确认无未知参数错误且输出与说明一致。"
+                    },
+                    "covers": [
+                      "R15"
+                    ],
+                    "ambiguities": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
