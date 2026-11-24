@@ -13,7 +13,7 @@ engine**: long-running coding work that plans itself into stages, advances
 step by step under hard gates, survives interruptions, and never marks
 itself done without independent verification and a human-confirmed release.
 
-Current release: **v2.0.0-go.17** · safe SDD intake, content proposals and lossless migration.
+Current release line: **v2.0.0 is an unreleased candidate** (plain SemVer, see [version-scheme.md](docs/version-scheme.md)). Do not treat it as a published release until a `v2.0.0` tag, GitHub Release, release notes, and `docs/beacon/v2.0.0/release/` are in place.
 go.13 adds SDD version iteration (greenfield `v0.0.1`, explicit
 `projects bump`, docs/runtime axis separation); go.12 added program-level sea
 delivery (`goal program drive --until-done` + one `goal program complete`),
@@ -77,7 +77,7 @@ Requires Go 1.27+.
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.17
+./bin/beacon --version          # Beacon CLI v2.0.0
 ```
 
 Five commands cover most of a day:
@@ -91,12 +91,13 @@ beacon goal driver run-loop --run-id <run-id>       # push it to the release gat
 beacon spine show --project . --feature my-feature  # read the one ledger view
 ```
 
-### Desktop workspace
+### Desktop workspace (quarantine)
 
-The workspace ships as one native window (Wails). There is no browser
-mode: one surface, one implementation, no second rendering path to keep
-in sync. The window embeds a single HTML shell and binds one shared API
-(`internal/agentapi`).
+> **Quarantine, not SDD kernel core.** Per [ADR-0002](docs/adr/ADR-0002-intent-tree-truth-model.md), the goal workflow is retained; desktop/agentapi surfaces are quarantine — kept in-repo but outside the kernel boundary and not described as current kernel facts.
+
+The workspace ships as one native window (Wails). There is no
+separate frontend dev server and no Node build step. The library API
+(`internal/agentapi`) is also quarantine.
 
 ```sh
 go build -o bin/beacon-desktop ./desktop   # native app

@@ -28,6 +28,9 @@ jobs:
       - name: gofmt
         if: matrix.os == 'ubuntu-latest'
         run: test -z "$(gofmt -l .)"
+      - name: version consistency
+        if: matrix.os == 'ubuntu-latest'
+        run: bash scripts/check_version_consistency.sh
       - name: AC-025 file-size guard
         if: matrix.os == 'ubuntu-latest'
         run: bash scripts/check_file_size.sh

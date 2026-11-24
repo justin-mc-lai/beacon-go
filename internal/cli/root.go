@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"beacon-go/internal/harness"
+	"beacon-go/internal/version"
 )
 
 // Version is the Go-track build version. The frozen kernel design targets
@@ -72,7 +73,11 @@ import (
 // streaming forwards real deltas, benchmark and file-size gates exist,
 // and the frozen feature packages are reconciled (docs/changes/change-audit-2026-10-29.md).
 // Development builds between exits carried a dev suffix.
-const Version = "2.0.0-go.17"
+//
+// Historical note: v2.0.0-go.1..17 were prereleases of 2.0.0. As of
+// 2026-11-24 the version is plain SemVer from internal/version
+// (docs/version-scheme.md); no new -go.N versions are issued.
+const Version = version.Version
 
 // NewRootCmd builds the beacon root command with the six first-class
 // abilities as real command groups (P4a convergence): goal (the loop

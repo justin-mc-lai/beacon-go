@@ -10,7 +10,7 @@ Beacon Go 是 Beacon 内核的 Go 语言重构版。它保留 Python 版 Beacon 
 自己排阶段、在硬门禁下逐步推进、断了能续跑，并且永远不能绕过独立
 检查者和人工确认自称完成。
 
-当前版本：**v2.0.0-go.17** · SDD 拆解入口保真、内容型提案与无损迁移。
+当前版本线：**v2.0.0 为未发布候选**（纯 SemVer，见 [version-scheme.md](docs/version-scheme.md)）。在 `v2.0.0` tag、GitHub Release、release notes 与 `docs/beacon/v2.0.0/release/` 就位前，不视为已发布版本。
 go.13 增加 SDD 版本迭代（绿项目 `v0.0.1`、显式 `projects bump`、docs/runtime
 双轴）；go.12 增加了多湖整片海交付、release 影子预演、特征地图、技能漂移
 校验和生命周期单调守卫。
@@ -65,7 +65,7 @@ Go 版按一份书面口径执行（[`docs/scope-charter.md`](docs/scope-charter
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0-go.17
+./bin/beacon --version          # Beacon CLI v2.0.0
 ```
 
 日常五条命令：
@@ -129,6 +129,7 @@ beacon skills show truth
 
 ## 已知边界（如实写明）
 
+- **桌面 / agentapi（quarantine）**：按 [ADR-0002](docs/adr/ADR-0002-intent-tree-truth-model.md)，goal 工作流保留；desktop/`internal/agentapi` 等面处于 quarantine，留在仓内但不属于 SDD 内核当前事实。
 - **ACP** 只到探针级（initialize + session/new 两步握手），真会话
   迭代等有真 ACP 程序时再验。
 - **厂商执行器**（codex / claude 命令行）已按档案模板接好端到端

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"beacon-go/internal/core"
+	"beacon-go/internal/version"
 )
 
 // ACP session iteration (AC-046).
@@ -106,7 +107,7 @@ func RunACPSession(ctx context.Context, argv []string, prompt string, workdir st
 			"fs":       map[string]any{"readTextFile": false, "writeTextFile": false},
 			"terminal": false,
 		},
-		"clientInfo": map[string]any{"name": "beacon-go-session", "version": "2.0.0-go.9"},
+		"clientInfo": map[string]any{"name": "beacon-go-session", "version": version.Version},
 	})
 	if callErr != nil {
 		return out, core.NewError(core.ReasonACPProbeFailed,

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"beacon-go/internal/core"
+	"beacon-go/internal/version"
 )
 
 // ACP probe (AC-046, PROBE LEVEL ONLY).
@@ -186,9 +187,8 @@ func ProbeACP(ctx context.Context, argv []string, timeout time.Duration) (ACPPro
 			"fs":       map[string]any{"readTextFile": false, "writeTextFile": false},
 			"terminal": false,
 		},
-		// Version literal mirrors cli.Version (harness cannot import cli:
-		// dependency direction is cli -> harness). Bump with the release.
-		"clientInfo": map[string]any{"name": "beacon-go-probe", "version": "2.0.0-go.4"},
+		// Version comes from internal/version, the single source.
+		"clientInfo": map[string]any{"name": "beacon-go-probe", "version": version.Version},
 	})
 	if callErr != nil {
 		res.ReasonCode = core.ReasonACPProbeFailed
