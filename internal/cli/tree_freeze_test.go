@@ -324,3 +324,112 @@ func TestImplementReportFlow(t *testing.T) {
 		t.Fatalf("missing artifact: %v", err)
 	}
 }
+
+func TestSnapshotsImmutableAndReferencePrevious(t *testing.T) {
+	proj := treeTestEnv(t)
+	seedFreezeTree(t, proj, false)
+	for _, id := range []string{"t1", "t2", "f", "m", "root"} {
+		if _, err := freeze(t, proj, id); err != nil {
+			t.Fatalf("freeze %s: %v", id, err)
+		}
+	}
+	dir := filepath.Join(proj, "docs", "beacon", "v0.1.0", "tree")
+	ids, err := intenttree.ListSnapshots(dir)
+	if err != nil || len(ids) != 1 {
+		t.Fatalf("snapshots: %v %v", ids, err)
+	}
+	first := ids[0]
+	raw1, err := os.ReadFile(filepath.Join(dir, "snapshots", first, "snapshot.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := mustRun(t, "truth", "tree", "--project", proj, "--snapshot", "latest", "--json")
+	doc := parseDoc(t, out)
+	if doc["view"] != "snapshot" || doc["node_count"] != float64(5) {
+		t.Fatalf("snapshot view: %v", doc)
+	}
+	raw2, _ := os.ReadFile(filepath.Join(dir, "snapshots", first, "snapshot.json"))
+	if string(raw1) != string(raw2) {
+		t.Fatal("reading a snapshot rewrote it")
+	}
+	// Change a leaf, refreeze, take a second snapshot.
+	base := ""
+	for _, n := range doc["nodes"].([]any) {
+		m := n.(map[string]any)
+		if m["id"] == "t1" {
+			base = m["fingerprint"].(string)
+		}
+	}
+	mustRun(t, "change", "request", "--project", proj, "--node", "t1", "--summary", "widen", "--base-fingerprint", base, "--json")
+	for _, id := range []string{"t1", "f", "m", "root"} {
+		if _, err := freeze(t, proj, id); err != nil {
+			t.Fatalf("refreeze %s: %v", id, err)
+		}
+	}
+	ids, _ = intenttree.ListSnapshots(dir)
+	if len(ids) != 2 {
+		t.Fatalf("want 2 snapshots, got %v", ids)
+	}
+	second := ids[0]
+	snap, err := intenttree.ReadSnapshot(dir, second)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range snap.Nodes {
+		if e.ID == "t2" && e.NodeRef == "nodes/t2.json" {
+			t.Fatalf("unchanged node t2 should reference the previous snapshot, got %s", e.NodeRef)
+		}
+	}
+	// The old snapshot still shows t1 frozen.
+	old, err := intenttree.ReadSnapshot(dir, first)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range old.Nodes {
+		if e.ID == "t1" && e.Status != intenttree.StatusFrozen {
+			t.Fatalf("old snapshot mutated: %v", e.Status)
+		}
+	}
+}
+
+func TestSnapshotFailsClosedOnCorruption(t *testing.T) {
+	proj := treeTestEnv(t)
+	seedFreezeTree(t, proj, false)
+	for _, id := range []string{"t1", "t2", "f", "m", "root"} {
+		if _, err := freeze(t, proj, id); err != nil {
+			t.Fatal(err)
+		}
+	}
+	dir := filepath.Join(proj, "docs", "beacon", "v0.1.0", "tree")
+	ids, _ := intenttree.ListSnapshots(dir)
+	if len(ids) == 0 {
+		t.Fatal("no snapshot")
+	}
+	snap, err := intenttree.ReadSnapshot(dir, ids[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	var target intenttree.SnapshotEntry
+	for _, e := range snap.Nodes {
+		if e.NodeRef == "nodes/"+e.ID+".json" {
+			target = e
+			break
+		}
+	}
+	if target.ID == "" {
+		t.Fatal("no locally stored body to corrupt")
+	}
+	p := filepath.Join(dir, "snapshots", ids[0], target.NodeRef)
+	raw, _ := os.ReadFile(p)
+	raw = bytesReplace(raw, []byte(`"status": "frozen"`), []byte(`"status": "draft"`))
+	if err := os.WriteFile(p, raw, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := intenttree.ReadSnapshot(dir, ids[0]); err == nil {
+		t.Fatal("corrupted snapshot must fail closed")
+	}
+}
+
+func bytesReplace(b, old, new []byte) []byte {
+	return []byte(strings.ReplaceAll(string(b), string(old), string(new)))
+}

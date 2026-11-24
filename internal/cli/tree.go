@@ -32,7 +32,7 @@ func newTruthTreeCmd() *cobra.Command {
 }
 
 func newTreeReadCmd(use, op, short string) *cobra.Command {
-	var project, version, format, outPath, nodeID string
+	var project, version, format, outPath, nodeID, snapshot string
 	var asJSON bool
 	c := &cobra.Command{
 		Use:   use,
@@ -50,6 +50,17 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 			dir, projRoot, idx, err := resolveTree(st, project, version)
 			if err != nil {
 				return err
+			}
+			if snapshot != "" {
+				snap, serr := intenttree.ReadSnapshot(dir, snapshot)
+				if serr != nil {
+					return serr
+				}
+				return printJSON(cmd, map[string]any{
+					"view": "snapshot", "snapshot_id": snapshot, "schema": snap.Schema,
+					"version": snap.Version, "root_id": snap.RootID, "created_at": snap.CreatedAt,
+					"source_hash": snap.SourceHash, "node_count": len(snap.Nodes), "nodes": snap.Nodes,
+				})
 			}
 			if nodeID != "" {
 				n, nerr := intenttree.ReadNode(dir, nodeID)
@@ -91,6 +102,7 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 	c.Flags().StringVar(&format, "format", "json", "output format: json, md, html")
 	c.Flags().StringVar(&outPath, "out", "", "render output path (for md/html)")
 	c.Flags().StringVar(&nodeID, "node", "", "print a single node body (canonical JSON)")
+	c.Flags().StringVar(&snapshot, "snapshot", "", "read an immutable snapshot (id or latest)")
 	c.Flags().BoolVar(&asJSON, "json", false, "print JSON (default)")
 	return c
 }

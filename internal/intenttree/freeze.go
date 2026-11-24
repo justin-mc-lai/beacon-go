@@ -17,6 +17,7 @@ type FreezeReport struct {
 	Fingerprint string `json:"fingerprint"`
 	Already     bool   `json:"already_frozen"`
 	Children    int    `json:"children_bound"`
+	SnapshotID  string `json:"snapshot_id,omitempty"`
 }
 
 // FreezeNode freezes one node after its exit conditions hold: leaves
@@ -108,9 +109,15 @@ func FreezeNode(st *store.Store, dir, versionID, nodeID string) (FreezeReport, e
 	if err := st.UpdateTreeNodeStatus(n.ID, string(n.Status), n.Fingerprint, time.Now().UTC().Format(time.RFC3339Nano)); err != nil {
 		return FreezeReport{}, err
 	}
-	return FreezeReport{
-		NodeID: nodeID, Status: string(n.Status), Fingerprint: n.Fingerprint, Children: len(bound),
-	}, nil
+	rep := FreezeReport{NodeID: nodeID, Status: string(n.Status), Fingerprint: n.Fingerprint, Children: len(bound)}
+	if n.ParentID == "" {
+		_, id, err := CreateSnapshot(dir, idx.Version)
+		if err != nil {
+			return rep, err
+		}
+		rep.SnapshotID = id
+	}
+	return rep, nil
 }
 
 func findEntry(idx Index, id string) (IndexEntry, bool) {
