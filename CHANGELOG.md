@@ -3,6 +3,14 @@
 All notable changes to Beacon Go. Versions are plain SemVer
 (`MAJOR.MINOR.PATCH`); see `docs/version-scheme.md`.
 
+## [3.0.6] - 2026-11-25
+
+### Changed
+
+- New projects now ignore the whole local `.beacon/` workspace, not only
+  `.beacon/artifacts/`; runtime state and local evidence stay machine-local.
+- `docs/beacon/` remains the shared requirement truth and is not ignored.
+
 ## [3.0.5] - 2026-11-25
 
 ### Fixed
