@@ -286,7 +286,8 @@ func newGoalRunCmd() *cobra.Command {
 	c.Flags().StringVarP(&version, "version", "v", "", "docs version (default: current)")
 	c.Flags().StringVarP(&feature, "feature", "f", "", "feature slug (default: first of the project)")
 	c.Flags().BoolVar(&ux, "ux", false, "UX/design work required (inserts the design stage; explicit signal, no guessing)")
-	c.Flags().StringArrayVar(&lakes, "lake", nil, "lake slugs (recorded on the run; lane routing and parallel plans consult them)")
+	c.Flags().StringArrayVar(&lakes, "lane", nil, "lane slugs (recorded on the run; lane routing and parallel plans consult them)")
+	c.Flags().StringArrayVar(&lakes, "lake", nil, "deprecated alias of --lane")
 	c.Flags().StringVar(&scale, "scale", "", "task scale field (large routes the implement lane to ralph)")
 	c.Flags().StringVar(&executorID, "executor-id", "", "identity of the executing agent (maker, for maker!=checker)")
 	c.Flags().StringVar(&executorMode, "executor", "",

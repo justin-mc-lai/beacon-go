@@ -89,7 +89,7 @@ func Import(st *store.Store, in ImportInput) (ImportReport, error) {
 	legacyID := shortID("nmod_", in.Version, "legacy")
 	root := Node{
 		ID: rootID, Kind: KindIntent, Title: in.ProjectName,
-		Intent: "Legacy sea/lake packages imported under one intent root.",
+		Intent: "Imported feature packages under one intent root.",
 		Path:   "root", Status: StatusDraft,
 	}
 	legacy := Node{
