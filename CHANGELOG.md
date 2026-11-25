@@ -3,6 +3,15 @@
 All notable changes to Beacon Go. Versions are plain SemVer
 (`MAJOR.MINOR.PATCH`); see `docs/version-scheme.md`.
 
+## [3.0.5] - 2026-11-25
+
+### Fixed
+
+- `plan init` and default HTML tree rendering now ignore
+  `.beacon/artifacts/` so derived HTML does not become an untracked file.
+- HTML render output is labelled as a derived artifact; explicit `--out`
+  outside the project gets an additional note.
+
 ## [3.0.4] - 2026-11-25
 
 ### Added
