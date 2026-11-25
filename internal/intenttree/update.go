@@ -13,6 +13,7 @@ import (
 type NodePatch struct {
 	Title        string        `json:"title"`
 	Intent       string        `json:"intent"`
+	Doc          string        `json:"doc,omitempty"`
 	ACs          []AC          `json:"acs"`
 	TestCases    []TestCase    `json:"test_cases,omitempty"`
 	Verification *Verification `json:"verification,omitempty"`
@@ -45,13 +46,19 @@ func UpdateNode(st *store.Store, dir, nodeID string, patch NodePatch) (Node, err
 	if strings.TrimSpace(patch.Intent) != "" {
 		n.Intent = strings.TrimSpace(patch.Intent)
 	}
+	if patch.Doc != "" {
+		n.Doc = patch.Doc
+	}
 	if patch.ACs != nil {
 		n.ACs = patch.ACs
 	}
 	if patch.TestCases != nil {
-		if n.Kind != KindTouchpoint {
+		if n.Kind != KindTouchpoint && n.Kind != KindFeature {
 			return Node{}, core.NewError(ReasonTestCaseInvalid, "intenttree.UpdateNode",
-				"test cases belong to touchpoints: "+nodeID+" is "+string(n.Kind))
+				"test cases belong to touchpoints or features: "+nodeID+" is "+string(n.Kind))
+		}
+		if findings := ValidateTestCases(n.ACs, patch.TestCases); len(findings) > 0 {
+			return Node{}, core.NewError(ReasonTestCaseInvalid, "intenttree.UpdateNode", strings.Join(findings, "; "))
 		}
 		n.TestCases = patch.TestCases
 	}

@@ -78,6 +78,9 @@ func newVerifyAuditCmd() *cobra.Command {
 						findings = append(findings, intenttree.ValidateTestCases(n.ACs, n.TestCases)...)
 					}
 				}
+				if n.Kind == intenttree.KindFeature && len(n.TestCases) > 0 {
+					findings = append(findings, intenttree.ValidateTestCases(n.ACs, n.TestCases)...)
+				}
 				if n.Kind != intenttree.KindTouchpoint && n.Verification != nil {
 					findings = append(findings, "tree_verification_scope: "+n.ID)
 				}

@@ -9,7 +9,7 @@ import (
 
 func newTruthNodeCmd() *cobra.Command {
 	c := &cobra.Command{Use: "node", Short: "Node-level operations"}
-	c.AddCommand(newTruthNodeFreezeCmd(), newTruthNodeUpdateCmd(), newTruthNodeLinkCmd(), newTruthNodeSyncStatusCmd())
+	c.AddCommand(newTruthNodeFreezeCmd(), newTruthNodeUpdateCmd(), newTruthNodeLinkCmd(), newTruthNodeSyncStatusCmd(), newTruthNodeGenerateTestsCmd(), newTruthNodeGenerateDocCmd())
 	return c
 }
 

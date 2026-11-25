@@ -134,6 +134,7 @@ type Node struct {
 	Kind                 Kind                  `json:"kind"`
 	Title                string                `json:"title"`
 	Intent               string                `json:"intent,omitempty"`
+	Doc                  string                `json:"doc,omitempty"`
 	ParentID             string                `json:"parent_id,omitempty"`
 	Path                 string                `json:"path"`
 	Status               Status                `json:"status"`

@@ -66,9 +66,9 @@ func ValidateProposal(parent Kind, p Proposal) error {
 			}
 		}
 		if len(ch.TestCases) > 0 {
-			if ch.Kind != KindTouchpoint {
+			if ch.Kind != KindTouchpoint && ch.Kind != KindFeature {
 				return core.NewError(ReasonTestCaseInvalid, "intenttree.ValidateProposal",
-					"test cases belong to touchpoints: "+ch.Title)
+					"test cases belong to touchpoints or features: "+ch.Title)
 			}
 			if findings := ValidateTestCases(ch.ACs, ch.TestCases); len(findings) > 0 {
 				return core.NewError(ReasonTestCaseInvalid, "intenttree.ValidateProposal", strings.Join(findings, "; "))
