@@ -3,6 +3,17 @@
 All notable changes to Beacon Go. Versions are plain SemVer
 (`MAJOR.MINOR.PATCH`); see `docs/version-scheme.md`.
 
+## [3.0.1] - 2026-11-25
+
+### Fixed
+
+- README (EN/ZH) now document the seven groups, tree workflow, and the seven
+  embedded skills; stale v2/desktop/executor sections removed.
+- The `qa` skill is renamed `beacon-go-verify`; stale program/ralph/sea-lake
+  guidance is removed from skill bodies and references.
+- `beacon ui` and the `loop` pointer are removed from the CLI; internal
+  maintenance commands are hidden from help.
+
 ## [3.0.0] - 2026-11-25
 
 ### Breaking

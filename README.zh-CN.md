@@ -12,7 +12,7 @@ intent -> module -> feature -> touchpoint
 
 每个节点有不可变 id、canonical JSON 正文、`tree-json-v1` 指纹，以及五态生命周期。海/湖模型已退役；旧包以 `feature` 节点导入。
 
-当前版本：**v3.0.0**（纯 SemVer，见 [version-scheme.md](docs/version-scheme.md)）。发布说明：[docs/beacon/v3.0.0/release/3.0.0.md](docs/beacon/v3.0.0/release/3.0.0.md)；迁移指南：[docs/migration-3.0.0.md](docs/migration-3.0.0.md)。
+当前版本：**v3.0.1**（纯 SemVer，见 [version-scheme.md](docs/version-scheme.md)）。发布说明：[docs/beacon/v3.0.1/release/3.0.1.md](docs/beacon/v3.0.1/release/3.0.1.md)；迁移指南：[docs/migration-3.0.1.md](docs/migration-3.0.1.md)。
 
 ## 为什么重构
 
@@ -55,7 +55,7 @@ Go 版按一份书面口径执行（[`docs/scope-charter.md`](docs/scope-charter
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v3.0.0
+./bin/beacon --version          # Beacon CLI v3.0.1
 ```
 
 典型树流程：
@@ -106,7 +106,7 @@ beacon skills verify --host codex      # 已安装与内嵌是否漂移
 - `bash scripts/check_kernel_deps.sh`：已删面不得回归。
 - [`e2e/run_e2e.sh`](e2e/run_e2e.sh)：manual lane 全链（注册 → 需求包 → 冻结 → 基线 → goal run/tick → 证据 → 门禁 → verifier → 完成）。
 - [`e2e/run_dogfood.sh`](e2e/run_dogfood.sh)：羽毛球队列 22 节点 / 12 叶子 / 2 快照；冻结、实现、验证、汇总、change+refreeze、HTML、审计全过。
-- v3.0.0 证据汇总：[docs/beacon/v3.0.0/release/3.0.0.md](docs/beacon/v3.0.0/release/3.0.0.md)。
+- v3.0.1 证据汇总：[docs/beacon/v3.0.1/release/3.0.1.md](docs/beacon/v3.0.1/release/3.0.1.md)。
 
 ## 已知边界（如实写明）
 
