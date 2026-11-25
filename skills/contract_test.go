@@ -61,7 +61,7 @@ func TestSkillsOrderTheReferenceRead(t *testing.T) {
 // set covers the four example chains the frozen surface names. Examples
 // are explicitly not requirement authority.
 func TestRouteExamplesCoverFourChains(t *testing.T) {
-	six := []string{"plan", "truth", "design", "implement", "qa", "release"}
+	six := []string{"plan", "truth", "design", "implement", "verify", "release"}
 	fileRef := regexp.MustCompile("`(examples/[^`]+\\.md)`")
 	chainRef := regexp.MustCompile("chain `([a-z-]+)`")
 	seen := map[string]bool{}

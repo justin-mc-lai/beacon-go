@@ -5,8 +5,6 @@
 package cli
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"beacon-go/internal/harness"
@@ -79,6 +77,13 @@ import (
 // (docs/version-scheme.md); no new -go.N versions are issued.
 const Version = version.Version
 
+// hidden keeps an internal maintenance command executable but out of the
+// user-facing help menu. The seven groups stay visible.
+func hidden(c *cobra.Command) *cobra.Command {
+	c.Hidden = true
+	return c
+}
+
 // NewRootCmd builds the beacon root command with the six first-class
 // abilities as real command groups (P4a convergence): goal (the loop
 // ability's formal entry), truth (real package lifecycle), and the
@@ -87,11 +92,11 @@ const Version = version.Version
 func NewRootCmd() *cobra.Command {
 	root := &cobra.Command{
 		Use:   "beacon",
-		Short: "Beacon - Evidence-first Product Workflow Kernel (Go track)",
-		Long: "Beacon v2 kernel (Go implementation of the frozen v2 design).\n" +
-			"Six first-class abilities: goal | truth | design | implement | qa | release\n" +
-			"(charter decision 5: the loop ability's user entry is `goal`; `loop` is a pointer).\n" +
-			"Runtime state: global ~/.beacon/beacon-go.db + project blob pointers.",
+		Short: "Beacon - requirement-truth kernel with an intent tree",
+		Long: "Beacon 3.x requirement-truth kernel.\n" +
+			"Seven groups: plan | truth | change | implement | verify | release | goal.\n" +
+			"Truth is an intent tree in the repo; SQLite is a rebuildable runtime cache.\n" +
+			"Internal maintenance commands are hidden from this help.",
 		Version:       Version,
 		SilenceUsage:  true,
 		SilenceErrors: true,
@@ -101,23 +106,6 @@ func NewRootCmd() *cobra.Command {
 	for _, ability := range harness.Abilities {
 		id := ability.ID // capture for closure
 		switch id {
-		case "loop":
-			// Charter decision 5 (2026-10-21): the user entry is named
-			// "goal", not "loop". The loop entry is kept as a
-			// pointer only — no alias with its own behaviour — so the
-			// surface cannot grow two divergent entries (anti-bloat
-			// rule). The change is booked on the Go side in
-			// docs/changes/change-goal-entry-rename.md (P3a); the
-			// upstream frozen package is read-only and unmodified.
-			root.AddCommand(&cobra.Command{
-				Use:   "loop",
-				Short: "Superseded by `beacon goal` (charter decision 5: the formal entry is goal)",
-				RunE: func(cmd *cobra.Command, args []string) error {
-					_, err := fmt.Fprintln(cmd.OutOrStdout(),
-						"beacon loop: superseded — the formal entry for this ability is `beacon goal` (charter decision 5, 2026-10-21). Run `beacon goal --help`.")
-					return err
-				},
-			})
 		case "truth":
 			root.AddCommand(newTruthCmd())
 		case "design":
@@ -133,6 +121,6 @@ func NewRootCmd() *cobra.Command {
 	// P2a: the goal command group (the loop ability's formal entry).
 	// P3a: the gate command group (formal evaluation write-back).
 	// P3b: migrate v1 (AC-077..079) + doctor rebuild (AC-011).
-	root.AddCommand(newSpineCmd(), newProjectsCmd(), newGoalCmd(), newGateCmd(), newMigrateCmd(), newDoctorCmd(), newSkillsCmd(), newReviewCmd(), newArchiveCmd(), newHooksCmd(), newUICmd(), newFSMCmd(), newVersionCmd(), newPlanCmd(), newVerifyCmd(), newChangeCmd())
+	root.AddCommand(hidden(newSpineCmd()), newProjectsCmd(), newGoalCmd(), newGateCmd(), hidden(newMigrateCmd()), hidden(newDoctorCmd()), newSkillsCmd(), hidden(newReviewCmd()), hidden(newArchiveCmd()), hidden(newHooksCmd()), hidden(newFSMCmd()), newVersionCmd(), newPlanCmd(), newVerifyCmd(), newChangeCmd())
 	return root
 }

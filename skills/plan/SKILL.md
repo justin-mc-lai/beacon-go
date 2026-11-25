@@ -1,7 +1,7 @@
 ---
 name: beacon-go-plan
-description: Think first, in the open. Socratic questions before freeze, multi-angle planner review, source-anchored research, sea-to-lake program planning. The planner never implements, never freezes truth, never issues a QA or release verdict.
-triggers: 规划, 先想清楚, plan, review, brainstorm, 审查, 拆海, program, 源码
+description: Think first, in the open. Socratic questions before freeze, multi-angle planner review, source-anchored research, and intent-tree planning. The planner never implements, never freezes truth, never issues a QA or release verdict.
+triggers: 规划, 先想清楚, plan, review, brainstorm, 审查, 意图树, 源码
 ---
 
 # beacon-plan
@@ -14,9 +14,9 @@ then work it):
 |------|--------------|------------|
 | pln-brainstorm | Socratic questions + first-principles decomposition before freeze | `beacon truth ask` / `beacon truth answer` (one question at a time, each with a recommendation) |
 | pln-fsm | Domain FSM decomposition: entity precedence, aggregate transitions, illegal slots | `beacon truth fsm check` / `beacon fsm transition` (mandatory for any workflow, order, dispatch, approval, lifecycle, or multi-state feature) |
-| pln-review | multi-angle planner review of a plan or package | `beacon goal planner-review` / `beacon qa planner-review` (real subprocess reviewers, one block blocks all) |
+| pln-review | multi-angle planner review of a plan or package | `beacon goal planner-review` / `beacon verify planner-review` (real subprocess reviewers, one block blocks all) |
 | pln-source | source-anchored research — read the code, never invent | host reads the repo; findings land in the intent (`beacon truth intent`) |
-| pln-program | sea-to-lake: split the big thing into boilable lakes, then the human multi-selects | `beacon goal program propose` / `select` / `plan --from-proposal` (3-7 lakes; cycles, unknown lakes and unselected deps refused) |
+| pln-tree | intent-tree planning: root intent -> module -> feature -> touchpoint | `beacon plan init` / `plan expand` / `plan apply` (kind rules + <=7 children per expansion) |
 | pln-friction | capture friction into the improvement input | record it as a truth question (`beacon truth ask`) until intake exists |
 
 The chain inside a package is **ask -> sign**: questions close one
@@ -27,45 +27,29 @@ planner proposes; the user owns scope and freeze.
 
 Hard rules (from the Python beacon-plan core):
 
-1. Lake vs sea — boil lakes; split or defer seas, never boil a sea.
+1. Tree over prose — expand the intent tree; never invent a flat feature list.
 2. Search before invent — truth, source, evidence, memory first.
 3. No fake delivery — placeholders and docs-only evidence are not a plan.
 4. Stay in the harness: planner != implementer; route onward to
    beacon-truth / beacon-goal instead of stretching this skill.
 
-## Sea -> lake proposal (pln-program)
+## Tree planning (pln-tree)
 
-Sea-to-lake is a human decision, not an AI free-run. The AI proposes
-3-7 lakes through a commercial/operable lens; the human multi-selects;
-only the selected lakes are created and driven.
-
-1. **Propose** - write a `lake-proposal.v1` file. Every lake carries
-   `outcome`, `value`, `metric`, `operable`, `size` (S/M/L) and
-   `acceptance_seed`; `not_proposed` lists what is deliberately
-   excluded, with a reason. Record it:
-   `beacon goal program propose --run-id <host> --file proposal.json`
-2. **Present** - show a compact table: lake, user value, success
-   metric, size, dependencies, and what is not proposed.
-3. **Multi-select** - the human picks. Record it:
-   `beacon goal program select --run-id <host> --proposal <id> --lake <slug>... --reject <slug>... --by <name>`
-   Draft packages are created for the selected lakes only.
-4. **Plan + freeze** - `beacon goal program plan --run-id <host> --from-proposal <id> --freeze`
-   refuses a dependency whose lake was not selected. Nothing runs
-   until the human freezes.
-5. **Drive** - `beacon goal program drive --run-id <host> --until-done`
-   runs only the selected lakes.
-
-Never invent the selection, never create unselected lakes, and never
-freeze on the user's behalf. The kernel refuses a first-cut
-`program plan --lake ...` with `lake_proposal_required` when no
-human-selected proposal exists; use `--from-proposal`.
+1. Create the root once: `beacon plan init --project . --title <title> --intent <intent>`.
+2. Expand one draft parent at a time with a proposal JSON:
+   `beacon plan expand --node <id> --children <proposal.json>` validates only;
+   `beacon plan apply --node <id> --proposal <proposal.json>` writes drafts.
+3. A proposal carries `provenance` (model/prompt hash/skill/tokens/cost); the host
+   agent produces it, the kernel records it.
+4. Never exceed 7 children per expansion; never skip a kind
+   (`intent -> module -> feature -> touchpoint`).
 
 ## Route examples
 
 Three worked routes; open the file before acting (they are examples, not
 requirement authority — the frozen package is):
 
-- `examples/sea-to-lake.md` — chain `full-delivery`: an ocean-sized goal is split into lakes before any code.
+- `examples/vague-requirement.md` — chain `honest-block`: a vague request is turned into questions, not guesses.
 - `examples/domain-fsm-decomposition.md` — chain `domain-fsm`: workflow/lifecycle features must decompose entity precedence, aggregate transitions, and illegal slots.
 - `examples/vague-requirement.md` — chain `honest-block`: a one-line request without an outcome stops at questions.
 - `examples/source-anchored-review.md` — chain `full-delivery`: every claim in a plan cites a file or command output.
@@ -90,7 +74,7 @@ summary alone.
 
 ## Output contract (minimum)
 
-- `mode_id`: one of `pln-brainstorm|pln-fsm|pln-review|pln-source|pln-program|pln-friction`
+- `mode_id`: one of `pln-brainstorm|pln-fsm|pln-review|pln-source|pln-tree|pln-friction`
 - the artifact for that mode (question list, FSM matrix, review verdict, findings, lake graph)
 - `evidence_refs`: files read, commands run, sources cited
 - `next`: one of `truth|goal|stop`

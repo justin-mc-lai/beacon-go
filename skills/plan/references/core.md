@@ -1,56 +1,38 @@
-<!-- Source: distilled from Python v1.6.19 skills/beacon/beacon-plan/
-     (SKILL.md + references/modes/INDEX.md). The Python package
-     carries one file per mode; this core keeps the mode index and
-     the load discipline, re-expressed for the Go surfaces. -->
+# Plan core reference
 
-# beacon-plan — core reference
+## Modes
 
-## Load discipline (Python original)
+- `pln-brainstorm`: ask one question at a time, each with a recommendation.
+- `pln-fsm`: model domain states, transitions, and illegal moves.
+- `pln-review`: multi-angle review; one blocking reviewer blocks the plan.
+- `pln-source`: read the repo before claiming anything.
+- `pln-tree`: build the intent tree.
+- `pln-friction`: record friction as a truth question.
 
-Select exactly ONE primary mode before acting, read its contract
-completely, emit the mode output + `mode_id` +
-`recommended_next_harness`, and stop at the harness boundary —
-route to another public core instead of stretching this one.
+## Tree planning
 
-## Mode index
+Kind matrix:
 
-| mode_id | purpose | notes |
-|---------|---------|-------|
-| pln-review | multi-angle planner review | reviewers run as real subprocesses in Go; one valid block blocks all; the verdict writes back into the run's state machine (P0 blocks implement, drift routes to change/refreeze) |
-| pln-brainstorm | brainstorm before freeze | Socratic four questions + first-principles decomposition; in Go the questions live in the truth ask/answer ledger, one at a time, each carrying a recommendation |
-| pln-fsm | Domain FSM decomposition | Entity Precedence + Aggregate FSM Tables + Illegal Transition Slots; verified via `beacon truth fsm check`; required for any stateful/workflow feature |
-| pln-source | source-anchored research | anchor every claim to code that exists; "对着源码，别瞎编" — findings feed the intent snapshot |
-| pln-program | sea-to-lake program plan | AI proposes 3-7 lakes (`lake-proposal.v1`), the human multi-selects, only selected lakes become drafts; `plan --from-proposal` records the graph; a cycle, unknown lake, unselected dependency or empty selection is refused |
-| pln-program-auto / pln-program-interactive | program variants | same selected graph, different driving: automatic advance vs step-by-step human routing |
-| pln-friction | friction intake | capture what hurt during delivery as a first-class input to the next plan |
+```
+intent -> intent | module
+module -> module | feature
+feature -> touchpoint
+touchpoint -> (leaf)
+```
 
-## Program proposal gate (pln-program)
+Commands:
 
-`program plan` is not the first step for a new sea. The order is:
+```bash
+beacon plan init   --project . --title <title> --intent <intent>
+beacon plan expand --node <id> --children proposal.json   # validate only
+beacon plan apply  --node <id> --proposal proposal.json   # write drafts
+beacon truth tree  --project . --json
+```
 
-1. AI writes a `lake-proposal.v1` file: 3-7 lakes, each with outcome, value,
-   metric, operable, size and acceptance_seed, plus a non-empty `not_proposed`.
-2. `beacon goal program propose --run-id <host> --file proposal.json` validates
-   and records it. The kernel never invents lakes.
-3. Present the table; the human multi-selects.
-4. `beacon goal program select --run-id <host> --proposal <id> --lake ... --reject ... --by <name>`
-   records the decision and creates drafts for selected lakes only.
-5. `beacon goal program plan --run-id <host> --from-proposal <id> --freeze`
-   records the graph; a dependency on an unselected lake is refused.
-6. `beacon goal program drive --run-id <host> --until-done` runs only the
-   selected lakes.
+Rules:
 
-Direct `program plan --lake ...` remains for re-planning an existing
-selected/frozen program, never for the first cut of a new sea. The CLI
-enforces this: a run with no plan and no selected proposal is refused with
-`lake_proposal_required`.
-
-## What planning produces in the Go kernel
-
-- A question ledger with no open questions.
-- An intent snapshot (utterance, goal, non-goals, constraints,
-  scope mode) that survives verbatim into the freeze gate.
-- For full_parity scope: a deferral ledger entry for anything
-  deferred — silent scope reduction is refused at sign time.
-- A planner-review verdict recorded against the run, with its
-  severity routing applied (not just filed).
+- At most 7 children per expansion.
+- Every child needs a title; touchpoints need an AC and a verification spec.
+- The proposal may carry `provenance` (model, prompt hash, skill, tokens, cost);
+  the kernel records it and never calls a model.
+- The host writes proposals; only the kernel mints ids and paths.

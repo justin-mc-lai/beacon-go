@@ -50,13 +50,11 @@ func newDesignCmd() *cobra.Command {
 func newImplementCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "implement",
-		Short: "Implement ability (thin face): plan / admit / delegate-ralph / receive-result / worktree — same implementation as under `goal`",
-		Long: "Implement face of the six abilities: consume frozen truth + a bound\n" +
-			"design + an admitted worktree, then run the agent/backend loop.\n" +
-			"Subcommands are the same constructors as `goal implement plan`,\n" +
-			"`goal admit`, `goal delegate-ralph`, `goal receive-result` and\n" +
-			"`goal worktree …` — one admission checker and one harvest rule\n" +
-			"under both entries.",
+		Short: "Implementation: admit / worktree / report — no built-in agent executor",
+		Long: "Implementation face: consume frozen truth + a bound design + an\n" +
+			"admitted worktree. The host does the work and records it with\n" +
+			"`implement report`; the kernel runs no agent and harvests artifacts\n" +
+			"under one admission rule.",
 	}
 	c.AddCommand(
 		newGoalImplementPlanCmd(), newGoalAdmitCmd(),

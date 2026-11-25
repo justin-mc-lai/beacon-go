@@ -23,7 +23,7 @@ import (
 	"strings"
 )
 
-//go:embed goal plan truth design implement qa release
+//go:embed goal plan truth design implement verify release
 var files embed.FS
 
 // Skill is one embedded public skill.
@@ -40,7 +40,7 @@ type RefFile struct {
 	Body string `json:"body,omitempty"`
 }
 
-var order = []string{"goal", "plan", "truth", "design", "implement", "qa", "release"}
+var order = []string{"goal", "plan", "truth", "design", "implement", "verify", "release"}
 
 // IDs returns the public skill ids in pipeline order.
 func IDs() []string { return append([]string{}, order...) }
@@ -299,7 +299,7 @@ description: >
   Beacon Go v2 track router. Always means the Go binary §beacon-go§
   (never the Python v1 §beacon§). The abilities are installed next to this
   file as beacon-go-goal / beacon-go-plan / beacon-go-truth /
-  beacon-go-design / beacon-go-implement / beacon-go-qa / beacon-go-release;
+  beacon-go-design / beacon-go-implement / beacon-go-verify / beacon-go-release;
   select one directly or load it with §beacon-go skills show <id>§.
 ---
 

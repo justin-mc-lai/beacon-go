@@ -2,23 +2,25 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
-Beacon Go is a ground-up rewrite of the Beacon kernel in Go. It keeps the
-discipline of the original Python Beacon — *decide clearly, freeze the
-requirement truth, implement against it, verify with evidence, release only
-with a human nod* — while stripping the redundant, outdated, and
-off-mainline surface the Python version accumulated over 1.x.
+Beacon Go is a single-binary **requirement-truth kernel**. It turns one
+utterance into an intent tree, freezes nodes only after they have executable
+verification, records implementation evidence, rolls verification up the tree,
+and releases only with a human nod.
 
-The result is a single static binary whose core is the **goal workflow
-engine**: long-running coding work that plans itself into stages, advances
-step by step under hard gates, survives interruptions, and never marks
-itself done without independent verification and a human-confirmed release.
+The tree is the only requirement truth:
 
-Current release: **v3.0.0** (plain SemVer, see [version-scheme.md](docs/version-scheme.md)). Release notes: [docs/beacon/v3.0.0/release/3.0.0.md](docs/beacon/v3.0.0/release/3.0.0.md). Migration: [docs/migration-3.0.0.md](docs/migration-3.0.0.md).
-go.13 adds SDD version iteration (greenfield `v0.0.1`, explicit
-`projects bump`, docs/runtime axis separation); go.12 added program-level sea
-delivery (`goal program drive --until-done` + one `goal program complete`),
-release shadow (`auto_shadow`), feature maps, skill drift verification, and
-monotonic lifecycle guards.
+```
+intent -> module -> feature -> touchpoint
+```
+
+Every node has an immutable id, a canonical JSON body, a `tree-json-v1`
+fingerprint, and a five-state lifecycle. Sea/lake is retired; old packages
+import as `feature` nodes.
+
+Current release: **v3.0.0** (plain SemVer, see
+[version-scheme.md](docs/version-scheme.md)). Release notes:
+[docs/beacon/v3.0.0/release/3.0.0.md](docs/beacon/v3.0.0/release/3.0.0.md).
+Migration: [docs/migration-3.0.0.md](docs/migration-3.0.0.md).
 
 ## Why a rewrite
 
@@ -33,43 +35,33 @@ The Python Beacon (v1.6.19, 77 top-level commands) worked, but:
   files (~1s per invocation before doing any work).
 
 The Go rewrite is governed by a written charter
-([`docs/scope-charter.md`](docs/scope-charter.md)): 77 commands converge to
-**12 kept / 49 merged / 16 dropped**, and the 22 workflows under `goal` are
-migrated in full. Requirement truth lives only in Markdown; runtime state
-lives only in one SQLite ledger; nothing keeps a private JSON state file.
+([`docs/scope-charter.md`](docs/scope-charter.md)). Requirement truth lives
+only in the tree JSON plus its rendered Markdown; runtime state lives only in
+one SQLite ledger; nothing keeps a private state file.
 
 ## What it does
 
-Six first-class abilities, one orchestration entry:
+Seven command groups, one tree:
 
-| Ability | Surface | What it does |
+| Group | Surface | What it does |
 | --- | --- | --- |
-| **goal** | `beacon goal …` | The orchestration entry. Create a run from one utterance, auto-plan stages (plan → truth → [design] → implement → qa → release), advance with `tick`/`driver`, block with reasons, checkpoint and resume after interruption, complete only at the release gate with a verifier attached and human confirmation. |
-| **truth** | `beacon truth …` | Requirement packages (`truth.md` + `tests.md` + `tasks.md` + `evidence.md`): create, freeze, register changes without touching a frozen body, refreeze. Freezing is branch-disciplined (canonical branch only) and only counts once committed. |
-| **design** | `beacon design …` | Design-primitive binding for UI work: no binding, no implement. The kernel tracks *whether the rules are bound*, never draws prototypes. |
-| **implement** | `beacon implement …` | Three lanes (single / team / ralph loop) behind one admission check and one hand-back standard; real subprocess executors and real git worktrees (satellites merge into the main star only). |
-| **qa** | `beacon qa …` | Evidence-based acceptance: formal gate evaluation that persists verdicts, multi-reviewer planner review, and the one unified skill-score engine (scores are health checks — they never pass or block a gate, and never edit a skill). |
-| **release** | `beacon release …` | The release gate: all gates green + human confirmation, or it stays blocked with named reasons. |
+| **plan** | `beacon plan …` | Create and expand the tree: `init` the root, validate a proposal with `expand`, write drafts with `apply`. Expansion provenance (model, prompt hash, tokens, cost) is recorded. |
+| **truth** | `beacon truth …` | Freeze nodes bottom-up (`truth node freeze`), keep legacy packages, render the tree, and produce immutable snapshots. A leaf needs an AC and a verification spec; a module needs children. |
+| **change** | `beacon change …` | Invalidate a frozen subtree: descendants become draft, ancestors become `change_pending`; refreeze bottom-up. Records are immutable. |
+| **implement** | `beacon implement …` | The host does the work; `implement report` records the leaf, executor identity, artifact hash, and failure reasons. |
+| **verify** | `beacon verify …` | Register evidence under a feature or node scope, verify leaves, roll parents up, audit the tree, and run the former qa gates/scores. |
+| **release** | `beacon release …` | Release gate and human confirmation; the tree release gate requires a verified root. |
+| **goal** | `beacon goal …` | The single-run driver: creates a stage plan, delegates stage readiness to the tree gate, and completes only with a verifier and human confirmation. |
 
 Cross-cutting machinery:
 
-- **Hard gates, written down** — four gates (truth_freeze, design,
-  implement, qa, release) evaluate real facts and persist verdicts to the
-  ledger; a truth-integrity gate cross-checks package references.
-- **Long-run care** — a driver pushes runs turn by turn (lease-guarded,
-  budget-capped, stops at the release gate), a supervisor detects stalls
-  from heartbeats, a kill switch halts all drivers, steering changes are
-  surfaced until acknowledged.
-- **Standard execution flow** — a fixed eight-step pipeline from canonical
-  truth authoring to implement resume; skipping a step fails closed.
-- **Topology gate** — understands single-repo, monorepo, and
-  multi-git-workspace layouts; loads v1.6.7 GitScopeGraphs and projects
-  them into BranchContext; admission requires the topology verdict.
-- **Protected paths** — satellite work can never merge `.env`, keys, auth,
-  payment, or migration files into the main line.
-- **Migration & rebuild** — `beacon migrate v1` imports Python-Beacon
-  projects idempotently; `beacon doctor rebuild` reconciles the ledger
-  with on-disk truth without ever deleting rows.
+- **Evidence-bound gates** — verification is a registered artifact plus a
+  hash; the kernel never trusts prose.
+- **Host-driven execution** — no built-in agent executor and no kernel LLM
+  client; the host records work with `goal tick --by`.
+- **Immutable history** — frozen fingerprints and version snapshots.
+- **Dependency gate** — removed LLM/HTTP/executor surfaces cannot re-enter
+  the binary (`scripts/check_kernel_deps.sh`).
 
 ## Quick start
 
@@ -77,127 +69,95 @@ Requires Go 1.27+.
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0
+./bin/beacon --version          # Beacon CLI v3.0.0
 ```
 
-Five commands cover most of a day:
+A typical tree loop:
 
 ```sh
-beacon projects register --path /path/to/project   # register a project
-beacon truth create --project . --slug my-feature   # scaffold a requirement package
-beacon truth freeze --project . --feature my-feature
-beacon goal run "add two-factor auth to the login page" --project . --feature my-feature
-beacon goal driver run-loop --run-id <run-id>       # push it to the release gate
-beacon spine show --project . --feature my-feature  # read the one ledger view
+beacon projects register --path /path/to/project --version v0.1.0
+beacon plan init  --project . --title "my product" --intent "one sentence"
+beacon plan expand --project . --node <id> --children proposal.json   # validate
+beacon plan apply  --project . --node <id> --proposal proposal.json   # write drafts
+beacon truth node freeze --project . --node <id>                     # leaves first
+beacon implement report  --project . --node <leaf> --by dev --artifact proof.txt
+beacon verify leaf       --project . --node <leaf> --artifact proof.txt --by qa
+beacon verify rollup     --project . --node <parent>
+beacon verify audit      --project . --json
 ```
 
-### Desktop workspace (quarantine)
+Build the tree from the root; the kernel blocks a parent freeze until every
+child is settled. `proposal.json` is produced by the host agent (see the
+`beacon-go-plan` skill).
 
-> **Quarantine, not SDD kernel core.** Per [ADR-0002](docs/adr/ADR-0002-intent-tree-truth-model.md), the goal workflow is retained; desktop/agentapi surfaces are quarantine — kept in-repo but outside the kernel boundary and not described as current kernel facts.
+### Ask before sign (legacy feature packages)
 
-The workspace ships as one native window (Wails). There is no
-separate frontend dev server and no Node build step. The library API
-(`internal/agentapi`) is also quarantine.
+Feature packages still work for `goal` runs. A package cannot freeze just
+because it is structurally complete; the intent gate requires the author to
+record what the user asked, close open questions, trace every AC to an intent
+source, and sign:
 
 ```sh
-go build -o bin/beacon-desktop ./desktop   # native app
-./bin/beacon ui                            # open the window
+beacon truth ask    --feature my-feature --question "Who is this for?" --recommend "..."
+beacon truth answer --feature my-feature --id Q1 --answer "..."
+beacon truth intent --feature my-feature --utterance "user words" --goal "..." \
+                    --non-goals "..." --constraints "..."
+beacon truth confirm --feature my-feature
+beacon truth freeze  --feature my-feature
 ```
 
-The workspace reads requirement packages from the ledger and creates
-real goal runs. It never claims a stage finished: with no executor
-registered the run stays parked at `plan`, and the release button
-returns the gate's real verdict and reason codes instead of a
-success message.
+### Skills
 
-The window uses the same ledger as the CLI. The Go track keeps its own
-database so it can never collide with the Python v1 schema: the default is
-`~/.beacon/beacon-go.db`, overridable with `BEACON_STORE_PATH`.
+The binary ships seven skills. Install them into a host skill directory; the
+host discovers `beacon-go` plus the per-ability skills.
 
-### Ask before sign
-
-A package cannot be frozen just because it is structurally complete. The
-intent gate requires the author to record what the user actually asked for,
-close the open-question ledger, trace every AC to an intent source, and sign
-the result:
+| Skill | Use it when |
+| --- | --- |
+| `beacon-go-goal` | one utterance should run as a staged delivery |
+| `beacon-go-plan` | planning, tree expansion, review, FSM, research |
+| `beacon-go-truth` | create/sign/freeze/change a requirement package |
+| `beacon-go-design` | bind design primitives before UI implementation |
+| `beacon-go-implement` | admission, worktree isolation, implement reports |
+| `beacon-go-verify` | evidence, leaf verification, rollup, audit, score |
+| `beacon-go-release` | release gate and human confirmation |
 
 ```sh
-beacon truth ask      --feature my-feature --question "Who is this for?" --recommend "..."
-beacon truth answer   --feature my-feature --id Q1 --answer "..."
-beacon truth intent   --feature my-feature --utterance "user words" --goal "..." \
-                      --non-goals "..." --constraints "..."
-beacon truth confirm  --feature my-feature        # refuses while anything is open
-beacon truth freeze   --feature my-feature        # completeness + integrity + intent
+beacon skills list                     # ids, names, one-line purposes
+beacon skills show plan                # full SKILL.md
+beacon skills hosts                    # detected host directories
+beacon skills install --host codex     # write beacon-go-<id> + router
+beacon skills install --dir <path>     # explicit target directory
+beacon skills verify --host codex      # installed vs embedded drift
 ```
 
-After a change, the package self-checks at requirement level:
-
-```sh
-beacon truth change   --feature my-feature --summary "widen AC-001"
-# edit the package, then:
-beacon truth refreeze --feature my-feature
-beacon truth drift    --feature my-feature        # names the ACs that moved
-beacon truth rebase   --feature my-feature --change <id> --accept-current
-```
-
-The six public skills ship inside the binary:
-
-```sh
-beacon skills list
-beacon skills show truth
-beacon skills hosts                 # which host dirs exist, what is installed
-beacon skills install --host workbuddy
-```
-
-`skills install` writes `beacon-go-<id>/SKILL.md` plus its `references/`,
-`examples/` and `evals/`, and the generated `beacon-go/` router skill, into the
-host's skill directory (workbuddy, claude, codex, opencode, agents, cursor,
-windsurf, trae). The `beacon-go-` prefix is deliberate: the Python v1 track
-already owns the flat `beacon-<id>` names, so the two tracks can be installed
-side by side without the host seeing two skills with one name. With no `--host`
-it auto-detects the first existing host directory and fails closed when none
-exists.
-
-Each package carries three worked examples and a `skill-evals.v1` eval set. The
-eval `checks` are machine-verifiable (`contains` / `references_contains` /
-`min_examples`), and `beacon qa score` runs them as part of the structural
-dimension — a skill that claims a rule it does not state scores zero on that item.
-Behavioural grading (did a model follow it) still needs a human grade.
-
-Runtime state lives in a single global SQLite database
-(`~/.beacon/beacon-go.db`, WAL). Requirement truth never enters the database —
-it stays in the Markdown packages under
-`docs/beacon/<version>/features/<slug>/`.
+Installed names are namespaced (`beacon-go-goal`, `beacon-go-verify`, …) so
+they never collide with another Beacon install. The generated `beacon-go`
+router maps a request to one skill. The former `qa` skill is now
+`beacon-go-verify`.
 
 ## Verification
 
-- `go test ./...` — 407 behavior-level tests.
-- [`e2e/run_e2e.sh`](e2e/run_e2e.sh) — a scripted full chain
-  (register → create → freeze → commit baseline → run with a real
-  subprocess executor → driver → gates → verify → complete) against the
-  real binary; currently 15 steps, exit 0.
-- [`docs/ac-matrix.md`](docs/ac-matrix.md) — the frozen v2 acceptance
-  criteria (171 ACs) with a final status per line:
-  88 tested, 62 implemented, 12 deferred to external conditions,
-  9 dropped by charter decision.
-- [`bench/`](bench/) — the performance gate. Read paths run 50–200×
-  faster than the Python version; the write paths were reworked to batch
-  commits (`docs/p6-fix-write-perf.md`). One benchmark line
-  (gate-evaluate latency on this shared VM's slow volume) remains above
-  its threshold and is reported as-is, not tuned away.
+- `go test ./... -count=1` — behavior-level suite.
+- `bash scripts/check_version_consistency.sh` — one version source.
+- `bash scripts/check_kernel_deps.sh` — removed surfaces stay out.
+- [`e2e/run_e2e.sh`](e2e/run_e2e.sh) — full chain on the manual lane
+  (register → truth package → freeze → baseline → goal run/tick → evidence
+  → gates → verifier → complete).
+- [`e2e/run_dogfood.sh`](e2e/run_dogfood.sh) — badminton tree: 22 nodes,
+  12 leaves, bucket freeze → implement → verify → rollup → change/refreeze
+  → two snapshots → HTML → audit.
+- [`docs/beacon/v3.0.0/release/3.0.0.md`](docs/beacon/v3.0.0/release/3.0.0.md) —
+  the v3.0.0 evidence summary.
 
 ## Known limits (stated, not hidden)
 
-- **ACP** support drives a real `initialize → session/new → session/prompt`
-  iteration against a scripted agent in tests; a real vendor ACP target is
-  still external evidence.
-- **Vendor executors** (codex / claude CLIs) are wired as command
-  profiles; end-to-end verification awaits authenticated binaries.
-- **Skill references** beyond the six embedded `SKILL.md` files stay
-  host-side; the binary ships the public surface only.
-- External verification that needs a vendor binary or a decision stays
-  deferred; at AC level the remaining rows are listed with preconditions,
-  probes and owners in [`docs/deferred-external.md`](docs/deferred-external.md).
+- The kernel does not run agents. Without a host, a goal run stays parked
+  and says so.
+- Orchestrator `program_*` internals still compile inside the package but
+  have no CLI/API entry; they are dead code awaiting removal.
+- `wails.json` remains because it is bound to a frozen desktop truth
+  package; the desktop and HTTP surfaces themselves are removed in 3.0.0.
+- Live-model skill evaluation is not in CI; skill evals are structural.
 
 ## Documentation
 

@@ -1,7 +1,7 @@
 ---
 name: beacon-go-implement
-description: Implementation lanes behind one admission check and one harvest rule. Single, team, and ralph lanes share the same entry gate and result contract.
-triggers: 实现, implement, 写代码, ralph, worktree
+description: Implementation lanes behind one admission check and one harvest rule. Single and team lanes share the same entry gate and result contract; executed work is reported with an artifact.
+triggers: 实现, implement, 写代码, worktree, 回报
 ---
 
 # beacon-implement
@@ -10,8 +10,9 @@ triggers: 实现, implement, 写代码, ralph, worktree
 2. `beacon implement admit --run-id <id>` is read-only; a blocked admission stops all writes.
 3. `beacon implement worktree create|merge|cleanup|status --run-id <id>` isolates parallel work.
    Satellites merge into the main star only; protected paths never merge.
-4. `beacon implement delegate-ralph --run-id <id>` hands the stage to the ralph lane.
-5. `beacon implement receive-result` harvests artifacts + evidence under one rule.
+4. Do the work in the admitted worktree, then report it:
+   `beacon implement report --project . --node <touchpoint> --by <id> --artifact <file>`.
+5. Verification evidence goes through `beacon verify leaf`, never by editing node JSON.
 
 Rules: no admission, no implement; no evidence, no completion claim.
 
@@ -22,7 +23,6 @@ requirement authority):
 
 - `examples/admission-blocked.md` — chain `honest-block`: an unfrozen package or unbound design blocks before code is written.
 - `examples/parallel-worktrees.md` — chain `full-delivery`: parallel lakes stay in separate worktrees; satellites merge into the main star.
-- `examples/delegate-ralph.md` — chain `full-delivery`: the implement stage is handed to a real loop and the result is harvested, not assumed.
 
 ## HARD GATE
 

@@ -5,7 +5,7 @@
 **mode_id**：`qa-score`
 
 **做法**
-1. `beacon qa score goal --project . --feature order-refund --evaluator verifier`
+1. `beacon verify score goal --project . --feature order-refund --evaluator verifier`
 2. 看结构分与 evals 项；effectiveness 没人评就显示 not scored
 3. 按建议人工改技能，再重打分
 

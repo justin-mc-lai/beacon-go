@@ -2,18 +2,17 @@
 
 [English](README.md) | **简体中文**
 
-Beacon Go 是 Beacon 内核的 Go 语言重构版。它保留 Python 版 Beacon 的
-纪律——*先想清楚、冻结需求真相、照着真相写代码、拿证据验收、人点头
-才发布*——同时剥掉 1.x 时代积攒的冗余、过时和与主线无关的摊子。
+Beacon Go 是单二进制的**需求真相内核**。它把一句话变成意图树，只在叶子有可执行验证后才允许冻结，记录实现证据，自底向上汇总验证，最后经人工确认才发布。
 
-成果是一个单文件二进制，核心是 **goal 工作流引擎**：长时编码任务
-自己排阶段、在硬门禁下逐步推进、断了能续跑，并且永远不能绕过独立
-检查者和人工确认自称完成。
+树是唯一需求真相：
+
+```
+intent -> module -> feature -> touchpoint
+```
+
+每个节点有不可变 id、canonical JSON 正文、`tree-json-v1` 指纹，以及五态生命周期。海/湖模型已退役；旧包以 `feature` 节点导入。
 
 当前版本：**v3.0.0**（纯 SemVer，见 [version-scheme.md](docs/version-scheme.md)）。发布说明：[docs/beacon/v3.0.0/release/3.0.0.md](docs/beacon/v3.0.0/release/3.0.0.md)；迁移指南：[docs/migration-3.0.0.md](docs/migration-3.0.0.md)。
-go.13 增加 SDD 版本迭代（绿项目 `v0.0.1`、显式 `projects bump`、docs/runtime
-双轴）；go.12 增加了多湖整片海交付、release 影子预演、特征地图、技能漂移
-校验和生命周期单调守卫。
 
 ## 为什么重构
 
@@ -31,33 +30,24 @@ Go 版按一份书面口径执行（[`docs/scope-charter.md`](docs/scope-charter
 
 ## 它能干什么
 
-六大能力，一个总入口：
+七个命令组，一棵树：
 
-| 能力 | 入口 | 干什么 |
+| 命令组 | 入口 | 做什么 |
 | --- | --- | --- |
-| **goal** | `beacon goal …` | 编排总入口。一句话建任务，自动排阶段（想清楚 → 冻需求 →〔需要界面才加设计〕→ 写代码 → 验收 → 发布），用 tick/司机逐步推进，卡住留原因码，存档断点续跑，完工必须在发布门口、挂独立检查者、且有人确认。 |
-| **truth** | `beacon truth …` | 需求包（truth.md + tests.md + tasks.md + evidence.md）：建包、冻结、给冻结稿登记变更（不动正文）、重新冻结。冻结有分支纪律（只能在主分支），且提交了才算数。 |
-| **design** | `beacon design …` | 带界面的活，先绑好设计规矩才准写代码。内核只管“规矩绑没绑”，不画图。 |
-| **implement** | `beacon implement …` | 三种干法（单人 / 团队交接 / ralph 循环）共用一套准入检查、一套收活标准；真执行外部命令，真建 git 工位（卫星只能往主工位合并）。 |
-| **qa** | `beacon qa …` | 拿证据验收：正式门禁评估并把结论写进账本、多评审聚合、一套统一评分引擎（评分是体检分，永远不能代替门禁放行，也永远不改被评的 skill）。 |
-| **release** | `beacon release …` | 发布门：各门全绿 + 人工确认，缺一就拦住并逐项点名。 |
+| **plan** | `beacon plan …` | 建树与展开：`init` 建根，`expand` 只校验提案，`apply` 写入 draft；记录展开 provenance（模型、prompt 哈希、tokens、成本）。 |
+| **truth** | `beacon truth …` | 自底向上冻结节点；叶子必须有 AC 和验证规格，module 必须有子节点；渲染树、生成不可变快照。 |
+| **change** | `beacon change …` | 改一棵子树：后代变 draft，全部祖先变 `change_pending`；再自底向上 refreeze。变更记录不可改。 |
+| **implement** | `beacon implement …` | 宿主干活，`implement report` 记录叶子、执行者、产物哈希与失败原因。 |
+| **verify** | `beacon verify …` | 按 feature/node scope 登记证据、验证叶子、汇总父级、审计树；原 qa 门禁与评分也在这里。 |
+| **release** | `beacon release …` | 发布门与人工确认；根未 verified 不放行。 |
+| **goal** | `beacon goal …` | 单次长跑的驱动：建阶段计划、把阶段判定委托给树门、verifier + 人工确认后才完成。 |
 
-横切的硬机制：
+横切能力：
 
-- **四道门正式评估**（冻需求 / 设计 / 写代码 / 验收，及发布门）：
-  读真事实、出结论、写账本；另有需求完整性检查，专查四件套互相
-  引用对不对得上。
-- **长跑看护**：司机一轮轮推任务（租约防双开、预算封顶、到发布门
-  口自停），监工靠心跳判卡死，急停开关一放全停，人中途改方向会
-  被各入口持续摆出直到确认。
-- **标准执行流**：八步固定顺序从主分支写真相到恢复开工，跳步直接
-  拦死。
-- **拓扑门**：认得单仓库、多包大仓、多仓拼工作区三种形状；能加载
-  v1.6.7 的作用域图谱并投影为分支上下文；准入必须带拓扑结论。
-- **受保护路径**：卫星工位的 `.env`、密钥、auth、支付、迁移类文件
-  永远合不进主线。
-- **迁移与重建**：`beacon migrate v1` 把 Python 版项目幂等导入；
-  `beacon doctor rebuild` 让账本和磁盘真相重新对齐，永不删行。
+- **证据门**：验证 = 已登记产物 + 哈希，内核不信散文。
+- **宿主执行**：没有内置 agent 执行器，也没有内核 LLM client；宿主用 `goal tick --by` 记账。
+- **不可变历史**：冻结指纹 + 版本快照。
+- **依赖门**：已删的 LLM/HTTP/执行器面不得回到二进制（`scripts/check_kernel_deps.sh`）。
 
 ## 快速上手
 
@@ -65,78 +55,65 @@ Go 版按一份书面口径执行（[`docs/scope-charter.md`](docs/scope-charter
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v2.0.0
+./bin/beacon --version          # Beacon CLI v3.0.0
 ```
 
-日常五条命令：
+典型树流程：
 
 ```sh
-beacon projects register --path /项目/路径        # 注册项目
-beacon truth create --project . --slug my-feature   # 建需求包骨架
-beacon truth freeze --project . --feature my-feature
-beacon goal run "给登录页加二次验证" --project . --feature my-feature
-beacon goal driver run-loop --run-id <任务id>       # 推到发布门口
-beacon spine show --project . --feature my-feature  # 看唯一账本视图
+beacon projects register --path /path/to/project --version v0.1.0
+beacon plan init  --project . --title "my product" --intent "一句话"
+beacon plan expand --project . --node <id> --children proposal.json   # 只校验
+beacon plan apply  --project . --node <id> --proposal proposal.json   # 写 draft
+beacon truth node freeze --project . --node <id>                     # 先冻叶子
+beacon implement report  --project . --node <leaf> --by dev --artifact proof.txt
+beacon verify leaf       --project . --node <leaf> --artifact proof.txt --by qa
+beacon verify rollup     --project . --node <parent>
+beacon verify audit      --project . --json
 ```
 
-### 先问清楚，再签字
+从根开始建树；子节点未全部就绪时，父节点冻结会被拒绝。`proposal.json` 由宿主 agent 生成（见 `beacon-go-plan` skill）。
 
-需求包结构完整不等于想清楚了。意图门要求：记录用户原话、关掉开放问题账本、
-每条 AC 都能追溯到意图来源，然后显式签字：
+### Skills
+
+二进制内置 7 个 skill。安装到宿主 skill 目录后，宿主能发现 `beacon-go` 路由与各能力 skill。
+
+| Skill | 什么时候用 |
+| --- | --- |
+| `beacon-go-goal` | 一句话要跑成一段有阶段的交付 |
+| `beacon-go-plan` | 规划、展开树、评审、FSM、调研 |
+| `beacon-go-truth` | 建包、签字、冻结、变更 |
+| `beacon-go-design` | UI 实现前绑定设计原语 |
+| `beacon-go-implement` | 准入、worktree 隔离、实现回报 |
+| `beacon-go-verify` | 证据、叶子验证、父级汇总、审计、评分 |
+| `beacon-go-release` | 发布门与人工确认 |
 
 ```sh
-beacon truth ask      --feature my-feature --question "这个功能给谁用？" --recommend "..."
-beacon truth answer   --feature my-feature --id Q1 --answer "..."
-beacon truth intent   --feature my-feature --utterance "用户原话" --goal "..." \
-                      --non-goals "..." --constraints "..."
-beacon truth confirm  --feature my-feature        # 还有开放问题就拒绝
-beacon truth freeze   --feature my-feature        # 完整性 + 一致性 + 意图
+beacon skills list                     # id、名称、一句话用途
+beacon skills show plan                # 完整 SKILL.md
+beacon skills hosts                    # 检测到的宿主目录
+beacon skills install --host codex     # 写入 beacon-go-<id> 与路由
+beacon skills install --dir <path>     # 指定目录
+beacon skills verify --host codex      # 已安装与内嵌是否漂移
 ```
 
-需求变更后，按 AC 级别自检：
-
-```sh
-beacon truth change   --feature my-feature --summary "放宽 AC-001"
-# 编辑需求包，然后：
-beacon truth refreeze --feature my-feature
-beacon truth drift    --feature my-feature        # 指出哪条 AC 动了
-beacon truth rebase   --feature my-feature --change <id> --accept-current
-```
-
-六个公共 skill 已随二进制打包：
-
-```sh
-beacon skills list
-beacon skills show truth
-```
-
-运行状态只存一个全局 SQLite 数据库（`~/.beacon/beacon-go.db`，WAL
-模式）。需求真相永不进库，只住在
-`docs/beacon/<版本>/features/<slug>/` 下的 Markdown 包里。
+安装名带命名空间（`beacon-go-goal`、`beacon-go-verify` …），不会和别的 Beacon 安装冲突。原 `qa` skill 已改名 `beacon-go-verify`。
 
 ## 验证情况
 
-- `go test ./...`——407 个行为级测试全过。
-- [`e2e/run_e2e.sh`](e2e/run_e2e.sh)——真二进制全链剧本（注册 →
-  建包 → 冻结 → 提交基线 → 真执行器干活 → 司机推进 → 四门评估 →
-  挂检查者 → 完工），15 步，退出码 0。
-- [`docs/ac-matrix.md`](docs/ac-matrix.md)——冻结 v2 的 171 条验收
-  标准逐条终局：有测试 82、已实现 64、待外部条件 16、按拍板不迁 9。
-- [`bench/`](bench/)——性能门禁。读路径比 Python 版快 50–200 倍；
-  写路径已按“合并落盘”改造（见 `docs/p6-fix-write-perf.md`）。还剩
-  一项（本机共享磁盘较慢，评估写结论的延迟）高于阈值，如实报，
-  不调阈值迁就。
+- `go test ./... -count=1`：行为级测试全绿。
+- `bash scripts/check_version_consistency.sh`：版本只有一个源。
+- `bash scripts/check_kernel_deps.sh`：已删面不得回归。
+- [`e2e/run_e2e.sh`](e2e/run_e2e.sh)：manual lane 全链（注册 → 需求包 → 冻结 → 基线 → goal run/tick → 证据 → 门禁 → verifier → 完成）。
+- [`e2e/run_dogfood.sh`](e2e/run_dogfood.sh)：羽毛球队列 22 节点 / 12 叶子 / 2 快照；冻结、实现、验证、汇总、change+refreeze、HTML、审计全过。
+- v3.0.0 证据汇总：[docs/beacon/v3.0.0/release/3.0.0.md](docs/beacon/v3.0.0/release/3.0.0.md)。
 
 ## 已知边界（如实写明）
 
-- **桌面 / agentapi（quarantine）**：按 [ADR-0002](docs/adr/ADR-0002-intent-tree-truth-model.md)，goal 工作流保留；desktop/`internal/agentapi` 等面处于 quarantine，留在仓内但不属于 SDD 内核当前事实。
-- **ACP** 只到探针级（initialize + session/new 两步握手），真会话
-  迭代等有真 ACP 程序时再验。
-- **厂商执行器**（codex / claude 命令行）已按档案模板接好端到端
-  形状，真机验证等已登录的真程序。
-- 四个外部验证项待外部条件（`docs/p6-implementation.md` 第 4 节）；
-  AC 层面为 17 条 `deferred-external`。逐条前置条件、复跑命令与责任
-  角色见 [`docs/deferred-external.md`](docs/deferred-external.md)。
+- 内核不跑 agent。没有宿主时，goal run 会停在原地说清楚原因。
+- orchestrator 内部 `program_*` 实现仍编译在包内，但没有 CLI/API 入口，属待删死代码。
+- `wails.json` 仍保留：它绑在冻结的 desktop 需求包上；desktop 与 HTTP 面已在 3.0.0 移除。
+- 真实模型驱动的 skill eval 不在 CI 内；当前 skill eval 是结构校验。
 
 ## 文档
 

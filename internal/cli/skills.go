@@ -17,7 +17,7 @@ import (
 func newSkillsCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "skills",
-		Short: "List, show or install the embedded public skills (1+6 Scheme A set)",
+		Short: "List, show, install, or verify the seven embedded skills",
 	}
 	c.AddCommand(newSkillsListCmd(), newSkillsShowCmd(), newSkillsReferencesCmd(),
 		newSkillsExamplesCmd(), newSkillsInstallCmd(), newSkillsHostsCmd(),

@@ -5,7 +5,7 @@
 **mode_id**：`qa-gate`
 
 **做法**
-1. `beacon qa evaluate ...` → `verdict=block`
+1. `beacon verify evaluate ...` → `verdict=block`
 2. 逐条读 reason codes，指到具体测试/工件
 3. 把失败写进 run 的 blocker，交回 implement
 

@@ -93,8 +93,8 @@ func routerData() []RouterEntry {
 			MustRead: []string{"references/core.md"},
 		},
 		{
-			Skill:    "qa",
-			Summary:  "验收：机器验资与门禁判定，自审不算数",
+			Skill:    "verify",
+			Summary:  "验收：证据登记、叶子验证、父级汇总与门禁判定",
 			Signals:  []Signal{{"验收", 2}, {"验证", 2}, {"评分", 2}, {"跑测试", 3}, {"门禁", 2}},
 			Samples:  []string{"验收一下", "跑一下测试验证"},
 			MustRead: []string{"references/core.md"},

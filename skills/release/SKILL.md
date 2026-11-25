@@ -19,7 +19,7 @@ Rules: no human nod, no release. The release gate never infers consent.
   a human, would this pass?" It records an event and never sets human confirmation.
 - `release_policy=human|auto_shadow` (default human). `auto` is refused
   (`release_policy_unsupported`); real auto-release is not implemented.
-- `beacon goal program complete` re-reads every lake's formal release gate; the one
+- `beacon goal complete` re-reads the tree release gate; the one
   signature covers only the human-confirmation check, never the other gates.
 
 ## Route examples

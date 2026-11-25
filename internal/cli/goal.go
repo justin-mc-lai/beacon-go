@@ -24,11 +24,11 @@ const goalReasonRunNotFound = orchestrator.ReasonRunNotFound
 func newGoalCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "goal",
-		Short: "Goal runs: the loop ability's formal entry (create, tick, complete, resume)",
+		Short: "Drive one staged delivery run (create, tick, complete, resume)",
 		Long: "Goal is the formal user entry for the loop ability (charter decision 5).\n" +
-			"A goal run walks plan -> truth -> (design) -> implement -> qa -> release\n" +
+			"A goal run walks plan -> truth -> (design) -> implement -> verify -> release\n" +
 			"under the loop-goal state machine; release completion always needs\n" +
-			"human confirmation, an attached verifier and a passing qa gate.",
+			"human confirmation, an attached verifier and a passing verify gate.",
 	}
 	c.AddCommand(
 		newGoalRunCmd(), newGoalStatusCmd(), newGoalTickCmd(false), newGoalTickCmd(true),

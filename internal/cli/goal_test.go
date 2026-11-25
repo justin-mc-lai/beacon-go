@@ -159,16 +159,11 @@ func mustEnvStorePath(t *testing.T) string {
 	return p
 }
 
-// The loop placeholder points at goal and carries no behaviour of its own.
-func TestLoopPlaceholderPointsToGoal(t *testing.T) {
-	out, err := runCLI(t, "loop")
-	if err != nil {
-		t.Fatalf("loop placeholder: %v", err)
+func TestLoopIsNotACommand(t *testing.T) {
+	if _, err := runCLI(t, "loop"); err == nil {
+		t.Fatal("loop must not be a command; goal is the entry")
 	}
-	if !strings.Contains(out, "beacon goal") {
-		t.Errorf("loop output = %q", out)
-	}
-	out, err = runCLI(t, "goal", "--help")
+	out, err := runCLI(t, "goal", "--help")
 	if err != nil || !strings.Contains(out, "tick") || !strings.Contains(out, "attach-verifier") {
 		t.Errorf("goal help = %q, %v", out, err)
 	}

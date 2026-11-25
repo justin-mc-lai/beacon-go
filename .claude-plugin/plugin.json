@@ -23,7 +23,7 @@
     "./skills/truth",
     "./skills/design",
     "./skills/implement",
-    "./skills/qa",
+    "./skills/verify",
     "./skills/release"
   ]
 }
