@@ -79,7 +79,7 @@ func (q *kernelQA) candidate() {
 	q.call(true, "goal", "artifacts", "register", "--run-id", q.run, "--kind", "qa_candidate", "--path", q.manifest, "--by", "maker")
 }
 func (q *kernelQA) autotest(ok bool) map[string]any {
-	return q.call(ok, "qa", "autotest", "run", "--run-id", q.run, "--by", "maker")
+	return q.call(ok, "verify", "autotest", "run", "--run-id", q.run, "--by", "maker")
 }
 func (q *kernelQA) review(scope, verdict, checker string) string {
 	path := filepath.Join(q.root, "review.json")

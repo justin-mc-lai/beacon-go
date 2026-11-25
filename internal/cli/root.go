@@ -124,8 +124,6 @@ func NewRootCmd() *cobra.Command {
 			root.AddCommand(newDesignCmd())
 		case "implement":
 			root.AddCommand(newImplementCmd())
-		case "qa":
-			root.AddCommand(newQACmd())
 		case "release":
 			root.AddCommand(newReleaseCmd())
 		}

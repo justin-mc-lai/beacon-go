@@ -10,8 +10,21 @@ import (
 )
 
 func newVerifyCmd() *cobra.Command {
-	c := &cobra.Command{Use: "verify", Short: "Verification group: read-only audit and evidence"}
-	c.AddCommand(newVerifyAuditCmd(), newVerifyLeafCmd(), newVerifyRollupCmd())
+	c := &cobra.Command{
+		Use:   "verify",
+		Short: "Verification group: audit, evidence, qa gate, score, autotest",
+		Long: "The single verification entry. Tree audit/leaf/rollup live here, and\n" +
+			"the former qa face is folded in: status, evaluate, planner-review,\n" +
+			"score, score-history, autotest, strategy, agentscore, agenteval,\n" +
+			"verify-harness. `qa` is not a command anymore.",
+	}
+	c.AddCommand(
+		newVerifyAuditCmd(), newVerifyLeafCmd(), newVerifyRollupCmd(),
+		newGateStatusCmd(), newGateEvaluateFixedCmd("qa"), newGoalPlannerReviewCmd(),
+		newQAScoreCmd(), newQAScoreHistoryCmd(), newQAAutoTestCmd(),
+		newQAStrategyCmd(), newQAAgentScoreCmd(), newQAAgentEvalCmd(),
+		newQAVerifyHarnessCmd(),
+	)
 	return c
 }
 

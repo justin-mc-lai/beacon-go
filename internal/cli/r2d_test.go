@@ -11,7 +11,7 @@ import (
 // surfaces — no store needed.
 func TestQAStrategyAndAgentEvalCLI(t *testing.T) {
 	root := t.TempDir()
-	out, err := runCLI(t, "qa", "strategy", "--project", root, "--json")
+	out, err := runCLI(t, "verify", "strategy", "--project", root, "--json")
 	if err != nil {
 		t.Fatalf("qa strategy: %v (%s)", err, out)
 	}
@@ -23,7 +23,7 @@ func TestQAStrategyAndAgentEvalCLI(t *testing.T) {
 		t.Fatalf("strategy not persisted: %v", err)
 	}
 
-	out, err = runCLI(t, "qa", "agent-eval", "catalog", "--json")
+	out, err = runCLI(t, "verify", "agent-eval", "catalog", "--json")
 	if err != nil {
 		t.Fatalf("catalog: %v (%s)", err, out)
 	}
@@ -35,7 +35,7 @@ func TestQAStrategyAndAgentEvalCLI(t *testing.T) {
 	if err := os.WriteFile(transcript, []byte("ROUTE: qa\nwork done\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	out, err = runCLI(t, "qa", "agent-eval", "grade", "--project", root,
+	out, err = runCLI(t, "verify", "agent-eval", "grade", "--project", root,
 		"--agent", "cli-bot", "--transcript", transcript, "--expect-route", "qa", "--json")
 	if err != nil {
 		t.Fatalf("grade: %v (%s)", err, out)
@@ -45,7 +45,7 @@ func TestQAStrategyAndAgentEvalCLI(t *testing.T) {
 		t.Fatalf("grade doc = %s", out)
 	}
 
-	out, err = runCLI(t, "qa", "agent-score", "--project", root, "--agent", "cli-bot", "--json")
+	out, err = runCLI(t, "verify", "agent-score", "--project", root, "--agent", "cli-bot", "--json")
 	if err != nil {
 		t.Fatalf("agent-score: %v (%s)", err, out)
 	}
@@ -53,7 +53,7 @@ func TestQAStrategyAndAgentEvalCLI(t *testing.T) {
 		t.Fatalf("score doc = %s", out)
 	}
 
-	out, err = runCLI(t, "qa", "agent-eval", "admission", "--project", root, "--agent", "cli-bot", "--json")
+	out, err = runCLI(t, "verify", "agent-eval", "admission", "--project", root, "--agent", "cli-bot", "--json")
 	if err != nil {
 		t.Fatalf("admission: %v (%s)", err, out)
 	}
@@ -61,7 +61,7 @@ func TestQAStrategyAndAgentEvalCLI(t *testing.T) {
 		t.Fatalf("admission doc = %s", out)
 	}
 
-	out, err = runCLI(t, "qa", "agent-eval", "history", "--project", root, "--json")
+	out, err = runCLI(t, "verify", "agent-eval", "history", "--project", root, "--json")
 	if err != nil {
 		t.Fatalf("history: %v (%s)", err, out)
 	}

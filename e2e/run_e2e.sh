@@ -408,7 +408,7 @@ CANDIDATEEOF
   # ==================================================================
   STEP="8c qa autotest (real TC commands -> autotest evidence)"
   echo; echo "===== STEP 8c: $STEP ====="
-  OUT="$("$BEACON" qa autotest run --run-id "$RUN_ID" --by "$EVALUATOR" --json)"
+  OUT="$("$BEACON" verify autotest run --run-id "$RUN_ID" --by "$EVALUATOR" --json)"
   echo "$OUT"
   [ -s "$PROJ/$(printf '%s' "$OUT" | jval report_path)" ] || {
     echo "FAIL: autotest report missing"; return 1; }
@@ -522,7 +522,7 @@ REVIEWEOF
 
   STEP="12 empty machine execution cannot inherit earlier QA PASS"
   printf 'pass\n' > "$PROJ/e2e-work/machine-proof.py"
-  if "$BEACON" qa autotest run --run-id "$RUN_ID" --by "$MAKER" --json; then
+  if "$BEACON" verify autotest run --run-id "$RUN_ID" --by "$MAKER" --json; then
     echo "FAIL: exit-0 empty runner was accepted"; return 1
   fi
   if "$BEACON" gate evaluate qa --project "$PROJ" --feature "$SLUG" --run "$RUN_ID" --evaluator "$CHECKER" --json; then

@@ -66,34 +66,6 @@ func newImplementCmd() *cobra.Command {
 	return c
 }
 
-// newQACmd is the qa ability face: gate status (read), the qa gate
-// evaluation (the shared gate service with the type fixed to qa),
-// planner review, and the unified skill score (P4b) folded in —
-// score / score-history live here, not on a new top-level command.
-func newQACmd() *cobra.Command {
-	c := &cobra.Command{
-		Use:   "qa",
-		Short: "QA ability (thin face): gate status / evaluate qa / planner-review / score / score-history — same implementations as `gate`, `goal planner-review` and the one score engine",
-		Long: "QA face of the six abilities: behavior evidence, the confidence chain\n" +
-			"and the defect repair chain, judged by the ONE gate service.\n" +
-			"`qa status` is `gate status`; `qa evaluate` is `gate evaluate qa`\n" +
-			"(verdicts persist to gate_results); `qa planner-review` is\n" +
-			"`goal planner-review`.\n\n" +
-			"`qa score` is the unified skill-score engine (AC-151..156): a health\n" +
-			"check over skill packages, recorded under gate_type=skill_score and\n" +
-			"listed by `qa score-history`, apart from the gates. A score is runtime\n" +
-			"evidence only (AC-153): it never substitutes this face's formal qa\n" +
-			"gate, and scoring never edits the skill — a human edits, then re-scores.",
-	}
-	c.AddCommand(newGateStatusCmd(), newGateEvaluateFixedCmd("qa"), newGoalPlannerReviewCmd(),
-		newQAScoreCmd(), newQAScoreHistoryCmd(), newQAAutoTestCmd(),
-		// R2d (M2/M1): qa9 strategy generation + the agent-eval
-		// line (a separate engine from the skill score above).
-		newQAStrategyCmd(), newQAAgentScoreCmd(), newQAAgentEvalCmd(),
-		newQAVerifyHarnessCmd())
-	return c
-}
-
 // newReleaseCmd is the release ability face: the release gate
 // evaluation (shared service, type fixed) and the completion entry
 // — the same constructor as `goal complete`, human confirmation

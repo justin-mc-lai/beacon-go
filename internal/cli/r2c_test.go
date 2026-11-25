@@ -167,7 +167,7 @@ func TestQAAutotestCLI(t *testing.T) {
 	}
 	runID := strField(t, parseDoc(t, out), "run_id")
 	prepareCLIProductQA(t, root, "feat-a", runID, "qa-bot")
-	out, err = runCLI(t, "qa", "autotest", "run", "--run-id", runID, "--by", "qa-bot", "--json")
+	out, err = runCLI(t, "verify", "autotest", "run", "--run-id", runID, "--by", "qa-bot", "--json")
 	if err != nil {
 		t.Fatalf("qa autotest run: %v\n%s", err, out)
 	}

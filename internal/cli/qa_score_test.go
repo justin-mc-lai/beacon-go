@@ -66,7 +66,7 @@ func writeCLISkill(t *testing.T) string {
 func TestQAScoreAndHistoryCLI(t *testing.T) {
 	root, _ := seedGateProject(t, true)
 	skill := writeCLISkill(t)
-	out, err := runCLI(t, "qa", "score", skill,
+	out, err := runCLI(t, "verify", "score", skill,
 		"--project", root, "--feature", "feat-gate", "--evaluator", "grader-1",
 		"--human-score", "effectiveness=90", "--json")
 	if err != nil {
@@ -105,7 +105,7 @@ func TestQAScoreAndHistoryCLI(t *testing.T) {
 		}
 	}
 	// History reads the record back.
-	out, err = runCLI(t, "qa", "score-history", "--project", root, "--feature", "feat-gate", "--json")
+	out, err = runCLI(t, "verify", "score-history", "--project", root, "--feature", "feat-gate", "--json")
 	if err != nil {
 		t.Fatalf("score-history: %v\n%s", err, out)
 	}
@@ -119,7 +119,7 @@ func TestQAScoreAndHistoryCLI(t *testing.T) {
 		t.Fatalf("history card lost attribution: %v", first)
 	}
 	// Human output works too.
-	out, err = runCLI(t, "qa", "score-history", "--project", root, "--feature", "feat-gate")
+	out, err = runCLI(t, "verify", "score-history", "--project", root, "--feature", "feat-gate")
 	if err != nil || !strings.Contains(out, "cli-skill") {
 		t.Fatalf("human history: err %v out %q", err, out)
 	}
@@ -129,24 +129,24 @@ func TestQAScoreRefusalsCLI(t *testing.T) {
 	root, _ := seedGateProject(t, true)
 	skill := writeCLISkill(t)
 	// --apply is forbidden outright (AC-170).
-	_, err := runCLI(t, "qa", "score", skill, "--project", root, "--feature", "feat-gate",
+	_, err := runCLI(t, "verify", "score", skill, "--project", root, "--feature", "feat-gate",
 		"--evaluator", "grader-1", "--apply")
 	if ce, ok := err.(*core.Error); !ok || ce.ReasonCode != core.ReasonSkillAutoEditForbidden {
 		t.Fatalf("--apply: err = %v, want skill_auto_edit_forbidden", err)
 	}
 	// No evaluator: refused before anything is recorded.
-	_, err = runCLI(t, "qa", "score", skill, "--project", root, "--feature", "feat-gate")
+	_, err = runCLI(t, "verify", "score", skill, "--project", root, "--feature", "feat-gate")
 	if ce, ok := err.(*core.Error); !ok || ce.ReasonCode != core.ReasonSkillScoreEvaluatorReq {
 		t.Fatalf("no evaluator: err = %v, want skill_score_evaluator_required", err)
 	}
 	// Malformed human score.
-	_, err = runCLI(t, "qa", "score", skill, "--project", root, "--feature", "feat-gate",
+	_, err = runCLI(t, "verify", "score", skill, "--project", root, "--feature", "feat-gate",
 		"--evaluator", "grader-1", "--human-score", "effectiveness=lots")
 	if ce, ok := err.(*core.Error); !ok || ce.ReasonCode != core.ReasonSkillHumanScoreInvalid {
 		t.Fatalf("bad human score: err = %v, want skill_human_score_invalid", err)
 	}
 	// Nothing was recorded by the refused runs.
-	out, err := runCLI(t, "qa", "score-history", "--project", root, "--feature", "feat-gate", "--json")
+	out, err := runCLI(t, "verify", "score-history", "--project", root, "--feature", "feat-gate", "--json")
 	if err != nil {
 		t.Fatalf("score-history: %v", err)
 	}

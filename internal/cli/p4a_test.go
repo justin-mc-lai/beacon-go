@@ -295,7 +295,7 @@ func TestThinFacesAgreeWithGoalAndGate(t *testing.T) {
 	}
 
 	// QA face status vs gate status: identical gate tables.
-	qaOut, err := runCLI(t, "qa", "status", "--project", root, "--feature", "feat-a", "--json")
+	qaOut, err := runCLI(t, "verify", "status", "--project", root, "--feature", "feat-a", "--json")
 	if err != nil {
 		t.Fatalf("qa status: %v", err)
 	}

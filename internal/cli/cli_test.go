@@ -418,7 +418,7 @@ func TestHarnessVerifyJSON(t *testing.T) {
 	seed := seedOneProject(t)
 
 	// 1. Unknown feature: never a pass, always a reason code.
-	_, err := runCLI(t, "qa", "verify-harness", "--project", seed.projRoot, "--slug", "test-feature", "--json")
+	_, err := runCLI(t, "verify", "verify-harness", "--project", seed.projRoot, "--slug", "test-feature", "--json")
 	if err == nil {
 		t.Fatal("verifying an unknown feature must fail")
 	}
@@ -427,7 +427,7 @@ func TestHarnessVerifyJSON(t *testing.T) {
 	}
 
 	// 2. Known feature with no QA evidence: blocked, exit_code 1, no hash.
-	out, err := runCLI(t, "qa", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
+	out, err := runCLI(t, "verify", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
 	if err == nil {
 		t.Fatal("verifying a feature without QA evidence must fail")
 	}
@@ -468,7 +468,7 @@ func TestHarnessVerifyJSON(t *testing.T) {
 	}
 
 	productReport := prepareCLIProductQA(t, seed.projRoot, "demo-feature", seed.run.ID, "qa-bot")
-	out, err = runCLI(t, "qa", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
+	out, err = runCLI(t, "verify", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
 	if err != nil {
 		t.Fatalf("verifying real QA evidence must pass: %v\n%s", err, out)
 	}
@@ -485,7 +485,7 @@ func TestHarnessVerifyJSON(t *testing.T) {
 	if err := os.WriteFile(productReport, []byte(`{"verdict":"tampered"}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	out, err = runCLI(t, "qa", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
+	out, err = runCLI(t, "verify", "verify-harness", "--project", seed.projRoot, "--slug", "demo-feature", "--json")
 	if err == nil {
 		t.Fatalf("a tampered evidence blob must fail verification:\n%s", out)
 	}
