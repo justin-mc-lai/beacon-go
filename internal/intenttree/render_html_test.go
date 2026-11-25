@@ -19,7 +19,7 @@ func TestRenderHTMLTreeShowsRequirementBodies(t *testing.T) {
 		States: []string{"draft", "frozen"}, Transitions: []FSMTransition{{From: "draft", To: "frozen", Event: "freeze"}},
 		Illegal: []FSMTransition{{From: "frozen", To: "draft"}}}}
 	html := string(RenderHTMLTree(idx, map[string]Node{"r": {ID: "r", Kind: KindIntent, Intent: "根意图"}, "t": tp, "f": f}))
-	for _, want := range []string{"用户能登录", "正确凭证返回会话", "当凭证正确时返回会话", "验收标准", "业务状态机", "freeze", "frozen→draft", "data-panel", "data-node", "fsm-canvas", "转移明细"} {
+	for _, want := range []string{"用户能登录", "正确凭证返回会话", "当凭证正确时返回会话", "验收标准", "业务状态机", "freeze", "frozen→draft", "data-panel", "data-node", "fsm-canvas", "转移明细", "tree-toggle", "status-badge", "全部展开", "localStorage"} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("html missing %q", want)
 		}

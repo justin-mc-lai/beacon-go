@@ -108,8 +108,7 @@ const css = `
 .brand{font-weight:700;font-size:16px;letter-spacing:-.01em;margin:0 0 2px}
 .sub{color:var(--muted);font-size:12px;margin:0 0 16px}
 .filter{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font:12px/1.4 inherit;margin:0 0 14px}
-.tree{list-style:none;margin:0;padding:0}
-.tree li{margin:1px 0}
+.tree{list-style:none;margin:0;padding:0}.tree-item{margin:1px 0}.tree-children{list-style:none;margin:0;padding:0;display:none}.tree-item.open>.tree-children{display:block}.tree-row{display:flex;align-items:center;gap:2px}.tree-toggle{width:18px;height:22px;border:0;background:transparent;cursor:pointer;color:#6b7280;padding:0;font-size:13px}.tree-toggle:before{content:"▸"}.tree-item.open>.tree-row .tree-toggle:before{content:"▾"}.tree-spacer{width:18px;flex:none}.tree-tools{display:flex;gap:6px;margin:0 0 8px}.tree-tools button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:3px 7px;font-size:11px;color:#374151;cursor:pointer}.tree-tools button:hover{background:var(--accent-soft)}.status-legend{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 10px}.status-badge{font-size:10px;line-height:1.5;border-radius:999px;padding:0 5px;border:1px solid var(--line);color:#6b7280;white-space:nowrap}.status-draft{color:#6b7280;background:#f3f4f6}.status-frozen{color:#2f6f4e;background:#f1f8f4;border-color:#b7d7c5}.status-implemented{color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe}.status-verified{color:#166534;background:#dcfce7;border-color:#86efac}.status-change_pending{color:#9a5b13;background:#fffaf1;border-color:#efd4ad}.status-deprecated{color:#6b7280;background:#f3f4f6}.status-blocked{color:#991b1b;background:#fef2f2;border-color:#fecaca}
 .node{display:flex;align-items:center;gap:6px;width:100%;border:0;background:transparent;text-align:left;color:var(--ink);padding:4px 7px;border-radius:7px;cursor:pointer;font:13px/1.5 inherit}
 .node:hover{background:#efede8}.node.active{background:#e8f0eb;color:#17412c;font-weight:600}
 .node .label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -152,32 +151,46 @@ func writeTreePane(b *strings.Builder, idx Index, children map[string][]IndexEnt
 	root := bodies[idx.RootID]
 	b.WriteString(`<aside class="pane tree-pane">`)
 	fmt.Fprintf(b, `<div class="brand">%s</div><div class="sub">需求树 · %d 节点</div>`, esc(root.Title), len(idx.Nodes))
-	b.WriteString(`<input id="filter" class="filter" placeholder="筛选节点" autocomplete="off"><ul class="tree">`)
-	var walk func(id string, depth int)
-	walk = func(id string, depth int) {
-		writeTreeNode(b, id, children, bodies, related, own, depth)
-		for _, c := range children[id] {
-			walk(c.ID, depth+1)
-		}
-	}
-	walk(idx.RootID, 0)
+	b.WriteString(`<input id="filter" class="filter" placeholder="筛选节点或 status:frozen" autocomplete="off">`)
+	b.WriteString(`<div class="tree-tools"><button type="button" id="tree-expand">全部展开</button><button type="button" id="tree-collapse">全部收起</button></div>`)
+	b.WriteString(`<div class="status-legend"><span class="status-badge status-draft">草稿</span><span class="status-badge status-frozen">已冻结</span><span class="status-badge status-implemented">已实现</span><span class="status-badge status-verified">已验证</span><span class="status-badge status-change_pending">变更中</span><span class="status-badge status-blocked">阻塞</span></div>`)
+	b.WriteString(`<ul class="tree">`)
+	writeTreeNode(b, idx.RootID, children, bodies, related, own)
 	b.WriteString(`</ul></aside>`)
 }
 
-func writeTreeNode(b *strings.Builder, id string, children map[string][]IndexEntry, bodies map[string]Node, related, own map[string]string, depth int) {
+func writeTreeNode(b *strings.Builder, id string, children map[string][]IndexEntry, bodies map[string]Node, related, own map[string]string) {
 	n := bodies[id]
 	owner := related[id]
 	fsm := ""
 	if own[id] != "" {
-		fsm = fmt.Sprintf(`<span class="fsm-mark">FSM</span>`)
+		fsm = `<span class="fsm-mark">FSM</span>`
 	}
-	dot := "dot"
-	if n.Status != "" {
-		dot += " " + string(n.Status)
+	kids := children[id]
+	open := ""
+	if n.Kind == KindIntent || n.Kind == KindModule {
+		open = " open"
 	}
-	search := esc(strings.ToLower(n.Title + " " + n.Intent + " " + string(n.Kind)))
-	fmt.Fprintf(b, `<li><button class="node" data-node="%s" data-fsm="%s" data-own="%s" data-kind="%s" data-search="%s" style="padding-left:%dpx"><span class="%s"></span><span class="label">%s</span>%s</button>`,
-		esc(id), esc(owner), boolStr(own[id] != ""), string(n.Kind), search, 7+depth*12, dot, esc(n.Title), fsm)
+	status := string(n.Status)
+	if status == "" {
+		status = "draft"
+	}
+	search := esc(strings.ToLower(n.Title + " " + n.Intent + " " + string(n.Kind) + " " + status))
+	fmt.Fprintf(b, `<li class="tree-item%s" data-tree-id="%s"><div class="tree-row">`, open, esc(id))
+	if len(kids) > 0 {
+		fmt.Fprintf(b, `<button type="button" class="tree-toggle" data-toggle="%s" aria-label="展开或收起"></button>`, esc(id))
+	} else {
+		b.WriteString(`<span class="tree-spacer"></span>`)
+	}
+	fmt.Fprintf(b, `<button class="node" data-node="%s" data-fsm="%s" data-own="%s" data-kind="%s" data-status="%s" data-search="%s"><span class="dot %s"></span><span class="label">%s</span><span class="status-badge status-%s">%s</span>%s</button></div>`,
+		esc(id), esc(owner), boolStr(own[id] != ""), string(n.Kind), esc(status), search, status, esc(n.Title), status, esc(statusLabel(n.Status)), fsm)
+	if len(kids) > 0 {
+		b.WriteString(`<ul class="tree-children">`)
+		for _, c := range kids {
+			writeTreeNode(b, c.ID, children, bodies, related, own)
+		}
+		b.WriteString(`</ul>`)
+	}
 	b.WriteString(`</li>`)
 }
 
@@ -315,8 +328,18 @@ buttons.forEach(b=>b.addEventListener('click',()=>select(b.dataset.node)));
 document.querySelectorAll('[data-select]').forEach(b=>b.addEventListener('click',()=>select(b.dataset.select)));
 document.querySelectorAll('.fsm-toggle').forEach(b=>b.addEventListener('click',()=>{const slot=b.closest('.fsm-slot');slot.classList.toggle('show-exceptions');b.textContent=slot.classList.contains('show-exceptions')?'隐藏异常转移':'显示异常转移';}));
 const filter=document.getElementById('filter');
-if(filter){filter.addEventListener('input',()=>{const v=filter.value.trim().toLowerCase();
- buttons.forEach(b=>{b.parentElement.classList.toggle('hidden',!!v&&!(b.dataset.search||'').includes(v));});});}
+const TREE_KEY='beacon-tree-open-v1';
+function treeItems(){return [...document.querySelectorAll('.tree-item')];}
+function saveTree(){try{localStorage.setItem(TREE_KEY,JSON.stringify(treeItems().filter(i=>i.classList.contains('open')).map(i=>i.dataset.treeId)));}catch(e){}}
+function restoreTree(){let saved=null;try{saved=JSON.parse(localStorage.getItem(TREE_KEY)||'null');}catch(e){}if(!saved)return;const set=new Set(saved);treeItems().forEach(i=>i.classList.toggle('open',set.has(i.dataset.treeId)));}
+document.querySelectorAll('.tree-toggle').forEach(t=>t.addEventListener('click',()=>{const li=t.closest('.tree-item');li.classList.toggle('open');saveTree();}));
+const expand=document.getElementById('tree-expand'), collapse=document.getElementById('tree-collapse');
+if(expand){expand.addEventListener('click',()=>{treeItems().forEach(i=>i.classList.add('open'));saveTree();});}
+if(collapse){collapse.addEventListener('click',()=>{treeItems().forEach(i=>i.classList.remove('open'));saveTree();});}
+function ownMatch(li,text,status){const b=li.querySelector(':scope > .tree-row .node');if(!b)return false;if(status&&b.dataset.status!==status)return false;return !text||(b.dataset.search||'').includes(text);}
+function applyFilter(){const raw=(filter&&filter.value.trim().toLowerCase())||'';let status='',text=raw;if(raw.startsWith('status:')){status=raw.slice(7).trim();text='';}function walk(li){const kids=[...li.querySelectorAll(':scope > .tree-children > .tree-item')];let child=false;kids.forEach(k=>{if(walk(k))child=true;});const own=ownMatch(li,text,status);const show=own||child;li.classList.toggle('hidden',!show);if(child)li.classList.add('open');return show;}treeItems().filter(i=>!i.parentElement.closest('.tree-item')).forEach(walk);}
+if(filter){filter.addEventListener('input',applyFilter);}
+restoreTree();
 select(location.hash.slice(1)||'%s');
 </script>`, esc(idx.RootID))
 }

@@ -175,6 +175,8 @@ func statusLabel(s Status) string {
 		return "变更中"
 	case StatusDeprecated:
 		return "已废弃"
+	case Status("blocked"):
+		return "阻塞"
 	}
 	return string(s)
 }
