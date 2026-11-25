@@ -102,7 +102,7 @@ func Import(st *store.Store, in ImportInput) (ImportReport, error) {
 		n := Node{
 			ID: shortID("nfeat_", in.Version, f.Slug), Kind: KindFeature,
 			ParentID: legacyID, Title: f.Slug, Path: "legacy/" + f.Slug,
-			Status: StatusDraft, LegacyTruthPath: f.TruthPath, LegacyTestsPath: f.TestsPath,
+			Status: StatusDraft, TruthPath: f.TruthPath, LegacyTestsPath: f.TestsPath,
 		}
 		nodes = append(nodes, n)
 	}
@@ -120,7 +120,8 @@ func Import(st *store.Store, in ImportInput) (ImportReport, error) {
 		}
 		idx.Nodes = append(idx.Nodes, IndexEntry{
 			ID: n.ID, ParentID: n.ParentID, Kind: n.Kind, Status: n.Status,
-			Title: n.Title, Path: n.Path, Fingerprint: n.Fingerprint, FingerprintAlg: n.FingerprintAlg,
+			Title: n.Title, Path: n.Path, TruthPath: n.EffectiveTruthPath(),
+			Fingerprint: n.Fingerprint, FingerprintAlg: n.FingerprintAlg,
 		})
 		cache = append(cache, store.TreeNode{
 			ID: n.ID, ProjectVersionID: in.VersionID, ParentID: n.ParentID,

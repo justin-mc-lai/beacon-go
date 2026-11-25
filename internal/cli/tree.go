@@ -87,7 +87,7 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 					}
 					bodies[e.ID] = n
 				}
-				return printTreeSummary(cmd, idx, bodies, dir)
+				return printTreeSummary(cmd, idx, bodies, dir, projRoot)
 			}
 			if format == "md" {
 				data := intenttree.RenderMarkdown(idx)
@@ -107,7 +107,21 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 					}
 					bodies[e.ID] = n
 				}
-				data := intenttree.RenderHTMLTree(idx, bodies)
+				truth := map[string]intenttree.TruthLinkStatus{}
+				for _, e := range idx.Nodes {
+					n := bodies[e.ID]
+					if n.EffectiveTruthPath() == "" {
+						continue
+					}
+					st := readTruthStatus(projRoot, n)
+					st.NodeStatus = ""
+					truth[e.ID] = intenttree.TruthLinkStatus{
+						Path: st.TruthPath, PackageStatus: st.PackageStatus,
+						PackageSlug: st.PackageSlug, SlugOK: st.SlugOK,
+						Match: st.Match, Error: st.Error,
+					}
+				}
+				data := intenttree.RenderHTMLTreeWithTruth(idx, bodies, truth)
 				def := filepath.Join(projRoot, ".beacon", "artifacts", "tree", idx.Version, "index.html")
 				p, werr := writeTreeRender(outPath, "", def, data)
 				if werr != nil {
@@ -290,8 +304,8 @@ func newDoctorRebuildTreeCmd() *cobra.Command {
 
 // printTreeSummary is the human default: what the project is, how much is
 // covered, and where the readable view is. Machine data stays behind --json.
-func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[string]intenttree.Node, dir string) error {
-	var modules, features, leaves, acs, fsm, planned, existing, verified int
+func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[string]intenttree.Node, dir, projRoot string) error {
+	var modules, features, leaves, acs, fsm, planned, existing, verified, linked, mismatch int
 	for _, e := range idx.Nodes {
 		switch e.Kind {
 		case intenttree.KindModule:
@@ -319,6 +333,13 @@ func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[strin
 				planned++
 			}
 		}
+		if n.EffectiveTruthPath() != "" {
+			linked++
+			st := readTruthStatus(projRoot, n)
+			if !st.Match || st.Error != "" {
+				mismatch++
+			}
+		}
 	}
 	root := bodies[idx.RootID]
 	out := cmd.OutOrStdout()
@@ -328,6 +349,7 @@ func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[strin
 	}
 	fmt.Fprintf(out, "%d 模块 · %d 功能 · %d 触达点 · %d 条 AC · %d 个状态机\n", modules, features, leaves, acs, fsm)
 	fmt.Fprintf(out, "测试：%d 已绑定 · %d 计划中；已验证节点 %d/%d\n", existing, planned, verified, len(idx.Nodes))
+	fmt.Fprintf(out, "真相关联：%d/%d 个功能节点已 link，状态不一致 %d\n", linked, features, mismatch)
 	if planned > 0 {
 		fmt.Fprintf(out, "\n还不能宣称已验证：%d 条测试仍是计划状态。\n", planned)
 	}

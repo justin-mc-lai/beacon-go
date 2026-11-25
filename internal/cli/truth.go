@@ -45,7 +45,7 @@ func newTruthCmd() *cobra.Command {
 		newTruthSemanticReviewCmd(),
 		newTruthMigrateCmd(), newTruthTreeCmd(), newTruthNodeCmd(), newTruthSnapshotCmd(),
 	)
-	hideAllBut(c, "create", "intent", "confirm", "freeze", "change", "refreeze", "show", "tree")
+	hideAllBut(c, "create", "intent", "confirm", "freeze", "change", "refreeze", "show", "tree", "node")
 	return c
 }
 

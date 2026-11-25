@@ -53,6 +53,10 @@ const (
 	ReasonTestCaseMissing      = "tree_test_case_missing"
 	ReasonTestCaseInvalid      = "tree_test_case_invalid"
 	ReasonACCoverage           = "tree_ac_test_coverage"
+	ReasonTruthPathMissing     = "tree_truth_path_missing"
+	ReasonTruthPathInvalid     = "tree_truth_path_invalid"
+	ReasonTruthSlugMismatch    = "tree_truth_slug_mismatch"
+	ReasonTruthLinkNotDraft    = "tree_truth_link_not_draft"
 )
 
 // Kind is one of the four frozen node kinds.
@@ -140,10 +144,22 @@ type Node struct {
 	ChildFingerprints    []string              `json:"child_fingerprints,omitempty"`
 	Implementation       *ImplementationRecord `json:"implementation,omitempty"`
 	VerificationEvidence *EvidenceRef          `json:"verification_evidence,omitempty"`
+	TruthPath            string                `json:"truth_path,omitempty"`
 	LegacyTruthPath      string                `json:"legacy_truth_path,omitempty"`
 	LegacyTestsPath      string                `json:"legacy_tests_path,omitempty"`
 	Fingerprint          string                `json:"fingerprint"`
 	FingerprintAlg       string                `json:"fingerprint_alg"`
+}
+
+// TruthLinkStatus is the read-only comparison between a node and its
+// linked requirement package. It is never persisted.
+type TruthLinkStatus struct {
+	Path          string `json:"truth_path"`
+	PackageStatus string `json:"package_status,omitempty"`
+	PackageSlug   string `json:"package_slug,omitempty"`
+	SlugOK        bool   `json:"slug_ok"`
+	Match         bool   `json:"match"`
+	Error         string `json:"error,omitempty"`
 }
 
 // IndexEntry is the reviewable summary of one node. A review never
@@ -155,8 +171,18 @@ type IndexEntry struct {
 	Status         Status `json:"status"`
 	Title          string `json:"title"`
 	Path           string `json:"path"`
+	TruthPath      string `json:"truth_path,omitempty"`
 	Fingerprint    string `json:"fingerprint"`
 	FingerprintAlg string `json:"fingerprint_alg"`
+}
+
+// EffectiveTruthPath returns the canonical link, falling back to the
+// legacy migration field for trees written before truth_path existed.
+func (n Node) EffectiveTruthPath() string {
+	if n.TruthPath != "" {
+		return n.TruthPath
+	}
+	return n.LegacyTruthPath
 }
 
 // Index is the single-document tree view.

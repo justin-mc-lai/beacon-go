@@ -56,6 +56,16 @@ func TestTreeMigrateReadAuditAndIdempotency(t *testing.T) {
 	if len(nodes) != 3 {
 		t.Fatalf("nodes = %d", len(nodes))
 	}
+	var linked bool
+	for _, raw := range nodes {
+		n := raw.(map[string]any)
+		if n["kind"] == "feature" && n["truth_path"] != "" {
+			linked = true
+		}
+	}
+	if !linked {
+		t.Fatal("migrated feature node must carry truth_path")
+	}
 
 	out = mustRun(t, "truth", "tree", "--project", proj, "--node", rootID, "--json")
 	node := parseDoc(t, out)

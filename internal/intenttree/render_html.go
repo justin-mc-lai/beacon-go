@@ -10,6 +10,12 @@ import (
 // on the left, the selected node's requirement text in the middle, and
 // the related business FSM as a real flow diagram on the right.
 func RenderHTMLTree(idx Index, bodies map[string]Node) []byte {
+	return RenderHTMLTreeWithTruth(idx, bodies, nil)
+}
+
+// RenderHTMLTreeWithTruth adds the read-only package-link comparison to
+// the node detail pane.
+func RenderHTMLTreeWithTruth(idx Index, bodies map[string]Node, truth map[string]TruthLinkStatus) []byte {
 	idx = SortedIndex(idx)
 	children := map[string][]IndexEntry{}
 	for _, n := range idx.Nodes {
@@ -77,7 +83,7 @@ func RenderHTMLTree(idx Index, bodies map[string]Node) []byte {
 	writeHTMLHead(&b, idx, bodies)
 	b.WriteString(`<div class="app">`)
 	writeTreePane(&b, idx, children, bodies, related, ownFSM)
-	writeDetailPane(&b, idx, children, bodies)
+	writeDetailPane(&b, idx, children, bodies, truth)
 	writeFSMPane(&b, idx, children, bodies, ownFSM)
 	b.WriteString(`</div>`)
 	writeScript(&b, idx)
@@ -175,11 +181,11 @@ func writeTreeNode(b *strings.Builder, id string, children map[string][]IndexEnt
 	b.WriteString(`</li>`)
 }
 
-func writeDetailPane(b *strings.Builder, idx Index, children map[string][]IndexEntry, bodies map[string]Node) {
+func writeDetailPane(b *strings.Builder, idx Index, children map[string][]IndexEntry, bodies map[string]Node, truth map[string]TruthLinkStatus) {
 	b.WriteString(`<main class="pane detail-pane">`)
 	var walk func(id string)
 	walk = func(id string) {
-		writeNodePanel(b, bodies[id], idx.RootID)
+		writeNodePanel(b, bodies[id], idx.RootID, truth)
 		for _, c := range children[id] {
 			walk(c.ID)
 		}
@@ -188,7 +194,7 @@ func writeDetailPane(b *strings.Builder, idx Index, children map[string][]IndexE
 	b.WriteString(`</main>`)
 }
 
-func writeNodePanel(b *strings.Builder, n Node, rootID string) {
+func writeNodePanel(b *strings.Builder, n Node, rootID string, truth map[string]TruthLinkStatus) {
 	if n.ID == "" {
 		return
 	}
@@ -205,6 +211,22 @@ func writeNodePanel(b *strings.Builder, n Node, rootID string) {
 	fmt.Fprintf(b, `<span class="badge">%s</span></div>`, esc(statusLabel(n.Status)))
 	if n.Intent != "" {
 		fmt.Fprintf(b, `<p class="intent">%s</p>`, esc(n.Intent))
+	}
+	if n.EffectiveTruthPath() != "" {
+		b.WriteString(`<div class="verify"><b>需求包：</b>` + esc(n.EffectiveTruthPath()))
+		if st, ok := truth[n.ID]; ok {
+			if st.PackageStatus != "" {
+				b.WriteString(` · 包状态：` + esc(st.PackageStatus))
+			}
+			b.WriteString(` · 节点：` + esc(string(n.Status)))
+			if !st.Match || st.Error != "" {
+				b.WriteString(` · <span style="color:#9a3412">状态不一致</span>`)
+			}
+			if st.Error != "" {
+				b.WriteString(` · ` + esc(st.Error))
+			}
+		}
+		b.WriteString(`</div>`)
 	}
 	if len(n.ACs) > 0 {
 		b.WriteString(`<h2>验收标准</h2><ul class="acs">`)
