@@ -433,3 +433,40 @@ func TestSnapshotFailsClosedOnCorruption(t *testing.T) {
 func bytesReplace(b, old, new []byte) []byte {
 	return []byte(strings.ReplaceAll(string(b), string(old), string(new)))
 }
+
+func TestVerifyLeafAndParentRollup(t *testing.T) {
+	proj := treeTestEnv(t)
+	seedFreezeTree(t, proj, false)
+	for _, id := range []string{"t1", "t2", "f", "m", "root"} {
+		if _, err := freeze(t, proj, id); err != nil {
+			t.Fatal(err)
+		}
+	}
+	artifact := filepath.Join(t.TempDir(), "proof.txt")
+	if err := os.WriteFile(artifact, []byte("proof"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, id := range []string{"t1", "t2"} {
+		mustRun(t, "implement", "report", "--project", proj, "--node", id, "--by", "dev", "--artifact", artifact, "--json")
+	}
+	out := mustRun(t, "verify", "leaf", "--project", proj, "--node", "t1", "--artifact", artifact, "--by", "qa", "--json")
+	doc := parseDoc(t, out)
+	if doc["verify"].(map[string]any)["status"] != "verified" {
+		t.Fatalf("verify leaf: %v", doc)
+	}
+	if _, err := runCLI(t, "verify", "rollup", "--project", proj, "--node", "f", "--json"); err == nil || !strings.Contains(err.Error(), "tree_parent_not_verified") {
+		t.Fatalf("rollup before all leaves: %v", err)
+	}
+	mustRun(t, "verify", "leaf", "--project", proj, "--node", "t2", "--artifact", artifact, "--by", "qa", "--json")
+	for _, id := range []string{"f", "m", "root"} {
+		out := mustRun(t, "verify", "rollup", "--project", proj, "--node", id, "--json")
+		if parseDoc(t, out)["status"] != "verified" {
+			t.Fatalf("rollup %s: %s", id, out)
+		}
+	}
+	// Evidence is registered under the node scope.
+	list := parseDoc(t, mustRun(t, "goal", "artifacts", "list", "--scope-kind", "node", "--scope-id", "t1", "--json"))
+	if len(list["artifact_refs"].([]any)) != 1 {
+		t.Fatalf("node evidence: %v", list)
+	}
+}

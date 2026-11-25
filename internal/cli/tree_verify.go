@@ -6,11 +6,12 @@ import (
 	"github.com/spf13/cobra"
 
 	"beacon-go/internal/intenttree"
+	"beacon-go/internal/orchestrator"
 )
 
 func newVerifyCmd() *cobra.Command {
 	c := &cobra.Command{Use: "verify", Short: "Verification group: read-only audit and evidence"}
-	c.AddCommand(newVerifyAuditCmd())
+	c.AddCommand(newVerifyAuditCmd(), newVerifyLeafCmd(), newVerifyRollupCmd())
 	return c
 }
 
@@ -77,5 +78,93 @@ func newVerifyAuditCmd() *cobra.Command {
 	c.Flags().StringVar(&project, "project", ".", "project root")
 	c.Flags().StringVar(&version, "version", "", "docs version (default current)")
 	c.Flags().BoolVar(&asJSON, "json", false, "JSON output (default)")
+	return c
+}
+
+func newVerifyLeafCmd() *cobra.Command {
+	var project, version, nodeID, artifact, by, kind string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "leaf",
+		Short: "Register leaf evidence under the node scope and mark it verified",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			st, err := openWriteStore()
+			if err != nil {
+				return err
+			}
+			defer st.Close()
+			dir, _, idx, err := resolveTree(st, project, version)
+			if err != nil {
+				return err
+			}
+			if nodeID == "" || artifact == "" {
+				return fail("tree_verification_required", "verify leaf", "--node and --artifact are required")
+			}
+			if kind == "" {
+				kind = "test_result"
+			}
+			eng := orchestrator.NewEngine(st)
+			reg, err := eng.RegisterScopedArtifact("node", nodeID, kind, artifact, by)
+			if err != nil {
+				return err
+			}
+			rep, err := intenttree.MarkVerified(st, dir, nodeID, reg.Artifact.ID, reg.Artifact.ContentHash, by)
+			if err != nil {
+				return err
+			}
+			_ = idx
+			if asJSON {
+				return printJSON(cmd, map[string]any{"verify": rep, "artifact": reg.Artifact})
+			}
+			_, err = cmd.OutOrStdout().Write([]byte("verified: " + rep.NodeID + " artifact " + reg.Artifact.ID + "\n"))
+			return err
+		},
+	}
+	c.Flags().StringVar(&project, "project", ".", "project root")
+	c.Flags().StringVar(&version, "version", "", "docs version (default current)")
+	c.Flags().StringVar(&nodeID, "node", "", "touchpoint node id (required)")
+	c.Flags().StringVar(&artifact, "artifact", "", "evidence file path (required)")
+	c.Flags().StringVar(&by, "by", "", "verifier identity (required)")
+	c.Flags().StringVar(&kind, "kind", "test_result", "evidence kind")
+	c.Flags().BoolVar(&asJSON, "json", false, "print JSON")
+	return c
+}
+
+func newVerifyRollupCmd() *cobra.Command {
+	var project, version, nodeID string
+	var asJSON bool
+	c := &cobra.Command{
+		Use:   "rollup",
+		Short: "Mark a parent verified only when every child is verified",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			st, err := openWriteStore()
+			if err != nil {
+				return err
+			}
+			defer st.Close()
+			dir, _, _, err := resolveTree(st, project, version)
+			if err != nil {
+				return err
+			}
+			if nodeID == "" {
+				return fail("tree_node_required", "verify rollup", "--node is required")
+			}
+			rep, err := intenttree.RollupVerified(st, dir, nodeID)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				return printJSON(cmd, rep)
+			}
+			_, err = cmd.OutOrStdout().Write([]byte("rollup: " + rep.NodeID + " " + rep.Status + "\n"))
+			return err
+		},
+	}
+	c.Flags().StringVar(&project, "project", ".", "project root")
+	c.Flags().StringVar(&version, "version", "", "docs version (default current)")
+	c.Flags().StringVar(&nodeID, "node", "", "parent node id (required)")
+	c.Flags().BoolVar(&asJSON, "json", false, "print JSON")
 	return c
 }

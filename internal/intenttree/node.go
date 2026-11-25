@@ -95,21 +95,22 @@ type ImplementationRecord struct {
 // Node is one canonical node body. Fingerprint fields are excluded from
 // the hashed bytes; everything else is contract surface.
 type Node struct {
-	ID                string                `json:"id"`
-	Kind              Kind                  `json:"kind"`
-	Title             string                `json:"title"`
-	Intent            string                `json:"intent,omitempty"`
-	ParentID          string                `json:"parent_id,omitempty"`
-	Path              string                `json:"path"`
-	Status            Status                `json:"status"`
-	ACs               []AC                  `json:"acs,omitempty"`
-	Verification      *Verification         `json:"verification,omitempty"`
-	ChildFingerprints []string              `json:"child_fingerprints,omitempty"`
-	Implementation    *ImplementationRecord `json:"implementation,omitempty"`
-	LegacyTruthPath   string                `json:"legacy_truth_path,omitempty"`
-	LegacyTestsPath   string                `json:"legacy_tests_path,omitempty"`
-	Fingerprint       string                `json:"fingerprint"`
-	FingerprintAlg    string                `json:"fingerprint_alg"`
+	ID                   string                `json:"id"`
+	Kind                 Kind                  `json:"kind"`
+	Title                string                `json:"title"`
+	Intent               string                `json:"intent,omitempty"`
+	ParentID             string                `json:"parent_id,omitempty"`
+	Path                 string                `json:"path"`
+	Status               Status                `json:"status"`
+	ACs                  []AC                  `json:"acs,omitempty"`
+	Verification         *Verification         `json:"verification,omitempty"`
+	ChildFingerprints    []string              `json:"child_fingerprints,omitempty"`
+	Implementation       *ImplementationRecord `json:"implementation,omitempty"`
+	VerificationEvidence *EvidenceRef          `json:"verification_evidence,omitempty"`
+	LegacyTruthPath      string                `json:"legacy_truth_path,omitempty"`
+	LegacyTestsPath      string                `json:"legacy_tests_path,omitempty"`
+	Fingerprint          string                `json:"fingerprint"`
+	FingerprintAlg       string                `json:"fingerprint_alg"`
 }
 
 // IndexEntry is the reviewable summary of one node. A review never
