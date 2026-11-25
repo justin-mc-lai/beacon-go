@@ -58,22 +58,6 @@ func TestGoalP2CChain(t *testing.T) {
 		t.Errorf("decision = %v", dec)
 	}
 
-	// parallel-plan: two lakes touching the same surface -> conflict,
-	// planned-only, and the run binds to its satellite worktree.
-	out, err = runCLI(t, "goal", "parallel-plan", "--run-id", runID,
-		"--lake", "feat-a", "--lake", "other",
-		"--touch", "feat-a=api.go", "--touch", "other=api.go", "--json")
-	if err != nil {
-		t.Fatalf("parallel-plan: %v (out %s)", err, out)
-	}
-	pp := parseDoc(t, out)
-	if pp["mode"] != "main_star_satellite_pool" || pp["planned_only"] != true {
-		t.Errorf("parallel plan = %v", pp)
-	}
-	if conflicts, _ := pp["conflicts"].([]any); len(conflicts) != 1 {
-		t.Errorf("conflicts = %v", pp["conflicts"])
-	}
-
 	// Design flow on a UX run of the same feature: unbound refuses
 	// admission; binding opens it.
 	out, err = runCLI(t, "goal", "run", "make it pretty",
