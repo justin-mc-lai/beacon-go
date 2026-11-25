@@ -99,8 +99,8 @@ func TestAddUpsertsByPath(t *testing.T) {
 		t.Fatalf("run2 rows = %v err=%v, want 1 row hash-v3", rows, err)
 	}
 
-	// TC-AU-006 (AC-006): the fix rides on the frozen schema — no new
-	// column, so the schema contract check keeps passing untouched.
+	// TC-AU-006: the schema contract stays explicit; #19 added the
+	// scope columns, which are part of the contract now.
 	if err := s.VerifySchemaContract(); err != nil {
 		t.Fatalf("schema contract drifted: %v", err)
 	}
@@ -108,7 +108,7 @@ func TestAddUpsertsByPath(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := "abs_path,content_hash,created_at,id,kind,run_id,size_bytes"
+	want := "abs_path,content_hash,created_at,id,kind,run_id,scope_id,scope_kind,size_bytes"
 	if strings.Join(cols, ",") != want {
 		t.Fatalf("artifact_refs columns = %v, want %s", cols, want)
 	}

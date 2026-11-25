@@ -159,8 +159,9 @@ func (d *ArtifactDao) Add(a ArtifactRef) (ArtifactRef, error) {
 	if a.ID == "" {
 		a.ID = newID("art_")
 	}
-	if _, err := d.q.Exec(`INSERT INTO artifact_refs(id, run_id, kind, abs_path, content_hash, size_bytes, created_at) VALUES(?,?,?,?,?,?,?)`,
-		a.ID, a.RunID, a.Kind, a.AbsPath, a.ContentHash, a.SizeBytes, a.CreatedAt); err != nil {
+	if _, err := d.q.Exec(`INSERT INTO artifact_refs(id, run_id, kind, abs_path, content_hash, size_bytes, created_at, scope_kind, scope_id)
+		VALUES(?,?,?,?,?,?,?, 'feature', COALESCE((SELECT feature_id FROM runs WHERE id = ?), ''))`,
+		a.ID, a.RunID, a.Kind, a.AbsPath, a.ContentHash, a.SizeBytes, a.CreatedAt, a.RunID); err != nil {
 		return ArtifactRef{}, err
 	}
 	return a, nil

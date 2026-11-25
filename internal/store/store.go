@@ -154,6 +154,15 @@ func (s *Store) init() error {
 	if s.ReadOnly {
 		return nil // no migration, no track binding on read-only opens
 	}
+	if version == 1 {
+		if err := migrateArtifactScope(s.db); err != nil {
+			return err
+		}
+		if _, err := s.db.Exec(`PRAGMA user_version = 2`); err != nil {
+			return err
+		}
+		version = 2
+	}
 	if version == 0 {
 		for _, stmt := range schemaDDL() {
 			if _, err := s.db.Exec(stmt); err != nil {

@@ -2,6 +2,7 @@
 package store
 
 import (
+	"database/sql"
 	"fmt"
 	"sort"
 	"strings"
@@ -11,7 +12,7 @@ import (
 
 // SchemaVersion is the current PRAGMA user_version (migration skeleton,
 // AC-080). Bumping it requires a migration step in Open.
-const SchemaVersion = 1
+const SchemaVersion = 2
 
 // SchemaContract is the frozen column contract per table, in DDL order.
 var SchemaContract = map[string][]string{
@@ -22,7 +23,7 @@ var SchemaContract = map[string][]string{
 	"runs":              {"id", "feature_id", "run_kind", "status", "iteration", "started_at", "ended_at", "metadata_json"},
 	"lifecycle_events":  {"id", "feature_id", "run_id", "event_type", "payload_json", "created_at"},
 	"gate_results":      {"id", "feature_id", "gate_type", "verdict", "reason_codes_json", "evaluated_at"},
-	"artifact_refs":     {"id", "run_id", "kind", "abs_path", "content_hash", "size_bytes", "created_at"},
+	"artifact_refs":     {"id", "run_id", "kind", "abs_path", "content_hash", "size_bytes", "created_at", "scope_kind", "scope_id"},
 	"checkpoints":       {"id", "run_id", "iteration", "state_json", "created_at"},
 	"tree_nodes": {"id", "project_version_id", "parent_id", "kind", "path", "status",
 		"title", "fingerprint", "fingerprint_alg", "doc_path", "created_at", "updated_at"},
@@ -122,8 +123,11 @@ func schemaDDL() []string {
 			abs_path TEXT NOT NULL,
 			content_hash TEXT NOT NULL,
 			size_bytes INTEGER NOT NULL DEFAULT 0,
-			created_at TEXT NOT NULL
+			created_at TEXT NOT NULL,
+			scope_kind TEXT NOT NULL DEFAULT 'feature',
+			scope_id TEXT NOT NULL DEFAULT ''
 		)`,
+		`CREATE INDEX IF NOT EXISTS idx_artifact_refs_scope ON artifact_refs(scope_kind, scope_id, abs_path)`,
 		`CREATE TABLE IF NOT EXISTS checkpoints (
 			id TEXT PRIMARY KEY,
 			run_id TEXT NOT NULL REFERENCES runs(id),
@@ -207,6 +211,39 @@ func (s *Store) VerifySchemaContract() error {
 	if len(drift) > 0 {
 		sort.Strings(drift)
 		return core.NewError(ReasonSchemaContractDrift, "VerifySchemaContract", strings.Join(drift, "; "))
+	}
+	return nil
+}
+
+// migrateArtifactScope upgrades a v1 artifact table to explicit scope.
+// Rows whose run has no feature are refused instead of silently scoped.
+func migrateArtifactScope(db *sql.DB) error {
+	var hasKind int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('artifact_refs') WHERE name='scope_kind'`).Scan(&hasKind); err != nil {
+		return err
+	}
+	if hasKind == 0 {
+		if _, err := db.Exec(`ALTER TABLE artifact_refs ADD COLUMN scope_kind TEXT NOT NULL DEFAULT 'feature'`); err != nil {
+			return err
+		}
+		if _, err := db.Exec(`ALTER TABLE artifact_refs ADD COLUMN scope_id TEXT NOT NULL DEFAULT ''`); err != nil {
+			return err
+		}
+	}
+	if _, err := db.Exec(`UPDATE artifact_refs SET scope_id = COALESCE((SELECT feature_id FROM runs WHERE runs.id = artifact_refs.run_id), '')
+		WHERE scope_id = ''`); err != nil {
+		return err
+	}
+	var missing int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM artifact_refs WHERE scope_id = ''`).Scan(&missing); err != nil {
+		return err
+	}
+	if missing > 0 {
+		return core.NewError("artifact_scope_backfill_failed", "migrateArtifactScope",
+			fmt.Sprintf("%d artifact rows have no resolvable feature scope", missing))
+	}
+	if _, err := db.Exec(`CREATE INDEX IF NOT EXISTS idx_artifact_refs_scope ON artifact_refs(scope_kind, scope_id, abs_path)`); err != nil {
+		return err
 	}
 	return nil
 }
