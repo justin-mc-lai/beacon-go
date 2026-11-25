@@ -12,6 +12,12 @@ for pkg in internal/llm internal/httpapi internal/agentapi internal/workspace; d
     fail=1
   fi
 done
+for f in internal/cli/goal_program.go internal/cli/goal_program_integrated.go; do
+  if [ -e "$f" ]; then
+    echo "kernel-deps: sea/lake write entry still present: $f" >&2
+    fail=1
+  fi
+done
 for f in internal/orchestrator/exec_subprocess.go internal/orchestrator/exec_ralph.go internal/orchestrator/exec_delegate.go; do
   if [ -e "$f" ]; then
     echo "kernel-deps: built-in executor file still present: $f" >&2

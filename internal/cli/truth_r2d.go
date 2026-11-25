@@ -14,67 +14,6 @@ import (
 	"beacon-go/internal/orchestrator"
 )
 
-func newTruthDecomposeCmd() *cobra.Command {
-	var project, feature, version, utterance, subintent, lakesRaw, by string
-	var asJSON bool
-	c := &cobra.Command{
-		Use:   "decompose",
-		Short: "Deterministic non-LLM rule decomposition into unconfirmed draft suggestions",
-		Long: "Deterministic, non-LLM rule decomposition (非 LLM 规则拆分).\n" +
-			"Keyword/clause matching produces candidate suggestions, not semantic readiness.\n" +
-			"SDD packages keep truth.md + tasks.md; human grounding, questions, actual tests,\n" +
-			"independent review and owner confirmation remain mandatory before freeze.\n" +
-			"Existing authored acceptance criteria or executable task content are not overwritten.",
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			st, err := openWriteStore()
-			if err != nil {
-				return err
-			}
-			defer st.Close()
-			ctx, err := resolveGateFeature(st, project, feature, version)
-			if err != nil {
-				return err
-			}
-			var lakes []string
-			if strings.TrimSpace(lakesRaw) != "" {
-				lakes = strings.Split(lakesRaw, ",")
-			}
-			v, err := orchestrator.NewEngine(st).DecomposeTruthPackage(ctx, utterance, lakes, subintent, by)
-			if err != nil {
-				return err
-			}
-			if asJSON {
-				return printJSON(cmd, v)
-			}
-			out := cmd.OutOrStdout()
-			d := v.Decomposition
-			fmt.Fprintf(out, "package:  %s (%s)\n", v.Slug, v.Version)
-			fmt.Fprintf(out, "scope:    %s  intents=%d journeys=%d\n",
-				d.ScopeMode, len(d.Intents), len(d.Journeys))
-			fmt.Fprintf(out, "acs:      %s\n", strings.Join(v.Materialized, ", "))
-			fmt.Fprintf(out, "ready:    %v (missing: %s)\n",
-				d.Readiness.Ready, strings.Join(d.Readiness.Missing, ", "))
-			fmt.Fprintf(out, "artifact: %s\n", v.ArtifactPath)
-			for _, w := range v.Warnings {
-				fmt.Fprintf(out, "warning:  %s\n", w)
-			}
-			return nil
-		},
-	}
-	c.Flags().StringVar(&project, "project", ".", "project root path")
-	c.Flags().StringVar(&feature, "feature", "", "feature slug (required; package must exist as a draft)")
-	c.Flags().StringVar(&version, "version", "", "docs version filter")
-	c.Flags().StringVar(&utterance, "utterance", "", "the one-sentence intent to decompose (required)")
-	c.Flags().StringVar(&subintent, "subintent", "", "declared subintent (methodology primary)")
-	c.Flags().StringVar(&lakesRaw, "lakes", "", "comma-separated lake labels, if already known")
-	c.Flags().StringVar(&by, "by", "cli", "who decomposes")
-	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
-	_ = c.MarkFlagRequired("feature")
-	_ = c.MarkFlagRequired("utterance")
-	return c
-}
-
 func newTruthBrainstormCmd() *cobra.Command {
 	var project, feature, version, mode, prompt, by string
 	var asJSON bool

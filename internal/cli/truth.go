@@ -38,7 +38,7 @@ func newTruthCmd() *cobra.Command {
 		newTruthMapCmd(),
 		// R2d (M3/M4/M13/M14): intent decomposition, kernel
 		// brainstorm questions, code2truth intake, revision reopen.
-		newTruthDecomposeCmd(), newTruthBrainstormCmd(),
+		newTruthBrainstormCmd(),
 		newTruthCode2TruthCmd(), newTruthReopenCmd(),
 		newTruthFSMCmd(),
 		newTruthRolesCmd(),

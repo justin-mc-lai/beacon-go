@@ -53,7 +53,7 @@ func newGoalCmd() *cobra.Command {
 		// P2d orchestration extensions: program (G-12), hotfix-plan
 		// (G-13), multi-version-plan (G-14), memory (G-15),
 		// axis (G-16).
-		newGoalProgramCmd(), newGoalHotfixPlanCmd(), newGoalMultiVersionPlanCmd(),
+		newGoalHotfixPlanCmd(), newGoalMultiVersionPlanCmd(),
 		newGoalMemoryCmd(), newGoalAxisCmd(),
 		// P3c real integration: worktree (AC-099), planner-review
 		// (AC-102), acp-probe (AC-046 probe level only).

@@ -77,21 +77,7 @@ func TestTruthR2dFacesCLI(t *testing.T) {
 	if _, err := runCLI(t, "truth", "create", "--project", root, "--slug", slug, "--json"); err != nil {
 		t.Fatalf("create: %v", err)
 	}
-	out, err := runCLI(t, "truth", "decompose", "--project", root, "--feature", slug,
-		"--utterance", "用户能注册登录，支付订阅后开通权益，还能导出报表。", "--json")
-	if err != nil {
-		t.Fatalf("decompose: %v (%s)", err, out)
-	}
-	doc := parseDoc(t, out)
-	if acs, _ := doc["materialized_acs"].([]any); len(acs) < 3 {
-		t.Fatalf("decompose doc = %s", out)
-	}
-	decomp, _ := doc["decomposition"].(map[string]any)
-	if journeys, _ := decomp["journeys"].([]any); len(journeys) < 2 {
-		t.Fatalf("decomposition journeys = %s", out)
-	}
-
-	out, err = runCLI(t, "truth", "brainstorm", "--project", root, "--feature", slug, "--json")
+	out, err := runCLI(t, "truth", "brainstorm", "--project", root, "--feature", slug, "--json")
 	if err != nil {
 		t.Fatalf("brainstorm: %v (%s)", err, out)
 	}
