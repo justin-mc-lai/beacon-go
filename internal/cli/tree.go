@@ -131,6 +131,11 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 					if err := ensureArtifactsIgnored(projRoot); err != nil {
 						return err
 					}
+					if localOnlyMode(projRoot) {
+						if err := ensureDocsIgnored(projRoot); err != nil {
+							return err
+						}
+					}
 				}
 				fmt.Fprintf(cmd.OutOrStdout(), "wrote %s (%d bytes, sha256=%s, source=%s)\n", p, len(data), hashHex(data), intenttree.SourceHash(idx))
 				fmt.Fprintln(cmd.OutOrStdout(), "派生产物，勿提交；权威源见 docs/beacon/"+idx.Version+"/")
