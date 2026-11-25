@@ -3,6 +3,22 @@
 All notable changes to Beacon Go. Versions are plain SemVer
 (`MAJOR.MINOR.PATCH`); see `docs/version-scheme.md`.
 
+## [3.0.4] - 2026-11-25
+
+### Added
+
+- `truth node link` and read-only `truth node sync-status` connect feature
+  nodes to their requirement packages via `truth_path`.
+- `truth node generate-tests` creates planned AC/FSM test skeletons;
+  `truth node generate-doc` creates a requirement-document template.
+- The HTML workbench now has a collapsible tree, text status badges, legend,
+  status filters, and persisted collapse state.
+
+### Changed
+
+- Migration backfills `truth_path`; tree summaries and HTML show package-link
+  status without mutating node state.
+
 ## [3.0.3] - 2026-11-25
 
 ### Changed
