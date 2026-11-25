@@ -212,6 +212,11 @@ func (e *Engine) Complete(runID string, opts CompleteOptions) (RunView, error) {
 	if m.LoopStage != string(core.LoopReleaseGate) {
 		return reject(core.ReasonNotAtReleaseGate, "current loop stage is "+m.LoopStage)
 	}
+	if ready, reason, gerr := e.treeStageGate(run, "release"); gerr != nil {
+		return RunView{}, gerr
+	} else if !ready {
+		return reject(reason, "tree release gate is not satisfied")
+	}
 	confirmedBy := strings.TrimSpace(opts.ConfirmedBy)
 	if opts.HumanConfirmed && confirmedBy == "" {
 		// AC-002: a confirmation without an identity is not a

@@ -1,0 +1,84 @@
+package intenttree
+
+import "strings"
+
+// StageGate answers one question for a goal stage: may it start, given
+// the canonical tree? It is read-only and shares the same structural
+// rules the direct tree commands use.
+func StageGate(dir, stage, featureSlug string) (bool, string, error) {
+	if !HasIndex(dir) {
+		return true, "", nil // legacy project: no tree, no extra gate
+	}
+	idx, err := ReadIndex(dir)
+	if err != nil {
+		return false, "", err
+	}
+	if findings := ValidateIndex(idx); len(findings) > 0 {
+		return false, ReasonInvalidIndex, nil
+	}
+	if stage == "plan" {
+		if len(idx.Nodes) == 0 {
+			return false, "tree_empty", nil
+		}
+		return true, "", nil
+	}
+	feature, ok := featureEntry(idx, featureSlug)
+	if !ok {
+		return false, "tree_feature_not_found", nil
+	}
+	children := map[string][]IndexEntry{}
+	for _, n := range idx.Nodes {
+		children[n.ParentID] = append(children[n.ParentID], n)
+	}
+	var leaves []IndexEntry
+	var walk func(string)
+	walk = func(id string) {
+		for _, ch := range children[id] {
+			if ch.Kind == KindTouchpoint {
+				leaves = append(leaves, ch)
+			}
+			walk(ch.ID)
+		}
+	}
+	walk(feature.ID)
+	switch stage {
+	case "truth":
+		if feature.Status == StatusDraft || feature.Status == StatusChangePending {
+			return false, "tree_feature_not_frozen", nil
+		}
+	case "implement":
+		if feature.Status != StatusFrozen && feature.Status != StatusImplemented && feature.Status != StatusVerified {
+			return false, "tree_feature_not_frozen", nil
+		}
+		for _, l := range leaves {
+			if l.Status == StatusDraft || l.Status == StatusChangePending {
+				return false, "tree_leaf_not_frozen", nil
+			}
+		}
+	case "qa":
+		for _, l := range leaves {
+			if l.Status != StatusVerified {
+				return false, "tree_leaf_not_verified", nil
+			}
+		}
+	case "release":
+		root, ok := findEntry(idx, idx.RootID)
+		if !ok || root.Status != StatusVerified {
+			return false, "tree_root_not_verified", nil
+		}
+	}
+	return true, "", nil
+}
+
+func featureEntry(idx Index, slug string) (IndexEntry, bool) {
+	slug = strings.TrimSpace(slug)
+	for _, n := range idx.Nodes {
+		if n.Kind != KindFeature {
+			continue
+		}
+		if n.Title == slug || strings.HasSuffix(n.Path, "/"+slug) {
+			return n, true
+		}
+	}
+	return IndexEntry{}, false
+}

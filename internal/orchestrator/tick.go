@@ -152,6 +152,15 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 	var manualCompletion bool
 	// Release never executes or exits on tick (human gate).
 	if stage != StageRelease {
+		if ready, reason, gerr := e.treeStageGate(run, stage); gerr != nil {
+			return RunView{}, gerr
+		} else if !ready {
+			m.LastTickKey = key
+			if err := e.applyBlockBatched(run, m, reason, "tree_stage_blocked"); err != nil {
+				return RunView{}, err
+			}
+			return viewOf(run, m, slug), nil
+		}
 		// AC-142 (review B2): the implement-entry admission bundle is the
 		// ONE shared judgement. It runs for EVERY executor before any
 		// stage execution — manual/external runs included. A manual run

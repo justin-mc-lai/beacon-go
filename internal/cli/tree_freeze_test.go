@@ -470,3 +470,54 @@ func TestVerifyLeafAndParentRollup(t *testing.T) {
 		t.Fatalf("node evidence: %v", list)
 	}
 }
+
+func TestGoalTruthStageDelegatesToTree(t *testing.T) {
+	proj := treeTestEnv(t)
+	mustRun(t, "truth", "create", "--project", proj, "--slug", "demo", "--json")
+	rep := parseDoc(t, mustRun(t, "migrate", "tree", "--project", proj, "--json"))
+	run := parseDoc(t, mustRun(t, "goal", "run", "--project", proj, "--feature", "demo", "--executor", "manual", "--json"))
+	runID := run["run_id"].(string)
+	// plan stage completes.
+	doc := parseDoc(t, mustRun(t, "goal", "tick", "--run-id", runID, "--by", "host", "--json"))
+	if doc["current_stage"] != "truth" {
+		t.Fatalf("after plan, stage = %v (%v)", doc["current_stage"], doc["reason_code"])
+	}
+	// truth stage blocks on the draft feature node, with no auto-expand.
+	out, err := runCLI(t, "goal", "tick", "--run-id", runID, "--by", "host", "--json")
+	if err == nil {
+		t.Fatalf("truth stage must block on draft feature: %s", out)
+	}
+	doc = parseDoc(t, out)
+	if doc["reason_code"] != "tree_feature_not_frozen" {
+		t.Fatalf("truth stage must delegate to tree: %v", doc)
+	}
+	// Freeze the imported branch, then the truth stage can advance.
+	for _, id := range []string{findNodeID(t, proj, "feature", "demo"), findNodeID(t, proj, "module", "Legacy packages"), rep["root_id"].(string)} {
+		if _, err := freeze(t, proj, id); err != nil {
+			t.Fatalf("freeze %s: %v", id, err)
+		}
+	}
+	// A manual run re-arms on a new identity; the same identity would
+	// be treated as an idempotent repeat of the blocked tick.
+	// The tree gate now passes; the next block is the package-level
+	// truth exit gate, which is a different source of judgement.
+	out, err = runCLI(t, "goal", "tick", "--run-id", runID, "--by", "host-2", "--json")
+	doc = parseDoc(t, out)
+	if doc["reason_code"] == "tree_feature_not_frozen" {
+		t.Fatalf("tree gate did not see the refreeze: %v", doc)
+	}
+	_ = err
+}
+
+func findNodeID(t *testing.T, proj, kind, title string) string {
+	t.Helper()
+	doc := parseDoc(t, mustRun(t, "plan", "tree", "--project", proj, "--json"))
+	for _, n := range doc["nodes"].([]any) {
+		m := n.(map[string]any)
+		if m["kind"] == kind && m["title"] == title {
+			return m["id"].(string)
+		}
+	}
+	t.Fatalf("%s %q not found", kind, title)
+	return ""
+}
