@@ -12,7 +12,7 @@ intent -> module -> feature -> touchpoint
 
 每个节点有不可变 id、canonical JSON 正文、`tree-json-v1` 指纹，以及五态生命周期。海/湖模型已退役；旧包以 `feature` 节点导入。
 
-当前版本：**v3.0.6**（纯 SemVer，见 [version-scheme.md](docs/version-scheme.md)）。发布说明：[docs/beacon/v3.0.6/release/3.0.6.md](docs/beacon/v3.0.6/release/3.0.6.md)；迁移指南：[docs/migration-3.0.2.md](docs/migration-3.0.2.md)。
+当前版本：**v3.0.7**（纯 SemVer，见 [version-scheme.md](docs/version-scheme.md)）。发布说明：[docs/beacon/v3.0.7/release/3.0.7.md](docs/beacon/v3.0.7/release/3.0.7.md)；迁移指南：[docs/migration-3.0.2.md](docs/migration-3.0.2.md)。
 
 ## 为什么重构
 
@@ -55,7 +55,7 @@ Go 版按一份书面口径执行（[`docs/scope-charter.md`](docs/scope-charter
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v3.0.6
+./bin/beacon --version          # Beacon CLI v3.0.7
 ```
 
 典型树流程：
@@ -63,6 +63,8 @@ go build -o bin/beacon ./cmd/beacon
 ```sh
 beacon projects register --path /path/to/project --version v0.1.0
 beacon plan init  --project . --title "my product" --intent "一句话"
+# 公司/本地模式：.beacon/ 与 docs/beacon/ 都不入库
+beacon plan init  --project . --title "my product" --intent "一句话" --local-only
 beacon plan expand --project . --node <id> --children proposal.json   # 只校验
 beacon plan apply  --project . --node <id> --proposal proposal.json   # 写 draft
 beacon truth node freeze --project . --node <id>                     # 先冻叶子
@@ -106,7 +108,7 @@ beacon skills verify --host codex      # 已安装与内嵌是否漂移
 - `bash scripts/check_kernel_deps.sh`：已删面不得回归。
 - [`e2e/run_e2e.sh`](e2e/run_e2e.sh)：manual lane 全链（注册 → 需求包 → 冻结 → 基线 → goal run/tick → 证据 → 门禁 → verifier → 完成）。
 - [`e2e/run_dogfood.sh`](e2e/run_dogfood.sh)：羽毛球队列 22 节点 / 12 叶子 / 2 快照；冻结、实现、验证、汇总、change+refreeze、HTML、审计全过。
-- v3.0.2 证据汇总：[docs/beacon/v3.0.6/release/3.0.6.md](docs/beacon/v3.0.6/release/3.0.6.md)。
+- v3.0.2 证据汇总：[docs/beacon/v3.0.7/release/3.0.7.md](docs/beacon/v3.0.7/release/3.0.7.md)。
 
 ## 已知边界（如实写明）
 

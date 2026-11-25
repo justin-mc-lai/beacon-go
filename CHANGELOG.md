@@ -3,6 +3,15 @@
 All notable changes to Beacon Go. Versions are plain SemVer
 (`MAJOR.MINOR.PATCH`); see `docs/version-scheme.md`.
 
+## [3.0.7] - 2026-11-25
+
+### Added
+
+- `plan init --local-only` ignores both `.beacon/` and `docs/beacon/` and
+  records `local_only = true` in the local `.beacon/config`.
+- If `docs/beacon/` is already tracked, init reports the exact
+  `git rm -r --cached docs/beacon` command instead of silently changing the index.
+
 ## [3.0.6] - 2026-11-25
 
 ### Changed

@@ -17,9 +17,9 @@ Every node has an immutable id, a canonical JSON body, a `tree-json-v1`
 fingerprint, and a five-state lifecycle. Sea/lake is retired; old packages
 import as `feature` nodes.
 
-Current release: **v3.0.6** (plain SemVer, see
+Current release: **v3.0.7** (plain SemVer, see
 [version-scheme.md](docs/version-scheme.md)). Release notes:
-[docs/beacon/v3.0.6/release/3.0.6.md](docs/beacon/v3.0.6/release/3.0.6.md).
+[docs/beacon/v3.0.7/release/3.0.7.md](docs/beacon/v3.0.7/release/3.0.7.md).
 Migration: [docs/migration-3.0.2.md](docs/migration-3.0.2.md).
 
 ## Why a rewrite
@@ -69,7 +69,7 @@ Requires Go 1.27+.
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v3.0.6
+./bin/beacon --version          # Beacon CLI v3.0.7
 ```
 
 A typical tree loop:
@@ -77,6 +77,8 @@ A typical tree loop:
 ```sh
 beacon projects register --path /path/to/project --version v0.1.0
 beacon plan init  --project . --title "my product" --intent "one sentence"
+# company/local-only mode: keep .beacon/ and docs/beacon/ out of git
+beacon plan init  --project . --title "my product" --intent "one sentence" --local-only
 beacon plan expand --project . --node <id> --children proposal.json   # validate
 beacon plan apply  --project . --node <id> --proposal proposal.json   # write drafts
 beacon truth node freeze --project . --node <id>                     # leaves first
@@ -146,8 +148,8 @@ router maps a request to one skill. The former `qa` skill is now
 - [`e2e/run_dogfood.sh`](e2e/run_dogfood.sh) — badminton tree: 22 nodes,
   12 leaves, bucket freeze → implement → verify → rollup → change/refreeze
   → two snapshots → HTML → audit.
-- [`docs/beacon/v3.0.6/release/3.0.6.md`](docs/beacon/v3.0.6/release/3.0.6.md) —
-  the v3.0.6 evidence summary.
+- [`docs/beacon/v3.0.7/release/3.0.7.md`](docs/beacon/v3.0.7/release/3.0.7.md) —
+  the v3.0.7 evidence summary.
 
 ## Known limits (stated, not hidden)
 
