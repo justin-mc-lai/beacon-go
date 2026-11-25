@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beacon Release"
+  short_description: "Evaluate the release gate and confirm delivery"
+  default_prompt: "Use $beacon-go-release to evaluate the release gate and record human confirmation."

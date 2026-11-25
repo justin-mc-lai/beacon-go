@@ -53,6 +53,9 @@ func TestInstallMaterializesHostLayout(t *testing.T) {
 		if !strings.Contains(string(raw), "name: "+InstallDirName(id)) {
 			t.Errorf("installed %s does not carry its name frontmatter", skillPath)
 		}
+		if _, err := os.Stat(filepath.Join(dir, InstallDirName(id), "agents", "openai.yaml")); err != nil {
+			t.Errorf("installed OpenAI metadata for %s: %v", id, err)
+		}
 		if _, err := os.Stat(filepath.Join(dir, InstallDirName(id), "references", "core.md")); err != nil {
 			t.Errorf("installed references for %s: %v", id, err)
 		}

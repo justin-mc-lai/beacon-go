@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beacon Goal"
+  short_description: "Drive one feature from intent to verified release"
+  default_prompt: "Use $beacon-go-goal to drive this feature through its staged delivery gates."

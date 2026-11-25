@@ -1,0 +1,82 @@
+{
+  "schema": "skill-evals.v1",
+  "skill_name": "beacon-go-truth",
+  "evals": [
+    {
+      "id": "beacon-go-truth-01",
+      "prompt": "这个需求可以冻了。",
+      "expected_output": "Refuses to freeze with an open question; Records the intent before signing",
+      "files": [],
+      "expectations": [
+        "Refuses to freeze with an open question",
+        "Records the intent before signing"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "Never freeze while"
+        },
+        {
+          "kind": "contains",
+          "text": "truth change"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-truth-02",
+      "prompt": "冻完之后要改 AC-003。",
+      "expected_output": "Uses truth change then refreeze; Does not edit the frozen body directly",
+      "files": [],
+      "expectations": [
+        "Uses truth change then refreeze",
+        "Does not edit the frozen body directly"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "refreeze"
+        },
+        {
+          "kind": "contains",
+          "text": "Never edit a frozen body"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-truth-03",
+      "prompt": "冻好了吗？",
+      "expected_output": "Reports the package path and fingerprint; Has at least three worked examples",
+      "files": [],
+      "expectations": [
+        "Reports the package path and fingerprint",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "package_path"
+        },
+        {
+          "kind": "contains",
+          "text": "plain_summary"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-truth-04",
+      "prompt": "把这个版本发布上线。",
+      "expected_output": "Does not treat release as truth freeze; Routes release work to the release skill",
+      "files": [],
+      "should_trigger": false,
+      "expectations": [
+        "Does not treat release as truth freeze",
+        "Routes release work to the release skill"
+      ],
+      "checks": []
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beacon Implement"
+  short_description: "Run admitted implementation lanes with evidence"
+  default_prompt: "Use $beacon-go-implement to run an admitted implementation lane and record its artifact."

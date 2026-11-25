@@ -1,0 +1,78 @@
+{
+  "schema": "skill-evals.v1",
+  "skill_name": "beacon-go-design",
+  "evals": [
+    {
+      "id": "beacon-go-design-01",
+      "prompt": "加一个退款进度页。",
+      "expected_output": "Marks design required; Blocks implement until the binding exists",
+      "files": [],
+      "expectations": [
+        "Marks design required",
+        "Blocks implement until the binding exists"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "No binding, no implement"
+        },
+        {
+          "kind": "contains",
+          "text": "ds-check"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-design-02",
+      "prompt": "顺手把原型也画了吧。",
+      "expected_output": "Refuses to generate the prototype in the kernel; Routes prototype generation to the host agent",
+      "files": [],
+      "expectations": [
+        "Refuses to generate the prototype in the kernel",
+        "Routes prototype generation to the host agent"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "Never draw"
+        },
+        {
+          "kind": "contains",
+          "text": "prototype"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-design-03",
+      "prompt": "加一个对账定时任务。",
+      "expected_output": "Does not insert a design stage for backend-only work; Has at least three worked examples",
+      "files": [],
+      "expectations": [
+        "Does not insert a design stage for backend-only work",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "does not require design"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-design-04",
+      "prompt": "加一个后端定时任务。",
+      "expected_output": "Does not insert a design stage for backend-only work; Does not invent visual primitives",
+      "files": [],
+      "should_trigger": false,
+      "expectations": [
+        "Does not insert a design stage for backend-only work",
+        "Does not invent visual primitives"
+      ],
+      "checks": []
+    }
+  ]
+}

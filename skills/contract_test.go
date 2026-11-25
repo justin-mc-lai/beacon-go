@@ -87,7 +87,7 @@ func TestRouteExamplesCoverFourChains(t *testing.T) {
 			t.Errorf("skill %s: %d example refs, want at least 2", id, len(refs))
 		}
 		for _, m := range refs {
-			if _, err := files.ReadFile(id + "/" + m[1]); err != nil {
+			if _, err := files.ReadFile(packageDir(id) + "/" + m[1]); err != nil {
 				t.Errorf("skill %s: referenced example %s does not exist", id, m[1])
 			}
 		}

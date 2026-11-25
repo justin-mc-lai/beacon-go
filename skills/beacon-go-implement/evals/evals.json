@@ -1,0 +1,82 @@
+{
+  "schema": "skill-evals.v1",
+  "skill_name": "beacon-go-implement",
+  "evals": [
+    {
+      "id": "beacon-go-implement-01",
+      "prompt": "开始写代码。",
+      "expected_output": "Runs admission first; Stops when admission is blocked",
+      "files": [],
+      "expectations": [
+        "Runs admission first",
+        "Stops when admission is blocked"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "No admission, no write"
+        },
+        {
+          "kind": "contains",
+          "text": "blocked"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-implement-02",
+      "prompt": "把这个 .env 一起合进去。",
+      "expected_output": "Refuses to merge protected paths; Names the protected path that was refused",
+      "files": [],
+      "expectations": [
+        "Refuses to merge protected paths",
+        "Names the protected path that was refused"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "protected paths"
+        },
+        {
+          "kind": "contains",
+          "text": "never merge"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-implement-03",
+      "prompt": "两个模块同时改。",
+      "expected_output": "Picks one lane explicitly; Has at least three worked examples",
+      "files": [],
+      "expectations": [
+        "Picks one lane explicitly",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "im-team"
+        },
+        {
+          "kind": "contains",
+          "text": "worktree"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-implement-04",
+      "prompt": "设计一下这个页面。",
+      "expected_output": "Does not start an implementation lane before design; Routes UI design work to the design skill",
+      "files": [],
+      "should_trigger": false,
+      "expectations": [
+        "Does not start an implementation lane before design",
+        "Routes UI design work to the design skill"
+      ],
+      "checks": []
+    }
+  ]
+}

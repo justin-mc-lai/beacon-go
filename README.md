@@ -17,9 +17,9 @@ Every node has an immutable id, a canonical JSON body, a `tree-json-v1`
 fingerprint, and a five-state lifecycle. Sea/lake is retired; old packages
 import as `feature` nodes.
 
-Current release: **v3.0.2** (plain SemVer, see
+Current release: **v3.0.3** (plain SemVer, see
 [version-scheme.md](docs/version-scheme.md)). Release notes:
-[docs/beacon/v3.0.2/release/3.0.2.md](docs/beacon/v3.0.2/release/3.0.2.md).
+[docs/beacon/v3.0.3/release/3.0.3.md](docs/beacon/v3.0.3/release/3.0.3.md).
 Migration: [docs/migration-3.0.2.md](docs/migration-3.0.2.md).
 
 ## Why a rewrite
@@ -69,7 +69,7 @@ Requires Go 1.27+.
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v3.0.2
+./bin/beacon --version          # Beacon CLI v3.0.3
 ```
 
 A typical tree loop:
@@ -114,11 +114,11 @@ host discovers `beacon-go` plus the per-ability skills.
 | Skill | Use it when |
 | --- | --- |
 | `beacon-go-goal` | one utterance should run as a staged delivery |
-| `beacon-go-plan` | planning, tree expansion, review, FSM, research |
+| `beacon-go-plan` | planning, tree expansion, review, FSM, research, brownfield intake |
 | `beacon-go-truth` | create/sign/freeze/change a requirement package |
 | `beacon-go-design` | bind design primitives before UI implementation |
 | `beacon-go-implement` | admission, worktree isolation, implement reports |
-| `beacon-go-verify` | evidence, leaf verification, rollup, audit, score |
+| `beacon-go-verify` | evidence, leaf verification, rollup, audit, score, parallel code review |
 | `beacon-go-release` | release gate and human confirmation |
 
 ```sh
@@ -146,8 +146,8 @@ router maps a request to one skill. The former `qa` skill is now
 - [`e2e/run_dogfood.sh`](e2e/run_dogfood.sh) — badminton tree: 22 nodes,
   12 leaves, bucket freeze → implement → verify → rollup → change/refreeze
   → two snapshots → HTML → audit.
-- [`docs/beacon/v3.0.2/release/3.0.2.md`](docs/beacon/v3.0.2/release/3.0.2.md) —
-  the v3.0.2 evidence summary.
+- [`docs/beacon/v3.0.3/release/3.0.3.md`](docs/beacon/v3.0.3/release/3.0.3.md) —
+  the v3.0.3 evidence summary.
 
 ## Known limits (stated, not hidden)
 

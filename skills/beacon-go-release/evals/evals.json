@@ -1,0 +1,82 @@
+{
+  "schema": "skill-evals.v1",
+  "skill_name": "beacon-go-release",
+  "evals": [
+    {
+      "id": "beacon-go-release-01",
+      "prompt": "发了吧。",
+      "expected_output": "Reports blocked with the named reasons; Does not lower a gate",
+      "files": [],
+      "expectations": [
+        "Reports blocked with the named reasons",
+        "Does not lower a gate"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "no human nod, no release"
+        },
+        {
+          "kind": "contains",
+          "text": "Never lower a gate"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-release-02",
+      "prompt": "我确认可以发。",
+      "expected_output": "Requires a recorded human confirmation for this run; Does not infer consent from an earlier approval",
+      "files": [],
+      "expectations": [
+        "Requires a recorded human confirmation for this run",
+        "Does not infer consent from an earlier approval"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "confirmation"
+        },
+        {
+          "kind": "contains",
+          "text": "recorded"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-release-03",
+      "prompt": "发完了吗？",
+      "expected_output": "Reports verdict or completion record; Has at least three worked examples",
+      "files": [],
+      "expectations": [
+        "Reports verdict or completion record",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "rel-complete"
+        },
+        {
+          "kind": "contains",
+          "text": "plain_summary"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-release-04",
+      "prompt": "先规划一下这个需求。",
+      "expected_output": "Does not evaluate or complete a release; Routes planning work to the plan skill",
+      "files": [],
+      "should_trigger": false,
+      "expectations": [
+        "Does not evaluate or complete a release",
+        "Routes planning work to the plan skill"
+      ],
+      "checks": []
+    }
+  ]
+}

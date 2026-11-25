@@ -251,9 +251,18 @@ type evalCase struct {
 }
 
 type evalSet struct {
-	Schema string     `json:"schema"`
-	Skill  string     `json:"skill"`
-	Cases  []evalCase `json:"cases"`
+	Schema    string     `json:"schema"`
+	Skill     string     `json:"skill"`
+	SkillName string     `json:"skill_name"`
+	Cases     []evalCase `json:"cases"`
+	Evals     []evalCase `json:"evals"`
+}
+
+func (e evalSet) cases() []evalCase {
+	if len(e.Evals) > 0 {
+		return e.Evals
+	}
+	return e.Cases
 }
 
 // evalsItems scores evals/evals.json: presence, case depth, and
@@ -273,25 +282,26 @@ func evalsItems(pkgDir, body string) []ScoreItem {
 			Detail: "evals/evals.json does not parse as skill-evals.v1",
 		}}
 	}
+	cases := set.cases()
 	items := []ScoreItem{{
 		Check: "evals_present", Points: 3, MaxPoints: 3, Applicable: true,
-		Detail: fmt.Sprintf("evals/evals.json parses (%d cases)", len(set.Cases)),
+		Detail: fmt.Sprintf("evals/evals.json parses (%d cases)", len(cases)),
 	}}
 
 	// Depth: >= 3 cases, each with id, prompt and >= 2 expectations.
 	thin := []string{}
-	for _, c := range set.Cases {
+	for _, c := range cases {
 		if strings.TrimSpace(c.ID) == "" || strings.TrimSpace(c.Prompt) == "" || len(c.Expectations) < 2 {
 			thin = append(thin, c.ID)
 		}
 	}
 	switch {
-	case len(set.Cases) >= 3 && len(thin) == 0:
+	case len(cases) >= 3 && len(thin) == 0:
 		items = append(items, ScoreItem{Check: "evals_cases", Points: 3, MaxPoints: 3, Applicable: true,
-			Detail: fmt.Sprintf("%d cases, each with id/prompt/2+ expectations", len(set.Cases))})
-	case len(set.Cases) > 0:
+			Detail: fmt.Sprintf("%d cases, each with id/prompt/2+ expectations", len(cases))})
+	case len(cases) > 0:
 		items = append(items, ScoreItem{Check: "evals_cases", Points: 1, MaxPoints: 3, Applicable: true,
-			Detail: fmt.Sprintf("%d cases; thin or incomplete: %s", len(set.Cases), strings.Join(thin, ", "))})
+			Detail: fmt.Sprintf("%d cases; thin or incomplete: %s", len(cases), strings.Join(thin, ", "))})
 	default:
 		items = append(items, ScoreItem{Check: "evals_cases", Points: 0, MaxPoints: 3, Applicable: true,
 			Detail: "no cases"})
@@ -300,7 +310,7 @@ func evalsItems(pkgDir, body string) []ScoreItem {
 	// Machine checks: every assertion must hold against the package.
 	var failed []string
 	total := 0
-	for _, c := range set.Cases {
+	for _, c := range cases {
 		for _, chk := range c.Checks {
 			total++
 			if ok, why := evalCheckPasses(chk, pkgDir, body); !ok {

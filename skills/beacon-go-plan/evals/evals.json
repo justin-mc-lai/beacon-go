@@ -1,0 +1,107 @@
+{
+  "schema": "skill-evals.v1",
+  "skill_name": "beacon-go-plan",
+  "evals": [
+    {
+      "id": "beacon-go-plan-01",
+      "prompt": "做个更好用的后台。",
+      "expected_output": "Asks exactly one question at a time; Does not answer for the user",
+      "files": [],
+      "expectations": [
+        "Asks exactly one question at a time",
+        "Does not answer for the user"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "one question at a time"
+        },
+        {
+          "kind": "contains",
+          "text": "answer your own question"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-plan-02",
+      "prompt": "把整个结算系统重写。",
+      "expected_output": "Classifies it as a sea and splits it into lakes; Names the lakes and their order",
+      "files": [],
+      "expectations": [
+        "Classifies it as a sea and splits it into lakes",
+        "Names the lakes and their order"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "sea"
+        },
+        {
+          "kind": "contains",
+          "text": "split"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-plan-03",
+      "prompt": "先想清楚再动手。",
+      "expected_output": "Picks exactly one pln-* mode; Has at least three worked examples",
+      "files": [],
+      "expectations": [
+        "Picks exactly one pln-* mode",
+        "Has at least three worked examples"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "pln-brainstorm"
+        },
+        {
+          "kind": "contains",
+          "text": "mode_id"
+        },
+        {
+          "kind": "min_examples",
+          "min": 3
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-plan-04",
+      "prompt": "接手一个存量项目做二开，先梳理业务代码和状态机。",
+      "expected_output": "Selects pln-brownfield, reverse-drafts candidate truth, records unknowns, and does not freeze code as authority",
+      "files": [],
+      "expectations": [
+        "Selects pln-brownfield",
+        "Uses truth code2truth to produce candidate claims",
+        "Records unknown behavior as questions before freeze"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "pln-brownfield"
+        },
+        {
+          "kind": "contains",
+          "text": "code2truth"
+        },
+        {
+          "kind": "references_contains",
+          "text": "brownfield"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-plan-04",
+      "prompt": "直接把这个函数改名，不用规划。",
+      "expected_output": "Does not start a planning or tree expansion; Routes implementation work away from planning",
+      "files": [],
+      "should_trigger": false,
+      "expectations": [
+        "Does not start a planning or tree expansion",
+        "Routes implementation work away from planning"
+      ],
+      "checks": []
+    }
+  ]
+}

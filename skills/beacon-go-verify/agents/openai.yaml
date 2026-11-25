@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beacon Verify"
+  short_description: "Verify artifacts and aggregate code reviews"
+  default_prompt: "Use $beacon-go-verify to register evidence, aggregate independent reviews, and evaluate the gate."

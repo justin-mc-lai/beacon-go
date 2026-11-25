@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beacon Truth"
+  short_description: "Freeze and govern requirement truth packages"
+  default_prompt: "Use $beacon-go-truth to turn the intent into a signed, frozen requirement package."

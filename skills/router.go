@@ -67,8 +67,8 @@ func routerData() []RouterEntry {
 		{
 			Skill:    "plan",
 			Summary:  "动手前的规划与拆解：想清楚再做，先出方案",
-			Signals:  []Signal{{"规划", 2}, {"方案", 2}, {"拆解", 2}, {"分解任务", 3}},
-			Samples:  []string{"帮我规划一下这个需求", "把这个需求拆解成任务"},
+			Signals:  []Signal{{"规划", 2}, {"方案", 2}, {"拆解", 2}, {"分解任务", 3}, {"接手", 3}, {"二开", 3}, {"棕地", 3}, {"存量项目", 3}},
+			Samples:  []string{"帮我规划一下这个需求", "把这个需求拆解成任务", "接手一个存量项目做二开，先盘点代码"},
 			MustRead: []string{"references/core.md"},
 		},
 		{
@@ -95,9 +95,9 @@ func routerData() []RouterEntry {
 		{
 			Skill:    "verify",
 			Summary:  "验收：证据登记、叶子验证、父级汇总与门禁判定",
-			Signals:  []Signal{{"验收", 2}, {"验证", 2}, {"评分", 2}, {"跑测试", 3}, {"门禁", 2}},
-			Samples:  []string{"验收一下", "跑一下测试验证"},
-			MustRead: []string{"references/core.md"},
+			Signals:  []Signal{{"验收", 2}, {"验证", 2}, {"评分", 2}, {"跑测试", 3}, {"门禁", 2}, {"code review", 3}, {"代码审查", 3}, {"多代理", 2}, {"并行评审", 2}},
+			Samples:  []string{"验收一下", "跑一下测试验证", "让多个代理并行做 code review"},
+			MustRead: []string{"references/core.md", "references/code-review.md"},
 		},
 		{
 			Skill:    "release",

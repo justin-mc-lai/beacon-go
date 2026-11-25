@@ -23,7 +23,7 @@ import (
 	"strings"
 )
 
-//go:embed goal plan truth design implement verify release
+//go:embed beacon-go-goal beacon-go-plan beacon-go-truth beacon-go-design beacon-go-implement beacon-go-verify beacon-go-release
 var files embed.FS
 
 // Skill is one embedded public skill.
@@ -41,6 +41,11 @@ type RefFile struct {
 }
 
 var order = []string{"goal", "plan", "truth", "design", "implement", "verify", "release"}
+
+// packageDir is the source directory for one skill id. It is the same
+// name the installer writes, so the embedded package and the installed
+// package validate against the same folder/name rule.
+func packageDir(id string) string { return InstallDirName(id) }
 
 // IDs returns the public skill ids in pipeline order.
 func IDs() []string { return append([]string{}, order...) }
@@ -60,7 +65,7 @@ func List() []Skill {
 // Get returns one skill including its SKILL.md body.
 func Get(id string) (Skill, bool) {
 	id = strings.ToLower(strings.TrimSpace(id))
-	raw, err := files.ReadFile(id + "/SKILL.md")
+	raw, err := files.ReadFile(packageDir(id) + "/SKILL.md")
 	if err != nil {
 		return Skill{}, false
 	}
@@ -80,7 +85,7 @@ func Get(id string) (Skill, bool) {
 // included), sorted by path. Empty when the skill is unknown.
 func References(id string) []RefFile {
 	id = strings.ToLower(strings.TrimSpace(id))
-	base := id + "/references"
+	base := packageDir(id) + "/references"
 	var out []RefFile
 	_ = fs.WalkDir(files, base, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
@@ -90,7 +95,7 @@ func References(id string) []RefFile {
 		if rerr != nil {
 			return nil
 		}
-		rel, _ := filepath.Rel(id, path)
+		rel, _ := filepath.Rel(packageDir(id), path)
 		out = append(out, RefFile{Path: filepath.ToSlash(rel), Body: string(raw)})
 		return nil
 	})
@@ -130,16 +135,28 @@ type EvalCase struct {
 	Checks       []EvalCheck `json:"checks"`
 }
 
-// EvalSet is one package's evals/evals.json.
+// EvalSet is one package's evals/evals.json. Both the Qi Dev
+// standard shape (skill_name + evals) and the legacy shape (skill +
+// cases) are readable; new packages use the standard shape.
 type EvalSet struct {
-	Schema string     `json:"schema"`
-	Skill  string     `json:"skill"`
-	Cases  []EvalCase `json:"cases"`
+	Schema    string     `json:"schema"`
+	Skill     string     `json:"skill"`
+	SkillName string     `json:"skill_name"`
+	Cases     []EvalCase `json:"cases"`
+	Evals     []EvalCase `json:"evals"`
+}
+
+// Cases returns the eval cases regardless of which schema field was used.
+func (e EvalSet) EvalCases() []EvalCase {
+	if len(e.Evals) > 0 {
+		return e.Evals
+	}
+	return e.Cases
 }
 
 // Evals reads one skill's evals/evals.json.
 func Evals(id string) (EvalSet, bool) {
-	raw, err := files.ReadFile(id + "/evals/evals.json")
+	raw, err := files.ReadFile(packageDir(id) + "/evals/evals.json")
 	if err != nil {
 		return EvalSet{}, false
 	}
@@ -161,11 +178,11 @@ func Examples(id string) []RefFile {
 // same bytes the binary holds.
 func packageFiles(id string) []string {
 	var out []string
-	_ = fs.WalkDir(files, id, func(path string, d fs.DirEntry, err error) error {
+	_ = fs.WalkDir(files, packageDir(id), func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return nil
 		}
-		rel, rerr := filepath.Rel(id, path)
+		rel, rerr := filepath.Rel(packageDir(id), path)
 		if rerr != nil {
 			return nil
 		}
@@ -178,7 +195,7 @@ func packageFiles(id string) []string {
 
 // walkFiles reads one subdirectory of a package.
 func walkFiles(id, sub string) []RefFile {
-	base := id + "/" + sub
+	base := packageDir(id) + "/" + sub
 	var out []RefFile
 	_ = fs.WalkDir(files, base, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
@@ -188,7 +205,7 @@ func walkFiles(id, sub string) []RefFile {
 		if rerr != nil {
 			return nil
 		}
-		rel, _ := filepath.Rel(id, path)
+		rel, _ := filepath.Rel(packageDir(id), path)
 		out = append(out, RefFile{Path: filepath.ToSlash(rel), Body: string(raw)})
 		return nil
 	})
@@ -218,7 +235,7 @@ type InstallResult struct {
 // dir, as target-relative paths — the pre-write display surface.
 func PlannedFiles(targetDir string) []string {
 	var out []string
-	out = append(out, filepath.Join(targetDir, RouterSkillID, "SKILL.md"))
+	out = append(out, filepath.Join(targetDir, RouterSkillID, "SKILL.md"), filepath.Join(targetDir, RouterSkillID, "agents", "openai.yaml"))
 	for _, id := range order {
 		base := filepath.Join(targetDir, InstallDirName(id))
 		for _, rel := range packageFiles(id) {
@@ -259,7 +276,14 @@ func Install(targetDir string, force bool) (InstallResult, error) {
 	if err := os.WriteFile(routerPath, []byte(RouterSkillBody()), 0o644); err != nil {
 		return InstallResult{}, err
 	}
-	res.Files = append(res.Files, routerPath)
+	routerMeta := filepath.Join(filepath.Dir(routerPath), "agents", "openai.yaml")
+	if err := os.MkdirAll(filepath.Dir(routerMeta), 0o755); err != nil {
+		return InstallResult{}, err
+	}
+	if err := os.WriteFile(routerMeta, []byte(routerOpenAIMetadata), 0o644); err != nil {
+		return InstallResult{}, err
+	}
+	res.Files = append(res.Files, routerPath, routerMeta)
 	for _, id := range order {
 		base := filepath.Join(targetDir, InstallDirName(id))
 		files := packageFiles(id)
@@ -286,7 +310,7 @@ func Install(targetDir string, force bool) (InstallResult, error) {
 }
 
 func readPackageFile(id, rel string) ([]byte, error) {
-	return files.ReadFile(id + "/" + rel)
+	return files.ReadFile(packageDir(id) + "/" + rel)
 }
 
 // routerTemplate is the generated entry skill. It carries no embedded
@@ -300,7 +324,7 @@ description: >
   (never the Python v1 §beacon§). The abilities are installed next to this
   file as beacon-go-goal / beacon-go-plan / beacon-go-truth /
   beacon-go-design / beacon-go-implement / beacon-go-verify / beacon-go-release;
-  select one directly or load it with §beacon-go skills show <id>§.
+  select one directly or load it by skill id with the CLI.
 ---
 
 # beacon-go
@@ -335,6 +359,13 @@ beacon-go skills show truth
 - Release always needs a human confirmation; the driver never auto-releases.
 - §--executor recording§ is a placeholder; real execution needs an external
   agent command.
+`
+
+// routerOpenAIMetadata is the generated router's OpenAI surface metadata.
+const routerOpenAIMetadata = `interface:
+  display_name: "Beacon Go"
+  short_description: "Route Beacon Go requirement-truth work"
+  default_prompt: "Use $beacon-go to route this task to the right Beacon Go skill."
 `
 
 // RouterSkillBody renders the generated beacon-go entry skill.

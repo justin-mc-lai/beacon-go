@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beacon Plan"
+  short_description: "Plan, review, and intake existing codebases"
+  default_prompt: "Use $beacon-go-plan to review the codebase and produce a grounded plan before implementation."

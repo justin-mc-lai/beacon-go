@@ -8,7 +8,7 @@ import (
 )
 
 func TestTruthSkillVersionFlow(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("truth", "SKILL.md"))
+	raw, err := os.ReadFile(filepath.Join("beacon-go-truth", "SKILL.md"))
 	if err != nil {
 		t.Fatal(err)
 	}

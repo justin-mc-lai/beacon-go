@@ -3,6 +3,21 @@
 All notable changes to Beacon Go. Versions are plain SemVer
 (`MAJOR.MINOR.PATCH`); see `docs/version-scheme.md`.
 
+## [3.0.3] - 2026-11-25
+
+### Changed
+
+- Skill packages now live under their installed names (`beacon-go-*`), carry
+  OpenAI metadata, and validate with the official structure checker.
+- Frontmatter no longer uses the unsupported `triggers` field; trigger phrases
+  moved into the description used by hosts.
+- Evals use the standard `skill_name` / `evals` shape and add
+  should-not-trigger coverage.
+- `beacon-go-plan` adds `pln-brownfield` for inherited codebases.
+- `beacon-go-verify` adds `qa-code-review`: an explicit host-side parallel
+  reviewer protocol. The kernel records the aggregate; it does not spawn or
+  claim parallel reviewers.
+
 ## [3.0.2] - 2026-11-25
 
 ### Fixed
