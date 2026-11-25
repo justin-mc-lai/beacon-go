@@ -3,6 +3,13 @@
 All notable changes to Beacon Go. Versions are plain SemVer
 (`MAJOR.MINOR.PATCH`); see `docs/version-scheme.md`.
 
+## [3.0.2] - 2026-11-25
+
+### Fixed
+
+- The generated `beacon-go` router skill no longer calls itself a "v2 track";
+  it now describes the 3.x requirement-truth kernel.
+
 ## [3.0.1] - 2026-11-25
 
 ### Fixed

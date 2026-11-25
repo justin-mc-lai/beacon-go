@@ -296,7 +296,7 @@ func readPackageFile(id, rel string) ([]byte, error) {
 const routerTemplate = `---
 name: beacon-go
 description: >
-  Beacon Go v2 track router. Always means the Go binary §beacon-go§
+  Beacon Go 3.x requirement-truth router. Always means the Go binary §beacon-go§
   (never the Python v1 §beacon§). The abilities are installed next to this
   file as beacon-go-goal / beacon-go-plan / beacon-go-truth /
   beacon-go-design / beacon-go-implement / beacon-go-verify / beacon-go-release;
@@ -305,7 +305,7 @@ description: >
 
 # beacon-go
 
-**Hard rule:** §beacon-go§ = this Go v2 track. §beacon§ = the Python v1
+**Hard rule:** §beacon-go§ = this Go 3.x track. §beacon§ = the Python v1
 track. They run in parallel; never swap one for the other.
 
 - Go ledger: §~/.beacon/beacon-go.db§ (the §beacon-go§ wrapper exports
