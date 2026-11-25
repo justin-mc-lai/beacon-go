@@ -3,6 +3,14 @@
 All notable changes to Beacon Go. Versions are plain SemVer
 (`MAJOR.MINOR.PATCH`); see `docs/version-scheme.md`.
 
+## [3.0.8] - 2026-11-25
+
+### Fixed
+
+- Local-only mode now writes `.git/info/exclude` instead of modifying the
+  tracked project `.gitignore`, so enabling it cannot create an uploadable
+  ignore-file change in a company repository.
+
 ## [3.0.7] - 2026-11-25
 
 ### Added
