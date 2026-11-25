@@ -37,14 +37,16 @@ func newPlanInitCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if localOnly {
+				if err := setLocalOnlyMode(proj.RootPath); err != nil {
+					return err
+				}
+			}
 			if err := ensureArtifactsIgnored(proj.RootPath); err != nil {
 				return err
 			}
 			if localOnly || localOnlyMode(proj.RootPath) {
 				if err := ensureDocsIgnored(proj.RootPath); err != nil {
-					return err
-				}
-				if err := setLocalOnlyMode(proj.RootPath); err != nil {
 					return err
 				}
 			}
