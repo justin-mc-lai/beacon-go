@@ -48,7 +48,7 @@ func newGoalCmd() *cobra.Command {
 		// P2c delegation & parallel: implement lanes (G-22), admit
 		// (G-04), delegate-ralph + receive-result (G-10),
 		// parallel-plan (G-11), design-stage (G-18).
-		newGoalImplementCmd(), newGoalAdmitCmd(), newGoalDelegateRalphCmd(),
+		newGoalImplementCmd(), newGoalAdmitCmd(),
 		newGoalReceiveResultCmd(), newGoalParallelPlanCmd(), newGoalDesignStageCmd(),
 		// P2d orchestration extensions: program (G-12), hotfix-plan
 		// (G-13), multi-version-plan (G-14), memory (G-15),

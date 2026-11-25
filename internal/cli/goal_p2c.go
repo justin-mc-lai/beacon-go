@@ -106,64 +106,6 @@ func newGoalAdmitCmd() *cobra.Command {
 	return c
 }
 
-func newGoalDelegateRalphCmd() *cobra.Command {
-	var runID string
-	var simulate, asJSON bool
-	var ef execFlags
-	c := &cobra.Command{
-		Use:   "delegate-ralph",
-		Short: "Pack the implement stage and delegate it to the ralph lane (real loop when a ralph command is configured)",
-		Long: "Delegate the run's whole implement stage to the ralph lane: the pack " +
-			"(requirement package, stage plan, admission verdict, acceptance and " +
-			"rollback rules) is recorded on the run. With a ralph command configured " +
-			"(--ralph-cmd here, or recorded by goal run --ralph-cmd) the REAL ralph " +
-			"loop runs (P3c): iterations execute until the RALPH_DONE completion " +
-			"marker, a failure, or the iteration ceiling, and the return is collected " +
-			"by the same harvest as any other return (simulated=false everywhere). " +
-			"--simulate instead runs the recording placeholder and labels every " +
-			"output simulated. With neither, the pack is recorded and no execution " +
-			"happens (P2c dispatch face).",
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			eng, closeFn, err := goalEngine("recording")
-			if err != nil {
-				return err
-			}
-			defer closeFn()
-			cfg, err := eng.ExecutorConfigFor(runID, ef.config())
-			if err != nil {
-				return err
-			}
-			var v orchestrator.DelegationView
-			switch {
-			case simulate:
-				v, err = eng.DelegateRalph(cmd.Context(), runID, true)
-			case orchestrator.RalphConfigured(cfg):
-				v, err = eng.DelegateRalphReal(cmd.Context(), runID, cfg.RalphArgv, cfg.TimeoutSec, cfg.RalphMaxIter)
-			default:
-				v, err = eng.DelegateRalph(cmd.Context(), runID, false)
-			}
-			if err != nil {
-				return err
-			}
-			if asJSON {
-				return printJSON(cmd, v)
-			}
-			d := v.Delegation
-			fmt.Fprintf(cmd.OutOrStdout(),
-				"delegation: %s\nlane: %s status: %s simulated: %v\ntruth: %s\nworktree: %s\n",
-				d.ID, d.Lane, d.Status, d.Simulated, d.Package.TruthPath, d.Package.WorktreeRef)
-			return nil
-		},
-	}
-	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
-	c.Flags().BoolVar(&simulate, "simulate", false, "run the recording placeholder executor now (labelled simulated; no real ralph work)")
-	addExecFlags(c, &ef, false)
-	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
-	_ = c.MarkFlagRequired("run-id")
-	return c
-}
-
 func newGoalReceiveResultCmd() *cobra.Command {
 	var runID, delegationID, status, summary, kind, by string
 	var artifacts []string

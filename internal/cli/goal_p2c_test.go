@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"path/filepath"
 	"testing"
 )
 
@@ -73,45 +72,6 @@ func TestGoalP2CChain(t *testing.T) {
 	}
 	if conflicts, _ := pp["conflicts"].([]any); len(conflicts) != 1 {
 		t.Errorf("conflicts = %v", pp["conflicts"])
-	}
-
-	// delegate-ralph --simulate: labelled simulated, pack is whole.
-	out, err = runCLI(t, "goal", "delegate-ralph", "--run-id", runID, "--simulate", "--json")
-	if err != nil {
-		t.Fatalf("delegate-ralph: %v (out %s)", err, out)
-	}
-	dv := parseDoc(t, out)
-	d, _ := dv["delegation"].(map[string]any)
-	if d["status"] != "delegated" || d["simulated"] != true {
-		t.Fatalf("delegation = %v", d)
-	}
-	delegationID, _ := d["id"].(string)
-	pkg, _ := d["package"].(map[string]any)
-	if pkg["truth_path"] == "" || pkg["lane"] != "ralph" {
-		t.Errorf("package = %v", pkg)
-	}
-
-	// receive without artifacts -> rejected with the harvest code.
-	out, err = runCLI(t, "goal", "receive-result", "--run-id", runID,
-		"--delegation-id", delegationID, "--json")
-	if err == nil {
-		t.Fatalf("receive without artifacts must fail (out %s)", out)
-	}
-	// receive with the three separated artifact kinds -> returned.
-	dir := t.TempDir()
-	art := filepath.Join(dir, "impl.go")
-	out, err = runCLI(t, "goal", "receive-result", "--run-id", runID,
-		"--delegation-id", delegationID,
-		"--artifact", "acceptance_seed_red="+filepath.Join(dir, "red-ac.txt"),
-		"--artifact", "acceptance_test="+filepath.Join(dir, "acceptance_seed_test.go"),
-		"--artifact", "implement_artifact="+art,
-		"--summary", "done", "--json")
-	if err != nil {
-		t.Fatalf("receive-result: %v (out %s)", err, out)
-	}
-	d, _ = parseDoc(t, out)["delegation"].(map[string]any)
-	if d["status"] != "returned" || d["simulated"] != true {
-		t.Errorf("delegation after receive = %v", d)
 	}
 
 	// Design flow on a UX run of the same feature: unbound refuses

@@ -12,6 +12,12 @@ for pkg in internal/llm internal/httpapi internal/agentapi internal/workspace; d
     fail=1
   fi
 done
+for f in internal/orchestrator/exec_subprocess.go internal/orchestrator/exec_ralph.go internal/orchestrator/exec_delegate.go; do
+  if [ -e "$f" ]; then
+    echo "kernel-deps: built-in executor file still present: $f" >&2
+    fail=1
+  fi
+done
 if grep -rnE 'ANTHROPIC_API_KEY|OPENAI_API_KEY' internal/cli internal/orchestrator internal/gate internal/store internal/core internal/intenttree --include='*.go' | grep -v '_test.go' >/dev/null; then
   echo "kernel-deps: API key literal found in kernel source" >&2
   fail=1

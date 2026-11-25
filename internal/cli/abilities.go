@@ -59,7 +59,7 @@ func newImplementCmd() *cobra.Command {
 			"under both entries.",
 	}
 	c.AddCommand(
-		newGoalImplementPlanCmd(), newGoalAdmitCmd(), newGoalDelegateRalphCmd(),
+		newGoalImplementPlanCmd(), newGoalAdmitCmd(),
 		newGoalReceiveResultCmd(), newGoalWorktreeCmd(),
 		newImplementTasksCmd(), newImplementReportCmd(),
 	)

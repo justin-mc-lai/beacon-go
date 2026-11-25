@@ -25,11 +25,7 @@
 package orchestrator
 
 import (
-	"context"
-	"strings"
-
 	"beacon-go/internal/core"
-	"beacon-go/internal/harness"
 )
 
 // mergeExecConfig overlays the invocation config on the run record:
@@ -85,119 +81,9 @@ func (e *Engine) ExecutorConfigFor(runID string, inv *ExecutorConfig) (*Executor
 // for ExecuteStage use; DelegateRalphReal is the delegation path
 // and does not go through here.
 func (e *Engine) ResolveExecutorFor(runID, selector string, inv *ExecutorConfig) (StageExecutor, error) {
-	_, m, _, err := e.loadRun(runID)
-	if err != nil {
-		return nil, err
+	if selector == ExecutorModeRecording {
+		return NewRecordingExecutor(e.store, ExecutorModeRecording), nil
 	}
-	cfg := mergeExecConfig(inv, m.Exec)
-	switch {
-	case selector == "" || selector == "none":
-		return nil, nil
-	case selector == "recording":
-		return NewRecordingExecutor(e.store, "recording"), nil
-	case selector == "ralph":
-		if len(cfg.RalphArgv) == 0 {
-			return nil, core.NewError(core.ReasonRalphConfigMissing, "goal.ResolveExecutorFor",
-				"selector ralph needs a configured ralph command (--ralph-cmd or goal run --ralph-cmd)")
-		}
-		return NewRalphExecutor(e, cfg.RalphArgv, cfg.TimeoutSec, cfg.RalphMaxIter), nil
-	case selector == "subprocess":
-		if len(cfg.Argv) == 0 {
-			return nil, core.NewError(core.ReasonExecutorNotConfigured, "goal.ResolveExecutorFor",
-				"subprocess executor selected but no command configured (--exec-cmd); refusing to fall back to a placeholder")
-		}
-		return NewSubprocessExecutor(e, cfg.Argv, cfg.TimeoutSec), nil
-	case strings.HasPrefix(selector, "subprocess:"):
-		name := strings.TrimPrefix(selector, "subprocess:")
-		if name == "" {
-			name = cfg.Profile
-		}
-		if name == "" {
-			return nil, core.NewError(core.ReasonExecutorProfileUnknown, "goal.ResolveExecutorFor",
-				"subprocess: needs a profile name (codex-style|claude-style)")
-		}
-		prof, ok := harness.LookupProfile(name)
-		if !ok {
-			return nil, core.NewError(core.ReasonExecutorProfileUnknown, "goal.ResolveExecutorFor",
-				"unknown profile "+name+" (built-ins: codex-style, claude-style)")
-		}
-		argv := cfg.ProfileArgv
-		if len(argv) == 0 {
-			argv = cfg.Argv
-		}
-		prof = prof.WithCommand(argv)
-		if len(argv) == 0 {
-			// No explicit command anywhere: only proceed when the
-			// profile's canonical binary actually exists; otherwise
-			// the machine is simply not configured for this profile.
-			probe := harness.NewSubprocessBackend([]string{prof.Argv[0]}, 0)
-			if hs := probe.HealthCheck(context.Background()); !hs.OK {
-				return nil, core.NewError(core.ReasonExecutorNotConfigured, "goal.ResolveExecutorFor",
-					"profile "+name+" selected but its command "+prof.Argv[0]+" is not available and no --exec-cmd override was given")
-			}
-		}
-		// R2d (M1): agent-eval admission at selection time — a
-		// profile whose latest scorecard is blocked (composite
-		// below the Python 70 threshold, or a boundary violation
-		// in its latest graded transcript) is refused here, the
-		// one place the kernel knows which agent is about to
-		// work. No record on file only warns (see
-		// core.AgentAdmissionFromRecord); it never blocks.
-		if fctx, ferr := e.featureContext(featureIDOf(e, runID)); ferr == nil {
-			if aerr := e.CheckProfileAdmission(fctx.Project.RootPath, name, "goal.ResolveExecutorFor"); aerr != nil {
-				return nil, aerr
-			}
-		}
-		return NewProfileExecutor(e, prof, cfg.TimeoutSec), nil
-	default:
-		return nil, core.NewError(core.ReasonExecutorProfileUnknown, "goal.ResolveExecutorFor",
-			"unknown executor selector "+selector+" (want recording|subprocess|subprocess:<profile>|ralph)")
-	}
-}
-
-// ExecuteProfileIteration runs ONE profile iteration outside the
-// stage machine — the AC-100 integration surface: cwd is the run's
-// bound ACTIVE real worktree when one exists (harness-in-worktree),
-// the stage-context file is built and registered, evidence lands
-// like a stage execution. stage is recorded as "implement" so the
-// harvest rule sees it as implement evidence.
-func (e *Engine) ExecuteProfileIteration(ctx context.Context, runID, profileName string, inv *ExecutorConfig) (StageOutcome, harness.Profile, error) {
-	_, m, _, err := e.loadRun(runID)
-	if err != nil {
-		return StageOutcome{}, harness.Profile{}, err
-	}
-	cfg := mergeExecConfig(inv, m.Exec)
-	if profileName == "" {
-		profileName = cfg.Profile
-	}
-	if profileName == "" {
-		profileName = "claude-style"
-	}
-	prof, ok := harness.LookupProfile(profileName)
-	if !ok {
-		return StageOutcome{}, harness.Profile{}, core.NewError(core.ReasonExecutorProfileUnknown,
-			"goal.ExecuteProfileIteration", "unknown profile "+profileName)
-	}
-	argv := cfg.ProfileArgv
-	if len(argv) == 0 {
-		argv = cfg.Argv
-	}
-	prof = prof.WithCommand(argv)
-	// R2d (M1): the same agent-eval admission as ResolveExecutorFor.
-	if fctx, ferr := e.featureContext(featureIDOf(e, runID)); ferr == nil {
-		if aerr := e.CheckProfileAdmission(fctx.Project.RootPath, profileName, "goal.ExecuteProfileIteration"); aerr != nil {
-			return StageOutcome{}, harness.Profile{}, aerr
-		}
-	}
-	ex := NewProfileExecutor(e, prof, cfg.TimeoutSec)
-	outcome, err := ex.ExecuteStage(ctx, RunView{RunID: runID, FeatureID: featureIDOf(e, runID)}, StageImplement)
-	return outcome, prof, err
-}
-
-func featureIDOf(e *Engine, runID string) string {
-	run, err := e.store.Runs().GetByID(runID)
-	if err != nil {
-		return ""
-	}
-	return run.FeatureID
+	return nil, core.NewError(ReasonExecutorNotReg, "goal.ResolveExecutorFor",
+		"built-in executors were removed; use the manual/external lane and `goal tick --by`")
 }

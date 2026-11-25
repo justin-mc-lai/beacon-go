@@ -26,7 +26,6 @@ import (
 
 	"beacon-go/internal/core"
 	"beacon-go/internal/harness"
-	"beacon-go/internal/store"
 )
 
 // -------- AC-002: real subprocess workers + barrier --------
@@ -414,74 +413,6 @@ func runHandoffTamperRejected(t *testing.T) {
 }
 
 // -------- AC-002/AC-003: continuous drive deadline + no-progress --------
-
-func TestProgramDriveUntilDoneDeadlineMidRound(t *testing.T) {
-	env := newGitEnv(t)
-	for _, gt := range []string{"truth_freeze", "qa"} {
-		if _, err := env.st.Gates().Record(store.GateResult{FeatureID: env.feature.ID, GateType: gt, Verdict: "pass"}); err != nil {
-			t.Fatal(err)
-		}
-	}
-	writePackage(t, env.root, "truth.md", "feat-a", "frozen")
-	host := env.createRun(t)
-	if _, err := env.eng.ProgramPlan(host.RunID, ProgramPlanInput{
-		Slug: "sea", Freeze: true, Lakes: []ProgramLakeInput{{Slug: "feat-a"}},
-	}); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := env.eng.ProgramIntegratedEnable(host.RunID); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := env.eng.ProgramIntegratedDispatch(context.Background(), host.RunID); err != nil {
-		t.Fatal(err)
-	}
-	// Put the lake run past the deterministic flow and at implement,
-	// then hand it a real subprocess executor that outlives the
-	// budget. The continuous drive must cut that unfinished round at
-	// the deadline — not only when the context was already expired.
-	_, hm, _, err := env.eng.loadRun(host.RunID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	lakeRunID := hm.Program.lake("feat-a").RunID
-	lr, lm, _, err := env.eng.loadRun(lakeRunID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if lm.Flow == nil {
-		lm.Flow = &FlowState{}
-	}
-	for _, step := range FlowSteps {
-		lm.Flow.Completed = append(lm.Flow.Completed, FlowStepRecord{Step: step, At: nowISO()})
-	}
-	lm.LoopStage = string(core.LoopImplementRouting)
-	if err := env.eng.saveRun(lr, lm); err != nil {
-		t.Fatal(err)
-	}
-
-	start := time.Now()
-	v, err := env.eng.ProgramDrive(host.RunID, ProgramDriveOptions{
-		Executor:  "subprocess",
-		Exec:      &ExecutorConfig{Argv: []string{"sh", "-c", "sleep 30"}},
-		UntilDone: true, MaxDurationSec: 1,
-	})
-	elapsed := time.Since(start)
-	if err != nil {
-		t.Fatalf("drive returned error instead of a bounded view: %v", err)
-	}
-	if v.ReasonCode != core.ReasonProgramDriveTimeout {
-		t.Fatalf("reason = %q, want %s (view lake=%s status=%s after %s)",
-			v.ReasonCode, core.ReasonProgramDriveTimeout, v.AdvancedLake, v.LakeStatus, elapsed)
-	}
-	if v.LakeStatus == "completed" || v.LakeStatus == "awaiting_release" {
-		t.Fatalf("an unfinished round cannot report %q", v.LakeStatus)
-	}
-	if elapsed > 20*time.Second {
-		t.Fatalf("deadline was not honoured: %s", elapsed)
-	}
-	t.Logf("deadline mid-round: reason=%s lake=%s status=%s after %s",
-		v.ReasonCode, v.AdvancedLake, v.LakeStatus, elapsed.Round(time.Millisecond))
-}
 
 func TestProgramDriveStallDecision(t *testing.T) {
 	// The continuous loop must distinguish "still making progress" from
