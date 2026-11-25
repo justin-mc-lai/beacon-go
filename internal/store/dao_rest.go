@@ -108,6 +108,8 @@ type ArtifactRef struct {
 	ContentHash string `json:"content_hash"`
 	SizeBytes   int64  `json:"size_bytes"`
 	CreatedAt   string `json:"created_at"`
+	ScopeKind   string `json:"scope_kind"`
+	ScopeID     string `json:"scope_id"`
 }
 
 // ArtifactDao implements artifact pointer access.
@@ -138,6 +140,11 @@ func (d *ArtifactDao) Add(a ArtifactRef) (ArtifactRef, error) {
 			"abs_path must be absolute: "+a.AbsPath)
 	}
 	a.CreatedAt = orNow(a.CreatedAt)
+	scopeKind, scopeID, err := resolveArtifactScope(d.q, a)
+	if err != nil {
+		return ArtifactRef{}, err
+	}
+	a.ScopeKind, a.ScopeID = scopeKind, scopeID
 	// One statement, one dbtx handle: the upsert and the read-back
 	// below must see the same transaction when called inside WithTx.
 	res, err := d.q.Exec(`UPDATE artifact_refs SET content_hash = ?, size_bytes = ?, created_at = ? WHERE run_id = ? AND abs_path = ?`,
@@ -160,8 +167,8 @@ func (d *ArtifactDao) Add(a ArtifactRef) (ArtifactRef, error) {
 		a.ID = newID("art_")
 	}
 	if _, err := d.q.Exec(`INSERT INTO artifact_refs(id, run_id, kind, abs_path, content_hash, size_bytes, created_at, scope_kind, scope_id)
-		VALUES(?,?,?,?,?,?,?, 'feature', COALESCE((SELECT feature_id FROM runs WHERE id = ?), ''))`,
-		a.ID, a.RunID, a.Kind, a.AbsPath, a.ContentHash, a.SizeBytes, a.CreatedAt, a.RunID); err != nil {
+		VALUES(?,?,?,?,?,?,?,?,?)`,
+		a.ID, a.RunID, a.Kind, a.AbsPath, a.ContentHash, a.SizeBytes, a.CreatedAt, a.ScopeKind, a.ScopeID); err != nil {
 		return ArtifactRef{}, err
 	}
 	return a, nil
@@ -169,24 +176,62 @@ func (d *ArtifactDao) Add(a ArtifactRef) (ArtifactRef, error) {
 
 func scanArtifact(row interface{ Scan(...any) error }) (ArtifactRef, error) {
 	var a ArtifactRef
-	err := row.Scan(&a.ID, &a.RunID, &a.Kind, &a.AbsPath, &a.ContentHash, &a.SizeBytes, &a.CreatedAt)
+	err := row.Scan(&a.ID, &a.RunID, &a.Kind, &a.AbsPath, &a.ContentHash, &a.SizeBytes, &a.CreatedAt, &a.ScopeKind, &a.ScopeID)
 	return a, err
 }
 
-const artifactCols = `id, run_id, kind, abs_path, content_hash, size_bytes, created_at`
+const artifactCols = `id, run_id, kind, abs_path, content_hash, size_bytes, created_at, scope_kind, scope_id`
 
-// FeatureScopeRunIDPrefix marks artifact_refs.run_id values that bind a
-// pointer to a feature instead of a run (AC-002). artifact_refs.run_id
-// carries no foreign key, so feature scope needs no schema change.
-const FeatureScopeRunIDPrefix = "feature:"
+// NormalizeArtifactScope canonicalizes an explicit evidence scope.
+func NormalizeArtifactScope(kind, id string) (string, string, error) {
+	kind = strings.ToLower(strings.TrimSpace(kind))
+	id = strings.TrimSpace(id)
+	if id == "" {
+		return "", "", core.NewError("artifact_scope_invalid", "NormalizeArtifactScope", "scope id is required")
+	}
+	if kind != "feature" && kind != "node" {
+		return "", "", core.NewError("artifact_scope_kind_unknown", "NormalizeArtifactScope", "unknown scope kind "+kind)
+	}
+	return kind, id, nil
+}
 
-// FeatureScopeRunID is the run_id sentinel for a feature-scoped pointer.
-func FeatureScopeRunID(featureID string) string { return FeatureScopeRunIDPrefix + featureID }
+// ScopeRunID returns the sentinel run_id for a feature/node scope.
+func ScopeRunID(kind, id string) string {
+	if kind == "node" {
+		return "node:" + id
+	}
+	return FeatureScopeRunID(id)
+}
 
-// ListByFeatureScope returns the feature-scoped pointers of a feature
-// (registered without a run) in creation order.
-func (d *ArtifactDao) ListByFeatureScope(featureID string) ([]ArtifactRef, error) {
-	rows, err := d.q.Query(`SELECT `+artifactCols+` FROM artifact_refs WHERE run_id = ? ORDER BY created_at, rowid`, FeatureScopeRunID(featureID))
+// resolveArtifactScope fills scope from the explicit fields or the run.
+func resolveArtifactScope(q dbtx, a ArtifactRef) (string, string, error) {
+	if a.ScopeKind != "" || a.ScopeID != "" {
+		if a.ScopeKind == "" {
+			a.ScopeKind = "feature"
+		}
+		return NormalizeArtifactScope(a.ScopeKind, a.ScopeID)
+	}
+	if strings.HasPrefix(a.RunID, "node:") {
+		return "node", strings.TrimPrefix(a.RunID, "node:"), nil
+	}
+	if strings.HasPrefix(a.RunID, FeatureScopeRunIDPrefix) {
+		return "feature", strings.TrimPrefix(a.RunID, FeatureScopeRunIDPrefix), nil
+	}
+	var featureID string
+	err := q.QueryRow(`SELECT feature_id FROM runs WHERE id = ?`, a.RunID).Scan(&featureID)
+	if err != nil {
+		return "", "", core.NewError("artifact_scope_backfill_failed", "resolveArtifactScope", "run has no feature scope: "+a.RunID)
+	}
+	return NormalizeArtifactScope("feature", featureID)
+}
+
+// ListByScope returns pointers for one explicit evidence scope.
+func (d *ArtifactDao) ListByScope(scopeKind, scopeID string) ([]ArtifactRef, error) {
+	kind, id, err := NormalizeArtifactScope(scopeKind, scopeID)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := d.q.Query(`SELECT `+artifactCols+` FROM artifact_refs WHERE scope_kind = ? AND scope_id = ? ORDER BY created_at, rowid`, kind, id)
 	if err != nil {
 		return nil, err
 	}
@@ -200,6 +245,20 @@ func (d *ArtifactDao) ListByFeatureScope(featureID string) ([]ArtifactRef, error
 		out = append(out, a)
 	}
 	return out, rows.Err()
+}
+
+// FeatureScopeRunIDPrefix marks artifact_refs.run_id values that bind a
+// pointer to a feature instead of a run (AC-002). artifact_refs.run_id
+// carries no foreign key, so feature scope needs no schema change.
+const FeatureScopeRunIDPrefix = "feature:"
+
+// FeatureScopeRunID is the run_id sentinel for a feature-scoped pointer.
+func FeatureScopeRunID(featureID string) string { return FeatureScopeRunIDPrefix + featureID }
+
+// ListByFeatureScope returns the feature-scoped pointers of a feature
+// (registered without a run) in creation order.
+func (d *ArtifactDao) ListByFeatureScope(featureID string) ([]ArtifactRef, error) {
+	return d.ListByScope("feature", featureID)
 }
 
 // ListByRun returns artifact pointers of a run in creation order.

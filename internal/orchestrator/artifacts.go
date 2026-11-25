@@ -277,6 +277,47 @@ func (e *Engine) registerArtifactScoped(scopeRunID, kind, path, by string) (Arti
 	return ArtifactRegistration{Artifact: ref, Supersedes: supersedes}, payload, nil
 }
 
+// RegisterScopedArtifact registers evidence under an explicit
+// feature/node scope without requiring a run. Feature callers keep the
+// existing RegisterFeatureArtifact wrapper; node evidence uses this.
+func (e *Engine) RegisterScopedArtifact(scopeKind, scopeID, kind, path, by string) (ArtifactRegistration, error) {
+	k, id, err := store.NormalizeArtifactScope(scopeKind, scopeID)
+	if err != nil {
+		return ArtifactRegistration{}, err
+	}
+	res, payload, err := e.registerArtifactScoped(store.ScopeRunID(k, id), kind, path, by)
+	if err != nil {
+		return ArtifactRegistration{}, err
+	}
+	if res.AlreadyRegistered {
+		return res, nil
+	}
+	if payload != nil {
+		payload["scope"] = k
+		payload["scope_id"] = id
+	}
+	if k == "feature" {
+		payload["feature_id"] = id
+		if err := e.appendFeatureEvent(id, EventArtifactRegistered, payload); err != nil {
+			return ArtifactRegistration{}, err
+		}
+	}
+	return res, nil
+}
+
+// ListScopedArtifacts lists evidence for one explicit scope.
+func (e *Engine) ListScopedArtifacts(scopeKind, scopeID string) ([]store.ArtifactView, error) {
+	arts, err := e.store.Artifacts().ListByScope(scopeKind, scopeID)
+	if err != nil {
+		return nil, err
+	}
+	views := []store.ArtifactView{}
+	for _, a := range arts {
+		views = append(views, store.ViewOf(a))
+	}
+	return views, nil
+}
+
 // ListRunArtifacts returns the run's registered pointers with live
 // staleness verdicts — the same presentation spine artifacts uses
 // (store.ViewOf), shared by `goal artifacts list`.

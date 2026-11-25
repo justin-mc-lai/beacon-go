@@ -80,3 +80,45 @@ func TestArtifactAddFillsFeatureScope(t *testing.T) {
 		t.Fatalf("scope = %s/%s, want feature/%s", kind, id, f.ID)
 	}
 }
+
+func TestNormalizeArtifactScope(t *testing.T) {
+	if _, _, err := NormalizeArtifactScope("", "x"); err == nil {
+		t.Error("empty kind must fail")
+	}
+	if _, _, err := NormalizeArtifactScope("node", " "); err == nil {
+		t.Error("empty id must fail")
+	}
+	if _, _, err := NormalizeArtifactScope("team", "x"); err == nil {
+		t.Error("unknown kind must fail")
+	}
+	if k, id, err := NormalizeArtifactScope(" NODE ", " n1 "); err != nil || k != "node" || id != "n1" {
+		t.Fatalf("normalize = %s/%s %v", k, id, err)
+	}
+}
+
+func TestArtifactNodeScopeIsExplicitAndIdempotent(t *testing.T) {
+	s, _ := openTestStore(t)
+	ref := ArtifactRef{RunID: ScopeRunID("node", "n1"), ScopeKind: "node", ScopeID: "n1",
+		Kind: "evidence", AbsPath: "/tmp/node-proof", ContentHash: "h1"}
+	if _, err := s.Artifacts().Add(ref); err != nil {
+		t.Fatal(err)
+	}
+	ref.ContentHash = "h2"
+	if _, err := s.Artifacts().Add(ref); err != nil {
+		t.Fatal(err)
+	}
+	rows, err := s.Artifacts().ListByScope("node", "n1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 || rows[0].ContentHash != "h2" {
+		t.Fatalf("node scope rows = %+v", rows)
+	}
+	empty, err := s.Artifacts().ListByScope("feature", "n1")
+	if err != nil || len(empty) != 0 {
+		t.Fatalf("feature scope leaked: %+v %v", empty, err)
+	}
+	if _, err := s.Artifacts().Add(ArtifactRef{RunID: ScopeRunID("node", "n2"), Kind: "evidence", AbsPath: "relative", ContentHash: "h"}); err == nil {
+		t.Fatal("relative path must fail")
+	}
+}
