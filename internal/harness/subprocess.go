@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"beacon-go/internal/core"
@@ -78,15 +77,11 @@ func RunCommand(ctx context.Context, argv []string, dir string, env []string, ti
 	// Kill the whole process GROUP on cancel/timeout: killing only
 	// the direct child leaves grandchildren (e.g. a `sleep` the agent
 	// spawned) holding the stdout pipe open, and cmd.Run would block
-	// on the pipe long past the timeout. Setpgid + group SIGKILL is
-	// what "timeout kills the process" must mean.
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.Cancel = func() error {
-		if cmd.Process != nil {
-			return syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
-		}
-		return nil
-	}
+	// on the pipe long past the timeout. setProcessGroup + group SIGKILL
+	// is what "timeout kills the process" must mean. Windows has no
+	// process group here; it kills the direct child instead.
+	setProcessGroup(cmd)
+	cmd.Cancel = func() error { return killProcessGroup(cmd) }
 	cmd.WaitDelay = 2 * time.Second
 	var stdout, stderr strings.Builder
 	cmd.Stdout = &stdout
