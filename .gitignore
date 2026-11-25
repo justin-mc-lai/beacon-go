@@ -23,3 +23,6 @@ docs/beacon/*/.machine/
 
 # prototype render output (ticket #17)
 docs/prototypes/**/out/
+
+# release binaries built locally
+dist/
