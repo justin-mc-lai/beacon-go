@@ -127,7 +127,16 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 				if werr != nil {
 					return werr
 				}
+				if outPath == "" {
+					if err := ensureArtifactsIgnored(projRoot); err != nil {
+						return err
+					}
+				}
 				fmt.Fprintf(cmd.OutOrStdout(), "wrote %s (%d bytes, sha256=%s, source=%s)\n", p, len(data), hashHex(data), intenttree.SourceHash(idx))
+				fmt.Fprintln(cmd.OutOrStdout(), "派生产物，勿提交；权威源见 docs/beacon/"+idx.Version+"/")
+				if outPath != "" && !isInside(projRoot, p) {
+					fmt.Fprintln(cmd.OutOrStdout(), "note: --out 指向项目外；该文件不会被项目的 .gitignore 覆盖")
+				}
 				return nil
 			}
 			return fail("tree_format_unknown", op, "format must be summary, json, md, or html")

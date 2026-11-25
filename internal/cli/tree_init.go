@@ -35,6 +35,9 @@ func newPlanInitCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if err := ensureArtifactsIgnored(proj.RootPath); err != nil {
+				return err
+			}
 			if asJSON {
 				return printJSON(cmd, map[string]any{"root": root, "tree_dir": dir})
 			}
