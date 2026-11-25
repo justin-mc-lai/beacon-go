@@ -29,11 +29,11 @@ PASS = []
 
 GOOD_BINARY = """#!/bin/sh
 if [ "$1" = "--version" ]; then echo "Beacon CLI v9-candidate"; exit 0; fi
-if [ "$1" = "goal" ] && [ "$2" = "program" ] && [ "$3" = "integrated" ]; then
-  if [ "$4" = "--help" ]; then
-    echo "enable handoff dispatch merge route qa approve finalize"; exit 0
+if [ "$1" = "plan" ]; then
+  if [ "$2" = "--help" ]; then
+    echo "init tree expand apply"; exit 0
   fi
-  if [ "$4" = "route" ]; then echo '{"error":"run not found"}'; exit 1; fi
+  if [ "$2" = "tree" ]; then echo '{"error":"project not registered"}'; exit 1; fi
 fi
 exit 0
 """
@@ -333,7 +333,7 @@ def suite_install():
                 check(approve(s5) == 0, "approve the version-only binary")
                 t5 = make_target(root5, label="old")
                 rc, out = run_install(s5, t5, expect_old=lr.sha256_file(t5), env=env5)
-                check(rc == 1, "install refuses a binary that fails the integrated probe")
+                check(rc == 1, "install refuses a binary that fails the tree probe")
                 st = lr.load_state(s5)
                 check(st["status"] == "failed" and st["failure"], "failed install records a reason")
                 check(st["failure"].get("backup") and os.path.exists(st["failure"]["backup"]),
@@ -374,7 +374,7 @@ def suite_status():
         check(rc == 0, "install ok: %s" % out[-160:])
         installed_history = len(lr.load_state(state)["history"])
         check(lr.main(["status", "--state-dir", state, "--target", target]) == 0,
-              "status aligned (hash + integrated probe) -> 0")
+              "status aligned (hash + tree probe) -> 0")
 
         make_binary(target, BROKEN_BINARY)
         rc = lr.main(["status", "--state-dir", state, "--target", target])
@@ -412,7 +412,7 @@ def suite_status():
             t2 = make_target(root2, body=BROKEN_BINARY)
             check(lr.sha256_file(t2) == bad_sha, "legacy target hash matches the installed record")
             rc = lr.main(["status", "--state-dir", s2, "--target", t2])
-            check(rc == lr.EXIT_NOT_USABLE, "hash match without the integrated probe -> 68, not aligned")
+            check(rc == lr.EXIT_NOT_USABLE, "hash match without the tree probe -> 68, not aligned")
         finally:
             shutil.rmtree(root2, ignore_errors=True)
 

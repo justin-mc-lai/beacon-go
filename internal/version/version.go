@@ -9,5 +9,6 @@ package version
 //
 // History: the old Go track used 2.0.0-go.N prerelease strings. Per the
 // 2026-11-24 normalization decision (docs/version-scheme.md), those were
-// prereleases of 2.0.0; the first stable release is 2.0.0.
-const Version = "2.0.0"
+// prereleases of 2.0.0. 2.0.0 was never tagged; 3.0.0 is the first
+// stable release of the intent-tree kernel.
+const Version = "3.0.0"

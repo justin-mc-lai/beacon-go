@@ -13,7 +13,7 @@ engine**: long-running coding work that plans itself into stages, advances
 step by step under hard gates, survives interruptions, and never marks
 itself done without independent verification and a human-confirmed release.
 
-Current release line: **v2.0.0 is an unreleased candidate** (plain SemVer, see [version-scheme.md](docs/version-scheme.md)). Do not treat it as a published release until a `v2.0.0` tag, GitHub Release, release notes, and `docs/beacon/v2.0.0/release/` are in place.
+Current release: **v3.0.0** (plain SemVer, see [version-scheme.md](docs/version-scheme.md)). Release notes: [docs/beacon/v3.0.0/release/3.0.0.md](docs/beacon/v3.0.0/release/3.0.0.md). Migration: [docs/migration-3.0.0.md](docs/migration-3.0.0.md).
 go.13 adds SDD version iteration (greenfield `v0.0.1`, explicit
 `projects bump`, docs/runtime axis separation); go.12 added program-level sea
 delivery (`goal program drive --until-done` + one `goal program complete`),

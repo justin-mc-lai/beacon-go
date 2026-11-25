@@ -10,7 +10,7 @@ Beacon Go 是 Beacon 内核的 Go 语言重构版。它保留 Python 版 Beacon 
 自己排阶段、在硬门禁下逐步推进、断了能续跑，并且永远不能绕过独立
 检查者和人工确认自称完成。
 
-当前版本线：**v2.0.0 为未发布候选**（纯 SemVer，见 [version-scheme.md](docs/version-scheme.md)）。在 `v2.0.0` tag、GitHub Release、release notes 与 `docs/beacon/v2.0.0/release/` 就位前，不视为已发布版本。
+当前版本：**v3.0.0**（纯 SemVer，见 [version-scheme.md](docs/version-scheme.md)）。发布说明：[docs/beacon/v3.0.0/release/3.0.0.md](docs/beacon/v3.0.0/release/3.0.0.md)；迁移指南：[docs/migration-3.0.0.md](docs/migration-3.0.0.md)。
 go.13 增加 SDD 版本迭代（绿项目 `v0.0.1`、显式 `projects bump`、docs/runtime
 双轴）；go.12 增加了多湖整片海交付、release 影子预演、特征地图、技能漂移
 校验和生命周期单调守卫。

@@ -50,8 +50,7 @@ EXIT_UNKNOWN_MANIFEST, EXIT_NOT_INSTALLED = 62, 63
 EXIT_STALE, EXIT_MANIFEST_CHANGED, EXIT_EVIDENCE_UNPROVEN = 64, 65, 66
 EXIT_TARGET_DRIFT, EXIT_NOT_USABLE = 67, 68
 
-INTEGRATED_SUBCOMMANDS = ("enable", "handoff", "dispatch", "merge", "route",
-                          "qa", "approve", "finalize")
+TREE_SUBCOMMANDS = ("init", "tree", "expand", "apply")
 
 _FIELD_ALIASES = {
     "verdict": "verdict", "判定": "verdict",
@@ -347,31 +346,30 @@ def functional_probe(binary):
     if proc.returncode != 0:
         return False, "version probe exit %d" % proc.returncode
     try:
-        help_proc = subprocess.run([binary, "goal", "program", "integrated", "--help"],
+        help_proc = subprocess.run([binary, "plan", "--help"],
                                    capture_output=True, text=True, timeout=20)
     except (OSError, subprocess.TimeoutExpired) as exc:
-        return False, "integrated help probe failed: " + str(exc)
+        return False, "tree help probe failed: " + str(exc)
     if help_proc.returncode != 0:
-        return False, "integrated help exit %d" % help_proc.returncode
-    missing = [sub for sub in INTEGRATED_SUBCOMMANDS
+        return False, "tree help exit %d" % help_proc.returncode
+    missing = [sub for sub in TREE_SUBCOMMANDS
                if sub not in (help_proc.stdout + help_proc.stderr)]
     if missing:
-        return False, "integrated help is missing: " + ", ".join(missing)
+        return False, "tree help is missing: " + ", ".join(missing)
     with tempfile.TemporaryDirectory(prefix="beacon-probe-") as tmp:
         env = dict(os.environ, BEACON_STORE_PATH=os.path.join(tmp, "probe.db"))
         try:
-            route_proc = subprocess.run(
-                [binary, "goal", "program", "integrated", "route",
-                 "--run-id", "release-probe-missing-run", "--json"],
+            tree_proc = subprocess.run(
+                [binary, "plan", "tree", "--project", tmp, "--json"],
                 capture_output=True, text=True, timeout=30, env=env)
         except (OSError, subprocess.TimeoutExpired) as exc:
-            return False, "integrated route probe failed: " + str(exc)
-    out = (route_proc.stdout + route_proc.stderr).strip()
-    if route_proc.returncode == 0:
-        return False, "integrated route probe unexpectedly found a run in a fresh store"
+            return False, "tree route probe failed: " + str(exc)
+    out = (tree_proc.stdout + tree_proc.stderr).strip()
+    if tree_proc.returncode == 0:
+        return False, "tree probe unexpectedly found a project in a fresh store"
     if "unknown command" in out.lower():
-        return False, "integrated route entry is not wired"
-    return True, "version + integrated entry + isolated route probe ok"
+        return False, "tree entry is not wired"
+    return True, "version + tree entry + isolated probe ok"
 
 
 # --------------------------------------------------------------------------

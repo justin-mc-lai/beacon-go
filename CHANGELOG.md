@@ -3,6 +3,34 @@
 All notable changes to Beacon Go. Versions are plain SemVer
 (`MAJOR.MINOR.PATCH`); see `docs/version-scheme.md`.
 
+## [3.0.0] - 2026-11-25
+
+### Breaking
+
+- Requirement truth is now an intent tree (`intent → module → feature → touchpoint`);
+  the sea/lake write surface (`goal program`, `truth decompose`, `goal parallel-plan`)
+  is removed.
+- Built-in agent executors (subprocess / profile / ralph), `delegate-ralph`, the
+  HTTP projection, desktop workspace, and the kernel LLM client are removed.
+  Stage work is host-driven and recorded with `goal tick --by`.
+- `qa` is no longer a top-level command; its capabilities live under `verify`.
+
+### Added
+
+- `plan init/tree/expand/apply`, `truth node freeze`, `change request/list`,
+  `implement report`, `verify leaf/rollup/audit`, `truth snapshot`, and
+  `doctor rebuild-tree`.
+- Canonical JSON tree with `tree-json-v1` fingerprints; SQLite is a rebuildable cache.
+- Immutable version snapshots with shared bodies; subtree change cascades to ancestors.
+- Node-scoped artifact evidence, parent verification rollup, and tree stage gates wired
+  into `goal`.
+- Badminton dogfood script and CI gate; kernel dependency gate.
+
+### Changed
+
+- Version is plain SemVer from `internal/version/version.go`; 2.0.0 was never tagged.
+- Package/evidence schema v2 adds explicit `scope_kind/scope_id` and backfills v1 rows.
+
 ## [2.0.0] - unreleased candidate
 
 > **Not a published release.** 2.0.0 remains an unreleased candidate until a `v2.0.0` tag, GitHub Release, release notes, and `docs/beacon/v2.0.0/release/` are in place.
