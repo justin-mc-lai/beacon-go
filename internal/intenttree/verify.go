@@ -119,6 +119,11 @@ func RollupVerified(st *store.Store, dir, nodeID string) (VerifyReport, error) {
 			return err
 		}
 		n.Status = StatusVerified
+		var bound []string
+		for _, ch := range children[id] {
+			bound = append(bound, ch.Fingerprint)
+		}
+		n.ChildFingerprints = bound
 		n, err = Stamp(n)
 		if err != nil {
 			return err

@@ -72,7 +72,7 @@ func FreezeNode(st *store.Store, dir, versionID, nodeID string) (FreezeReport, e
 	}
 	bound := make([]string, 0, len(children))
 	for _, ch := range children {
-		if ch.Status != StatusFrozen {
+		if ch.Status != StatusFrozen && ch.Status != StatusImplemented && ch.Status != StatusVerified {
 			return FreezeReport{}, core.NewError(ReasonParentNotFrozen, "intenttree.FreezeNode",
 				fmt.Sprintf("child %s is %s; freeze children first", ch.ID, ch.Status))
 		}

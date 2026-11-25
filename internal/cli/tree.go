@@ -19,7 +19,7 @@ import (
 
 func newPlanCmd() *cobra.Command {
 	c := &cobra.Command{Use: "plan", Short: "Plan group: build and validate intent trees"}
-	c.AddCommand(newPlanTreeCmd(), newPlanExpandCmd(), newPlanApplyCmd())
+	c.AddCommand(newPlanInitCmd(), newPlanTreeCmd(), newPlanExpandCmd(), newPlanApplyCmd())
 	return c
 }
 

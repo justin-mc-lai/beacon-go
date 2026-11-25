@@ -34,6 +34,9 @@ jobs:
       - name: kernel dependency gate
         if: matrix.os == 'ubuntu-latest'
         run: bash scripts/check_kernel_deps.sh
+      - name: badminton dogfood
+        if: matrix.os == 'ubuntu-latest'
+        run: go build -o bin/beacon ./cmd/beacon && bash e2e/run_dogfood.sh
       - name: AC-025 file-size guard
         if: matrix.os == 'ubuntu-latest'
         run: bash scripts/check_file_size.sh

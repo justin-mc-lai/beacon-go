@@ -2,6 +2,7 @@ package intenttree
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -19,9 +20,21 @@ type ProposalChild struct {
 	Verification *Verification `json:"verification,omitempty"`
 }
 
+// Provenance is the host/LLM record for one expansion. The kernel
+// stores it; it never calls the model itself.
+type Provenance struct {
+	Model      string  `json:"model,omitempty"`
+	PromptHash string  `json:"prompt_hash,omitempty"`
+	Skill      string  `json:"skill,omitempty"`
+	Tokens     int     `json:"tokens,omitempty"`
+	CostUSD    float64 `json:"cost_usd,omitempty"`
+	By         string  `json:"by,omitempty"`
+}
+
 // Proposal is one expansion request for an existing draft parent.
 type Proposal struct {
-	Children []ProposalChild `json:"children"`
+	Children   []ProposalChild `json:"children"`
+	Provenance *Provenance     `json:"provenance,omitempty"`
 }
 
 // ValidateProposal is the single proposal judgement shared by the
@@ -133,6 +146,15 @@ func ApplyProposal(st *store.Store, dir, versionID, parentID string, p Proposal)
 	}
 	if err := st.AppendTreeNodes(versionID, cache); err != nil {
 		return nil, err
+	}
+	record := map[string]any{
+		"parent_id": parentID, "at": now, "children": nodes,
+	}
+	if p.Provenance != nil {
+		record["provenance"] = p.Provenance
+	}
+	if raw, err := prettyJSON(record); err == nil {
+		_ = atomicWrite(filepath.Join(dir, "expansions", shortID("exp_", parentID, now)+".json"), raw)
 	}
 	return nodes, nil
 }

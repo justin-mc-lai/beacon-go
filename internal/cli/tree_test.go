@@ -246,3 +246,19 @@ func TestTreeRollbackAndRerun(t *testing.T) {
 	}
 	mustRun(t, "plan", "tree", "--project", proj, "--json")
 }
+
+func TestPlanInitCreatesRoot(t *testing.T) {
+	proj := treeTestEnv(t)
+	out := mustRun(t, "plan", "init", "--project", proj, "--title", "badminton", "--intent", "run a badminton community", "--json")
+	root := parseDoc(t, out)["root"].(map[string]any)
+	if root["kind"] != "intent" {
+		t.Fatalf("root = %v", root)
+	}
+	doc := parseDoc(t, mustRun(t, "plan", "tree", "--project", proj, "--json"))
+	if doc["node_count"] != float64(1) {
+		t.Fatalf("tree = %v", doc)
+	}
+	if _, err := runCLI(t, "plan", "init", "--project", proj, "--json"); err == nil || !strings.Contains(err.Error(), "tree_state_conflict") {
+		t.Fatalf("second init: %v", err)
+	}
+}
