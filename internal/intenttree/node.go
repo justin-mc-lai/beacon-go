@@ -45,6 +45,14 @@ const (
 	ReasonNodeNotFrozen        = "tree_node_not_frozen"
 	ReasonArtifactRequired     = "tree_artifact_required"
 	ReasonOutcomeInvalid       = "tree_outcome_invalid"
+	ReasonFSMScope             = "tree_fsm_scope"
+	ReasonFSMInvalid           = "tree_fsm_invalid"
+	ReasonFSMUnknownState      = "tree_fsm_unknown_state"
+	ReasonFSMDuplicate         = "tree_fsm_duplicate_state"
+	ReasonFSMConflict          = "tree_fsm_illegal_conflict"
+	ReasonTestCaseMissing      = "tree_test_case_missing"
+	ReasonTestCaseInvalid      = "tree_test_case_invalid"
+	ReasonACCoverage           = "tree_ac_test_coverage"
 )
 
 // Kind is one of the four frozen node kinds.
@@ -92,6 +100,29 @@ type ImplementationRecord struct {
 	At           string `json:"at"`
 }
 
+// FSMTransition is one legal or illegal domain transition.
+type FSMTransition struct {
+	From  string `json:"from"`
+	To    string `json:"to"`
+	Event string `json:"event,omitempty"`
+}
+
+// DomainFSM is the business state machine carried by a feature node.
+type DomainFSM struct {
+	States      []string        `json:"states"`
+	Transitions []FSMTransition `json:"transitions"`
+	Illegal     []FSMTransition `json:"illegal,omitempty"`
+}
+
+// TestCase binds one AC to a concrete test or manual check.
+type TestCase struct {
+	ID     string `json:"id"`
+	ACID   string `json:"ac_id"`
+	Kind   string `json:"kind"`
+	Ref    string `json:"ref"`
+	Status string `json:"status"`
+}
+
 // Node is one canonical node body. Fingerprint fields are excluded from
 // the hashed bytes; everything else is contract surface.
 type Node struct {
@@ -103,6 +134,8 @@ type Node struct {
 	Path                 string                `json:"path"`
 	Status               Status                `json:"status"`
 	ACs                  []AC                  `json:"acs,omitempty"`
+	TestCases            []TestCase            `json:"test_cases,omitempty"`
+	DomainFSM            *DomainFSM            `json:"domain_fsm,omitempty"`
 	Verification         *Verification         `json:"verification,omitempty"`
 	ChildFingerprints    []string              `json:"child_fingerprints,omitempty"`
 	Implementation       *ImplementationRecord `json:"implementation,omitempty"`
@@ -254,5 +287,91 @@ func SortedIndex(idx Index) Index {
 		}
 		return strings.Compare(out.Nodes[i].Path, out.Nodes[j].Path) < 0
 	})
+	return out
+}
+
+// ValidateDomainFSM checks a feature's business state machine.
+func ValidateDomainFSM(f *DomainFSM) []string {
+	if f == nil {
+		return nil
+	}
+	var out []string
+	states := map[string]bool{}
+	for _, st := range f.States {
+		st = strings.TrimSpace(st)
+		if st == "" {
+			out = append(out, ReasonFSMInvalid+": empty state")
+			continue
+		}
+		if states[st] {
+			out = append(out, ReasonFSMDuplicate+": "+st)
+		}
+		states[st] = true
+	}
+	if len(f.States) == 0 {
+		out = append(out, ReasonFSMInvalid+": states are empty")
+	}
+	legal := map[string]bool{}
+	for _, tr := range f.Transitions {
+		if !states[tr.From] || !states[tr.To] {
+			out = append(out, ReasonFSMUnknownState+": "+tr.From+" -> "+tr.To)
+			continue
+		}
+		legal[tr.From+"->"+tr.To] = true
+	}
+	for _, tr := range f.Illegal {
+		if !states[tr.From] || !states[tr.To] {
+			out = append(out, ReasonFSMUnknownState+": "+tr.From+" -> "+tr.To)
+		}
+		if legal[tr.From+"->"+tr.To] {
+			out = append(out, ReasonFSMConflict+": "+tr.From+" -> "+tr.To)
+		}
+	}
+	return out
+}
+
+// ValidateTestCases checks ids, enum values, AC references and that every
+// AC is covered by at least one test case.
+func ValidateTestCases(acs []AC, cases []TestCase) []string {
+	var out []string
+	seen := map[string]bool{}
+	covered := map[string]bool{}
+	for _, tc := range cases {
+		if strings.TrimSpace(tc.ID) == "" {
+			out = append(out, ReasonTestCaseInvalid+": empty id")
+		}
+		if seen[tc.ID] {
+			out = append(out, ReasonTestCaseInvalid+": duplicate id "+tc.ID)
+		}
+		seen[tc.ID] = true
+		switch tc.Kind {
+		case "unit", "e2e", "manual":
+		default:
+			out = append(out, ReasonTestCaseInvalid+": kind "+tc.Kind)
+		}
+		switch tc.Status {
+		case "existing", "planned":
+		default:
+			out = append(out, ReasonTestCaseInvalid+": status "+tc.Status)
+		}
+		if strings.TrimSpace(tc.Ref) == "" {
+			out = append(out, ReasonTestCaseInvalid+": empty ref "+tc.ID)
+		}
+		found := false
+		for _, ac := range acs {
+			if ac.ID == tc.ACID {
+				found = true
+				covered[ac.ID] = true
+			}
+		}
+		if !found {
+			out = append(out, ReasonTestCaseInvalid+": unknown ac "+tc.ACID)
+		}
+	}
+	for _, ac := range acs {
+		if !covered[ac.ID] {
+			out = append(out, ReasonACCoverage+": "+ac.ID)
+		}
+	}
 	return out
 }

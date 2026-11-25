@@ -1,0 +1,36 @@
+{
+  "at": "2026-11-25T03:04:56.290408Z",
+  "children": [
+    {
+      "id": "n_99a31e588da7",
+      "kind": "feature",
+      "title": "canonical-json",
+      "intent": "canonical JSON 与指纹",
+      "parent_id": "n_244f402ca9c7",
+      "path": "root/truth-kernel/canonical-json",
+      "status": "draft",
+      "fingerprint": "12ea1e1574bbec40cfa77bf97896542b62e27a335c235864bc56ad0ba5ea4348",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_b5046d07c9aa",
+      "kind": "feature",
+      "title": "freeze-change",
+      "intent": "递归冻结与子树变更",
+      "parent_id": "n_244f402ca9c7",
+      "path": "root/truth-kernel/freeze-change",
+      "status": "draft",
+      "fingerprint": "0785133093ebce0eee9b503fbbe5adfe830652cc2d9d5ef9f6d0f034d10b528b",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_244f402ca9c7",
+  "provenance": {
+    "model": "host-agent",
+    "prompt_hash": "sha256:beacon-self-tree-v1",
+    "skill": "beacon-go-plan",
+    "tokens": 2400,
+    "cost_usd": 0.04,
+    "by": "self-host"
+  }
+}

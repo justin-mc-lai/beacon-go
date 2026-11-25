@@ -46,7 +46,7 @@ Seven command groups, one tree:
 | Group | Surface | What it does |
 | --- | --- | --- |
 | **plan** | `beacon plan …` | Create and expand the tree: `init` the root, validate a proposal with `expand`, write drafts with `apply`. Expansion provenance (model, prompt hash, tokens, cost) is recorded. |
-| **truth** | `beacon truth …` | Freeze nodes bottom-up (`truth node freeze`), keep legacy packages, render the tree, and produce immutable snapshots. A leaf needs an AC and a verification spec; a module needs children. |
+| **truth** | `beacon truth …` | Freeze nodes bottom-up (`truth node freeze`), keep legacy packages, render the tree (the HTML view is a three-pane workbench: full tree, node requirement, related FSM), and produce immutable snapshots. A leaf needs an AC and a verification spec; a module needs children. |
 | **change** | `beacon change …` | Invalidate a frozen subtree: descendants become draft, ancestors become `change_pending`; refreeze bottom-up. Records are immutable. |
 | **implement** | `beacon implement …` | The host does the work; `implement report` records the leaf, executor identity, artifact hash, and failure reasons. |
 | **verify** | `beacon verify …` | Register evidence under a feature or node scope, verify leaves, roll parents up, audit the tree, and run the former qa gates/scores. |

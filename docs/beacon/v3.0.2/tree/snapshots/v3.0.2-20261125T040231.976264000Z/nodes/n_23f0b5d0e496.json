@@ -1,0 +1,41 @@
+{
+  "id": "n_23f0b5d0e496",
+  "kind": "touchpoint",
+  "title": "source-hash",
+  "intent": "源哈希随正文变化，渲染只引用不改写。",
+  "parent_id": "n_e7a2c69c27ab",
+  "path": "root/truth-kernel/repository-projection/source-hash",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "sh1",
+      "text": "正文变化后 source hash 变化。"
+    },
+    {
+      "id": "sh2",
+      "text": "渲染结果携带 source hash。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "sh-tc1",
+      "ac_id": "sh1",
+      "kind": "unit",
+      "ref": "go test ./internal/intenttree -run TestRenderSourceHashTracksChange",
+      "status": "planned"
+    },
+    {
+      "id": "sh-tc2",
+      "ac_id": "sh2",
+      "kind": "unit",
+      "ref": "go test ./internal/intenttree -run TestRenderSourceHashTracksChange",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "修改任一节点正文后重新渲染，页面 source hash 不同。"
+  },
+  "fingerprint": "814ed25e9ec10e1734e1344afbbd717061828c2c84d1fe2d53bbc21c43c309d6",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,58 @@
+{
+  "id": "n_9689b26b5f17",
+  "kind": "feature",
+  "title": "gate-evaluation",
+  "intent": "正式 gate 评估并写回结果；未通过不自动补全。",
+  "parent_id": "n_66fe3404b218",
+  "path": "root/verification/gate-evaluation",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "ge-1",
+      "text": "评估写 gate_results。"
+    },
+    {
+      "id": "ge-2",
+      "text": "状态查询按 feature 作用域。"
+    },
+    {
+      "id": "ge-3",
+      "text": "失败返回稳定 reason code。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "pending",
+      "passed",
+      "blocked"
+    ],
+    "transitions": [
+      {
+        "from": "pending",
+        "to": "passed",
+        "event": "evaluate_pass"
+      },
+      {
+        "from": "pending",
+        "to": "blocked",
+        "event": "evaluate_block"
+      },
+      {
+        "from": "blocked",
+        "to": "pending",
+        "event": "fix"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "blocked",
+        "to": "passed"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "da406db47ee957568b95650c87f3b0ab3f1242f7c676f52118435334d1e94e56"
+  ],
+  "fingerprint": "3b2eda92f3708b8caf38702ac72302c464ecbc94993d96852072c9ada5102171",
+  "fingerprint_alg": "tree-json-v1"
+}

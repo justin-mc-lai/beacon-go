@@ -1,0 +1,41 @@
+{
+  "id": "n_79f7bfd68155",
+  "kind": "touchpoint",
+  "title": "tick identity",
+  "intent": "显式身份推进",
+  "parent_id": "n_4aafa3895e8d",
+  "path": "root/goal-orchestration/manual-run/tick-identity",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_79f7bfd68155-1",
+      "text": "goal tick --by 推进一个阶段。"
+    },
+    {
+      "id": "n_79f7bfd68155-2",
+      "text": "无身份时阻塞并给 manual_tick_required。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_79f7bfd68155-tc1",
+      "ac_id": "n_79f7bfd68155-1",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestManualExecutorRunAdvancesViaTick",
+      "status": "existing"
+    },
+    {
+      "id": "n_79f7bfd68155-tc2",
+      "ac_id": "n_79f7bfd68155-2",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestManualExecutorRunAdvancesViaTick",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 goal tick --by host 执行后，当前阶段推进一次"
+  },
+  "fingerprint": "a0312f862c12e324b2167dd0962f6382451dbafa43bce00930f599543e1166f8",
+  "fingerprint_alg": "tree-json-v1"
+}

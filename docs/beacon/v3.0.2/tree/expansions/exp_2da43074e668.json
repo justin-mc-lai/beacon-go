@@ -1,0 +1,53 @@
+{
+  "at": "2026-11-25T04:02:14.771296Z",
+  "children": [
+    {
+      "id": "n_65c89b949e6f",
+      "kind": "module",
+      "title": "data-migration",
+      "intent": "旧账本与仓库真相之间的单向迁移；先快照，再写入，可回滚。",
+      "parent_id": "nroot_98a9c77a9519",
+      "path": "root/data-migration",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "dm-1",
+          "text": "迁移前必须生成快照；写入失败保留原始数据。"
+        },
+        {
+          "id": "dm-2",
+          "text": "SQLite 只是缓存，树 JSON 是唯一权威。"
+        }
+      ],
+      "fingerprint": "02d640bd871a0dd39e24bc17b87b6912ca72c58fdcffeee677ded18241f69fdf",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_b635840fe744",
+      "kind": "module",
+      "title": "security-boundary",
+      "intent": "受保护路径与写入口必须有明确批准与回执。",
+      "parent_id": "nroot_98a9c77a9519",
+      "path": "root/security-boundary",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "sb-1",
+          "text": "密钥、支付、迁移目录写入必须显式批准。"
+        },
+        {
+          "id": "sb-2",
+          "text": "每个写回执记录操作者、时间与原因。"
+        }
+      ],
+      "fingerprint": "d848e68e0c51555562ac3a81ffb6334c82afee7399a78f9f8c77e00ea82b5186",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "nroot_98a9c77a9519",
+  "provenance": {
+    "model": "host-llm",
+    "skill": "beacon-intent-tree",
+    "by": "self-host"
+  }
+}

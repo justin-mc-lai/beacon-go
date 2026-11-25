@@ -1,0 +1,52 @@
+{
+  "at": "2026-11-25T04:02:31.318259Z",
+  "children": [
+    {
+      "id": "n_8107d51ca5b8",
+      "kind": "touchpoint",
+      "title": "gate-evaluate",
+      "intent": "评估一次并写回可查询结果。",
+      "parent_id": "n_9689b26b5f17",
+      "path": "root/verification/gate-evaluation/gate-evaluate",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "gv-1",
+          "text": "通过时 gate_result=passed。"
+        },
+        {
+          "id": "gv-2",
+          "text": "缺证据时 blocked 并给 reason。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "gv-tc1",
+          "ac_id": "gv-1",
+          "kind": "unit",
+          "ref": "go test ./internal/gate -run TestTruthFreezePassAndBlock",
+          "status": "planned"
+        },
+        {
+          "id": "gv-tc2",
+          "ac_id": "gv-2",
+          "kind": "unit",
+          "ref": "go test ./internal/gate -run TestTruthFreezePassAndBlock",
+          "status": "planned"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "调用 gate evaluate 后查询状态，结果与退出码一致。"
+      },
+      "fingerprint": "c0e0d052e620e41cc0382a1be92edbdbd62d495993f089a17ab721f007acca31",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_9689b26b5f17",
+  "provenance": {
+    "model": "host-llm",
+    "skill": "beacon-intent-tree",
+    "by": "self-host"
+  }
+}

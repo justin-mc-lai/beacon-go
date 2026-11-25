@@ -1,0 +1,25 @@
+{
+  "id": "n_79f7bfd68155",
+  "kind": "touchpoint",
+  "title": "tick identity",
+  "intent": "显式身份推进",
+  "parent_id": "n_4aafa3895e8d",
+  "path": "root/goal-orchestration/manual-run/tick-identity",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_79f7bfd68155-1",
+      "text": "goal tick --by 推进一个阶段。"
+    },
+    {
+      "id": "n_79f7bfd68155-2",
+      "text": "无身份时阻塞并给 manual_tick_required。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 goal tick --by host 执行后，当前阶段推进一次"
+  },
+  "fingerprint": "3b4dae13b1f2616feca057ab949f4c7baf6cff57a00a3953d5c7b9e3a3c9b6a7",
+  "fingerprint_alg": "tree-json-v1"
+}

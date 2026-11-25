@@ -1,0 +1,15 @@
+{
+  "id": "n_2f9cbcff36f4",
+  "kind": "module",
+  "title": "goal-orchestration",
+  "intent": "单次长跑的阶段推进与门禁",
+  "parent_id": "nroot_98a9c77a9519",
+  "path": "root/goal-orchestration",
+  "status": "frozen",
+  "child_fingerprints": [
+    "f1646c503f9cc458b783d7ca6407e9496f9b1f9a86eeb1725f1a7a688934492a",
+    "426c9af6c132f130e650cfbb817ac922464a53623f88a6d6528bfa35d5eb92c9"
+  ],
+  "fingerprint": "cba8d56518cd5be0e0a9fa4183d4b344b29e0240aad560decef710ea0deb103c",
+  "fingerprint_alg": "tree-json-v1"
+}

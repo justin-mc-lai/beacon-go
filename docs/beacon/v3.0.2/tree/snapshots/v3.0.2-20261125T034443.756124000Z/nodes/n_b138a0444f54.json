@@ -1,0 +1,25 @@
+{
+  "id": "n_b138a0444f54",
+  "kind": "touchpoint",
+  "title": "release gate",
+  "intent": "根未 verified 不放行",
+  "parent_id": "n_542ddf4aff0d",
+  "path": "root/goal-orchestration/stage-gate/release-gate",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_b138a0444f54-1",
+      "text": "root 未 verified 时 complete 拒绝。"
+    },
+    {
+      "id": "n_b138a0444f54-2",
+      "text": "verified root + verifier + 人工确认才完成。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当根未 verified 时，goal complete 返回 tree_root_not_verified"
+  },
+  "fingerprint": "26110b7665b69a8e7232502711a3d93d9d6109856d268dcfd364c0b9364150b1",
+  "fingerprint_alg": "tree-json-v1"
+}

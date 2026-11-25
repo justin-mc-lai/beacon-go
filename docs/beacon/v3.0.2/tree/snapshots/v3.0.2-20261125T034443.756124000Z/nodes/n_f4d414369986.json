@@ -1,0 +1,25 @@
+{
+  "id": "n_f4d414369986",
+  "kind": "touchpoint",
+  "title": "single version source",
+  "intent": "版本只有一个源",
+  "parent_id": "n_02bbe57308e0",
+  "path": "root/cli-surface/dependency-gate/single-version-source",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_f4d414369986-1",
+      "text": "README/README.zh/AGENTS 与 version.go 一致。"
+    },
+    {
+      "id": "n_f4d414369986-2",
+      "text": "写死版本或第二字面量被门禁拒绝。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 AGENTS 写死当前版本时，版本检查失败"
+  },
+  "fingerprint": "906eb87ed11556c6dadc095a38c8a476e17a5503ebf20326539fb29f6ba60e2b",
+  "fingerprint_alg": "tree-json-v1"
+}

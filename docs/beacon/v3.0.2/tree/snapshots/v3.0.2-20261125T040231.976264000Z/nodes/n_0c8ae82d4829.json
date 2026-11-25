@@ -1,0 +1,41 @@
+{
+  "id": "n_0c8ae82d4829",
+  "kind": "touchpoint",
+  "title": "ask-confirm",
+  "intent": "提问关闭、意图确认后才允许冻结。",
+  "parent_id": "n_2f1bbf51c776",
+  "path": "root/truth-kernel/package-lifecycle/ask-confirm",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "aq-1",
+      "text": "存在未回答问题时不确认。"
+    },
+    {
+      "id": "aq-2",
+      "text": "确认后状态进入 in_review。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "aq-tc1",
+      "ac_id": "aq-1",
+      "kind": "unit",
+      "ref": "planned: truth ask answer confirm test",
+      "status": "planned"
+    },
+    {
+      "id": "aq-tc2",
+      "ac_id": "aq-2",
+      "kind": "unit",
+      "ref": "planned: truth confirm state test",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当存在 open question 时 confirm 拒绝；关闭后 confirm 成功。"
+  },
+  "fingerprint": "3a50ea1bd1d94f0148e6a6ec0d7afd6cc3e3f1fecbb9bf1b1c1a2836756da84e",
+  "fingerprint_alg": "tree-json-v1"
+}

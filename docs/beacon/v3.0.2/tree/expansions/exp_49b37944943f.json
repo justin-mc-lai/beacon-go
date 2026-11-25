@@ -1,0 +1,113 @@
+{
+  "at": "2026-11-25T04:02:31.216036Z",
+  "children": [
+    {
+      "id": "n_2f1bbf51c776",
+      "kind": "feature",
+      "title": "package-lifecycle",
+      "intent": "需求包从提问、确认、冻结、变更到重冻与重开的生命周期。",
+      "parent_id": "n_244f402ca9c7",
+      "path": "root/truth-kernel/package-lifecycle",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "pl-1",
+          "text": "未确认的意图不能冻结。"
+        },
+        {
+          "id": "pl-2",
+          "text": "变更关闭后才能重冻。"
+        },
+        {
+          "id": "pl-3",
+          "text": "重开产生新修订，旧冻结留在轨迹。"
+        }
+      ],
+      "domain_fsm": {
+        "states": [
+          "draft",
+          "in_review",
+          "frozen",
+          "change_pending",
+          "reopened",
+          "deprecated"
+        ],
+        "transitions": [
+          {
+            "from": "draft",
+            "to": "in_review",
+            "event": "confirm"
+          },
+          {
+            "from": "in_review",
+            "to": "frozen",
+            "event": "freeze"
+          },
+          {
+            "from": "frozen",
+            "to": "change_pending",
+            "event": "change"
+          },
+          {
+            "from": "change_pending",
+            "to": "frozen",
+            "event": "refreeze"
+          },
+          {
+            "from": "frozen",
+            "to": "reopened",
+            "event": "reopen"
+          },
+          {
+            "from": "frozen",
+            "to": "deprecated",
+            "event": "deprecate"
+          }
+        ],
+        "illegal": [
+          {
+            "from": "draft",
+            "to": "frozen"
+          },
+          {
+            "from": "deprecated",
+            "to": "frozen"
+          }
+        ]
+      },
+      "fingerprint": "11e0b0b473f52dc22275b815eaa74a20e7075f00bf3f366a89c9c35e3b2f4bf6",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_e7a2c69c27ab",
+      "kind": "feature",
+      "title": "repository-projection",
+      "intent": "树 JSON 是权威，缓存与渲染均为可重建投影。",
+      "parent_id": "n_244f402ca9c7",
+      "path": "root/truth-kernel/repository-projection",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "rp-1",
+          "text": "源哈希覆盖全部节点正文。"
+        },
+        {
+          "id": "rp-2",
+          "text": "渲染不改合同指纹。"
+        },
+        {
+          "id": "rp-3",
+          "text": "缓存失效可从 JSON 重建。"
+        }
+      ],
+      "fingerprint": "65750e69323196dff117741ee64c774eeddcdca552bfcac1669b6d5d69bdaaa0",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_244f402ca9c7",
+  "provenance": {
+    "model": "host-llm",
+    "skill": "beacon-intent-tree",
+    "by": "self-host"
+  }
+}

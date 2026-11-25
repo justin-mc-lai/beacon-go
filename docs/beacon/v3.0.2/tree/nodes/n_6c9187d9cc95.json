@@ -1,0 +1,41 @@
+{
+  "id": "n_6c9187d9cc95",
+  "kind": "touchpoint",
+  "title": "canonical serialization",
+  "intent": "固定键序与字段序",
+  "parent_id": "n_99a31e588da7",
+  "path": "root/truth-kernel/canonical-json/canonical-serialization",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_6c9187d9cc95-1",
+      "text": "两次序列化字节一致。"
+    },
+    {
+      "id": "n_6c9187d9cc95-2",
+      "text": "键序与字段序固定。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_6c9187d9cc95-tc1",
+      "ac_id": "n_6c9187d9cc95-1",
+      "kind": "unit",
+      "ref": "go test ./internal/intenttree -run TestFingerprintStableAndSensitive",
+      "status": "existing"
+    },
+    {
+      "id": "n_6c9187d9cc95-tc2",
+      "ac_id": "n_6c9187d9cc95-2",
+      "kind": "unit",
+      "ref": "go test ./internal/intenttree -run TestFingerprintStableAndSensitive",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当同一节点写两次时，两字节流 SHA-256 相同"
+  },
+  "fingerprint": "8929d336a97e0a391d5cee821b4c38c2eaa7e4bf6bd05dff73d6ace81a8df442",
+  "fingerprint_alg": "tree-json-v1"
+}

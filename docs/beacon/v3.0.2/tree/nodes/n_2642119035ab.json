@@ -1,0 +1,41 @@
+{
+  "id": "n_2642119035ab",
+  "kind": "touchpoint",
+  "title": "change cascade",
+  "intent": "祖先自动失效",
+  "parent_id": "n_b5046d07c9aa",
+  "path": "root/truth-kernel/freeze-change/change-cascade",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_2642119035ab-1",
+      "text": "后代 change 后祖先 change_pending。"
+    },
+    {
+      "id": "n_2642119035ab-2",
+      "text": "refreeze 自底向上恢复。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_2642119035ab-tc1",
+      "ac_id": "n_2642119035ab-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestSubtreeChangeCascadeAndRefreeze",
+      "status": "existing"
+    },
+    {
+      "id": "n_2642119035ab-tc2",
+      "ac_id": "n_2642119035ab-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestSubtreeChangeCascadeAndRefreeze",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当对叶子发起 change 时，其 feature/module/root 状态为 change_pending"
+  },
+  "fingerprint": "96d49a75780fa1f7d266eb740df67b17837eb7a3c45eeb6f630c1c6de26c3bd6",
+  "fingerprint_alg": "tree-json-v1"
+}

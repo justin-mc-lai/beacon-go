@@ -140,8 +140,8 @@ func TestPlanApplyThenFreezeWholeTree(t *testing.T) {
 	feat := apply(modID, `{"children":[{"kind":"feature","title":"login"}]}`)
 	featID := feat["nodes"].([]any)[0].(map[string]any)["id"].(string)
 	leaf := apply(featID, `{"children":[
-		{"kind":"touchpoint","title":"submit","acs":[{"id":"a1","text":"可提交"}],"verification":{"type":"test","spec":"当提交时返回结果"}},
-		{"kind":"touchpoint","title":"cancel","acs":[{"id":"a2","text":"可取消"}],"verification":{"type":"test","spec":"当取消时释放名额"}}
+		{"kind":"touchpoint","title":"submit","acs":[{"id":"a1","text":"可提交"}],"verification":{"type":"test","spec":"当提交时返回结果"},"test_cases":[{"id":"t1","ac_id":"a1","kind":"unit","ref":"go test ./internal/cli -run TestPlanApplyThenFreezeWholeTree","status":"existing"}]},
+		{"kind":"touchpoint","title":"cancel","acs":[{"id":"a2","text":"可取消"}],"verification":{"type":"test","spec":"当取消时释放名额"},"test_cases":[{"id":"t2","ac_id":"a2","kind":"unit","ref":"go test ./internal/cli -run TestPlanApplyThenFreezeWholeTree","status":"existing"}]}
 	]}`)
 	leaves := leaf["nodes"].([]any)
 

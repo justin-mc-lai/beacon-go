@@ -1,0 +1,69 @@
+{
+  "at": "2026-11-25T03:04:56.281637Z",
+  "children": [
+    {
+      "id": "n_244f402ca9c7",
+      "kind": "module",
+      "title": "truth-kernel",
+      "intent": "需求真相的存储、冻结与变更",
+      "parent_id": "nroot_98a9c77a9519",
+      "path": "root/truth-kernel",
+      "status": "draft",
+      "fingerprint": "35a22ecc67813519eee18f89cdac73fd7b9bcdba7004c25761b7494c9b217a65",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_66fe3404b218",
+      "kind": "module",
+      "title": "verification",
+      "intent": "证据、叶子验证与父级汇总",
+      "parent_id": "nroot_98a9c77a9519",
+      "path": "root/verification",
+      "status": "draft",
+      "fingerprint": "fb3a024ad00ed27923f046e4108470b07326b14c212325872cae35210877b46a",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_2f9cbcff36f4",
+      "kind": "module",
+      "title": "goal-orchestration",
+      "intent": "单次长跑的阶段推进与门禁",
+      "parent_id": "nroot_98a9c77a9519",
+      "path": "root/goal-orchestration",
+      "status": "draft",
+      "fingerprint": "2c279b976f313d8eff765e332bfc63147cfccfe833968e1a7eb9cc80c0616083",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_8b83bfc9403d",
+      "kind": "module",
+      "title": "cli-surface",
+      "intent": "用户命令面与依赖门禁",
+      "parent_id": "nroot_98a9c77a9519",
+      "path": "root/cli-surface",
+      "status": "draft",
+      "fingerprint": "a971ea00890a67e69cc1ed612b02e3c697f6ef1f7ee3fe427e9f2fd53abdfa00",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_0338b8fdd30a",
+      "kind": "module",
+      "title": "self-host",
+      "intent": "用自身能力验证自身",
+      "parent_id": "nroot_98a9c77a9519",
+      "path": "root/self-host",
+      "status": "draft",
+      "fingerprint": "a4ab46254b2cf60b1d6e82aecab9e12915468a8178d8f03e0922ab33e9aa659f",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "nroot_98a9c77a9519",
+  "provenance": {
+    "model": "host-agent",
+    "prompt_hash": "sha256:beacon-self-tree-v1",
+    "skill": "beacon-go-plan",
+    "tokens": 2400,
+    "cost_usd": 0.04,
+    "by": "self-host"
+  }
+}

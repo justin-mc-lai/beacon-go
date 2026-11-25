@@ -1,0 +1,25 @@
+{
+  "id": "n_d806badcae4c",
+  "kind": "touchpoint",
+  "title": "node scope registration",
+  "intent": "证据绑到节点",
+  "parent_id": "n_f2b317a84be5",
+  "path": "root/verification/evidence-scope/node-scope-registration",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_d806badcae4c-1",
+      "text": "node scope 登记后可按 scope 查询。"
+    },
+    {
+      "id": "n_d806badcae4c-2",
+      "text": "feature scope 不串数据。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当登记 node scope 证据后，按 scope 查询返回该工件"
+  },
+  "fingerprint": "57e3ac0744188da4379d5d3f441ad7a233b63a9a273fbb2cc47cc707695d689c",
+  "fingerprint_alg": "tree-json-v1"
+}

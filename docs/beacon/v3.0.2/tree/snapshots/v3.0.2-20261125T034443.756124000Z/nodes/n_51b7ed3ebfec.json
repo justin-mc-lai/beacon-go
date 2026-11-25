@@ -1,0 +1,25 @@
+{
+  "id": "n_51b7ed3ebfec",
+  "kind": "touchpoint",
+  "title": "html history",
+  "intent": "历史树可浏览",
+  "parent_id": "n_036eb6e70d4a",
+  "path": "root/self-host/dogfood/html-history",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_51b7ed3ebfec-1",
+      "text": "快照 index 可读且指纹校验通过。"
+    },
+    {
+      "id": "n_51b7ed3ebfec-2",
+      "text": "HTML 渲染路径可打印。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 truth tree --format html 后，index.html 存在"
+  },
+  "fingerprint": "ae3477f3370132e558bb5acc86814181287937b0a8dbe75a80de9042d4febd24",
+  "fingerprint_alg": "tree-json-v1"
+}

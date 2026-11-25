@@ -17,6 +17,8 @@ type ProposalChild struct {
 	Title        string        `json:"title"`
 	Intent       string        `json:"intent,omitempty"`
 	ACs          []AC          `json:"acs,omitempty"`
+	TestCases    []TestCase    `json:"test_cases,omitempty"`
+	DomainFSM    *DomainFSM    `json:"domain_fsm,omitempty"`
 	Verification *Verification `json:"verification,omitempty"`
 }
 
@@ -53,6 +55,24 @@ func ValidateProposal(parent Kind, p Proposal) error {
 		}
 		if err := ValidateChild(parent, ch.Kind); err != nil {
 			return err
+		}
+		if ch.DomainFSM != nil {
+			if ch.Kind != KindFeature {
+				return core.NewError(ReasonFSMScope, "intenttree.ValidateProposal",
+					"domain FSM belongs to feature nodes: "+ch.Title)
+			}
+			if findings := ValidateDomainFSM(ch.DomainFSM); len(findings) > 0 {
+				return core.NewError(ReasonFSMInvalid, "intenttree.ValidateProposal", strings.Join(findings, "; "))
+			}
+		}
+		if len(ch.TestCases) > 0 {
+			if ch.Kind != KindTouchpoint {
+				return core.NewError(ReasonTestCaseInvalid, "intenttree.ValidateProposal",
+					"test cases belong to touchpoints: "+ch.Title)
+			}
+			if findings := ValidateTestCases(ch.ACs, ch.TestCases); len(findings) > 0 {
+				return core.NewError(ReasonTestCaseInvalid, "intenttree.ValidateProposal", strings.Join(findings, "; "))
+			}
 		}
 		if ch.Kind == KindTouchpoint {
 			if len(ch.ACs) == 0 {
@@ -117,6 +137,8 @@ func ApplyProposal(st *store.Store, dir, versionID, parentID string, p Proposal)
 			Path:         path,
 			Status:       StatusDraft,
 			ACs:          ch.ACs,
+			TestCases:    ch.TestCases,
+			DomainFSM:    ch.DomainFSM,
 			Verification: ch.Verification,
 		}
 		n, err = Stamp(n)

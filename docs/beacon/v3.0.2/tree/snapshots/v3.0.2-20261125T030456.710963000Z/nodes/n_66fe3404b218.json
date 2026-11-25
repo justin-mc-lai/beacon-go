@@ -1,0 +1,15 @@
+{
+  "id": "n_66fe3404b218",
+  "kind": "module",
+  "title": "verification",
+  "intent": "证据、叶子验证与父级汇总",
+  "parent_id": "nroot_98a9c77a9519",
+  "path": "root/verification",
+  "status": "frozen",
+  "child_fingerprints": [
+    "8a3c5f968d4b8c1c1c7d62df7092905b0126f0fe7638026858acb6fd3dacbee3",
+    "627e9301acffbb902a2c7d86327df2517d2e73ac822d8bce14e2ae50c42e8f0f"
+  ],
+  "fingerprint": "0a8e805e591371fac377753cb33d5d96308af071c89beab3c4d3dfd3fa4f58ea",
+  "fingerprint_alg": "tree-json-v1"
+}

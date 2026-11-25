@@ -1,0 +1,15 @@
+{
+  "id": "n_02bbe57308e0",
+  "kind": "feature",
+  "title": "dependency-gate",
+  "intent": "依赖与版本门禁",
+  "parent_id": "n_8b83bfc9403d",
+  "path": "root/cli-surface/dependency-gate",
+  "status": "frozen",
+  "child_fingerprints": [
+    "ea65827ccc7e39c1294e0e01de0b3d46ac7f7578b92bc6b25980105bfe282d35",
+    "a2eacca541e543c11bad71f4f6c7872672d242d717b67a1d63a2baa90ff6d6a4"
+  ],
+  "fingerprint": "c266fadcd54e0b2cab78be6e8ac22199aa4da31ef68303ab115918b9ff6b883e",
+  "fingerprint_alg": "tree-json-v1"
+}

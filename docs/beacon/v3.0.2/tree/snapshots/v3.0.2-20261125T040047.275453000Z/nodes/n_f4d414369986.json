@@ -1,0 +1,41 @@
+{
+  "id": "n_f4d414369986",
+  "kind": "touchpoint",
+  "title": "single version source",
+  "intent": "版本只有一个源",
+  "parent_id": "n_02bbe57308e0",
+  "path": "root/cli-surface/dependency-gate/single-version-source",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_f4d414369986-1",
+      "text": "README/README.zh/AGENTS 与 version.go 一致。"
+    },
+    {
+      "id": "n_f4d414369986-2",
+      "text": "写死版本或第二字面量被门禁拒绝。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_f4d414369986-tc1",
+      "ac_id": "n_f4d414369986-1",
+      "kind": "unit",
+      "ref": "planned: go test ./cmd/... -run TestVersionSources",
+      "status": "planned"
+    },
+    {
+      "id": "n_f4d414369986-tc2",
+      "ac_id": "n_f4d414369986-2",
+      "kind": "unit",
+      "ref": "planned: go test ./cmd/... -run TestVersionSources",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 AGENTS 写死当前版本时，版本检查失败"
+  },
+  "fingerprint": "5a73fc171e4a89716d4fc6cf54180119119fb04d2f9f64c1d6ce802a6d9b3a39",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "n_79f7bfd68155",
+  "kind": "touchpoint",
+  "title": "tick identity",
+  "intent": "显式身份推进",
+  "parent_id": "n_4aafa3895e8d",
+  "path": "root/goal-orchestration/manual-run/tick-identity",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "ti-AC1",
+      "text": "手动 tick 用 --by 记账"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 goal tick --by host 执行后，当前阶段推进一次"
+  },
+  "fingerprint": "254561894f900ddf03244c62f290ea3767207818682a9db80cc4b37571280131",
+  "fingerprint_alg": "tree-json-v1"
+}

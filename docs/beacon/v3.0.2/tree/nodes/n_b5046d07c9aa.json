@@ -1,0 +1,120 @@
+{
+  "id": "n_b5046d07c9aa",
+  "kind": "feature",
+  "title": "freeze-change",
+  "intent": "递归冻结与子树变更",
+  "parent_id": "n_244f402ca9c7",
+  "path": "root/truth-kernel/freeze-change",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "fc-1",
+      "text": "叶子冻结要求无子节点、至少一条 AC、可执行验证规格。"
+    },
+    {
+      "id": "fc-2",
+      "text": "父节点冻结要求全部子节点已 settled；父记录绑定有序子指纹。"
+    },
+    {
+      "id": "fc-3",
+      "text": "后代 change 后全部祖先为 change_pending；refreeze 自底向上。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "draft",
+      "frozen",
+      "implemented",
+      "verified",
+      "change_pending",
+      "deprecated"
+    ],
+    "transitions": [
+      {
+        "from": "draft",
+        "to": "frozen",
+        "event": "freeze"
+      },
+      {
+        "from": "frozen",
+        "to": "implemented",
+        "event": "implement"
+      },
+      {
+        "from": "implemented",
+        "to": "verified",
+        "event": "verify"
+      },
+      {
+        "from": "frozen",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "implemented",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "verified",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "frozen",
+        "to": "change_pending",
+        "event": "descendant_change"
+      },
+      {
+        "from": "implemented",
+        "to": "change_pending",
+        "event": "descendant_change"
+      },
+      {
+        "from": "verified",
+        "to": "change_pending",
+        "event": "descendant_change"
+      },
+      {
+        "from": "change_pending",
+        "to": "frozen",
+        "event": "refreeze"
+      },
+      {
+        "from": "change_pending",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "frozen",
+        "to": "deprecated",
+        "event": "deprecate"
+      },
+      {
+        "from": "verified",
+        "to": "deprecated",
+        "event": "deprecate"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "draft",
+        "to": "verified"
+      },
+      {
+        "from": "verified",
+        "to": "implemented"
+      },
+      {
+        "from": "deprecated",
+        "to": "frozen"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "96d49a75780fa1f7d266eb740df67b17837eb7a3c45eeb6f630c1c6de26c3bd6",
+    "66cbdc26f96748561fb1872b935aaf6227197f4aea10029f62b8d9a17b95a94d"
+  ],
+  "fingerprint": "b49353c996bd8d361ded1c821097585fb334a85bdd69258770346e68aedc2d2b",
+  "fingerprint_alg": "tree-json-v1"
+}

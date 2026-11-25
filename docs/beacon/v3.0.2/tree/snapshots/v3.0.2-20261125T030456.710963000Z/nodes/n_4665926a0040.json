@@ -1,0 +1,15 @@
+{
+  "id": "n_4665926a0040",
+  "kind": "feature",
+  "title": "skills",
+  "intent": "技能安装与路由",
+  "parent_id": "n_0338b8fdd30a",
+  "path": "root/self-host/skills",
+  "status": "frozen",
+  "child_fingerprints": [
+    "e45238c417d234965e0fc9e6befc285cd94155be9be3bd2877bf1750c9279838",
+    "b2483ca37a22ecdb83f89084526d2ee499e07588a03c5fea085c10b1d658a318"
+  ],
+  "fingerprint": "70456c6acb524623ae21fb1de481adbd7e8e038b0038846a3484890bd6a372eb",
+  "fingerprint_alg": "tree-json-v1"
+}

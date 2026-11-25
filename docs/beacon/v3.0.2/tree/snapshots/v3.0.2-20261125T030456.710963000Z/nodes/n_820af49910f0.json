@@ -1,0 +1,15 @@
+{
+  "id": "n_820af49910f0",
+  "kind": "feature",
+  "title": "rollup-audit",
+  "intent": "验证汇总与审计",
+  "parent_id": "n_66fe3404b218",
+  "path": "root/verification/rollup-audit",
+  "status": "frozen",
+  "child_fingerprints": [
+    "a9cdfb5df57f36b6d481999179ddf0defe350191682c502d9acf675c97951ed3",
+    "3a254fa41653f335617dc996c765799b1a04689697fe711e8d9fe138f6eb62b0"
+  ],
+  "fingerprint": "627e9301acffbb902a2c7d86327df2517d2e73ac822d8bce14e2ae50c42e8f0f",
+  "fingerprint_alg": "tree-json-v1"
+}

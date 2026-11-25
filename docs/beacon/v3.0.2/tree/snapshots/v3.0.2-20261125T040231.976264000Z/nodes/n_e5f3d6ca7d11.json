@@ -1,0 +1,28 @@
+{
+  "id": "n_e5f3d6ca7d11",
+  "kind": "feature",
+  "title": "docs-consistency",
+  "intent": "README/AGENTS/版本只引用唯一源，CI 阻止漂移。",
+  "parent_id": "n_0338b8fdd30a",
+  "path": "root/self-host/docs-consistency",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "dc-1",
+      "text": "版本只写在 version.go。"
+    },
+    {
+      "id": "dc-2",
+      "text": "README/AGENTS 不写死当前版本。"
+    },
+    {
+      "id": "dc-3",
+      "text": "CI 校验不一致即失败。"
+    }
+  ],
+  "child_fingerprints": [
+    "3630f287390fdcc86591f1595881971b7eb0fc6a9cd964df4e53aa1fc7054cc2"
+  ],
+  "fingerprint": "08404bf6d4423913e18d78b237df4643a8403d794d69b28e5af6f2907c4bec14",
+  "fingerprint_alg": "tree-json-v1"
+}

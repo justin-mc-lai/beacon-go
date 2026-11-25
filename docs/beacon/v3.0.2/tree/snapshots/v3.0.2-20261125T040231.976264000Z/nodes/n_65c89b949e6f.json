@@ -1,0 +1,25 @@
+{
+  "id": "n_65c89b949e6f",
+  "kind": "module",
+  "title": "data-migration",
+  "intent": "旧账本与仓库真相之间的单向迁移；先快照，再写入，可回滚。",
+  "parent_id": "nroot_98a9c77a9519",
+  "path": "root/data-migration",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "dm-1",
+      "text": "迁移前必须生成快照；写入失败保留原始数据。"
+    },
+    {
+      "id": "dm-2",
+      "text": "SQLite 只是缓存，树 JSON 是唯一权威。"
+    }
+  ],
+  "child_fingerprints": [
+    "37718dbb28f1413efa394124ea7fcf3ceb2b9a2a7cdda29d04486a68e04a16e9",
+    "3748f4f5765b0d52b6dd6823a03c2f08f79594755afb0efebe8a83bab9aad308"
+  ],
+  "fingerprint": "77a3c11583616cd15e9aa839e68bac592e2e8b66757861ccb3e73a35665435f7",
+  "fingerprint_alg": "tree-json-v1"
+}

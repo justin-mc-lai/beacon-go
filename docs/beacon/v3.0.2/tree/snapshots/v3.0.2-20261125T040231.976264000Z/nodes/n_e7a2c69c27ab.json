@@ -1,0 +1,28 @@
+{
+  "id": "n_e7a2c69c27ab",
+  "kind": "feature",
+  "title": "repository-projection",
+  "intent": "树 JSON 是权威，缓存与渲染均为可重建投影。",
+  "parent_id": "n_244f402ca9c7",
+  "path": "root/truth-kernel/repository-projection",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "rp-1",
+      "text": "源哈希覆盖全部节点正文。"
+    },
+    {
+      "id": "rp-2",
+      "text": "渲染不改合同指纹。"
+    },
+    {
+      "id": "rp-3",
+      "text": "缓存失效可从 JSON 重建。"
+    }
+  ],
+  "child_fingerprints": [
+    "814ed25e9ec10e1734e1344afbbd717061828c2c84d1fe2d53bbc21c43c309d6"
+  ],
+  "fingerprint": "c2bd9cc6cf38576f3a12766d1aad5d9e6fa99b0a5e910cdb3f028962b9102718",
+  "fingerprint_alg": "tree-json-v1"
+}

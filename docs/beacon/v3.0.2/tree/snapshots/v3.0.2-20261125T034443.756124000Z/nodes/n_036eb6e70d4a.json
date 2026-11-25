@@ -1,0 +1,29 @@
+{
+  "id": "n_036eb6e70d4a",
+  "kind": "feature",
+  "title": "dogfood",
+  "intent": "羽毛球 dogfood",
+  "parent_id": "n_0338b8fdd30a",
+  "path": "root/self-host/dogfood",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "df-1",
+      "text": "羽毛球树 22 节点、12 叶子、2 快照。"
+    },
+    {
+      "id": "df-2",
+      "text": "根 verified，全部叶子 verified，审计通过。"
+    },
+    {
+      "id": "df-3",
+      "text": "一次子树 change 后 refreeze 恢复，历史快照不变。"
+    }
+  ],
+  "child_fingerprints": [
+    "a6678729b77d7f2004ca82d1d24f8ab8ad97223f5ee2fed0ef1f6f090e3f428b",
+    "ae3477f3370132e558bb5acc86814181287937b0a8dbe75a80de9042d4febd24"
+  ],
+  "fingerprint": "cd23578d5c0f36c99b295d3ae1aafea72e75e2837d795c6a0552f4ef7dc402f3",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -44,6 +44,15 @@ func FreezeNode(st *store.Store, dir, versionID, nodeID string) (FreezeReport, e
 	if err != nil {
 		return FreezeReport{}, err
 	}
+	if n.DomainFSM != nil {
+		if n.Kind != KindFeature {
+			return FreezeReport{}, core.NewError(ReasonFSMScope, "intenttree.FreezeNode",
+				"domain FSM belongs to feature nodes: "+nodeID)
+		}
+		if findings := ValidateDomainFSM(n.DomainFSM); len(findings) > 0 {
+			return FreezeReport{}, core.NewError(ReasonFSMInvalid, "intenttree.FreezeNode", strings.Join(findings, "; "))
+		}
+	}
 	var children []IndexEntry
 	for _, e := range idx.Nodes {
 		if e.ParentID == nodeID {

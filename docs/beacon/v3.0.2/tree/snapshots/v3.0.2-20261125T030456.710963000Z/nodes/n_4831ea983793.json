@@ -1,0 +1,21 @@
+{
+  "id": "n_4831ea983793",
+  "kind": "touchpoint",
+  "title": "no llm executor",
+  "intent": "已删面不得回归",
+  "parent_id": "n_02bbe57308e0",
+  "path": "root/cli-surface/dependency-gate/no-llm-executor",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "nl-AC1",
+      "text": "依赖图 gate 覆盖 llm/http/executor"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当依赖图包含 internal/llm 时，check_kernel_deps 失败"
+  },
+  "fingerprint": "ea65827ccc7e39c1294e0e01de0b3d46ac7f7578b92bc6b25980105bfe282d35",
+  "fingerprint_alg": "tree-json-v1"
+}

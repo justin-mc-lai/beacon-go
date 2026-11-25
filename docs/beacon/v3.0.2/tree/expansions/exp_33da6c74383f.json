@@ -1,0 +1,56 @@
+{
+  "at": "2026-11-25T03:04:56.323465Z",
+  "children": [
+    {
+      "id": "n_d806badcae4c",
+      "kind": "touchpoint",
+      "title": "node scope registration",
+      "intent": "证据绑到节点",
+      "parent_id": "n_f2b317a84be5",
+      "path": "root/verification/evidence-scope/node-scope-registration",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "ns-AC1",
+          "text": "node scope 可登记并查询"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当登记 node scope 证据后，按 scope 查询返回该工件"
+      },
+      "fingerprint": "dd9f15ab647f3c867e57975fcc300c5ac3f1702fb7efaedf17ba0bf70efeee97",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_091c9aeebdd2",
+      "kind": "touchpoint",
+      "title": "hash recheck",
+      "intent": "哈希可复查",
+      "parent_id": "n_f2b317a84be5",
+      "path": "root/verification/evidence-scope/hash-recheck",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "hr-AC1",
+          "text": "工件变化后判 stale"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当改写已登记文件后，门禁读取标记 stale"
+      },
+      "fingerprint": "77639a713493bbea20c30307b99da7242998fae7ee3c922cac229d434f51d9a4",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_f2b317a84be5",
+  "provenance": {
+    "model": "host-agent",
+    "prompt_hash": "sha256:beacon-self-tree-v1",
+    "skill": "beacon-go-plan",
+    "tokens": 2400,
+    "cost_usd": 0.04,
+    "by": "self-host"
+  }
+}

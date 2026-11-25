@@ -25,6 +25,7 @@ func newVerifyCmd() *cobra.Command {
 		newQAStrategyCmd(), newQAAgentScoreCmd(), newQAAgentEvalCmd(),
 		newQAVerifyHarnessCmd(),
 	)
+	hideAllBut(c, "audit", "leaf", "rollup", "status", "evaluate")
 	return c
 }
 
@@ -51,6 +52,7 @@ func newVerifyAuditCmd() *cobra.Command {
 				return err
 			}
 			findings := intenttree.ValidateIndex(idx)
+			var advisories []string
 			childCount := map[string]int{}
 			for _, n := range idx.Nodes {
 				if n.ParentID != "" {
@@ -66,6 +68,16 @@ func newVerifyAuditCmd() *cobra.Command {
 				if n.Kind == intenttree.KindTouchpoint && n.Verification == nil {
 					findings = append(findings, intenttree.ReasonVerificationMissing+": "+n.ID)
 				}
+				if n.Kind == intenttree.KindTouchpoint {
+					if len(n.TestCases) == 0 {
+						// Legacy trees predate test cases. Missing coverage is
+						// reported, but it must not break rendering or projects
+						// that never opted into the new contract.
+						advisories = append(advisories, intenttree.ReasonTestCaseMissing+": "+n.ID)
+					} else {
+						findings = append(findings, intenttree.ValidateTestCases(n.ACs, n.TestCases)...)
+					}
+				}
 				if n.Kind != intenttree.KindTouchpoint && n.Verification != nil {
 					findings = append(findings, "tree_verification_scope: "+n.ID)
 				}
@@ -77,6 +89,7 @@ func newVerifyAuditCmd() *cobra.Command {
 				"ok": len(findings) == 0, "reads_only": true,
 				"schema": idx.Schema, "version": idx.Version,
 				"node_count": len(idx.Nodes), "findings": findings,
+				"advisories": advisories,
 			}
 			if err := printJSON(cmd, report); err != nil {
 				return err

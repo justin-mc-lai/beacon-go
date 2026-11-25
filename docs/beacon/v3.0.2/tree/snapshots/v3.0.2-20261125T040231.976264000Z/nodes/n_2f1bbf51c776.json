@@ -1,0 +1,80 @@
+{
+  "id": "n_2f1bbf51c776",
+  "kind": "feature",
+  "title": "package-lifecycle",
+  "intent": "需求包从提问、确认、冻结、变更到重冻与重开的生命周期。",
+  "parent_id": "n_244f402ca9c7",
+  "path": "root/truth-kernel/package-lifecycle",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "pl-1",
+      "text": "未确认的意图不能冻结。"
+    },
+    {
+      "id": "pl-2",
+      "text": "变更关闭后才能重冻。"
+    },
+    {
+      "id": "pl-3",
+      "text": "重开产生新修订，旧冻结留在轨迹。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "draft",
+      "in_review",
+      "frozen",
+      "change_pending",
+      "reopened",
+      "deprecated"
+    ],
+    "transitions": [
+      {
+        "from": "draft",
+        "to": "in_review",
+        "event": "confirm"
+      },
+      {
+        "from": "in_review",
+        "to": "frozen",
+        "event": "freeze"
+      },
+      {
+        "from": "frozen",
+        "to": "change_pending",
+        "event": "change"
+      },
+      {
+        "from": "change_pending",
+        "to": "frozen",
+        "event": "refreeze"
+      },
+      {
+        "from": "frozen",
+        "to": "reopened",
+        "event": "reopen"
+      },
+      {
+        "from": "frozen",
+        "to": "deprecated",
+        "event": "deprecate"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "draft",
+        "to": "frozen"
+      },
+      {
+        "from": "deprecated",
+        "to": "frozen"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "3a50ea1bd1d94f0148e6a6ec0d7afd6cc3e3f1fecbb9bf1b1c1a2836756da84e"
+  ],
+  "fingerprint": "44a743eaa0e81dc55fa7c4b016d9a1f383e92c4663e59b49b8a2ca9bee3ecc4a",
+  "fingerprint_alg": "tree-json-v1"
+}

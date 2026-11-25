@@ -1,0 +1,15 @@
+{
+  "id": "n_8b83bfc9403d",
+  "kind": "module",
+  "title": "cli-surface",
+  "intent": "用户命令面与依赖门禁",
+  "parent_id": "nroot_98a9c77a9519",
+  "path": "root/cli-surface",
+  "status": "frozen",
+  "child_fingerprints": [
+    "c266fadcd54e0b2cab78be6e8ac22199aa4da31ef68303ab115918b9ff6b883e",
+    "1502e2e9dbf517ae0e30e3f4c61b47efd19c52da4214aa6af702d0a9c8bf2ce2"
+  ],
+  "fingerprint": "cec09bec27a2b5973591e405648dd7a2e22a86ba7bdc9d984099e52a4cdbcb83",
+  "fingerprint_alg": "tree-json-v1"
+}

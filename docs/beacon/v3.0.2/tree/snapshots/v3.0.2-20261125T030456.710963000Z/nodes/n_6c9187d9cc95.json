@@ -1,0 +1,21 @@
+{
+  "id": "n_6c9187d9cc95",
+  "kind": "touchpoint",
+  "title": "canonical serialization",
+  "intent": "固定键序与字段序",
+  "parent_id": "n_99a31e588da7",
+  "path": "root/truth-kernel/canonical-json/canonical-serialization",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "cj-AC1",
+      "text": "同输入两次序列化字节一致"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当同一节点写两次时，两字节流 SHA-256 相同"
+  },
+  "fingerprint": "c5a1289faa2bb66f32e873a6088259e443935c745f61539095f479d14c895f02",
+  "fingerprint_alg": "tree-json-v1"
+}

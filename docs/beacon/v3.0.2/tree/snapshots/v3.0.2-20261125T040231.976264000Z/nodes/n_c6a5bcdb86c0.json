@@ -1,0 +1,58 @@
+{
+  "id": "n_c6a5bcdb86c0",
+  "kind": "feature",
+  "title": "store-cache",
+  "intent": "SQLite 缓存可从树 JSON 重建，不成为第二真相。",
+  "parent_id": "n_65c89b949e6f",
+  "path": "root/data-migration/store-cache",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "sc-1",
+      "text": "删除缓存后可重建。"
+    },
+    {
+      "id": "sc-2",
+      "text": "重建不改变树内容。"
+    },
+    {
+      "id": "sc-3",
+      "text": "缓存状态不参与冻结判定。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "empty",
+      "loaded",
+      "rebuilt"
+    ],
+    "transitions": [
+      {
+        "from": "empty",
+        "to": "loaded",
+        "event": "load"
+      },
+      {
+        "from": "loaded",
+        "to": "rebuilt",
+        "event": "rebuild"
+      },
+      {
+        "from": "rebuilt",
+        "to": "loaded",
+        "event": "load"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "empty",
+        "to": "rebuilt"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "52f8d0acf34d636e943ac7ce9189454d5429a0a8f1cb86dfa985c843406af607"
+  ],
+  "fingerprint": "37718dbb28f1413efa394124ea7fcf3ceb2b9a2a7cdda29d04486a68e04a16e9",
+  "fingerprint_alg": "tree-json-v1"
+}

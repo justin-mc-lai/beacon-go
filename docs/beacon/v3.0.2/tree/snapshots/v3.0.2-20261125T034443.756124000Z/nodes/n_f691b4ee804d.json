@@ -1,0 +1,25 @@
+{
+  "id": "n_f691b4ee804d",
+  "kind": "touchpoint",
+  "title": "parent rollup",
+  "intent": "父级只在子全 verified 后 verified",
+  "parent_id": "n_820af49910f0",
+  "path": "root/verification/rollup-audit/parent-rollup",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_f691b4ee804d-1",
+      "text": "子未 verified 时父 rollup 拒绝。"
+    },
+    {
+      "id": "n_f691b4ee804d-2",
+      "text": "全部 verified 后父 verified。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当子节点未 verified 时，verify rollup 返回 tree_parent_not_verified"
+  },
+  "fingerprint": "965932c0e0abf3ed782a6ce1a9b0cc614052e7b8d3f68b783073648c44c3d626",
+  "fingerprint_alg": "tree-json-v1"
+}

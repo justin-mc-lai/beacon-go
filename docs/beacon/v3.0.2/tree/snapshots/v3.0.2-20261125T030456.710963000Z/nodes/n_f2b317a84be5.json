@@ -1,0 +1,15 @@
+{
+  "id": "n_f2b317a84be5",
+  "kind": "feature",
+  "title": "evidence-scope",
+  "intent": "证据作用域",
+  "parent_id": "n_66fe3404b218",
+  "path": "root/verification/evidence-scope",
+  "status": "frozen",
+  "child_fingerprints": [
+    "1017c5c80c6c0b94599d3a7ae1bf580ae53438e66777e9e481bb782e57dd6b77",
+    "710c0c192bc11afbcdb1131a4811b7624a85edfeaa6aa731317d73d01ffa1271"
+  ],
+  "fingerprint": "8a3c5f968d4b8c1c1c7d62df7092905b0126f0fe7638026858acb6fd3dacbee3",
+  "fingerprint_alg": "tree-json-v1"
+}

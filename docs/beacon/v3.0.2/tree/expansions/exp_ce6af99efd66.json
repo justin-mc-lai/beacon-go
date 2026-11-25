@@ -1,0 +1,52 @@
+{
+  "at": "2026-11-25T04:02:31.128441Z",
+  "children": [
+    {
+      "id": "n_b13a0884f790",
+      "kind": "touchpoint",
+      "title": "rebuild-from-json",
+      "intent": "从树 JSON 重建缓存并保持内容一致。",
+      "parent_id": "n_c6a5bcdb86c0",
+      "path": "root/data-migration/store-cache/rebuild-from-json",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "rb-1",
+          "text": "重建后节点数与指纹一致。"
+        },
+        {
+          "id": "rb-2",
+          "text": "重建不写树正文。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "rb-tc1",
+          "ac_id": "rb-1",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestTreeRebuildAndMarkdownRender",
+          "status": "planned"
+        },
+        {
+          "id": "rb-tc2",
+          "ac_id": "rb-2",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestTreeRebuildAndMarkdownRender",
+          "status": "planned"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "删除缓存后运行重建，树索引字节不变。"
+      },
+      "fingerprint": "988b09422f10462784757502ce14e98df75f96f3a95379773f14abb4f9f8f945",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_c6a5bcdb86c0",
+  "provenance": {
+    "model": "host-llm",
+    "skill": "beacon-intent-tree",
+    "by": "self-host"
+  }
+}

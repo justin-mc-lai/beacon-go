@@ -1,0 +1,52 @@
+{
+  "at": "2026-11-25T04:02:31.19296Z",
+  "children": [
+    {
+      "id": "n_d3c786a2e734",
+      "kind": "touchpoint",
+      "title": "write-receipt",
+      "intent": "每次写回执可查询、不可覆盖。",
+      "parent_id": "n_9e9c5307a85b",
+      "path": "root/security-boundary/write-audit/write-receipt",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "wr-1",
+          "text": "回执含 by/at/reason。"
+        },
+        {
+          "id": "wr-2",
+          "text": "重复写不覆盖旧回执。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "wr-tc1",
+          "ac_id": "wr-1",
+          "kind": "unit",
+          "ref": "planned: write receipt test",
+          "status": "planned"
+        },
+        {
+          "id": "wr-tc2",
+          "ac_id": "wr-2",
+          "kind": "unit",
+          "ref": "planned: write receipt append test",
+          "status": "planned"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "写入两次后查询回执，至少保留两条并且字段完整。"
+      },
+      "fingerprint": "30443363d5328dad8dd85e0a0fc8af9bfab604c1243e9555eef7b1c6064af3da",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_9e9c5307a85b",
+  "provenance": {
+    "model": "host-llm",
+    "skill": "beacon-intent-tree",
+    "by": "self-host"
+  }
+}

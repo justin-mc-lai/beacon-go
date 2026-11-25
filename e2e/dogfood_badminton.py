@@ -145,7 +145,12 @@ snaps = run("truth", "snapshot", "list", "--project", str(PROJ), "--json")["snap
 assert len(snaps) >= 2, snaps
 run("truth", "tree", "--project", str(PROJ), "--snapshot", "latest", "--json")
 html = run("plan", "tree", "--project", str(PROJ), "--format", "html", doc=False)
-assert "index.html" in html and pathlib.Path(html.split()[1]).exists(), html
+html_path = pathlib.Path(html.split()[1])
+assert "index.html" in html and html_path.exists(), html
+# A non-self project must get the same reading template, not a
+# project-specific one-off.
+rendered = html_path.read_text()
+assert "需求工作台" in rendered and "data-panel" in rendered, "dogfood did not get the unified HTML template"
 
 # Evidence hash re-check against the node-scope registration.
 listed = run("goal", "artifacts", "list", "--project", str(PROJ), "--scope-kind", "node",

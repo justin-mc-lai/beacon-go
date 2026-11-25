@@ -1,0 +1,36 @@
+{
+  "at": "2026-11-25T03:04:56.391664Z",
+  "children": [
+    {
+      "id": "n_036eb6e70d4a",
+      "kind": "feature",
+      "title": "dogfood",
+      "intent": "羽毛球 dogfood",
+      "parent_id": "n_0338b8fdd30a",
+      "path": "root/self-host/dogfood",
+      "status": "draft",
+      "fingerprint": "fd2a2e8f1ef203d2d5b4e42f8f1b92fc0d71d8e2535659f56ed2ea77f221a3af",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_4665926a0040",
+      "kind": "feature",
+      "title": "skills",
+      "intent": "技能安装与路由",
+      "parent_id": "n_0338b8fdd30a",
+      "path": "root/self-host/skills",
+      "status": "draft",
+      "fingerprint": "2dc443e838f5266d9f198295cbb26bbb77300d2302322fbf2226ac5f7ded240a",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_0338b8fdd30a",
+  "provenance": {
+    "model": "host-agent",
+    "prompt_hash": "sha256:beacon-self-tree-v1",
+    "skill": "beacon-go-plan",
+    "tokens": 2400,
+    "cost_usd": 0.04,
+    "by": "self-host"
+  }
+}

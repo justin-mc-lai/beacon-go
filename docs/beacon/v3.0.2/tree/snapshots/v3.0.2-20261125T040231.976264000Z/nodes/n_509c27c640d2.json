@@ -1,0 +1,28 @@
+{
+  "id": "n_509c27c640d2",
+  "kind": "feature",
+  "title": "protected-paths",
+  "intent": "受保护路径写入必须显式批准，默认拒绝。",
+  "parent_id": "n_b635840fe744",
+  "path": "root/security-boundary/protected-paths",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "pp-1",
+      "text": "密钥、支付、迁移路径默认拒绝写入。"
+    },
+    {
+      "id": "pp-2",
+      "text": "批准必须绑定操作者与原因。"
+    },
+    {
+      "id": "pp-3",
+      "text": "拒绝返回稳定 reason code。"
+    }
+  ],
+  "child_fingerprints": [
+    "eabc5186d6c7293480d48a4292f48f6462f8d3f303538e1efef7bb24ea77f574"
+  ],
+  "fingerprint": "26ab1107f54d79ffffe9fb101500491b9df1d8d5cc5222d740ec6bbef0b3ba91",
+  "fingerprint_alg": "tree-json-v1"
+}

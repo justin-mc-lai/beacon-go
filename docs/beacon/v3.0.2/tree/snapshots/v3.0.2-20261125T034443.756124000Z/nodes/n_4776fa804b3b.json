@@ -1,0 +1,25 @@
+{
+  "id": "n_4776fa804b3b",
+  "kind": "touchpoint",
+  "title": "seven groups",
+  "intent": "七个用户入口",
+  "parent_id": "n_068ee154c0a2",
+  "path": "root/cli-surface/seven-groups/seven-groups",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_4776fa804b3b-1",
+      "text": "七个顶层命令存在。"
+    },
+    {
+      "id": "n_4776fa804b3b-2",
+      "text": "内部命令隐藏但可执行。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当运行 beacon --help 时，七个组均存在"
+  },
+  "fingerprint": "294c4d1e08095e740bc9030549117d5cec9e0120174b90f518b7117685bca4aa",
+  "fingerprint_alg": "tree-json-v1"
+}

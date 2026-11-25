@@ -1,0 +1,509 @@
+package intenttree
+
+import (
+	"fmt"
+	"html"
+	"sort"
+	"strings"
+)
+
+// RenderHTMLTree renders a three-pane reader: the full requirement tree
+// on the left, the selected node's requirement text in the middle, and
+// the related business FSM as a real flow diagram on the right.
+func RenderHTMLTree(idx Index, bodies map[string]Node) []byte {
+	idx = SortedIndex(idx)
+	children := map[string][]IndexEntry{}
+	for _, n := range idx.Nodes {
+		children[n.ParentID] = append(children[n.ParentID], n)
+	}
+	for k := range children {
+		sort.Slice(children[k], func(i, j int) bool { return children[k][i].Path < children[k][j].Path })
+	}
+	ownFSM := map[string]string{}
+	var walk func(id string)
+	walk = func(id string) {
+		n := bodies[id]
+		if n.DomainFSM != nil {
+			ownFSM[id] = id
+		}
+		for _, c := range children[id] {
+			walk(c.ID)
+		}
+	}
+	walk(idx.RootID)
+	related := map[string]string{}
+	firstFSM := map[string]string{}
+	var first func(id string) string
+	first = func(id string) string {
+		if got, ok := firstFSM[id]; ok {
+			return got
+		}
+		if ownFSM[id] != "" {
+			firstFSM[id] = ownFSM[id]
+			return ownFSM[id]
+		}
+		for _, c := range children[id] {
+			if got := first(c.ID); got != "" {
+				firstFSM[id] = got
+				return got
+			}
+		}
+		firstFSM[id] = ""
+		return ""
+	}
+	defaultFSM := ""
+	for _, id := range ownFSM {
+		if bodies[id].Title == "freeze-change" {
+			defaultFSM = id
+		}
+	}
+	var assign func(id, inherited string)
+	assign = func(id, inherited string) {
+		owner := inherited
+		if ownFSM[id] != "" {
+			owner = ownFSM[id]
+		} else if owner == "" {
+			owner = first(id)
+		}
+		if id == idx.RootID && defaultFSM != "" {
+			owner = defaultFSM
+		}
+		related[id] = owner
+		for _, c := range children[id] {
+			assign(c.ID, owner)
+		}
+	}
+	assign(idx.RootID, "")
+	var b strings.Builder
+	writeHTMLHead(&b, idx, bodies)
+	b.WriteString(`<div class="app">`)
+	writeTreePane(&b, idx, children, bodies, related, ownFSM)
+	writeDetailPane(&b, idx, children, bodies)
+	writeFSMPane(&b, idx, children, bodies, ownFSM)
+	b.WriteString(`</div>`)
+	writeScript(&b, idx)
+	fmt.Fprintf(&b, "</body></html>\n")
+	return []byte(b.String())
+}
+
+func writeHTMLHead(b *strings.Builder, idx Index, bodies map[string]Node) {
+	fmt.Fprintf(b, "<!doctype html><html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n")
+	fmt.Fprintf(b, "<!-- source: %s -->\n", SourceHash(idx))
+	fmt.Fprintf(b, "<title>需求工作台 · %s</title><style>%s</style></head><body>\n", esc(idx.Version), css)
+}
+
+const css = `
+:root{--ink:#1f2937;--muted:#6b7280;--line:#e5e7eb;--bg:#f7f6f3;--card:#fff;--accent:#2f6f4e;--accent-soft:#f1f8f4;--danger:#b23b3b;--warn:#8a5a12}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB",sans-serif}
+.app{display:grid;grid-template-columns:280px minmax(360px,1fr) 430px;height:100vh;overflow:hidden}
+.pane{overflow:auto;min-width:0}
+.tree-pane{background:#fbfaf8;border-right:1px solid var(--line);padding:20px 14px 32px}
+.detail-pane{background:var(--card);padding:30px 40px 56px}
+.fsm-pane{background:#fbfaf8;border-left:1px solid var(--line);padding:24px 22px 40px}
+.brand{font-weight:700;font-size:16px;letter-spacing:-.01em;margin:0 0 2px}
+.sub{color:var(--muted);font-size:12px;margin:0 0 16px}
+.filter{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font:12px/1.4 inherit;margin:0 0 14px}
+.tree{list-style:none;margin:0;padding:0}
+.tree li{margin:1px 0}
+.node{display:flex;align-items:center;gap:6px;width:100%;border:0;background:transparent;text-align:left;color:var(--ink);padding:4px 7px;border-radius:7px;cursor:pointer;font:13px/1.5 inherit}
+.node:hover{background:#efede8}.node.active{background:#e8f0eb;color:#17412c;font-weight:600}
+.node .label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:6px;height:6px;border-radius:50%;flex:none;background:#c7c7c7}.dot.frozen{background:#4b8b68}.dot.verified{background:#2f6f4e}.dot.change{background:#c58a2a}
+.fsm-mark{font-size:9px;line-height:1;border:1px solid #b7d7c5;color:var(--accent);border-radius:999px;padding:1px 4px;flex:none}
+.tree-kicker{font-size:11px;color:var(--muted);margin:12px 0 4px;letter-spacing:.04em}
+.crumb{font-size:12px;color:var(--muted);margin-bottom:10px}
+h1{font-size:26px;line-height:1.25;margin:0 0 8px;letter-spacing:-.02em}
+h2{font-size:15px;margin:26px 0 8px;color:#374151}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.badge{font-size:12px;border-radius:999px;padding:1px 8px;border:1px solid var(--line);color:var(--muted);background:#fafafa;white-space:nowrap}
+.badge.fsm{color:var(--accent);border-color:#b7d7c5;background:var(--accent-soft)}
+.badge.warn{color:var(--warn);border-color:#efd4ad;background:#fffaf1}
+.intent{font-size:16px;color:#374151;margin:0 0 6px}
+ul.acs{margin:0;padding-left:20px}ul.acs li{margin:5px 0}
+.verify{background:#fafaf8;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:13px}
+details.tech{margin-top:22px;color:var(--muted);font-size:12px}details.tech summary{cursor:pointer}
+.tech dl{display:grid;grid-template-columns:90px 1fr;gap:3px 10px;margin:10px 0}.tech dt{color:#9ca3af}.tech dd{margin:0;word-break:break-all}
+table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:5px 6px;vertical-align:top}th{color:var(--muted);font-weight:500}td.ref{color:#4b5563;word-break:break-word}td:last-child{white-space:nowrap}
+.fsm-head{font-size:12px;color:var(--muted);margin:0 0 6px}.fsm-title{font-size:17px;font-weight:650;margin:0 0 4px}
+.fsm-wrap{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;overflow:auto}
+.fsm-wrap svg{display:block;width:100%;height:auto}
+.fsm-canvas{position:relative;margin:0 auto}.fsm-canvas .edge-layer{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.state{position:absolute;width:100px;height:40px;padding:0 4px;line-height:1.1;text-align:center;overflow-wrap:anywhere;border-radius:9px;background:#f4f8f5;border:1.4px solid #c9d5ce;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:#1f2937;white-space:nowrap;box-sizing:border-box}.state.start{border-color:#2f6f4e}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin:10px 0 0}
+.legend i{display:inline-block;width:22px;height:0;border-top:2px solid #6b7280;vertical-align:middle;margin-right:5px}.legend .bad i{border-top:2px dashed var(--danger)}
+.illegal-line{font-size:11px;color:var(--danger);margin:8px 0 0}
+.fsm-toggle{margin:8px 0 0;border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 10px;font-size:11px;font-family:inherit;line-height:1.4;color:#374151;cursor:pointer;min-width:96px;text-align:center}.fsm-toggle:hover{background:var(--accent-soft)}
+.fsm-slot:not(.show-exceptions) .exceptions{display:none}
+.fsm-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.fsm-link{text-align:left;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;cursor:pointer;font:12px/1.4 inherit;color:var(--ink)}
+.fsm-link:hover{border-color:#b7d7c5;background:var(--accent-soft)}
+.hidden{display:none!important}
+.empty{color:var(--muted);font-size:12px}
+@media (max-width:1100px){.app{grid-template-columns:240px 1fr 360px}}
+@media (max-width:860px){.app{display:block;height:auto}.pane{overflow:visible;max-height:none}.tree-pane,.fsm-pane{border:0;border-bottom:1px solid var(--line)}.detail-pane{padding:22px}}
+`
+
+func writeTreePane(b *strings.Builder, idx Index, children map[string][]IndexEntry, bodies map[string]Node, related, own map[string]string) {
+	root := bodies[idx.RootID]
+	b.WriteString(`<aside class="pane tree-pane">`)
+	fmt.Fprintf(b, `<div class="brand">%s</div><div class="sub">需求树 · %d 节点</div>`, esc(root.Title), len(idx.Nodes))
+	b.WriteString(`<input id="filter" class="filter" placeholder="筛选节点" autocomplete="off"><ul class="tree">`)
+	var walk func(id string, depth int)
+	walk = func(id string, depth int) {
+		writeTreeNode(b, id, children, bodies, related, own, depth)
+		for _, c := range children[id] {
+			walk(c.ID, depth+1)
+		}
+	}
+	walk(idx.RootID, 0)
+	b.WriteString(`</ul></aside>`)
+}
+
+func writeTreeNode(b *strings.Builder, id string, children map[string][]IndexEntry, bodies map[string]Node, related, own map[string]string, depth int) {
+	n := bodies[id]
+	owner := related[id]
+	fsm := ""
+	if own[id] != "" {
+		fsm = fmt.Sprintf(`<span class="fsm-mark">FSM</span>`)
+	}
+	dot := "dot"
+	if n.Status != "" {
+		dot += " " + string(n.Status)
+	}
+	search := esc(strings.ToLower(n.Title + " " + n.Intent + " " + string(n.Kind)))
+	fmt.Fprintf(b, `<li><button class="node" data-node="%s" data-fsm="%s" data-own="%s" data-kind="%s" data-search="%s" style="padding-left:%dpx"><span class="%s"></span><span class="label">%s</span>%s</button>`,
+		esc(id), esc(owner), boolStr(own[id] != ""), string(n.Kind), search, 7+depth*12, dot, esc(n.Title), fsm)
+	b.WriteString(`</li>`)
+}
+
+func writeDetailPane(b *strings.Builder, idx Index, children map[string][]IndexEntry, bodies map[string]Node) {
+	b.WriteString(`<main class="pane detail-pane">`)
+	var walk func(id string)
+	walk = func(id string) {
+		writeNodePanel(b, bodies[id], idx.RootID)
+		for _, c := range children[id] {
+			walk(c.ID)
+		}
+	}
+	walk(idx.RootID)
+	b.WriteString(`</main>`)
+}
+
+func writeNodePanel(b *strings.Builder, n Node, rootID string) {
+	if n.ID == "" {
+		return
+	}
+	hidden := ""
+	if n.ID != rootID {
+		hidden = " hidden"
+	}
+	fmt.Fprintf(b, `<section class="node-panel%s" data-panel="%s">`, hidden, esc(n.ID))
+	kind := map[Kind]string{KindIntent: "项目意图", KindModule: "模块", KindFeature: "功能", KindTouchpoint: "触达点"}[n.Kind]
+	fmt.Fprintf(b, `<div class="crumb">%s</div><h1>%s</h1><div class="badges"><span class="badge">%s</span>`, kind, esc(n.Title), esc(kind))
+	if n.DomainFSM != nil {
+		b.WriteString(`<span class="badge fsm">状态机</span>`)
+	}
+	fmt.Fprintf(b, `<span class="badge">%s</span></div>`, esc(statusLabel(n.Status)))
+	if n.Intent != "" {
+		fmt.Fprintf(b, `<p class="intent">%s</p>`, esc(n.Intent))
+	}
+	if len(n.ACs) > 0 {
+		b.WriteString(`<h2>验收标准</h2><ul class="acs">`)
+		for _, ac := range n.ACs {
+			fmt.Fprintf(b, `<li>%s</li>`, esc(ac.Text))
+		}
+		b.WriteString(`</ul>`)
+	}
+	if n.Verification != nil || len(n.TestCases) > 0 {
+		b.WriteString(`<details><summary><b>测试与验证</b></summary>`)
+		if n.Verification != nil {
+			fmt.Fprintf(b, `<div class="verify"><b>验证方式：</b>%s</div>`, esc(n.Verification.Spec))
+		}
+		if len(n.TestCases) > 0 {
+			acText := map[string]string{}
+			for _, ac := range n.ACs {
+				acText[ac.ID] = ac.Text
+			}
+			b.WriteString(`<table><tr><th>验收标准</th><th>用例</th><th>状态</th></tr>`)
+			for _, tc := range n.TestCases {
+				text := acText[tc.ACID]
+				if text == "" {
+					text = tc.ACID
+				}
+				fmt.Fprintf(b, `<tr><td>%s</td><td class="ref">%s</td><td><span class="badge">%s</span></td></tr>`, esc(text), esc(tc.Ref), esc(testStatusLabel(tc.Status)))
+			}
+			b.WriteString(`</table>`)
+		}
+		b.WriteString(`</details>`)
+	}
+	b.WriteString(`<details class="tech"><summary>技术信息</summary><dl>`)
+	fmt.Fprintf(b, `<dt>ID</dt><dd>%s</dd><dt>路径</dt><dd>%s</dd><dt>状态</dt><dd>%s</dd><dt>指纹</dt><dd>%s · %s</dd>`, esc(n.ID), esc(n.Path), esc(statusLabel(n.Status)), esc(n.FingerprintAlg), esc(n.Fingerprint))
+	if n.VerificationEvidence != nil {
+		fmt.Fprintf(b, `<dt>证据</dt><dd>%s</dd>`, esc(n.VerificationEvidence.ArtifactID))
+	}
+	b.WriteString(`</dl></details></section>`)
+}
+
+func writeFSMPane(b *strings.Builder, idx Index, children map[string][]IndexEntry, bodies map[string]Node, own map[string]string) {
+	b.WriteString(`<aside class="pane fsm-pane"><div class="fsm-head" id="fsm-head">业务状态机</div><div id="fsm-title" class="fsm-title"></div>`)
+	for _, e := range orderedFSMNodes(idx, bodies) {
+		n := bodies[e.ID]
+		fmt.Fprintf(b, `<div class="fsm-slot hidden" data-owner="%s" data-owner-title="%s">`, esc(n.ID), esc(n.Title))
+		fmt.Fprintf(b, `<div class="fsm-wrap">%s</div>`, renderFSMSVG(n.DomainFSM, n.ID))
+		b.WriteString(`<details class="transitions"><summary>转移明细</summary><table><tr><th>从</th><th>到</th><th>事件</th><th>类型</th></tr>`)
+		for _, tr := range n.DomainFSM.Transitions {
+			fmt.Fprintf(b, `<tr><td>%s</td><td>%s</td><td>%s</td><td>正向</td></tr>`, esc(tr.From), esc(tr.To), esc(tr.Event))
+		}
+		for _, tr := range n.DomainFSM.Illegal {
+			fmt.Fprintf(b, `<tr><td>%s</td><td>%s</td><td>%s</td><td>禁止</td></tr>`, esc(tr.From), esc(tr.To), esc(tr.Event))
+		}
+		b.WriteString(`</table></details><button class="fsm-toggle" type="button">显示异常转移</button><div class="legend"><span><i></i>正向转移</span><span class="bad"><i></i>禁止转移</span></div>`)
+		if len(n.DomainFSM.Illegal) > 0 {
+			fmt.Fprintf(b, `<div class="illegal-line">禁止：%s</div>`, esc(joinIllegal(n.DomainFSM.Illegal)))
+		}
+		b.WriteString(`</div>`)
+	}
+	b.WriteString(`<div id="fsm-empty" class="hidden"><p class="empty">该节点不承载状态机；选择带 FSM 标记的功能查看。</p><div class="fsm-list">`)
+	for _, e := range orderedFSMNodes(idx, bodies) {
+		n := bodies[e.ID]
+		fmt.Fprintf(b, `<button class="fsm-link" data-select="%s">%s <span class="fsm-mark">FSM</span></button>`, esc(n.ID), esc(n.Title))
+	}
+	b.WriteString(`</div></div></aside>`)
+}
+
+func writeScript(b *strings.Builder, idx Index) {
+	fmt.Fprintf(b, `<script>
+const panels=[...document.querySelectorAll('[data-panel]')];
+const buttons=[...document.querySelectorAll('.node')];
+const byId=Object.fromEntries(buttons.map(b=>[b.dataset.node,b]));
+const slots=[...document.querySelectorAll('.fsm-slot')];
+const head=document.getElementById('fsm-head'), title=document.getElementById('fsm-title');
+const empty=document.getElementById('fsm-empty');
+function select(id){
+ const btn=byId[id]; if(!btn)return;
+ buttons.forEach(b=>b.classList.toggle('active',b===btn));
+ panels.forEach(p=>p.classList.toggle('hidden',p.dataset.panel!==id));
+ const owner=btn.dataset.fsm; const own=btn.dataset.own==='1';
+ slots.forEach(s=>s.classList.toggle('hidden',s.dataset.owner!==owner));
+ empty.classList.toggle('hidden',!!owner);
+ head.textContent=own?'当前节点状态机':(btn.dataset.kind==='touchpoint'?'所属功能状态机':'相关状态机');
+ title.textContent=owner?(document.querySelector('.fsm-slot[data-owner="'+owner+'"]')?.dataset.ownerTitle||''):'';
+ if(location.hash.slice(1)!==id)history.replaceState(null,'','#'+id);
+}
+buttons.forEach(b=>b.addEventListener('click',()=>select(b.dataset.node)));
+document.querySelectorAll('[data-select]').forEach(b=>b.addEventListener('click',()=>select(b.dataset.select)));
+document.querySelectorAll('.fsm-toggle').forEach(b=>b.addEventListener('click',()=>{const slot=b.closest('.fsm-slot');slot.classList.toggle('show-exceptions');b.textContent=slot.classList.contains('show-exceptions')?'隐藏异常转移':'显示异常转移';}));
+const filter=document.getElementById('filter');
+if(filter){filter.addEventListener('input',()=>{const v=filter.value.trim().toLowerCase();
+ buttons.forEach(b=>{b.parentElement.classList.toggle('hidden',!!v&&!(b.dataset.search||'').includes(v));});});}
+select(location.hash.slice(1)||'%s');
+</script>`, esc(idx.RootID))
+}
+
+func orderedFSMNodes(idx Index, bodies map[string]Node) []IndexEntry {
+	var out []IndexEntry
+	for _, e := range idx.Nodes {
+		if n, ok := bodies[e.ID]; ok && n.DomainFSM != nil {
+			out = append(out, e)
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Path < out[j].Path })
+	return out
+}
+
+func boolStr(v bool) string {
+	if v {
+		return "1"
+	}
+	return "0"
+}
+
+// renderFSMSVG draws a real flow diagram: states on layers, legal edges
+// solid, illegal edges dashed red. No external renderer is involved.
+func renderFSMSVG(f *DomainFSM, key string) string {
+	if f == nil || len(f.States) == 0 {
+		return ""
+	}
+	marker := "arrow-" + key
+	markerRed := "arrow-red-" + key
+	states := f.States
+	index := map[string]int{}
+	for i, s := range states {
+		index[s] = i
+	}
+	level := map[string]int{}
+	visited := map[string]bool{}
+	for _, s := range states {
+		level[s] = 0
+	}
+	// roots: no legal incoming edge
+	in := map[string]int{}
+	for _, tr := range f.Transitions {
+		if _, ok := index[tr.From]; !ok {
+			continue
+		}
+		if _, ok := index[tr.To]; !ok {
+			continue
+		}
+		in[tr.To]++
+	}
+	var queue []string
+	for _, s := range states {
+		if in[s] == 0 {
+			queue = append(queue, s)
+			visited[s] = true
+		}
+	}
+	if len(queue) == 0 {
+		queue = append(queue, states[0])
+		visited[states[0]] = true
+	}
+	for len(queue) > 0 {
+		cur := queue[0]
+		queue = queue[1:]
+		for _, tr := range f.Transitions {
+			if tr.From != cur {
+				continue
+			}
+			if _, ok := index[tr.To]; !ok || visited[tr.To] {
+				continue
+			}
+			level[tr.To] = level[cur] + 1
+			visited[tr.To] = true
+			queue = append(queue, tr.To)
+		}
+	}
+	maxLevel := 0
+	byLevel := map[int][]string{}
+	for _, s := range states {
+		l := level[s]
+		if l > maxLevel {
+			maxLevel = l
+		}
+		byLevel[l] = append(byLevel[l], s)
+	}
+	maxCount := 1
+	for _, list := range byLevel {
+		if len(list) > maxCount {
+			maxCount = len(list)
+		}
+	}
+	nodeW, nodeH := 100.0, 40.0
+	spacing := 118.0
+	width := 300.0
+	if float64(maxCount)*spacing+30 > width {
+		width = float64(maxCount)*spacing + 30
+	}
+	height := 60 + float64(maxLevel+1)*105
+	pos := map[string][2]float64{}
+	for l := 0; l <= maxLevel; l++ {
+		list := byLevel[l]
+		for i, s := range list {
+			x := (width - float64(len(list)-1)*spacing) / 2
+			if len(list) > 1 {
+				x += float64(i) * spacing
+			}
+			y := 48.0 + float64(l)*105
+			pos[s] = [2]float64{x, y}
+		}
+	}
+	var b strings.Builder
+	// Default view: every forward transition (the normal lifecycle).
+	// Back/cross edges and illegal transitions are the exception group.
+	forward := map[string]bool{}
+	for _, tr := range f.Transitions {
+		if level[tr.To] > level[tr.From] {
+			forward[tr.From+"->"+tr.To] = true
+		}
+	}
+	drawEdge := func(tr FSMTransition, legal bool) string {
+		s, ok1 := pos[tr.From]
+		d, ok2 := pos[tr.To]
+		if !ok1 || !ok2 || tr.From == tr.To {
+			return ""
+		}
+		stroke, mk, dash := "#6b7280", marker, ""
+		if !legal {
+			stroke, mk, dash = "#b23b3b", markerRed, ` stroke-dasharray="5 4"`
+		}
+		x1, y1 := s[0], s[1]+nodeH/2
+		x2, y2 := d[0], d[1]-nodeH/2
+		path := ""
+		if d[1] <= s[1] || !legal {
+			side := width - 18
+			path = fmt.Sprintf("M %.1f %.1f C %.1f %.1f, %.1f %.1f, %.1f %.1f", x1, y1, side, y1+20, side, y2-20, x2, y2)
+		} else {
+			midY := (y1 + y2) / 2
+			path = fmt.Sprintf("M %.1f %.1f C %.1f %.1f, %.1f %.1f, %.1f %.1f", x1, y1, x1, midY, x2, midY, x2, y2)
+		}
+		var out strings.Builder
+		fmt.Fprintf(&out, `<path d="%s" fill="none" stroke="%s" stroke-width="1.6"%s marker-end="url(#%s)"/>`, path, stroke, dash, mk)
+		return out.String()
+	}
+	var defs, primary, exceptions strings.Builder
+	fmt.Fprintf(&defs, `<defs><marker id="%s" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6b7280"/></marker><marker id="%s" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b23b3b"/></marker></defs>`, marker, markerRed)
+	for _, tr := range f.Transitions {
+		if forward[tr.From+"->"+tr.To] {
+			primary.WriteString(drawEdge(tr, true))
+		} else {
+			exceptions.WriteString(drawEdge(tr, true))
+		}
+	}
+	for _, tr := range f.Illegal {
+		exceptions.WriteString(drawEdge(tr, false))
+	}
+	fmt.Fprintf(&b, `<div class="fsm-canvas" style="width:%.0fpx;height:%.0fpx">`, width, height)
+	fmt.Fprintf(&b, `<svg class="edge-layer" viewBox="0 0 %.0f %.0f" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="业务状态机">`, width, height)
+	b.WriteString(defs.String())
+	b.WriteString(primary.String())
+	b.WriteString(`<g class="exceptions">`)
+	b.WriteString(exceptions.String())
+	b.WriteString(`</g></svg>`)
+	// State labels are HTML, not SVG text: readable in every browser,
+	// selectable and searchable.
+	for _, st := range states {
+		p := pos[st]
+		cls := "state"
+		if in[st] == 0 {
+			cls += " start"
+		}
+		fmt.Fprintf(&b, `<div class="%s" style="left:%.1fpx;top:%.1fpx">%s</div>`, cls, p[0]-nodeW/2, p[1]-nodeH/2, esc(st))
+	}
+	b.WriteString(`</div>`)
+	return b.String()
+}
+
+func statusLabel(s Status) string {
+	switch s {
+	case StatusDraft:
+		return "草稿"
+	case StatusFrozen:
+		return "已冻结"
+	case StatusImplemented:
+		return "已实现"
+	case StatusVerified:
+		return "已验证"
+	case StatusChangePending:
+		return "变更中"
+	case StatusDeprecated:
+		return "已废弃"
+	}
+	return string(s)
+}
+
+func testStatusLabel(s string) string {
+	if s == "existing" {
+		return "已绑定"
+	}
+	return "计划中"
+}
+
+func joinIllegal(in []FSMTransition) string {
+	parts := make([]string, 0, len(in))
+	for _, tr := range in {
+		parts = append(parts, tr.From+"→"+tr.To)
+	}
+	return strings.Join(parts, "，")
+}
+
+func esc(s string) string { return html.EscapeString(s) }

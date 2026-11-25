@@ -1,0 +1,52 @@
+{
+  "at": "2026-11-25T04:02:31.110705Z",
+  "children": [
+    {
+      "id": "n_375e008bae8f",
+      "kind": "touchpoint",
+      "title": "snapshot-before-write",
+      "intent": "迁移前先快照，写入失败保留快照。",
+      "parent_id": "n_7df782fdb5d7",
+      "path": "root/data-migration/v1-migration/snapshot-before-write",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "sv-1",
+          "text": "迁移命令先产生快照。"
+        },
+        {
+          "id": "sv-2",
+          "text": "写入失败时源库不变。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "sv-tc1",
+          "ac_id": "sv-1",
+          "kind": "unit",
+          "ref": "planned: internal/cli TestMigrationReadStoreSnapshotsCommittedWALThroughSymlink",
+          "status": "planned"
+        },
+        {
+          "id": "sv-tc2",
+          "ac_id": "sv-2",
+          "kind": "unit",
+          "ref": "planned: migration rollback test",
+          "status": "planned"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当迁移被中断时，源库哈希不变且快照可读取。"
+      },
+      "fingerprint": "737a01380bacea420029de690dc1eef2df18373a7ad1fdab21c5f595bfad0be9",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_7df782fdb5d7",
+  "provenance": {
+    "model": "host-llm",
+    "skill": "beacon-intent-tree",
+    "by": "self-host"
+  }
+}

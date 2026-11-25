@@ -1,0 +1,41 @@
+{
+  "id": "n_363997977d4a",
+  "kind": "touchpoint",
+  "title": "reason-exit",
+  "intent": "失败输出 reason code 与非零退出码。",
+  "parent_id": "n_d5b8e9a5716f",
+  "path": "root/cli-surface/error-contract/reason-exit",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "re-1",
+      "text": "失败打印 reason code。"
+    },
+    {
+      "id": "re-2",
+      "text": "失败退出码非零。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "re-tc1",
+      "ac_id": "re-1",
+      "kind": "unit",
+      "ref": "planned: CLI error contract test",
+      "status": "planned"
+    },
+    {
+      "id": "re-tc2",
+      "ac_id": "re-2",
+      "kind": "unit",
+      "ref": "planned: CLI exit code test",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "执行被拒绝的命令，stdout 含 reason code 且退出码非零。"
+  },
+  "fingerprint": "faf46fcb294522628f23875a1ce26cf041dd77a5d2e74788d821175be1a868e7",
+  "fingerprint_alg": "tree-json-v1"
+}

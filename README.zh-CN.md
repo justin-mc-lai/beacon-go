@@ -35,7 +35,7 @@ Go 版按一份书面口径执行（[`docs/scope-charter.md`](docs/scope-charter
 | 命令组 | 入口 | 做什么 |
 | --- | --- | --- |
 | **plan** | `beacon plan …` | 建树与展开：`init` 建根，`expand` 只校验提案，`apply` 写入 draft；记录展开 provenance（模型、prompt 哈希、tokens、成本）。 |
-| **truth** | `beacon truth …` | 自底向上冻结节点；叶子必须有 AC 和验证规格，module 必须有子节点；渲染树、生成不可变快照。 |
+| **truth** | `beacon truth …` | 自底向上冻结节点；叶子必须有 AC 和验证规格，module 必须有子节点；渲染树（HTML 为三栏工作台：全树 / 当前需求 / 对应 FSM）、生成不可变快照。 |
 | **change** | `beacon change …` | 改一棵子树：后代变 draft，全部祖先变 `change_pending`；再自底向上 refreeze。变更记录不可改。 |
 | **implement** | `beacon implement …` | 宿主干活，`implement report` 记录叶子、执行者、产物哈希与失败原因。 |
 | **verify** | `beacon verify …` | 按 feature/node scope 登记证据、验证叶子、汇总父级、审计树；原 qa 门禁与评分也在这里。 |

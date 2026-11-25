@@ -94,7 +94,7 @@ func NewRootCmd() *cobra.Command {
 		Use:   "beacon",
 		Short: "Beacon - requirement-truth kernel with an intent tree",
 		Long: "Beacon 3.x requirement-truth kernel.\n" +
-			"Seven groups: plan | truth | change | implement | verify | release | goal.\n" +
+			"Seven groups: plan | truth | change | implement | verify | release | goal; plus skills.\n" +
 			"Truth is an intent tree in the repo; SQLite is a rebuildable runtime cache.\n" +
 			"Internal maintenance commands are hidden from this help.",
 		Version:       Version,
@@ -109,7 +109,7 @@ func NewRootCmd() *cobra.Command {
 		case "truth":
 			root.AddCommand(newTruthCmd())
 		case "design":
-			root.AddCommand(newDesignCmd())
+			root.AddCommand(hidden(newDesignCmd()))
 		case "implement":
 			root.AddCommand(newImplementCmd())
 		case "release":
@@ -121,6 +121,6 @@ func NewRootCmd() *cobra.Command {
 	// P2a: the goal command group (the loop ability's formal entry).
 	// P3a: the gate command group (formal evaluation write-back).
 	// P3b: migrate v1 (AC-077..079) + doctor rebuild (AC-011).
-	root.AddCommand(hidden(newSpineCmd()), newProjectsCmd(), newGoalCmd(), newGateCmd(), hidden(newMigrateCmd()), hidden(newDoctorCmd()), newSkillsCmd(), hidden(newReviewCmd()), hidden(newArchiveCmd()), hidden(newHooksCmd()), hidden(newFSMCmd()), newVersionCmd(), newPlanCmd(), newVerifyCmd(), newChangeCmd())
+	root.AddCommand(hidden(newSpineCmd()), hidden(newProjectsCmd()), newGoalCmd(), hidden(newGateCmd()), hidden(newMigrateCmd()), hidden(newDoctorCmd()), newSkillsCmd(), hidden(newReviewCmd()), hidden(newArchiveCmd()), hidden(newHooksCmd()), hidden(newFSMCmd()), hidden(newVersionCmd()), newPlanCmd(), newVerifyCmd(), newChangeCmd())
 	return root
 }

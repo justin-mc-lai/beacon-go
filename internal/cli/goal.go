@@ -81,6 +81,7 @@ func newGoalCmd() *cobra.Command {
 		// command.
 		newGoalReleaseShadowCmd(),
 	)
+	hideAllBut(c, "run", "status", "tick", "block", "recover", "attach-verifier", "complete", "resume")
 	return c
 }
 

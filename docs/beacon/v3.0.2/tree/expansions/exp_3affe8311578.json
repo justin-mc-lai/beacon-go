@@ -1,0 +1,36 @@
+{
+  "at": "2026-11-25T04:02:31.375858Z",
+  "children": [
+    {
+      "id": "n_d5b8e9a5716f",
+      "kind": "feature",
+      "title": "error-contract",
+      "intent": "用户只看到稳定 reason code 与可操作提示，不看到内部栈。",
+      "parent_id": "n_8b83bfc9403d",
+      "path": "root/cli-surface/error-contract",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "ec-1",
+          "text": "错误返回稳定 reason code。"
+        },
+        {
+          "id": "ec-2",
+          "text": "退出码可脚本判断。"
+        },
+        {
+          "id": "ec-3",
+          "text": "帮助只显示用户命令。"
+        }
+      ],
+      "fingerprint": "a9639887f464d8f75ea4b769d9835881a1f5db1f77f399b8d769c6eebba6d288",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_8b83bfc9403d",
+  "provenance": {
+    "model": "host-llm",
+    "skill": "beacon-intent-tree",
+    "by": "self-host"
+  }
+}

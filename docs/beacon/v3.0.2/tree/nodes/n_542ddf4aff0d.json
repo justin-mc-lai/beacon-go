@@ -1,0 +1,80 @@
+{
+  "id": "n_542ddf4aff0d",
+  "kind": "feature",
+  "title": "stage-gate",
+  "intent": "阶段门禁",
+  "parent_id": "n_2f9cbcff36f4",
+  "path": "root/goal-orchestration/stage-gate",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "sg-1",
+      "text": "truth 阶段要求 feature frozen；implement 要求叶子 frozen。"
+    },
+    {
+      "id": "sg-2",
+      "text": "qa 阶段要求全部叶子 verified；release 要求 root verified。"
+    },
+    {
+      "id": "sg-3",
+      "text": "不满足时返回稳定 reason code，不自动补全。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "plan",
+      "truth",
+      "design",
+      "implement",
+      "qa",
+      "release"
+    ],
+    "transitions": [
+      {
+        "from": "plan",
+        "to": "truth",
+        "event": "plan_done"
+      },
+      {
+        "from": "truth",
+        "to": "design",
+        "event": "truth_frozen"
+      },
+      {
+        "from": "design",
+        "to": "implement",
+        "event": "design_bound"
+      },
+      {
+        "from": "implement",
+        "to": "qa",
+        "event": "implement_done"
+      },
+      {
+        "from": "qa",
+        "to": "release",
+        "event": "qa_verified"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "release",
+        "to": "plan"
+      },
+      {
+        "from": "qa",
+        "to": "plan"
+      },
+      {
+        "from": "implement",
+        "to": "release"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "4bb67bd5c1635cdc90b9fa7db5ae026f13041b87b5da32759fc38582cac3689e",
+    "8d9dfcb9bc764e4dd04152a57c95160ce32ead98c04865de4bca25369a62df7d"
+  ],
+  "fingerprint": "b0ce7cdf48e73de3649803d745be7eb8bcb28a19eb85bba2ebc873dbd754b5b9",
+  "fingerprint_alg": "tree-json-v1"
+}

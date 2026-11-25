@@ -1,0 +1,25 @@
+{
+  "id": "n_62abbe8a407b",
+  "kind": "touchpoint",
+  "title": "badminton chain",
+  "intent": "完整树链可跑",
+  "parent_id": "n_036eb6e70d4a",
+  "path": "root/self-host/dogfood/badminton-chain",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_62abbe8a407b-1",
+      "text": "run_dogfood 输出 PASS。"
+    },
+    {
+      "id": "n_62abbe8a407b-2",
+      "text": "证据哈希可复查。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当运行 run_dogfood.sh 时，输出 verdict=PASS 且 audit=true"
+  },
+  "fingerprint": "a6678729b77d7f2004ca82d1d24f8ab8ad97223f5ee2fed0ef1f6f090e3f428b",
+  "fingerprint_alg": "tree-json-v1"
+}

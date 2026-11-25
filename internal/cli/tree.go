@@ -69,11 +69,25 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 				}
 				return printJSON(cmd, n)
 			}
-			if format == "" || format == "json" {
-				report := treeReport(dir, idx)
-				if asJSON || format == "json" || format == "" {
-					return printJSON(cmd, report)
+			if format == "" {
+				format = "summary"
+			}
+			if format == "json" {
+				return printJSON(cmd, treeReport(dir, idx))
+			}
+			if asJSON {
+				return printJSON(cmd, treeReport(dir, idx))
+			}
+			if format == "summary" {
+				bodies := map[string]intenttree.Node{}
+				for _, e := range idx.Nodes {
+					n, nerr := intenttree.ReadNode(dir, e.ID)
+					if nerr != nil {
+						return nerr
+					}
+					bodies[e.ID] = n
 				}
+				return printTreeSummary(cmd, idx, bodies, dir)
 			}
 			if format == "md" {
 				data := intenttree.RenderMarkdown(idx)
@@ -85,7 +99,15 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 				return nil
 			}
 			if format == "html" {
-				data := intenttree.RenderHTML(idx)
+				bodies := map[string]intenttree.Node{}
+				for _, e := range idx.Nodes {
+					n, nerr := intenttree.ReadNode(dir, e.ID)
+					if nerr != nil {
+						return nerr
+					}
+					bodies[e.ID] = n
+				}
+				data := intenttree.RenderHTMLTree(idx, bodies)
 				def := filepath.Join(projRoot, ".beacon", "artifacts", "tree", idx.Version, "index.html")
 				p, werr := writeTreeRender(outPath, "", def, data)
 				if werr != nil {
@@ -94,12 +116,12 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 				fmt.Fprintf(cmd.OutOrStdout(), "wrote %s (%d bytes, sha256=%s, source=%s)\n", p, len(data), hashHex(data), intenttree.SourceHash(idx))
 				return nil
 			}
-			return fail("tree_format_unknown", op, "format must be json, md, or html")
+			return fail("tree_format_unknown", op, "format must be summary, json, md, or html")
 		},
 	}
 	c.Flags().StringVar(&project, "project", ".", "project root")
 	c.Flags().StringVar(&version, "version", "", "docs version (default current)")
-	c.Flags().StringVar(&format, "format", "json", "output format: json, md, html")
+	c.Flags().StringVar(&format, "format", "summary", "output format: summary, json, md, html")
 	c.Flags().StringVar(&outPath, "out", "", "render output path (for md/html)")
 	c.Flags().StringVar(&nodeID, "node", "", "print a single node body (canonical JSON)")
 	c.Flags().StringVar(&snapshot, "snapshot", "", "read an immutable snapshot (id or latest)")
@@ -264,4 +286,51 @@ func newDoctorRebuildTreeCmd() *cobra.Command {
 	c.Flags().StringVar(&version, "version", "", "docs version (default current)")
 	c.Flags().BoolVar(&asJSON, "json", false, "JSON output (default)")
 	return c
+}
+
+// printTreeSummary is the human default: what the project is, how much is
+// covered, and where the readable view is. Machine data stays behind --json.
+func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[string]intenttree.Node, dir string) error {
+	var modules, features, leaves, acs, fsm, planned, existing, verified int
+	for _, e := range idx.Nodes {
+		switch e.Kind {
+		case intenttree.KindModule:
+			modules++
+		case intenttree.KindFeature:
+			features++
+		case intenttree.KindTouchpoint:
+			leaves++
+		}
+		if e.Status == intenttree.StatusVerified {
+			verified++
+		}
+		n, ok := bodies[e.ID]
+		if !ok {
+			continue
+		}
+		acs += len(n.ACs)
+		if n.DomainFSM != nil {
+			fsm++
+		}
+		for _, tc := range n.TestCases {
+			if tc.Status == "existing" {
+				existing++
+			} else {
+				planned++
+			}
+		}
+	}
+	root := bodies[idx.RootID]
+	out := cmd.OutOrStdout()
+	fmt.Fprintf(out, "需求简报 · %s\n\n", idx.Version)
+	if root.Intent != "" {
+		fmt.Fprintf(out, "%s\n\n", root.Intent)
+	}
+	fmt.Fprintf(out, "%d 模块 · %d 功能 · %d 触达点 · %d 条 AC · %d 个状态机\n", modules, features, leaves, acs, fsm)
+	fmt.Fprintf(out, "测试：%d 已绑定 · %d 计划中；已验证节点 %d/%d\n", existing, planned, verified, len(idx.Nodes))
+	if planned > 0 {
+		fmt.Fprintf(out, "\n还不能宣称已验证：%d 条测试仍是计划状态。\n", planned)
+	}
+	fmt.Fprintf(out, "\n阅读版：beacon truth tree --version %s --format html\n", idx.Version)
+	return nil
 }

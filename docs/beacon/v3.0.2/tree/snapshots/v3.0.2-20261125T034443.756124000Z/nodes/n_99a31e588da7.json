@@ -1,0 +1,29 @@
+{
+  "id": "n_99a31e588da7",
+  "kind": "feature",
+  "title": "canonical-json",
+  "intent": "canonical JSON 与指纹",
+  "parent_id": "n_244f402ca9c7",
+  "path": "root/truth-kernel/canonical-json",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "cj-1",
+      "text": "同一棵树跨运行产生相同 canonical JSON 与 SHA-256。"
+    },
+    {
+      "id": "cj-2",
+      "text": "AC 文本变化必须改变 tree-json-v1 指纹。"
+    },
+    {
+      "id": "cj-3",
+      "text": "渲染 MD/HTML 带 source hash，作为派生视图不入合同指纹。"
+    }
+  ],
+  "child_fingerprints": [
+    "24161dd5ee5a8a521f1844addd7a6f2c78904f436063591ef03d069482e48d7d",
+    "b4cf064ea5bc1af1a3cda6bde6c325a2527ca872ec6317ef2047ed2915c43c15"
+  ],
+  "fingerprint": "ca45ff74e077f5a56ceb9f1b95368208c908d22239030fd296c1d78228f27119",
+  "fingerprint_alg": "tree-json-v1"
+}

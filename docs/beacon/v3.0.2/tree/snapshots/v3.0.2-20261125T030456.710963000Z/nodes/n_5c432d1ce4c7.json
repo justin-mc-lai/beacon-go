@@ -1,0 +1,21 @@
+{
+  "id": "n_5c432d1ce4c7",
+  "kind": "touchpoint",
+  "title": "leaf verification",
+  "intent": "叶子 implemented→verified",
+  "parent_id": "n_820af49910f0",
+  "path": "root/verification/rollup-audit/leaf-verification",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "lv-AC1",
+      "text": "叶子证据登记后变 verified"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当对 implemented 叶子执行 verify leaf 时，状态变 verified"
+  },
+  "fingerprint": "a9cdfb5df57f36b6d481999179ddf0defe350191682c502d9acf675c97951ed3",
+  "fingerprint_alg": "tree-json-v1"
+}

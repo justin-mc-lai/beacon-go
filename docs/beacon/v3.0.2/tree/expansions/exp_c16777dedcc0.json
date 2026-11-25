@@ -1,0 +1,56 @@
+{
+  "at": "2026-11-25T03:04:56.374715Z",
+  "children": [
+    {
+      "id": "n_4776fa804b3b",
+      "kind": "touchpoint",
+      "title": "seven groups",
+      "intent": "七个用户入口",
+      "parent_id": "n_068ee154c0a2",
+      "path": "root/cli-surface/seven-groups/seven-groups",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "sg-AC1",
+          "text": "help 暴露 plan/truth/change/implement/verify/release/goal"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当运行 beacon --help 时，七个组均存在"
+      },
+      "fingerprint": "9ae86db1ee996f02ab338fe25b5437bf05a4280ffba7f6c3a5f06ab0d8f11b2f",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_09894e8e7c1c",
+      "kind": "touchpoint",
+      "title": "verify replaces qa",
+      "intent": "qa 不再存在",
+      "parent_id": "n_068ee154c0a2",
+      "path": "root/cli-surface/seven-groups/verify-replaces-qa",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "vq-AC1",
+          "text": "qa 执行返回 unknown"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当运行 beacon qa 时，返回 unknown command"
+      },
+      "fingerprint": "37a76c21beeefde2ad38d9af12b42bd432a65310e6c1134ce66a7a7dd6592d4b",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_068ee154c0a2",
+  "provenance": {
+    "model": "host-agent",
+    "prompt_hash": "sha256:beacon-self-tree-v1",
+    "skill": "beacon-go-plan",
+    "tokens": 2400,
+    "cost_usd": 0.04,
+    "by": "self-host"
+  }
+}

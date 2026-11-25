@@ -1,0 +1,56 @@
+{
+  "at": "2026-11-25T03:04:56.299193Z",
+  "children": [
+    {
+      "id": "n_6c9187d9cc95",
+      "kind": "touchpoint",
+      "title": "canonical serialization",
+      "intent": "固定键序与字段序",
+      "parent_id": "n_99a31e588da7",
+      "path": "root/truth-kernel/canonical-json/canonical-serialization",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "cj-AC1",
+          "text": "同输入两次序列化字节一致"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当同一节点写两次时，两字节流 SHA-256 相同"
+      },
+      "fingerprint": "0117e98db1f5bfb1b720f4db02b3ff3f11b3bbf1adf93287a9cfda7e900fde7a",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_af25a081f24e",
+      "kind": "touchpoint",
+      "title": "AC fingerprint",
+      "intent": "AC 变化移动指纹",
+      "parent_id": "n_99a31e588da7",
+      "path": "root/truth-kernel/canonical-json/ac-fingerprint",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "fp-AC1",
+          "text": "AC 文本变更必须改变指纹"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当 AC 文本变化时，tree-json-v1 指纹变化"
+      },
+      "fingerprint": "cc0d4b56998145ecfe78e78e590f0341e1e39515a46ac3d1305462f41c4ffe1f",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_99a31e588da7",
+  "provenance": {
+    "model": "host-agent",
+    "prompt_hash": "sha256:beacon-self-tree-v1",
+    "skill": "beacon-go-plan",
+    "tokens": 2400,
+    "cost_usd": 0.04,
+    "by": "self-host"
+  }
+}

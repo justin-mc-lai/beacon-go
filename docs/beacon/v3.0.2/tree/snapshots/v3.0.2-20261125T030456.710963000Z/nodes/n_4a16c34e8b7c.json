@@ -1,0 +1,21 @@
+{
+  "id": "n_4a16c34e8b7c",
+  "kind": "touchpoint",
+  "title": "seven skills",
+  "intent": "七个 skill 可安装",
+  "parent_id": "n_4665926a0040",
+  "path": "root/self-host/skills/seven-skills",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "ss-AC1",
+      "text": "skills verify 显示 agents OK"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当安装到 agents 后，beacon skills verify 显示 OK"
+  },
+  "fingerprint": "b2483ca37a22ecdb83f89084526d2ee499e07588a03c5fea085c10b1d658a318",
+  "fingerprint_alg": "tree-json-v1"
+}

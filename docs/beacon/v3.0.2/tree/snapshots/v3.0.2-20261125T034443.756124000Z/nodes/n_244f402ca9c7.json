@@ -1,0 +1,29 @@
+{
+  "id": "n_244f402ca9c7",
+  "kind": "module",
+  "title": "truth-kernel",
+  "intent": "需求真相的存储、冻结与变更",
+  "parent_id": "nroot_98a9c77a9519",
+  "path": "root/truth-kernel",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "tk-1",
+      "text": "树是唯一需求真相；canonical JSON 是权威源，SQLite 只是可重建缓存。"
+    },
+    {
+      "id": "tk-2",
+      "text": "节点冻结必须绑定 AC 与可执行验证规格；冻结后正文不得原地修改。"
+    },
+    {
+      "id": "tk-3",
+      "text": "子树变更后祖先自动失效；refreeze 自底向上并重绑子指纹。"
+    }
+  ],
+  "child_fingerprints": [
+    "ca45ff74e077f5a56ceb9f1b95368208c908d22239030fd296c1d78228f27119",
+    "dc8e35ccbd86afa6e5b10284e1c7673ac8c0d1cf8beffae5b3ce942872e480a3"
+  ],
+  "fingerprint": "e81cd97a2f42016599c37813070b44c064972b25b38c696361fe26e0c250df45",
+  "fingerprint_alg": "tree-json-v1"
+}

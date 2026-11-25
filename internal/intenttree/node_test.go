@@ -84,3 +84,32 @@ func hasCode(findings []string, code string) bool {
 	}
 	return false
 }
+
+func TestValidateDomainFSM(t *testing.T) {
+	ok := &DomainFSM{States: []string{"draft", "frozen"}, Transitions: []FSMTransition{{From: "draft", To: "frozen", Event: "freeze"}}, Illegal: []FSMTransition{{From: "frozen", To: "draft"}}}
+	if got := ValidateDomainFSM(ok); len(got) != 0 {
+		t.Fatalf("valid FSM rejected: %v", got)
+	}
+	bad := &DomainFSM{States: []string{"draft", "draft", "verified"}, Transitions: []FSMTransition{{From: "draft", To: "verified"}}, Illegal: []FSMTransition{{From: "draft", To: "verified"}}}
+	got := strings.Join(ValidateDomainFSM(bad), "; ")
+	for _, want := range []string{ReasonFSMDuplicate, ReasonFSMConflict} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %s in %q", want, got)
+		}
+	}
+}
+
+func TestValidateTestCases(t *testing.T) {
+	acs := []AC{{ID: "a1"}, {ID: "a2"}}
+	bad := []TestCase{{ID: "t1", ACID: "a1", Kind: "unit", Ref: "x", Status: "existing"}, {ID: "t1", ACID: "a9", Kind: "e2e", Ref: "", Status: "planned"}}
+	got := strings.Join(ValidateTestCases(acs, bad), "; ")
+	for _, want := range []string{ReasonTestCaseInvalid, ReasonACCoverage} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("missing %s in %q", want, got)
+		}
+	}
+	ok := []TestCase{{ID: "t1", ACID: "a1", Kind: "unit", Ref: "x", Status: "existing"}, {ID: "t2", ACID: "a2", Kind: "manual", Ref: "y", Status: "planned"}}
+	if got := ValidateTestCases(acs, ok); len(got) != 0 {
+		t.Fatalf("valid cases rejected: %v", got)
+	}
+}

@@ -1,0 +1,15 @@
+{
+  "id": "n_068ee154c0a2",
+  "kind": "feature",
+  "title": "seven-groups",
+  "intent": "七命令组",
+  "parent_id": "n_8b83bfc9403d",
+  "path": "root/cli-surface/seven-groups",
+  "status": "frozen",
+  "child_fingerprints": [
+    "a81a056d89ce4d9c9b9022fd27750afa5a60756b41d46593cfcd87e1d6064ab3",
+    "0eb8fa5280af0d236820329fbea1e109beeeda716eedb7f54c9b67b5518d0141"
+  ],
+  "fingerprint": "1502e2e9dbf517ae0e30e3f4c61b47efd19c52da4214aa6af702d0a9c8bf2ce2",
+  "fingerprint_alg": "tree-json-v1"
+}

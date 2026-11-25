@@ -1,0 +1,56 @@
+{
+  "at": "2026-11-25T03:04:56.358269Z",
+  "children": [
+    {
+      "id": "n_79f7bfd68155",
+      "kind": "touchpoint",
+      "title": "tick identity",
+      "intent": "显式身份推进",
+      "parent_id": "n_4aafa3895e8d",
+      "path": "root/goal-orchestration/manual-run/tick-identity",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "ti-AC1",
+          "text": "手动 tick 用 --by 记账"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当 goal tick --by host 执行后，当前阶段推进一次"
+      },
+      "fingerprint": "3741f7859ebca2f271fa5e11a1d331679e713ac08b2e16acec299d8a381fefec",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_77ece7e1beb1",
+      "kind": "touchpoint",
+      "title": "checkpoint resume",
+      "intent": "断点可恢复",
+      "parent_id": "n_4aafa3895e8d",
+      "path": "root/goal-orchestration/manual-run/checkpoint-resume",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "cr-AC1",
+          "text": "checkpoint 写下一步"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当写 checkpoint 后，resume-pack 返回下一步"
+      },
+      "fingerprint": "7b120a21d6e6abcd08ca92e34eb9c3e0d430ca7a65d2403063f319445fc32989",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_4aafa3895e8d",
+  "provenance": {
+    "model": "host-agent",
+    "prompt_hash": "sha256:beacon-self-tree-v1",
+    "skill": "beacon-go-plan",
+    "tokens": 2400,
+    "cost_usd": 0.04,
+    "by": "self-host"
+  }
+}

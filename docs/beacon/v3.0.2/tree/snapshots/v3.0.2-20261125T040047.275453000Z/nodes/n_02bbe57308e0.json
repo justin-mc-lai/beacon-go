@@ -1,0 +1,29 @@
+{
+  "id": "n_02bbe57308e0",
+  "kind": "feature",
+  "title": "dependency-gate",
+  "intent": "依赖与版本门禁",
+  "parent_id": "n_8b83bfc9403d",
+  "path": "root/cli-surface/dependency-gate",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "dg-1",
+      "text": "内核依赖图不含 llm/httpapi/agentapi/workspace/desktop。"
+    },
+    {
+      "id": "dg-2",
+      "text": "执行器文件与 goal program 命令文件不得回归。"
+    },
+    {
+      "id": "dg-3",
+      "text": "版本只有一个源，AGENTS/README 写死当前版本即失败。"
+    }
+  ],
+  "child_fingerprints": [
+    "f967669be258dfb4c2ba7218c53d5e781b5052cac01d0d43055a103ce64d00c1",
+    "5a73fc171e4a89716d4fc6cf54180119119fb04d2f9f64c1d6ce802a6d9b3a39"
+  ],
+  "fingerprint": "f093d06d9373f53102be5b59d84314b6c20e2a50e308d147ae2bf29a0f1ab57c",
+  "fingerprint_alg": "tree-json-v1"
+}
