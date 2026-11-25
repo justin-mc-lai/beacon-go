@@ -6,9 +6,11 @@ import (
 	"strings"
 )
 
-const artifactIgnoreLine = ".beacon/artifacts/"
+const artifactIgnoreLine = ".beacon/"
 
-// ensureArtifactsIgnored makes the derived HTML tree untracked by default.
+// ensureArtifactsIgnored keeps the whole local `.beacon` workspace out of
+// git for new projects: runtime state, artifacts and local evidence are
+// machine-local. `docs/beacon` remains the shared truth and is not ignored.
 // The root .gitignore is the reliable layer (the nested .gitignore alone
 // would still show as an untracked directory before it is committed).
 func ensureArtifactsIgnored(projRoot string) error {

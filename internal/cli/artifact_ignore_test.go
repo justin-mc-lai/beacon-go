@@ -14,7 +14,7 @@ func TestArtifactsAreIgnoredOnInitAndRender(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(rootIgnore), ".beacon/artifacts/") {
+	if !strings.Contains(string(rootIgnore), ".beacon/") {
 		t.Fatalf("root .gitignore missing artifacts rule: %s", rootIgnore)
 	}
 	if _, err := os.Stat(filepath.Join(proj, ".beacon", "artifacts", ".gitignore")); err != nil {
