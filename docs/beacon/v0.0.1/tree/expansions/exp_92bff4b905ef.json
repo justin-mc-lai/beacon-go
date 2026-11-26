@@ -1,0 +1,36 @@
+{
+  "at": "2026-11-26T11:02:39.19104Z",
+  "children": [
+    {
+      "id": "n_12c7f50ea594",
+      "kind": "feature",
+      "title": "TC acceptance binding",
+      "intent": "每条 TC 显式绑定 FSM 转移或 illegal slot，gate 输出 per-TC verdict 而非整体 pass/blocked。",
+      "parent_id": "n_3c1f1d8ec396",
+      "path": "root/acceptance-binding/tc-acceptance-binding",
+      "status": "draft",
+      "fingerprint": "ddee00bbc148f98c2fac898109d321ae97b2e1731d203df8e0d45d1b8e89aa1d",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_dbab29f9640e",
+      "kind": "feature",
+      "title": "FSM illegal slot coverage",
+      "intent": "每个 FSM illegal slot 必须有对应 negative TC，缺失时 integrity fail-closed。",
+      "parent_id": "n_3c1f1d8ec396",
+      "path": "root/acceptance-binding/fsm-illegal-coverage",
+      "status": "draft",
+      "fingerprint": "60e4553bbe47fafbf8e843ac373608b4d80c4dc8d47d784ddb4597bb430f58c5",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_3c1f1d8ec396",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main",
+    "sources": [
+      "BoundariesB: integrity.go / qa_evidence.go"
+    ]
+  }
+}

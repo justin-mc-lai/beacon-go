@@ -1,0 +1,21 @@
+{
+  "id": "n_a7c847346c2c",
+  "kind": "touchpoint",
+  "title": "tree drift command",
+  "intent": "对意图树节点指纹输出 added/changed/removed 级漂移报告。",
+  "parent_id": "n_679cb763d41a",
+  "path": "root/truth-binding/requirement-level-drift/tree-drift-cmd",
+  "status": "draft",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "改动节点正文后 beacon plan drift 列出该节点为 changed，未改动节点不出现"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/intenttree -run TestDrift -count=1 通过且命令 beacon plan drift --node \u003cid\u003e --json 输出 added/changed/removed 数组"
+  },
+  "fingerprint": "b1855329c6de3c5015befa4f4bda5e858957dbda68201a4072c73034e0ceb1a5",
+  "fingerprint_alg": "tree-json-v1"
+}

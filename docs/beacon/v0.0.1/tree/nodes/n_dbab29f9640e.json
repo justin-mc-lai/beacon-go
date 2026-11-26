@@ -1,0 +1,11 @@
+{
+  "id": "n_dbab29f9640e",
+  "kind": "feature",
+  "title": "FSM illegal slot coverage",
+  "intent": "每个 FSM illegal slot 必须有对应 negative TC，缺失时 integrity fail-closed。",
+  "parent_id": "n_3c1f1d8ec396",
+  "path": "root/acceptance-binding/fsm-illegal-coverage",
+  "status": "draft",
+  "fingerprint": "60e4553bbe47fafbf8e843ac373608b4d80c4dc8d47d784ddb4597bb430f58c5",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,53 @@
+{
+  "at": "2026-11-26T11:01:47.686944Z",
+  "children": [
+    {
+      "id": "n_97cff751330d",
+      "kind": "touchpoint",
+      "title": "node deprecate",
+      "intent": "将节点置 deprecated 并记录 change record，不物理删除。",
+      "parent_id": "n_1a712a5f8a04",
+      "path": "root/truth-binding/intent-tree-crud/node-deprecate",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "对 draft 节点执行废弃后 status=deprecated 且生成 change 记录"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "beacon change request --node \u003cid\u003e --summary deprecate --json 退出 0 且 beacon plan show --node \u003cid\u003e 显示 status=deprecated"
+      },
+      "fingerprint": "7cae2075c350cc25f541653f829cf1e44d3f9e3e1b2f0a99e53de122d586e8b3",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_a9b167dac971",
+      "kind": "touchpoint",
+      "title": "freeze gate",
+      "intent": "只有 draft 节点可冻结，frozen 节点冻结返回稳定 reason code。",
+      "parent_id": "n_1a712a5f8a04",
+      "path": "root/truth-binding/intent-tree-crud/freeze-gate",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "重复冻结 frozen 节点返回非零退出码 reason=tree_node_not_draft"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "beacon plan freeze --node \u003cfrozen-id\u003e 退出非零且 stderr 含 tree_node_not_draft"
+      },
+      "fingerprint": "32ab9b94a0f117ef62aef5d11e9b78bfc91d06a32f33f88a9c0b2e1a8ac6691b",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_1a712a5f8a04",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main"
+  }
+}

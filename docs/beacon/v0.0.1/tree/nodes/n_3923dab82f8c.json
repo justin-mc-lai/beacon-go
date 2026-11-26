@@ -1,0 +1,21 @@
+{
+  "id": "n_3923dab82f8c",
+  "kind": "touchpoint",
+  "title": "project bump manifest",
+  "intent": "bump 创建下一 manifest 并置 current",
+  "parent_id": "n_143f1617bc78",
+  "path": "root/version-evolution/docs-version-line/project-bump-manifest",
+  "status": "draft",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "bump 后新 vX.Y.Z manifest 为 current"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon projects bump --project . --level patch --json | jq -e '.version'"
+  },
+  "fingerprint": "6882ac72eb791540ab5a38dffd628edba38846d72ceecd3c96718f6d451e3929",
+  "fingerprint_alg": "tree-json-v1"
+}

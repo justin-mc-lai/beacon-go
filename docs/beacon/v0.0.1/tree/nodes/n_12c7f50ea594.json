@@ -1,0 +1,11 @@
+{
+  "id": "n_12c7f50ea594",
+  "kind": "feature",
+  "title": "TC acceptance binding",
+  "intent": "每条 TC 显式绑定 FSM 转移或 illegal slot，gate 输出 per-TC verdict 而非整体 pass/blocked。",
+  "parent_id": "n_3c1f1d8ec396",
+  "path": "root/acceptance-binding/tc-acceptance-binding",
+  "status": "draft",
+  "fingerprint": "ddee00bbc148f98c2fac898109d321ae97b2e1731d203df8e0d45d1b8e89aa1d",
+  "fingerprint_alg": "tree-json-v1"
+}

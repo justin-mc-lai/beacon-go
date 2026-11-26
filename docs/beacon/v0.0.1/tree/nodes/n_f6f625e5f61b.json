@@ -1,0 +1,11 @@
+{
+  "id": "n_f6f625e5f61b",
+  "kind": "feature",
+  "title": "module admission",
+  "intent": "module 入口统一调用共享 admission 检查，任一子 feature blocked 则 module 不启动。",
+  "parent_id": "n_5f7fcbdf0840",
+  "path": "root/module-orchestration/module-admission",
+  "status": "draft",
+  "fingerprint": "87b5e55454732828ff3231c168595f42680c3d62f2c15ddcf1433a1806c54c0c",
+  "fingerprint_alg": "tree-json-v1"
+}

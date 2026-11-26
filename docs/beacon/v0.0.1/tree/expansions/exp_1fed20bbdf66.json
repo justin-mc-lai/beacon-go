@@ -1,0 +1,53 @@
+{
+  "at": "2026-11-26T11:03:06.778678Z",
+  "children": [
+    {
+      "id": "n_799afe679d02",
+      "kind": "touchpoint",
+      "title": "illegal slot negative tc",
+      "intent": "每个 illegal slot 有对应 negative TC",
+      "parent_id": "n_dbab29f9640e",
+      "path": "root/acceptance-binding/fsm-illegal-coverage/illegal-slot-negative-tc",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "缺失 illegal slot 覆盖时 integrity 报 uncovered reason"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "beacon gate integrity --feature \u003cslug\u003e --json | jq -e '.reason_code'"
+      },
+      "fingerprint": "be421043d41dacd7c0642318ffc4e51fe9759dacf21344ff28b103e8b84b6bed",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_673d03783f60",
+      "kind": "touchpoint",
+      "title": "evidence hash check",
+      "intent": "TC evidence hash 与 artifact 注册一致",
+      "parent_id": "n_dbab29f9640e",
+      "path": "root/acceptance-binding/fsm-illegal-coverage/evidence-hash-check",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "篡改 evidence 后 gate evaluate qa blocked reason=qa_execution_stale"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "beacon gate evaluate qa --run-id \u003cid\u003e --evaluator x 退出非零"
+      },
+      "fingerprint": "227f2b3c5691caf8f64babe6bc10a29af67993a3c3a8135430c9a983a3e11864",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_dbab29f9640e",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "n_679cb763d41a",
+  "kind": "feature",
+  "title": "requirement level drift",
+  "intent": "对意图树节点指纹做 added/changed/removed 级漂移报告，只覆盖需求正文，不含治理规则。",
+  "parent_id": "n_56360bc665a3",
+  "path": "root/truth-binding/requirement-level-drift",
+  "status": "draft",
+  "fingerprint": "2f96ea971ca6d8678721a454d50977de7b754f63a7bf7e9ddb9761be7b5608e8",
+  "fingerprint_alg": "tree-json-v1"
+}

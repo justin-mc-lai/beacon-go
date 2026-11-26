@@ -1,0 +1,90 @@
+{
+  "at": "2026-11-26T11:02:39.66134Z",
+  "children": [
+    {
+      "id": "n_e11ba0e98451",
+      "kind": "feature",
+      "title": "self tree CI validation",
+      "intent": "CI 校验本仓意图树指纹、索引与 SQLite 投影一致，dogfood 自己的树。",
+      "parent_id": "n_5e13a94c202d",
+      "path": "root/self-drive/self-tree-ci",
+      "status": "draft",
+      "fingerprint": "0aa46b73c2799696d2a34c84799e480b7a512cfe5c9018e6cf3a74e64b04f226",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_41398c3173e0",
+      "kind": "feature",
+      "title": "self goal loop",
+      "intent": "用 beacon goal 在 beacon-go 自身仓库运行完整交付闭环。",
+      "parent_id": "n_5e13a94c202d",
+      "path": "root/self-drive/self-goal-loop",
+      "status": "draft",
+      "domain_fsm": {
+        "states": [
+          "idle",
+          "running",
+          "verifying",
+          "delivered",
+          "blocked"
+        ],
+        "transitions": [
+          {
+            "from": "idle",
+            "to": "running",
+            "event": "run"
+          },
+          {
+            "from": "running",
+            "to": "verifying",
+            "event": "implement_done"
+          },
+          {
+            "from": "verifying",
+            "to": "delivered",
+            "event": "gate_pass"
+          },
+          {
+            "from": "verifying",
+            "to": "blocked",
+            "event": "gate_block"
+          }
+        ],
+        "illegal": [
+          {
+            "from": "idle",
+            "to": "delivered",
+            "event": "skip_all"
+          },
+          {
+            "from": "blocked",
+            "to": "delivered",
+            "event": "force"
+          }
+        ]
+      },
+      "fingerprint": "87ca3b353043333a00dc122c848e6cb2cf27d710ddd0d018be84ecba85bd7fa2",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_5e74132fe68f",
+      "kind": "feature",
+      "title": "defect feedback",
+      "intent": "缺陷自动回流为树节点或 change 记录并进入实现闭环，形成自驱迭代。",
+      "parent_id": "n_5e13a94c202d",
+      "path": "root/self-drive/defect-feedback",
+      "status": "draft",
+      "fingerprint": "ebb3e464007c58829f6992abb769af1c5c75542dbe35ac3e4650a502942cd8da",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_5e13a94c202d",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main",
+    "sources": [
+      "BoundariesC: e2e/run_dogfood.sh / ci.yml"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "n_143f1617bc78",
+  "kind": "feature",
+  "title": "docs version line",
+  "intent": "项目级 docs 版本创建、bump、manifest 基线/继承，版本按 project_id 隔离。",
+  "parent_id": "n_75ea19c0c144",
+  "path": "root/version-evolution/docs-version-line",
+  "status": "draft",
+  "domain_fsm": {
+    "states": [
+      "draft",
+      "frozen",
+      "released"
+    ],
+    "transitions": [
+      {
+        "from": "draft",
+        "to": "frozen",
+        "event": "freeze"
+      },
+      {
+        "from": "frozen",
+        "to": "released",
+        "event": "release"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "released",
+        "to": "draft",
+        "event": "reopen"
+      },
+      {
+        "from": "draft",
+        "to": "released",
+        "event": "skip_freeze"
+      }
+    ]
+  },
+  "fingerprint": "901fedd3f460b8ad2698507c034005ae87fed73f9b4dbe3d03fbbaaefe941e83",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,53 @@
+{
+  "at": "2026-11-26T11:03:06.87246Z",
+  "children": [
+    {
+      "id": "n_b935c7e6837a",
+      "kind": "touchpoint",
+      "title": "rebuild tree passes",
+      "intent": "CI 校验本仓树指纹/索引/投影一致",
+      "parent_id": "n_e11ba0e98451",
+      "path": "root/self-drive/self-tree-ci/self-rebuild-tree",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "doctor rebuild-tree 对本仓退出 0 且 rebuilt 数=索引节点数"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "beacon doctor rebuild-tree --project . --json | jq -e '.rebuilt \u003e 0'"
+      },
+      "fingerprint": "e67c7e93bf4e601e3f9ba6e83d380c92a0a41496037ee5864bd65d8bf0d84fd9",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_657f878cb0ab",
+      "kind": "touchpoint",
+      "title": "full test suite green",
+      "intent": "全量测试绿",
+      "parent_id": "n_e11ba0e98451",
+      "path": "root/self-drive/self-tree-ci/self-test-suite",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "go test ./... -count=1 全绿"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./... -count=1"
+      },
+      "fingerprint": "1a450058ce120262145ff7add8a2578421f9228f8ffe37ef92a2bf130aff1f9c",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_e11ba0e98451",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main"
+  }
+}

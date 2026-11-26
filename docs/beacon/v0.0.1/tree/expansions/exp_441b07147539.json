@@ -1,0 +1,32 @@
+{
+  "at": "2026-11-26T11:03:06.397195Z",
+  "children": [
+    {
+      "id": "n_e203874ad8d4",
+      "kind": "touchpoint",
+      "title": "register self project",
+      "intent": "幂等登记本仓",
+      "parent_id": "n_41398c3173e0",
+      "path": "root/self-drive/self-goal-loop/self-project-register",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "register 后 current_version=v0.0.1"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "beacon projects register --path . --version v0.0.1 --json | jq -e '.current_version == \"v0.0.1\"'"
+      },
+      "fingerprint": "973770e747f13eee06fd4754b5f9e6c4c0e2af24acafc992508cf1b5a3a8a816",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_41398c3173e0",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main"
+  }
+}

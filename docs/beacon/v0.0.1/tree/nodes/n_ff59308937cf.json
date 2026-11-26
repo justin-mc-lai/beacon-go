@@ -1,0 +1,11 @@
+{
+  "id": "n_ff59308937cf",
+  "kind": "feature",
+  "title": "runtime version source",
+  "intent": "校验 version.go 唯一源与所有引用点无第二份字面量，覆盖 tag/release/CHANGELOG 的 V-08/V-09 完整性。",
+  "parent_id": "n_75ea19c0c144",
+  "path": "root/version-evolution/runtime-version-source",
+  "status": "draft",
+  "fingerprint": "94add8fbfa89dad723b01f874940f5039df91246e4449433d3961f94a192bb80",
+  "fingerprint_alg": "tree-json-v1"
+}

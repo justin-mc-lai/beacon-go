@@ -1,0 +1,11 @@
+{
+  "id": "n_92210b2358fa",
+  "kind": "feature",
+  "title": "node id namespace",
+  "intent": "所有节点类型 id 按 versionID 命名空间并有测试覆盖，跨项目同版本号不撞主键。",
+  "parent_id": "n_75ea19c0c144",
+  "path": "root/version-evolution/node-id-namespace",
+  "status": "draft",
+  "fingerprint": "4800c2ae4e8df50b97099d3cc923da409c63f13c6b6654c37cda34be79bb4ebb",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,54 @@
+{
+  "id": "n_41398c3173e0",
+  "kind": "feature",
+  "title": "self goal loop",
+  "intent": "用 beacon goal 在 beacon-go 自身仓库运行完整交付闭环。",
+  "parent_id": "n_5e13a94c202d",
+  "path": "root/self-drive/self-goal-loop",
+  "status": "draft",
+  "domain_fsm": {
+    "states": [
+      "idle",
+      "running",
+      "verifying",
+      "delivered",
+      "blocked"
+    ],
+    "transitions": [
+      {
+        "from": "idle",
+        "to": "running",
+        "event": "run"
+      },
+      {
+        "from": "running",
+        "to": "verifying",
+        "event": "implement_done"
+      },
+      {
+        "from": "verifying",
+        "to": "delivered",
+        "event": "gate_pass"
+      },
+      {
+        "from": "verifying",
+        "to": "blocked",
+        "event": "gate_block"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "idle",
+        "to": "delivered",
+        "event": "skip_all"
+      },
+      {
+        "from": "blocked",
+        "to": "delivered",
+        "event": "force"
+      }
+    ]
+  },
+  "fingerprint": "87ca3b353043333a00dc122c848e6cb2cf27d710ddd0d018be84ecba85bd7fa2",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "n_ca6fe1322405",
+  "kind": "feature",
+  "title": "AGENTS.md sync guard",
+  "intent": "检测 AGENTS.md 中声明的 SDD 规范与意图树之间的漂移，只报不改；治理规则变更不得被误判为需求漂移。",
+  "parent_id": "n_56360bc665a3",
+  "path": "root/truth-binding/agents-md-sync-guard",
+  "status": "draft",
+  "fingerprint": "2b9cf202673e43e02a5a6af2633e1bbc16d706207f397ec9dc5de3c5d88674ae",
+  "fingerprint_alg": "tree-json-v1"
+}

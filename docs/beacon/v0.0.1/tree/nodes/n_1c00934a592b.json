@@ -1,0 +1,21 @@
+{
+  "id": "n_1c00934a592b",
+  "kind": "touchpoint",
+  "title": "defect to change",
+  "intent": "缺陷回流为 change 记录并可 refreeze",
+  "parent_id": "n_5e74132fe68f",
+  "path": "root/self-drive/defect-feedback/defect-to-change",
+  "status": "draft",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "truth change 生成 change_id"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon truth change --project . --node n_5e13a94c202d --summary self-drive-gap --json | jq -e '.change_id'"
+  },
+  "fingerprint": "4abbea3242e67ed2747bf399d4de268a042fc2dffbb7b433f467cf2c25706df0",
+  "fingerprint_alg": "tree-json-v1"
+}

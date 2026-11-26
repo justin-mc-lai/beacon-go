@@ -23,6 +23,66 @@
       "fingerprint_alg": "tree-json-v1"
     },
     {
+      "id": "n_dbab29f9640e",
+      "parent_id": "n_3c1f1d8ec396",
+      "kind": "feature",
+      "status": "draft",
+      "title": "FSM illegal slot coverage",
+      "path": "root/acceptance-binding/fsm-illegal-coverage",
+      "fingerprint": "60e4553bbe47fafbf8e843ac373608b4d80c4dc8d47d784ddb4597bb430f58c5",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_673d03783f60",
+      "parent_id": "n_dbab29f9640e",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "evidence hash check",
+      "path": "root/acceptance-binding/fsm-illegal-coverage/evidence-hash-check",
+      "fingerprint": "227f2b3c5691caf8f64babe6bc10a29af67993a3c3a8135430c9a983a3e11864",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_799afe679d02",
+      "parent_id": "n_dbab29f9640e",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "illegal slot negative tc",
+      "path": "root/acceptance-binding/fsm-illegal-coverage/illegal-slot-negative-tc",
+      "fingerprint": "be421043d41dacd7c0642318ffc4e51fe9759dacf21344ff28b103e8b84b6bed",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_12c7f50ea594",
+      "parent_id": "n_3c1f1d8ec396",
+      "kind": "feature",
+      "status": "draft",
+      "title": "TC acceptance binding",
+      "path": "root/acceptance-binding/tc-acceptance-binding",
+      "fingerprint": "ddee00bbc148f98c2fac898109d321ae97b2e1731d203df8e0d45d1b8e89aa1d",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_1ebfb857b26f",
+      "parent_id": "n_12c7f50ea594",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "tc to gate link",
+      "path": "root/acceptance-binding/tc-acceptance-binding/tc-to-gate-link",
+      "fingerprint": "ffacb80a5b846bac74d298aec621dee98ed396aeae00d2b3bc8da874e07c962a",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_2b2a883e7f64",
+      "parent_id": "n_12c7f50ea594",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "tc verdict detail",
+      "path": "root/acceptance-binding/tc-acceptance-binding/tc-verdict-detail",
+      "fingerprint": "c5f94d1247c74409ab89d0f4f51b84e50d1a1c809dc14da2ca25b8d082b2b4db",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
       "id": "n_5f7fcbdf0840",
       "parent_id": "nroot_6b8991789867",
       "kind": "module",
@@ -30,6 +90,66 @@
       "title": "module orchestration",
       "path": "root/module-orchestration",
       "fingerprint": "310f34f07a2e7b6beef61251e1ff6b42af844586f3ecc2158073e126a06a2543",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_f6f625e5f61b",
+      "parent_id": "n_5f7fcbdf0840",
+      "kind": "feature",
+      "status": "draft",
+      "title": "module admission",
+      "path": "root/module-orchestration/module-admission",
+      "fingerprint": "87b5e55454732828ff3231c168595f42680c3d62f2c15ddcf1433a1806c54c0c",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_3670106f522e",
+      "parent_id": "n_f6f625e5f61b",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "module admission gate",
+      "path": "root/module-orchestration/module-admission/module-admission-gate",
+      "fingerprint": "d518e4dfc734c84507d93a9def80a2b4585b687f5aecd55d0571fcf854f64ae6",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_030e377c5621",
+      "parent_id": "n_5f7fcbdf0840",
+      "kind": "feature",
+      "status": "draft",
+      "title": "module scheduler",
+      "path": "root/module-orchestration/module-scheduler",
+      "fingerprint": "3bf65ac58758b83494d4df2d21133cd4052699ffd36487d6fccee01a4e901792",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_8fe4e4482eee",
+      "parent_id": "n_030e377c5621",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "cross module parallel",
+      "path": "root/module-orchestration/module-scheduler/cross-module-parallel",
+      "fingerprint": "f79e1f98c6eccaeecf4b144d04aaec56ee4eb06778fd4284778a69b00a67a14d",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_5d6dde8f4e1a",
+      "parent_id": "n_030e377c5621",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "intra module order",
+      "path": "root/module-orchestration/module-scheduler/intra-module-order",
+      "fingerprint": "859368029075eb4eabd53fdab1c69134d6284cc672a891a3b70e087ba7999555",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_adda25ea8f26",
+      "parent_id": "n_030e377c5621",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "module run cmd",
+      "path": "root/module-orchestration/module-scheduler/module-run-cmd",
+      "fingerprint": "890b4b7866bed8fc778d9ed853cc26dc09c38d0017d00512943266eab2fe6dcd",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -43,6 +163,76 @@
       "fingerprint_alg": "tree-json-v1"
     },
     {
+      "id": "n_5e74132fe68f",
+      "parent_id": "n_5e13a94c202d",
+      "kind": "feature",
+      "status": "draft",
+      "title": "defect feedback",
+      "path": "root/self-drive/defect-feedback",
+      "fingerprint": "ebb3e464007c58829f6992abb769af1c5c75542dbe35ac3e4650a502942cd8da",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_1c00934a592b",
+      "parent_id": "n_5e74132fe68f",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "defect to change",
+      "path": "root/self-drive/defect-feedback/defect-to-change",
+      "fingerprint": "4abbea3242e67ed2747bf399d4de268a042fc2dffbb7b433f467cf2c25706df0",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_41398c3173e0",
+      "parent_id": "n_5e13a94c202d",
+      "kind": "feature",
+      "status": "draft",
+      "title": "self goal loop",
+      "path": "root/self-drive/self-goal-loop",
+      "fingerprint": "87ca3b353043333a00dc122c848e6cb2cf27d710ddd0d018be84ecba85bd7fa2",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_e203874ad8d4",
+      "parent_id": "n_41398c3173e0",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "register self project",
+      "path": "root/self-drive/self-goal-loop/self-project-register",
+      "fingerprint": "973770e747f13eee06fd4754b5f9e6c4c0e2af24acafc992508cf1b5a3a8a816",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_e11ba0e98451",
+      "parent_id": "n_5e13a94c202d",
+      "kind": "feature",
+      "status": "draft",
+      "title": "self tree CI validation",
+      "path": "root/self-drive/self-tree-ci",
+      "fingerprint": "0aa46b73c2799696d2a34c84799e480b7a512cfe5c9018e6cf3a74e64b04f226",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_b935c7e6837a",
+      "parent_id": "n_e11ba0e98451",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "rebuild tree passes",
+      "path": "root/self-drive/self-tree-ci/self-rebuild-tree",
+      "fingerprint": "e67c7e93bf4e601e3f9ba6e83d380c92a0a41496037ee5864bd65d8bf0d84fd9",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_657f878cb0ab",
+      "parent_id": "n_e11ba0e98451",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "full test suite green",
+      "path": "root/self-drive/self-tree-ci/self-test-suite",
+      "fingerprint": "1a450058ce120262145ff7add8a2578421f9228f8ffe37ef92a2bf130aff1f9c",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
       "id": "n_47544230bf1e",
       "parent_id": "nroot_6b8991789867",
       "kind": "module",
@@ -50,6 +240,46 @@
       "title": "tree visual",
       "path": "root/tree-visual",
       "fingerprint": "1ae2c59ef9d7ea913814bf7b029b3fca31078c3428187bb6a50907bf5ec3c9cd",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_5a4abb5210d0",
+      "parent_id": "n_47544230bf1e",
+      "kind": "feature",
+      "status": "draft",
+      "title": "gate verdict panel",
+      "path": "root/tree-visual/gate-verdict-panel",
+      "fingerprint": "5f0c9bd842a3898bc432c64aa427c71717e523213c409ecd7b139162eea440c6",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_17162700446e",
+      "parent_id": "n_5a4abb5210d0",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "gate panel",
+      "path": "root/tree-visual/gate-verdict-panel/gate-panel",
+      "fingerprint": "4936d23bc663b7d99e920a9a9aa34aa6ebce6250e70b64c974159eb4826778d6",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_39e50c0e0da2",
+      "parent_id": "n_47544230bf1e",
+      "kind": "feature",
+      "status": "draft",
+      "title": "interactive acceptance binding",
+      "path": "root/tree-visual/interactive-acceptance-binding",
+      "fingerprint": "fdab9ef507249fde382d2307bd84bdb324b30a5327c185d5d0770b5b9aaf728c",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_bd880ecae011",
+      "parent_id": "n_39e50c0e0da2",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "testcase bind click",
+      "path": "root/tree-visual/interactive-acceptance-binding/tc-bind-click",
+      "fingerprint": "5a6b7e6028f1f2d641f0a49823039152c8b1bbb1dd12c1bf941fe788b58eba54",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -63,6 +293,76 @@
       "fingerprint_alg": "tree-json-v1"
     },
     {
+      "id": "n_ca6fe1322405",
+      "parent_id": "n_56360bc665a3",
+      "kind": "feature",
+      "status": "draft",
+      "title": "AGENTS.md sync guard",
+      "path": "root/truth-binding/agents-md-sync-guard",
+      "fingerprint": "2b9cf202673e43e02a5a6af2633e1bbc16d706207f397ec9dc5de3c5d88674ae",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_86e6a7a520c7",
+      "parent_id": "n_ca6fe1322405",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "agents md drift report",
+      "path": "root/truth-binding/agents-md-sync-guard/agents-md-drift-report",
+      "fingerprint": "de3db72efec2acfaef89ead8bf4d908ad72a9d4b90cdb84f97234d0b5e09382a",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_1a712a5f8a04",
+      "parent_id": "n_56360bc665a3",
+      "kind": "feature",
+      "status": "draft",
+      "title": "intent tree CRUD",
+      "path": "root/truth-binding/intent-tree-crud",
+      "fingerprint": "1dc50d97e30fddb5cc73df8e0480d9c4e37d1ae25e698d952a212737d505e597",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_a9b167dac971",
+      "parent_id": "n_1a712a5f8a04",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "freeze gate",
+      "path": "root/truth-binding/intent-tree-crud/freeze-gate",
+      "fingerprint": "32ab9b94a0f117ef62aef5d11e9b78bfc91d06a32f33f88a9c0b2e1a8ac6691b",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_97cff751330d",
+      "parent_id": "n_1a712a5f8a04",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "node deprecate",
+      "path": "root/truth-binding/intent-tree-crud/node-deprecate",
+      "fingerprint": "7cae2075c350cc25f541653f829cf1e44d3f9e3e1b2f0a99e53de122d586e8b3",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_679cb763d41a",
+      "parent_id": "n_56360bc665a3",
+      "kind": "feature",
+      "status": "draft",
+      "title": "requirement level drift",
+      "path": "root/truth-binding/requirement-level-drift",
+      "fingerprint": "2f96ea971ca6d8678721a454d50977de7b754f63a7bf7e9ddb9761be7b5608e8",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_a7c847346c2c",
+      "parent_id": "n_679cb763d41a",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "tree drift command",
+      "path": "root/truth-binding/requirement-level-drift/tree-drift-cmd",
+      "fingerprint": "b1855329c6de3c5015befa4f4bda5e858957dbda68201a4072c73034e0ceb1a5",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
       "id": "n_75ea19c0c144",
       "parent_id": "nroot_6b8991789867",
       "kind": "module",
@@ -70,6 +370,86 @@
       "title": "version evolution",
       "path": "root/version-evolution",
       "fingerprint": "77e8d3a4271a16ad89da9970c247076ef01b2244fefe0087c27a05ab949af521",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_143f1617bc78",
+      "parent_id": "n_75ea19c0c144",
+      "kind": "feature",
+      "status": "draft",
+      "title": "docs version line",
+      "path": "root/version-evolution/docs-version-line",
+      "fingerprint": "901fedd3f460b8ad2698507c034005ae87fed73f9b4dbe3d03fbbaaefe941e83",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_3923dab82f8c",
+      "parent_id": "n_143f1617bc78",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "project bump manifest",
+      "path": "root/version-evolution/docs-version-line/project-bump-manifest",
+      "fingerprint": "6882ac72eb791540ab5a38dffd628edba38846d72ceecd3c96718f6d451e3929",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_26809ef014ec",
+      "parent_id": "n_75ea19c0c144",
+      "kind": "feature",
+      "status": "draft",
+      "title": "dual axis alignment",
+      "path": "root/version-evolution/dual-axis-alignment",
+      "fingerprint": "9ac3c60fca2fdd34d6ef24057210396169769ccec8cb274078c9884b2a61e132",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_40642d4f01bd",
+      "parent_id": "n_26809ef014ec",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "manifest runtime match",
+      "path": "root/version-evolution/dual-axis-alignment/manifest-runtime-match",
+      "fingerprint": "dcd46583ae482b51189c1b5ef9aca7088ddf579aacb1f5eee189dc24ea765509",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_92210b2358fa",
+      "parent_id": "n_75ea19c0c144",
+      "kind": "feature",
+      "status": "draft",
+      "title": "node id namespace",
+      "path": "root/version-evolution/node-id-namespace",
+      "fingerprint": "4800c2ae4e8df50b97099d3cc923da409c63f13c6b6654c37cda34be79bb4ebb",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_5a276e5230e8",
+      "parent_id": "n_92210b2358fa",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "shortid prefix coverage",
+      "path": "root/version-evolution/node-id-namespace/shortid-prefix-coverage",
+      "fingerprint": "2ee141513362db08edaa74f99e24b944a444ef5409856dbf59323833f0302cd2",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_ff59308937cf",
+      "parent_id": "n_75ea19c0c144",
+      "kind": "feature",
+      "status": "draft",
+      "title": "runtime version source",
+      "path": "root/version-evolution/runtime-version-source",
+      "fingerprint": "94add8fbfa89dad723b01f874940f5039df91246e4449433d3961f94a192bb80",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_dbd725546f3a",
+      "parent_id": "n_ff59308937cf",
+      "kind": "touchpoint",
+      "status": "draft",
+      "title": "full version consistency gate",
+      "path": "root/version-evolution/runtime-version-source/version-consistency-full",
+      "fingerprint": "12b3def001679f11d3a3ec6e626b554b883fdde5573f2fe3513b5101c574a2be",
       "fingerprint_alg": "tree-json-v1"
     }
   ]

@@ -1,0 +1,11 @@
+{
+  "id": "n_e11ba0e98451",
+  "kind": "feature",
+  "title": "self tree CI validation",
+  "intent": "CI 校验本仓意图树指纹、索引与 SQLite 投影一致，dogfood 自己的树。",
+  "parent_id": "n_5e13a94c202d",
+  "path": "root/self-drive/self-tree-ci",
+  "status": "draft",
+  "fingerprint": "0aa46b73c2799696d2a34c84799e480b7a512cfe5c9018e6cf3a74e64b04f226",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,53 @@
+{
+  "id": "n_1a712a5f8a04",
+  "kind": "feature",
+  "title": "intent tree CRUD",
+  "intent": "为意图树节点提供显式增删改入口；删除走 change request 作废链路而非物理删除，保持真相可追溯。",
+  "parent_id": "n_56360bc665a3",
+  "path": "root/truth-binding/intent-tree-crud",
+  "status": "draft",
+  "domain_fsm": {
+    "states": [
+      "draft",
+      "frozen",
+      "change_pending",
+      "deprecated"
+    ],
+    "transitions": [
+      {
+        "from": "draft",
+        "to": "frozen",
+        "event": "freeze"
+      },
+      {
+        "from": "frozen",
+        "to": "change_pending",
+        "event": "change_request"
+      },
+      {
+        "from": "change_pending",
+        "to": "frozen",
+        "event": "refreeze"
+      },
+      {
+        "from": "frozen",
+        "to": "deprecated",
+        "event": "deprecate"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "deprecated",
+        "to": "frozen",
+        "event": "revive"
+      },
+      {
+        "from": "draft",
+        "to": "deprecated",
+        "event": "skip_freeze"
+      }
+    ]
+  },
+  "fingerprint": "1dc50d97e30fddb5cc73df8e0480d9c4e37d1ae25e698d952a212737d505e597",
+  "fingerprint_alg": "tree-json-v1"
+}

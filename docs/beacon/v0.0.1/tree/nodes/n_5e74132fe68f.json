@@ -1,0 +1,11 @@
+{
+  "id": "n_5e74132fe68f",
+  "kind": "feature",
+  "title": "defect feedback",
+  "intent": "缺陷自动回流为树节点或 change 记录并进入实现闭环，形成自驱迭代。",
+  "parent_id": "n_5e13a94c202d",
+  "path": "root/self-drive/defect-feedback",
+  "status": "draft",
+  "fingerprint": "ebb3e464007c58829f6992abb769af1c5c75542dbe35ac3e4650a502942cd8da",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "n_26809ef014ec",
+  "kind": "feature",
+  "title": "dual axis alignment",
+  "intent": "发布时 runtime Version 与当前 docs 版本线对齐并写入 manifest.Runtime，两轴平时独立。",
+  "parent_id": "n_75ea19c0c144",
+  "path": "root/version-evolution/dual-axis-alignment",
+  "status": "draft",
+  "fingerprint": "9ac3c60fca2fdd34d6ef24057210396169769ccec8cb274078c9884b2a61e132",
+  "fingerprint_alg": "tree-json-v1"
+}

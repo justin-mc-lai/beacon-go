@@ -1,0 +1,84 @@
+{
+  "at": "2026-11-26T11:02:38.989235Z",
+  "children": [
+    {
+      "id": "n_030e377c5621",
+      "kind": "feature",
+      "title": "module scheduler",
+      "intent": "从意图树 module 节点展开多个 feature run，同 module 内按序、跨 module 分配 worktree 并行。",
+      "parent_id": "n_5f7fcbdf0840",
+      "path": "root/module-orchestration/module-scheduler",
+      "status": "draft",
+      "domain_fsm": {
+        "states": [
+          "draft",
+          "planned",
+          "running",
+          "done",
+          "blocked"
+        ],
+        "transitions": [
+          {
+            "from": "draft",
+            "to": "planned",
+            "event": "plan"
+          },
+          {
+            "from": "planned",
+            "to": "running",
+            "event": "dispatch"
+          },
+          {
+            "from": "running",
+            "to": "done",
+            "event": "complete"
+          },
+          {
+            "from": "running",
+            "to": "blocked",
+            "event": "admission_fail"
+          },
+          {
+            "from": "blocked",
+            "to": "planned",
+            "event": "replan"
+          }
+        ],
+        "illegal": [
+          {
+            "from": "draft",
+            "to": "running",
+            "event": "skip_plan"
+          },
+          {
+            "from": "done",
+            "to": "running",
+            "event": "rerun"
+          }
+        ]
+      },
+      "fingerprint": "3bf65ac58758b83494d4df2d21133cd4052699ffd36487d6fccee01a4e901792",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_f6f625e5f61b",
+      "kind": "feature",
+      "title": "module admission",
+      "intent": "module 入口统一调用共享 admission 检查，任一子 feature blocked 则 module 不启动。",
+      "parent_id": "n_5f7fcbdf0840",
+      "path": "root/module-orchestration/module-admission",
+      "status": "draft",
+      "fingerprint": "87b5e55454732828ff3231c168595f42680c3d62f2c15ddcf1433a1806c54c0c",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_5f7fcbdf0840",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main",
+    "sources": [
+      "BoundariesB: parallel.go / admission.go"
+    ]
+  }
+}

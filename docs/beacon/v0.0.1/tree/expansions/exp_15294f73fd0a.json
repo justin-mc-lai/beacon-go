@@ -1,0 +1,74 @@
+{
+  "at": "2026-11-26T11:03:05.921072Z",
+  "children": [
+    {
+      "id": "n_adda25ea8f26",
+      "kind": "touchpoint",
+      "title": "module run cmd",
+      "intent": "从 module 节点展开子 feature runs",
+      "parent_id": "n_030e377c5621",
+      "path": "root/module-orchestration/module-scheduler/module-run-cmd",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "运行命令输出 N 个 run id 且每个 run 的 FeatureID 属于该 module"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "beacon goal module run --node \u003cmodule-id\u003e --json | jq -e 'length \u003e 0'"
+      },
+      "fingerprint": "890b4b7866bed8fc778d9ed853cc26dc09c38d0017d00512943266eab2fe6dcd",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_5d6dde8f4e1a",
+      "kind": "touchpoint",
+      "title": "intra module order",
+      "intent": "同模块 feature 按声明顺序串行",
+      "parent_id": "n_030e377c5621",
+      "path": "root/module-orchestration/module-scheduler/intra-module-order",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "第二个 run 在第一个 stage done 前为 pending"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "beacon goal status --run-id \u003cid2\u003e 显示 blocked=false 且 current_stage=plan"
+      },
+      "fingerprint": "859368029075eb4eabd53fdab1c69134d6284cc672a891a3b70e087ba7999555",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_8fe4e4482eee",
+      "kind": "touchpoint",
+      "title": "cross module parallel",
+      "intent": "不同 module 自动分配 worktree 并行",
+      "parent_id": "n_030e377c5621",
+      "path": "root/module-orchestration/module-scheduler/cross-module-parallel",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "parallel_plan mode=pool 且 satellites 数=module 数"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "beacon goal worktree status --run-id \u003cid\u003e --json"
+      },
+      "fingerprint": "f79e1f98c6eccaeecf4b144d04aaec56ee4eb06778fd4284778a69b00a67a14d",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_030e377c5621",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main"
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "at": "2026-11-26T11:01:16.673724Z",
+  "children": [
+    {
+      "id": "n_1a712a5f8a04",
+      "kind": "feature",
+      "title": "intent tree CRUD",
+      "intent": "为意图树节点提供显式增删改入口；删除走 change request 作废链路而非物理删除，保持真相可追溯。",
+      "parent_id": "n_56360bc665a3",
+      "path": "root/truth-binding/intent-tree-crud",
+      "status": "draft",
+      "domain_fsm": {
+        "states": [
+          "draft",
+          "frozen",
+          "change_pending",
+          "deprecated"
+        ],
+        "transitions": [
+          {
+            "from": "draft",
+            "to": "frozen",
+            "event": "freeze"
+          },
+          {
+            "from": "frozen",
+            "to": "change_pending",
+            "event": "change_request"
+          },
+          {
+            "from": "change_pending",
+            "to": "frozen",
+            "event": "refreeze"
+          },
+          {
+            "from": "frozen",
+            "to": "deprecated",
+            "event": "deprecate"
+          }
+        ],
+        "illegal": [
+          {
+            "from": "deprecated",
+            "to": "frozen",
+            "event": "revive"
+          },
+          {
+            "from": "draft",
+            "to": "deprecated",
+            "event": "skip_freeze"
+          }
+        ]
+      },
+      "fingerprint": "1dc50d97e30fddb5cc73df8e0480d9c4e37d1ae25e698d952a212737d505e597",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_ca6fe1322405",
+      "kind": "feature",
+      "title": "AGENTS.md sync guard",
+      "intent": "检测 AGENTS.md 中声明的 SDD 规范与意图树之间的漂移，只报不改；治理规则变更不得被误判为需求漂移。",
+      "parent_id": "n_56360bc665a3",
+      "path": "root/truth-binding/agents-md-sync-guard",
+      "status": "draft",
+      "fingerprint": "2b9cf202673e43e02a5a6af2633e1bbc16d706207f397ec9dc5de3c5d88674ae",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_679cb763d41a",
+      "kind": "feature",
+      "title": "requirement level drift",
+      "intent": "对意图树节点指纹做 added/changed/removed 级漂移报告，只覆盖需求正文，不含治理规则。",
+      "parent_id": "n_56360bc665a3",
+      "path": "root/truth-binding/requirement-level-drift",
+      "status": "draft",
+      "fingerprint": "2f96ea971ca6d8678721a454d50977de7b754f63a7bf7e9ddb9761be7b5608e8",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_56360bc665a3",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main",
+    "sources": [
+      "BoundariesA 现状调查",
+      "internal/intenttree",
+      "internal/cli/tree_node_truth.go"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "at": "2026-11-26T11:02:38.792004Z",
+  "children": [
+    {
+      "id": "n_39e50c0e0da2",
+      "kind": "feature",
+      "title": "interactive acceptance binding",
+      "intent": "在需求树 HTML 中点击 AC↔TestCase 完成绑定并回写树；复杂度留系统，用户只点选。",
+      "parent_id": "n_47544230bf1e",
+      "path": "root/tree-visual/interactive-acceptance-binding",
+      "status": "draft",
+      "fingerprint": "fdab9ef507249fde382d2307bd84bdb324b30a5327c185d5d0770b5b9aaf728c",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_5a4abb5210d0",
+      "kind": "feature",
+      "title": "gate verdict panel",
+      "intent": "可视化展示 freeze/verify/gate 结果与 reason code，点击节点即可读到验收判定。",
+      "parent_id": "n_47544230bf1e",
+      "path": "root/tree-visual/gate-verdict-panel",
+      "status": "draft",
+      "fingerprint": "5f0c9bd842a3898bc432c64aa427c71717e523213c409ecd7b139162eea440c6",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_47544230bf1e",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main",
+    "sources": [
+      "BoundariesA: render_html.go"
+    ]
+  }
+}

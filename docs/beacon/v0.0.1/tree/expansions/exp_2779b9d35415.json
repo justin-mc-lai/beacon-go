@@ -1,0 +1,32 @@
+{
+  "at": "2026-11-26T11:01:47.785984Z",
+  "children": [
+    {
+      "id": "n_86e6a7a520c7",
+      "kind": "touchpoint",
+      "title": "agents md drift report",
+      "intent": "检测 AGENTS.md 声明的 SDD 规范与树的漂移，只报不改。",
+      "parent_id": "n_ca6fe1322405",
+      "path": "root/truth-binding/agents-md-sync-guard/agents-md-drift-report",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "治理规则变更不进入需求漂移报告；仅规范正文变化被列出"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "beacon plan drift --agents-md --json 输出仅含需求级 changed 项，治理规则字段不在列表中"
+      },
+      "fingerprint": "de3db72efec2acfaef89ead8bf4d908ad72a9d4b90cdb84f97234d0b5e09382a",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_ca6fe1322405",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-source",
+    "by": "main"
+  }
+}

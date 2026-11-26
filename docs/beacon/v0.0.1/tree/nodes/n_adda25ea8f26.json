@@ -1,0 +1,21 @@
+{
+  "id": "n_adda25ea8f26",
+  "kind": "touchpoint",
+  "title": "module run cmd",
+  "intent": "从 module 节点展开子 feature runs",
+  "parent_id": "n_030e377c5621",
+  "path": "root/module-orchestration/module-scheduler/module-run-cmd",
+  "status": "draft",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "运行命令输出 N 个 run id 且每个 run 的 FeatureID 属于该 module"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon goal module run --node \u003cmodule-id\u003e --json | jq -e 'length \u003e 0'"
+  },
+  "fingerprint": "890b4b7866bed8fc778d9ed853cc26dc09c38d0017d00512943266eab2fe6dcd",
+  "fingerprint_alg": "tree-json-v1"
+}
