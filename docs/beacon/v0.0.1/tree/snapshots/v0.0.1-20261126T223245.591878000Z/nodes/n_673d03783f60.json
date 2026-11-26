@@ -1,0 +1,21 @@
+{
+  "id": "n_673d03783f60",
+  "kind": "touchpoint",
+  "title": "evidence hash check",
+  "intent": "TC evidence hash 与 artifact 注册一致",
+  "parent_id": "n_dbab29f9640e",
+  "path": "root/acceptance-binding/fsm-illegal-coverage/evidence-hash-check",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "篡改 evidence 后 gate evaluate qa blocked reason=qa_execution_stale"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon gate evaluate qa --run-id \u003cid\u003e --evaluator x 退出非零"
+  },
+  "fingerprint": "b85a81f40be8258793c09a18d89cb7b6b923ccd56a914dabffe7ce494abac429",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "n_2b2a883e7f64",
+  "kind": "touchpoint",
+  "title": "tc verdict detail",
+  "intent": "gate evaluate qa 输出每 TC pass/fail",
+  "parent_id": "n_12c7f50ea594",
+  "path": "root/acceptance-binding/tc-acceptance-binding/tc-verdict-detail",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "gate evaluate qa --json 的 checks 含 TC-001:pass 形式条目"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon gate evaluate qa --run-id \u003cid\u003e --evaluator x --json | jq -e '.checks'"
+  },
+  "fingerprint": "88d806d325ca804fdd56117ebf37f4ab0cf37c1ad4c1385916d73775d4164464",
+  "fingerprint_alg": "tree-json-v1"
+}

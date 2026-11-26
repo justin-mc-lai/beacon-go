@@ -5,7 +5,7 @@
   "intent": "CI 校验本仓树指纹/索引/投影一致",
   "parent_id": "n_e11ba0e98451",
   "path": "root/self-drive/self-tree-ci/self-rebuild-tree",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "beacon doctor rebuild-tree --project . --json | jq -e '.rebuilt \u003e 0'"
   },
-  "fingerprint": "e67c7e93bf4e601e3f9ba6e83d380c92a0a41496037ee5864bd65d8bf0d84fd9",
+  "fingerprint": "a1a5a76593d390cd65afd8f1b81552fa84fc16823e43a8f06b211456dd8241d5",
   "fingerprint_alg": "tree-json-v1"
 }

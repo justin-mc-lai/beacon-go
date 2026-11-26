@@ -1,0 +1,15 @@
+{
+  "id": "n_ca6fe1322405",
+  "kind": "feature",
+  "title": "AGENTS.md sync guard",
+  "intent": "检测 AGENTS.md 中声明的 SDD 规范与意图树之间的漂移，只报不改；治理规则变更不得被误判为需求漂移。",
+  "doc": "## 问题\nAGENTS.md 中用自然语言声明了一组 SDD 规范正文，意图树节点也承载需求，两处内容可能各自演进而产生漂移。治理规则（协作流程、写入口约定等过程性约定）的变化属于治理范畴，不应被当作需求漂移上报。当前缺少只针对规范正文、且能区分治理规则的漂移检测定义。\n\n## 目标用户\n维护 AGENTS.md 与意图树的规范负责人、在提交前核对规范与树是否一致的 beacon 使用者。\n\n## 场景\n当有人改动 AGENTS.md 的规范正文或治理规则后，运行漂移检查：规范正文的变化应作为需求级 changed 项列出，治理规则字段的变化不得出现在需求漂移报告中。检查过程只读，不回写 AGENTS.md 或意图树。\n\n## 范围\n本包交付一个只读、只报不改的漂移检测需求定义：比较 AGENTS.md 声明的 SDD 规范正文与意图树节点，只输出需求级 changed 项并排除治理规则。现有落点 scripts/check_version_consistency.sh 只校验 AGENTS.md 的版本号硬编码，与规范正文漂移无关。规范正文与意图树的漂移检测逻辑当前未实现，本包冻结的是需求定义，不是实现状态。\n\n## 非目标\n不自动修改 AGENTS.md 或意图树，检测只报不改；不把治理规则变更计入需求漂移。不做版本号唯一源校验，那属于 runtime-version-source；不做节点级 added/changed/removed 通用漂移报告，那属于 requirement-level-drift。\n\n## 验收标准\n治理规则字段变更后报告不含任何需求漂移项，只有规范正文变化被列为 changed 项。验收命令为 `beacon plan drift --agents-md --json 输出仅含需求级 changed 项，治理规则字段不在列表中`，该命令当前尚不存在（现有 plan 命令组只有 init/tree/expand/apply），属待实现能力。",
+  "parent_id": "n_56360bc665a3",
+  "path": "root/truth-binding/agents-md-sync-guard",
+  "status": "frozen",
+  "child_fingerprints": [
+    "7bec15bad668350734b11421087627a8455f2f66fc8fe4f37065321ae8679bd0"
+  ],
+  "fingerprint": "0a8e597b268a4912d9fd362a85d9e19e8424608c882b73c94149aa5e74951ec1",
+  "fingerprint_alg": "tree-json-v1"
+}

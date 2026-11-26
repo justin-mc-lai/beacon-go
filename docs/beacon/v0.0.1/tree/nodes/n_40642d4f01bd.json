@@ -5,7 +5,7 @@
   "intent": "发布前 manifest.Runtime 等于 beacon --version",
   "parent_id": "n_26809ef014ec",
   "path": "root/version-evolution/dual-axis-alignment/manifest-runtime-match",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "test \"$(jq -r .runtime docs/beacon/v0.0.1/manifest.json)\" = \"$(beacon-go --version | sed 's/^v//')\""
   },
-  "fingerprint": "dcd46583ae482b51189c1b5ef9aca7088ddf579aacb1f5eee189dc24ea765509",
+  "fingerprint": "d5f079755e899217c6dc713b34cb4a9b636560aad46276fa72f16f36f0ee0399",
   "fingerprint_alg": "tree-json-v1"
 }

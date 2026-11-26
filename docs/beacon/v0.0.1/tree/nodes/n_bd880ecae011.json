@@ -5,7 +5,7 @@
   "intent": "点击 TestCase 行完成 AC 绑定并写回树",
   "parent_id": "n_39e50c0e0da2",
   "path": "root/tree-visual/interactive-acceptance-binding/tc-bind-click",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "go test ./internal/intenttree -run TestRenderHTML -count=1 通过且 grep -q data-bind-ac 输出 HTML"
   },
-  "fingerprint": "5a6b7e6028f1f2d641f0a49823039152c8b1bbb1dd12c1bf941fe788b58eba54",
+  "fingerprint": "8d58c3f8819286064fd0e84bd124ca471b57ee4bc09782bd2c522daba8491c48",
   "fingerprint_alg": "tree-json-v1"
 }

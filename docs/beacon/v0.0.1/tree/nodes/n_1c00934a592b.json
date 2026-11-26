@@ -5,7 +5,7 @@
   "intent": "缺陷回流为 change 记录并可 refreeze",
   "parent_id": "n_5e74132fe68f",
   "path": "root/self-drive/defect-feedback/defect-to-change",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "beacon truth change --project . --node n_5e13a94c202d --summary self-drive-gap --json | jq -e '.change_id'"
   },
-  "fingerprint": "4abbea3242e67ed2747bf399d4de268a042fc2dffbb7b433f467cf2c25706df0",
+  "fingerprint": "7af3595395ae5e9044ccc09430de1954246d1306d2521a23120f958179d5d9b8",
   "fingerprint_alg": "tree-json-v1"
 }

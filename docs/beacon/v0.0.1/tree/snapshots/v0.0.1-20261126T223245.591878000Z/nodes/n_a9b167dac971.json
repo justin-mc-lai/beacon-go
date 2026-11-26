@@ -1,0 +1,21 @@
+{
+  "id": "n_a9b167dac971",
+  "kind": "touchpoint",
+  "title": "freeze gate",
+  "intent": "只有 draft 节点可冻结，frozen 节点冻结返回稳定 reason code。",
+  "parent_id": "n_1a712a5f8a04",
+  "path": "root/truth-binding/intent-tree-crud/freeze-gate",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "重复冻结 frozen 节点返回非零退出码 reason=tree_node_not_draft"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon plan freeze --node \u003cfrozen-id\u003e 退出非零且 stderr 含 tree_node_not_draft"
+  },
+  "fingerprint": "ceb0eb6dda632be1a52e0ebb01c6469c9784b2fc079574aa257ac29318ff8ec5",
+  "fingerprint_alg": "tree-json-v1"
+}

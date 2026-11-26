@@ -1,0 +1,21 @@
+{
+  "id": "n_5a276e5230e8",
+  "kind": "touchpoint",
+  "title": "shortid prefix coverage",
+  "intent": "测试覆盖全部 7 类 id 前缀",
+  "parent_id": "n_92210b2358fa",
+  "path": "root/version-evolution/node-id-namespace/shortid-prefix-coverage",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "TestShortIDNamespacedByVersionID 覆盖 n_/chg_/exp_/nroot_/nmod_/nfeat_/tmig_"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/intenttree -run TestShortIDNamespacedByVersionID -count=1"
+  },
+  "fingerprint": "019265689d4652464b397ef4c1394371cb00ddf4a05d4c288817032ea6c7135d",
+  "fingerprint_alg": "tree-json-v1"
+}

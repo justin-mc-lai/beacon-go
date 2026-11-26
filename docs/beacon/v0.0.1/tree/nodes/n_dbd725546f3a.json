@@ -5,7 +5,7 @@
   "intent": "version.go 唯一源覆盖 tag/release/CHANGELOG",
   "parent_id": "n_ff59308937cf",
   "path": "root/version-evolution/runtime-version-source/version-consistency-full",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "bash scripts/check_version_consistency.sh \u0026\u0026 test \"$(git describe --tags --abbrev=0)\" = \"v$(awk '/^const Version = /{gsub(/\\\"/,\"\",$4);print $4;exit}' internal/version/version.go)\""
   },
-  "fingerprint": "12b3def001679f11d3a3ec6e626b554b883fdde5573f2fe3513b5101c574a2be",
+  "fingerprint": "d30ef3446d1ea4a6046d9900a3b3fa91ed308b72e04c6e6ee4a050060b31b5a5",
   "fingerprint_alg": "tree-json-v1"
 }

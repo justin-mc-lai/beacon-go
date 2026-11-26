@@ -5,7 +5,12 @@
   "intent": "自驱迭代能力：用 beacon-go 自身的能力持续迭代 beacon-go 自己（dogfooding）——把自己的需求树当真相、按树展开 feature/touchpoint、走 goal/tasks/evidence/gate 实现与验收、用 worktree 并行交付模块；迭代中发现的缺陷（如节点 id 跨项目撞主键）回流为树节点修复，形成闭环。",
   "parent_id": "nroot_6b8991789867",
   "path": "root/self-drive",
-  "status": "draft",
-  "fingerprint": "b935d84b70b8872b01bdcf3b8ac7b8c80cc7f5b214f9706426fa435d26a98887",
+  "status": "frozen",
+  "child_fingerprints": [
+    "46970fc516d8efe78e52aefc1ad6d2fe898e1237adc9ee697cc3793fdd7fa014",
+    "f19db4b6b9337d3634a3b7496a88d600ab7d7e940c046dbf332709ecc2a14a7a",
+    "8acb76db770ea7ec7bec09b925da092f27c2b77a61937c922ed73e15b597e09b"
+  ],
+  "fingerprint": "472913c00a07e5dd01af0f47cfa8071f2d24de252f4457ab8cc1592ca2355896",
   "fingerprint_alg": "tree-json-v1"
 }

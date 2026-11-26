@@ -1,0 +1,21 @@
+{
+  "id": "n_657f878cb0ab",
+  "kind": "touchpoint",
+  "title": "full test suite green",
+  "intent": "全量测试绿",
+  "parent_id": "n_e11ba0e98451",
+  "path": "root/self-drive/self-tree-ci/self-test-suite",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "go test ./... -count=1 全绿"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./... -count=1"
+  },
+  "fingerprint": "94fa34f4a93f040851f3fabb8d7f79a4dec464bd904d16b8c7efdd12228a1605",
+  "fingerprint_alg": "tree-json-v1"
+}

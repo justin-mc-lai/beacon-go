@@ -1,0 +1,21 @@
+{
+  "id": "n_97cff751330d",
+  "kind": "touchpoint",
+  "title": "node deprecate",
+  "intent": "将节点置 deprecated 并记录 change record，不物理删除。",
+  "parent_id": "n_1a712a5f8a04",
+  "path": "root/truth-binding/intent-tree-crud/node-deprecate",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "对 draft 节点执行废弃后 status=deprecated 且生成 change 记录"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon change request --node \u003cid\u003e --summary deprecate --json 退出 0 且 beacon plan show --node \u003cid\u003e 显示 status=deprecated"
+  },
+  "fingerprint": "09d4527bd783326256ded7665bf684833227e464c989214fd7f349bcb9e1c97f",
+  "fingerprint_alg": "tree-json-v1"
+}

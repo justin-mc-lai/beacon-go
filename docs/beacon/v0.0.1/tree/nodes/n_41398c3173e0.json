@@ -3,9 +3,10 @@
   "kind": "feature",
   "title": "self goal loop",
   "intent": "用 beacon goal 在 beacon-go 自身仓库运行完整交付闭环。",
+  "doc": "## 问题\n在 beacon-go 自身仓库尚无以项目身份登记并跑通 goal 交付闭环的入口，自身开发无法 dogfood beacon goal 全流程。\n\n## 目标用户\n维护 beacon-go 的开发者与发布者，需要在本仓验证 goal 闭环。\n\n## 场景\n开发者在仓库根执行项目登记命令，期望登记后 current_version 为 v0.0.1，并以此版本为起点驱动 goal 完整交付。\n\n## 范围\n定义本仓作为 beacon 项目登记并以 v0.0.1 启动 goal 闭环的契约：登记幂等、current_version 固定为 v0.0.1。现有落点 internal/cli/goal*.go 提供 goal 基础设施，但尚无 self-goal-loop 专属 wiring，当前未实现，本包冻结的是需求定义，不是实现状态。\n\n## 非目标\n不实现 goal 调度、worktree 分配与多 module 并行（属 module-scheduler）；不处理缺陷回流（属 defect-feedback）；不校验树指纹与索引投影（属 self-tree-ci）。\n\n## 验收标准\n登记命令 `beacon projects register --path . --version v0.0.1 --json` 输出的 current_version 等于 \"v0.0.1\"（jq -e '.current_version == \"v0.0.1\"' 退出 0）。该命令当前尚不存在，属待实现能力。",
   "parent_id": "n_5e13a94c202d",
   "path": "root/self-drive/self-goal-loop",
-  "status": "draft",
+  "status": "frozen",
   "domain_fsm": {
     "states": [
       "idle",
@@ -49,6 +50,9 @@
       }
     ]
   },
-  "fingerprint": "87ca3b353043333a00dc122c848e6cb2cf27d710ddd0d018be84ecba85bd7fa2",
+  "child_fingerprints": [
+    "31473b979f626e07806ef54554d547f7b93915a135e1a2080c526957aa5a951d"
+  ],
+  "fingerprint": "f19db4b6b9337d3634a3b7496a88d600ab7d7e940c046dbf332709ecc2a14a7a",
   "fingerprint_alg": "tree-json-v1"
 }

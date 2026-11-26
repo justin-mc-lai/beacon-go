@@ -5,7 +5,7 @@
   "intent": "一条 TC 从定义到 report 到 gate verdict 可追溯",
   "parent_id": "n_12c7f50ea594",
   "path": "root/acceptance-binding/tc-acceptance-binding/tc-to-gate-link",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "beacon goal autotest --run-id \u003cid\u003e --by x \u0026\u0026 beacon gate evaluate qa --run-id \u003cid\u003e --evaluator x"
   },
-  "fingerprint": "ffacb80a5b846bac74d298aec621dee98ed396aeae00d2b3bc8da874e07c962a",
+  "fingerprint": "59aaa862bd4a75c3311b038daa599f8ed0d1849fb99ea7a7fe954ea02cbc5c58",
   "fingerprint_alg": "tree-json-v1"
 }

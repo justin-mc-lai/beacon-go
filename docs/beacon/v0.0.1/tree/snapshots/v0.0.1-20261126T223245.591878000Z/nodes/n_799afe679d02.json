@@ -1,0 +1,21 @@
+{
+  "id": "n_799afe679d02",
+  "kind": "touchpoint",
+  "title": "illegal slot negative tc",
+  "intent": "每个 illegal slot 有对应 negative TC",
+  "parent_id": "n_dbab29f9640e",
+  "path": "root/acceptance-binding/fsm-illegal-coverage/illegal-slot-negative-tc",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "缺失 illegal slot 覆盖时 integrity 报 uncovered reason"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon gate integrity --feature \u003cslug\u003e --json | jq -e '.reason_code'"
+  },
+  "fingerprint": "695606134ff3542b29505ed0ebff5e0e27ed184676cf929854b32c9120c44d20",
+  "fingerprint_alg": "tree-json-v1"
+}

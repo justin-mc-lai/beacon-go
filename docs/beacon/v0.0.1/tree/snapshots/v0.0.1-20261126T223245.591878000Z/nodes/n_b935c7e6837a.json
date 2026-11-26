@@ -1,0 +1,21 @@
+{
+  "id": "n_b935c7e6837a",
+  "kind": "touchpoint",
+  "title": "rebuild tree passes",
+  "intent": "CI 校验本仓树指纹/索引/投影一致",
+  "parent_id": "n_e11ba0e98451",
+  "path": "root/self-drive/self-tree-ci/self-rebuild-tree",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "doctor rebuild-tree 对本仓退出 0 且 rebuilt 数=索引节点数"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon doctor rebuild-tree --project . --json | jq -e '.rebuilt \u003e 0'"
+  },
+  "fingerprint": "a1a5a76593d390cd65afd8f1b81552fa84fc16823e43a8f06b211456dd8241d5",
+  "fingerprint_alg": "tree-json-v1"
+}

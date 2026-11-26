@@ -3,9 +3,14 @@
   "kind": "feature",
   "title": "self tree CI validation",
   "intent": "CI 校验本仓意图树指纹、索引与 SQLite 投影一致，dogfood 自己的树。",
+  "doc": "## 问题\nCI 仅覆盖 build/test/version-consistency，未校验本仓意图树指纹、索引与 SQLite 投影一致，无法 dogfood 自己的树。\n\n## 目标用户\nbeacon-go 维护者与 CI 流水线，需在每次变更后确认树一致性。\n\n## 场景\nCI 在 ubuntu runner 上执行 tree 重建与全量测试，期望 doctor rebuild-tree 退出 0 且 rebuilt 数大于 0，同时 go test ./... -count=1 全绿。\n\n## 范围\n定义 CI 必须执行的树一致性校验：doctor rebuild-tree --project . 退出 0 且 rebuilt 数等于索引节点数，并运行全量测试。现有落点 .github/workflows/ci.yml 仅含 build/test/version-consistency，无树指纹 CI，当前未实现，本包冻结的是需求定义，不是实现状态。\n\n## 非目标\n不实现 tree 指纹 diff/added/changed/removed 报告（属 requirement-level-drift）；不实现 AGENTS.md 漂移检测（属 agents-md-sync-guard）；不实现 gate verdict 可视化（属 gate-verdict-panel）。\n\n## 验收标准\n`beacon doctor rebuild-tree --project . --json | jq -e '.rebuilt \u003e 0'` 退出 0；且 `go test ./... -count=1` 全绿。前者命令当前尚不存在，属待实现能力。",
   "parent_id": "n_5e13a94c202d",
   "path": "root/self-drive/self-tree-ci",
-  "status": "draft",
-  "fingerprint": "0aa46b73c2799696d2a34c84799e480b7a512cfe5c9018e6cf3a74e64b04f226",
+  "status": "frozen",
+  "child_fingerprints": [
+    "a1a5a76593d390cd65afd8f1b81552fa84fc16823e43a8f06b211456dd8241d5",
+    "94fa34f4a93f040851f3fabb8d7f79a4dec464bd904d16b8c7efdd12228a1605"
+  ],
+  "fingerprint": "8acb76db770ea7ec7bec09b925da092f27c2b77a61937c922ed73e15b597e09b",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -5,7 +5,7 @@
   "intent": "从 module 节点展开子 feature runs",
   "parent_id": "n_030e377c5621",
   "path": "root/module-orchestration/module-scheduler/module-run-cmd",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "beacon goal module run --node \u003cmodule-id\u003e --json | jq -e 'length \u003e 0'"
   },
-  "fingerprint": "890b4b7866bed8fc778d9ed853cc26dc09c38d0017d00512943266eab2fe6dcd",
+  "fingerprint": "83dad45a74fa124cf9cf190e78af3aefac69457f6646f9ef4e4f67e2b68b6471",
   "fingerprint_alg": "tree-json-v1"
 }

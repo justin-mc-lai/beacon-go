@@ -5,7 +5,7 @@
   "intent": "对意图树节点指纹输出 added/changed/removed 级漂移报告。",
   "parent_id": "n_679cb763d41a",
   "path": "root/truth-binding/requirement-level-drift/tree-drift-cmd",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "go test ./internal/intenttree -run TestDrift -count=1 通过且命令 beacon plan drift --node \u003cid\u003e --json 输出 added/changed/removed 数组"
   },
-  "fingerprint": "b1855329c6de3c5015befa4f4bda5e858957dbda68201a4072c73034e0ceb1a5",
+  "fingerprint": "3c7cd8a3e4c4c7c31bf9598037205973b4f3764a6db9de26def263c02da3deac",
   "fingerprint_alg": "tree-json-v1"
 }

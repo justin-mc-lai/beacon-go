@@ -1,0 +1,21 @@
+{
+  "id": "n_5d6dde8f4e1a",
+  "kind": "touchpoint",
+  "title": "intra module order",
+  "intent": "同模块 feature 按声明顺序串行",
+  "parent_id": "n_030e377c5621",
+  "path": "root/module-orchestration/module-scheduler/intra-module-order",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "第二个 run 在第一个 stage done 前为 pending"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon goal status --run-id \u003cid2\u003e 显示 blocked=false 且 current_stage=plan"
+  },
+  "fingerprint": "8d56c49bbe8e19e920d416e709d3e3cbc2123562a7e468c03eebbf99829280e5",
+  "fingerprint_alg": "tree-json-v1"
+}

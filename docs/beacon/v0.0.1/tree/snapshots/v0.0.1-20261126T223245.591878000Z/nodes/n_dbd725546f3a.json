@@ -1,0 +1,21 @@
+{
+  "id": "n_dbd725546f3a",
+  "kind": "touchpoint",
+  "title": "full version consistency gate",
+  "intent": "version.go 唯一源覆盖 tag/release/CHANGELOG",
+  "parent_id": "n_ff59308937cf",
+  "path": "root/version-evolution/runtime-version-source/version-consistency-full",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "consistency 脚本通过且 tag/release notes/CHANGELOG 版本等于 Version"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "bash scripts/check_version_consistency.sh \u0026\u0026 test \"$(git describe --tags --abbrev=0)\" = \"v$(awk '/^const Version = /{gsub(/\\\"/,\"\",$4);print $4;exit}' internal/version/version.go)\""
+  },
+  "fingerprint": "d30ef3446d1ea4a6046d9900a3b3fa91ed308b72e04c6e6ee4a050060b31b5a5",
+  "fingerprint_alg": "tree-json-v1"
+}

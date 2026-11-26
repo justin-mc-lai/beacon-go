@@ -5,7 +5,7 @@
   "intent": "TC evidence hash 与 artifact 注册一致",
   "parent_id": "n_dbab29f9640e",
   "path": "root/acceptance-binding/fsm-illegal-coverage/evidence-hash-check",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "beacon gate evaluate qa --run-id \u003cid\u003e --evaluator x 退出非零"
   },
-  "fingerprint": "227f2b3c5691caf8f64babe6bc10a29af67993a3c3a8135430c9a983a3e11864",
+  "fingerprint": "b85a81f40be8258793c09a18d89cb7b6b923ccd56a914dabffe7ce494abac429",
   "fingerprint_alg": "tree-json-v1"
 }

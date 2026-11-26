@@ -1,0 +1,15 @@
+{
+  "id": "n_39e50c0e0da2",
+  "kind": "feature",
+  "title": "interactive acceptance binding",
+  "intent": "在需求树 HTML 中点击 AC↔TestCase 完成绑定并回写树；复杂度留系统，用户只点选。",
+  "doc": "## 问题\n需求树 HTML 中 AC 与 TestCase 无交互绑定入口，无法通过点选完成绑定并回写树，绑定复杂度暴露给用户。\n\n## 目标用户\n审阅需求树的开发者，需在 HTML 中点选完成 AC↔TestCase 绑定。\n\n## 场景\n生成树 HTML 后，页面存在 data-bind-ac 属性标记的 TestCase 行，用户点击后绑定写回树。\n\n## 范围\n定义渲染产物必须包含 data-bind-ac 属性以支持点击绑定与回写。现有落点 internal/intenttree/render_html.go 为静态渲染，无交互绑定/回写，当前未实现，本包冻结的是需求定义，不是实现状态。\n\n## 非目标\n不实现 gate verdict 展示（属 gate-verdict-panel）；不实现 FSM illegal slot 覆盖（属 fsm-illegal-coverage）；不改变树指纹/索引投影（属 self-tree-ci）。\n\n## 验收标准\n`go test ./internal/intenttree -run TestRenderHTML -count=1` 通过，且输出 HTML 中 `grep -q data-bind-ac` 命中。当前尚无交互绑定，属待实现能力。",
+  "parent_id": "n_47544230bf1e",
+  "path": "root/tree-visual/interactive-acceptance-binding",
+  "status": "frozen",
+  "child_fingerprints": [
+    "8d58c3f8819286064fd0e84bd124ca471b57ee4bc09782bd2c522daba8491c48"
+  ],
+  "fingerprint": "59ec3b96a45a1aab7c6e253c642ea4c584f97255348f149244e62a5fecb28167",
+  "fingerprint_alg": "tree-json-v1"
+}
