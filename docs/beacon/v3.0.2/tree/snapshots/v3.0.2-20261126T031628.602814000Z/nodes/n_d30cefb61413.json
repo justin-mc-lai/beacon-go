@@ -1,0 +1,43 @@
+{
+  "id": "n_d30cefb61413",
+  "kind": "touchpoint",
+  "title": "shared admission",
+  "intent": "所有实现入口共用同一套准入判定",
+  "parent_id": "n_7c5c1cfc7372",
+  "path": "root/cli-surface/implement-surface/shared-admission",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "admit-1",
+      "text": "tick、delegate、admit 对同一 run 返回一致准入结论；任一阻塞项阻止写入。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "admit-tc1",
+      "ac_id": "admit-1",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestAdmissionSharedAcrossTickDelegateAdmit -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当准入项失败时三个入口都返回同一阻塞原因"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_d30cefb61413.txt",
+    "artifact_hash": "653069a762649c0d15c424ea144e94c9461e0b8aeb57601b265b7471bf68647f",
+    "at": "2026-11-26T03:06:50.69964Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_28c5f0e6290ff8c2513798b4",
+    "content_hash": "653069a762649c0d15c424ea144e94c9461e0b8aeb57601b265b7471bf68647f",
+    "by": "self-audit",
+    "at": "2026-11-26T03:06:50.714167Z"
+  },
+  "fingerprint": "61c7e85e0b267761696cf570bd0c0e852079ccf3a2848701004d99ffa7bc73e9",
+  "fingerprint_alg": "tree-json-v1"
+}

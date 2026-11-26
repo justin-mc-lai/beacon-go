@@ -5,7 +5,7 @@
   "intent": "用自身能力验证自身",
   "parent_id": "nroot_98a9c77a9519",
   "path": "root/self-host",
-  "status": "change_pending",
+  "status": "frozen",
   "acs": [
     {
       "id": "sh-1",
@@ -21,11 +21,12 @@
     }
   ],
   "child_fingerprints": [
-    "08404bf6d4423913e18d78b237df4643a8403d794d69b28e5af6f2907c4bec14",
-    "9c7e08b31e4c33cba8a9f4516fe07a73e90031301bdc3020ae889cf3c4244c47",
-    "028d1350a599e8ab070d8a553ae1338ffda1bbaa1f22d74c57e97783eae65149",
-    "9665c635389fd0a87b9caa43ac97c101d2852876351de313e0714d6760decb8b"
+    "bedccf8a5e7489787ce2e4991ecd5f9a46e15c51e8eb82e976ac0aa574e33c68",
+    "6524c65b1feedaa7b8cca8ac928028ddaea1ec001e46fce01029b78be0133251",
+    "23fd4cbc0cab428d878f4134aa501aaad5d472f0f782f1d5eba0c7ef0980eccd",
+    "c0dee128a41f554baab6e49ac6f8a3448b3eeff41902ef80da10aaac3d1b8920",
+    "b469071a532978b6a9904b20b23c6b5bd548d64e98c749a20abfdfc7fe50878f"
   ],
-  "fingerprint": "b21f000b3434b63fd042e2fe7ad4e0ebcf5d13de4f48d1db48077f283fcbddba",
+  "fingerprint": "b8678b239f8fdecf0371315fda43285a1f6c311b6eb9a0980660b154f749e769",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -1,0 +1,54 @@
+{
+  "id": "n_79f7bfd68155",
+  "kind": "touchpoint",
+  "title": "tick identity",
+  "intent": "显式身份推进",
+  "parent_id": "n_4aafa3895e8d",
+  "path": "root/goal-orchestration/manual-run/tick-identity",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "n_79f7bfd68155-1",
+      "text": "goal tick --by 推进一个阶段。"
+    },
+    {
+      "id": "n_79f7bfd68155-2",
+      "text": "无身份时阻塞并给 manual_tick_required。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_79f7bfd68155-tc1",
+      "ac_id": "n_79f7bfd68155-1",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestManualExecutorRunAdvancesViaTick",
+      "status": "existing"
+    },
+    {
+      "id": "n_79f7bfd68155-tc2",
+      "ac_id": "n_79f7bfd68155-2",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestManualExecutorRunAdvancesViaTick",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 goal tick --by host 执行后，当前阶段推进一次"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_79f7bfd68155.txt",
+    "artifact_hash": "b884722189a931f7e2c3bc172e239b2c80cacb11a8e06c2b7b5e415ae41280f5",
+    "at": "2026-11-26T03:07:00.629808Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_6bbcf361c77d4cba7cd7c3d6",
+    "content_hash": "b884722189a931f7e2c3bc172e239b2c80cacb11a8e06c2b7b5e415ae41280f5",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:00.646223Z"
+  },
+  "fingerprint": "4416fceb3946eb77b838435fd26ec9c45ffcfc57cb6efa0a9d92ac4d61bc16f2",
+  "fingerprint_alg": "tree-json-v1"
+}

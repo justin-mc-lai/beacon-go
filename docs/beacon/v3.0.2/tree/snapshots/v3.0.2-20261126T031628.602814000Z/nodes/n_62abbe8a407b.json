@@ -1,0 +1,54 @@
+{
+  "id": "n_62abbe8a407b",
+  "kind": "touchpoint",
+  "title": "badminton chain",
+  "intent": "完整树链可跑",
+  "parent_id": "n_036eb6e70d4a",
+  "path": "root/self-host/dogfood/badminton-chain",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "n_62abbe8a407b-1",
+      "text": "run_dogfood 输出 PASS。"
+    },
+    {
+      "id": "n_62abbe8a407b-2",
+      "text": "证据哈希可复查。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_62abbe8a407b-tc1",
+      "ac_id": "n_62abbe8a407b-1",
+      "kind": "e2e",
+      "ref": "bash e2e/run_dogfood.sh",
+      "status": "existing"
+    },
+    {
+      "id": "n_62abbe8a407b-tc2",
+      "ac_id": "n_62abbe8a407b-2",
+      "kind": "e2e",
+      "ref": "bash e2e/run_dogfood.sh",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当运行 run_dogfood.sh 时，输出 verdict=PASS 且 audit=true"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_62abbe8a407b.txt",
+    "artifact_hash": "07a9a6ce1af55b7d5f6f4afa53e03d17d72edb712a29af8c4c96aa71011ff2db",
+    "at": "2026-11-26T03:07:10.973844Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_21092dd186e7e1c466919dc1",
+    "content_hash": "07a9a6ce1af55b7d5f6f4afa53e03d17d72edb712a29af8c4c96aa71011ff2db",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:10.989447Z"
+  },
+  "fingerprint": "4de5a04ad4843e7aad7c6f639e3a8d51b572e31ca94817bee824965b0876047a",
+  "fingerprint_alg": "tree-json-v1"
+}

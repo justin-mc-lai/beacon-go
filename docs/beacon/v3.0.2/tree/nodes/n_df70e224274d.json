@@ -5,7 +5,7 @@
   "intent": "下一轮用户体验需求：一个入口、一个验证动作、不暴露内部 ID",
   "parent_id": "n_0338b8fdd30a",
   "path": "root/self-host/experience-next",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "exp-1",
@@ -20,6 +20,11 @@
       "text": "用户不需要输入 run id、artifact path、slug 或 hash。"
     }
   ],
-  "fingerprint": "4b24ffb7a30f735a346b3b46ce6a681d73b9a731af8e5a767e0d92b8503f1c06",
+  "child_fingerprints": [
+    "24d92432f85d7233c9ff684eec3764550027d5952c126f41b577d1e8f0ed05ed",
+    "ff25698c615cfd7be3b922f283630ddf09172d471276ff75d1ff0b7f299d2f8a",
+    "a50da948dafb2e323df211593b840e5797350eccf04002df5866da8414f0dd31"
+  ],
+  "fingerprint": "23fd4cbc0cab428d878f4134aa501aaad5d472f0f782f1d5eba0c7ef0980eccd",
   "fingerprint_alg": "tree-json-v1"
 }

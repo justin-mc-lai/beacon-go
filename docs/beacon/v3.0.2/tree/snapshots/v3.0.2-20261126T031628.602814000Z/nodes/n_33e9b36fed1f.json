@@ -1,0 +1,54 @@
+{
+  "id": "n_33e9b36fed1f",
+  "kind": "touchpoint",
+  "title": "proposal guards",
+  "intent": "非法或冲突的显式 slug 必须拒绝，不能覆盖已有路径",
+  "parent_id": "n_a8b3e6af8664",
+  "path": "root/cli-surface/plan-surface/proposal-guards",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "guard-1",
+      "text": "非法显式 slug 返回 tree_node_slug_invalid。"
+    },
+    {
+      "id": "guard-2",
+      "text": "显式 slug 与已有路径冲突时返回 tree_node_slug_collision，不静默加后缀。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "guard-tc1",
+      "ac_id": "guard-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestProposalInvalidAndCollidingExplicitSlug -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "guard-tc2",
+      "ac_id": "guard-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestProposalInvalidAndCollidingExplicitSlug -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当显式 slug 非法或重复时 plan apply 非零退出并返回对应 reason code"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_33e9b36fed1f.txt",
+    "artifact_hash": "49f795292d3bfb6b29ba0086f01753ab7a4c5aa65a02f7ef398ebe79085bea50",
+    "at": "2026-11-26T03:06:51.426835Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_0445f3919cada4261d6b7678",
+    "content_hash": "49f795292d3bfb6b29ba0086f01753ab7a4c5aa65a02f7ef398ebe79085bea50",
+    "by": "self-audit",
+    "at": "2026-11-26T03:06:51.440646Z"
+  },
+  "fingerprint": "eb1c9e349a7cec87fc3680b014e5074cc03557292d64e1b77c6e44d0cb6af2ec",
+  "fingerprint_alg": "tree-json-v1"
+}

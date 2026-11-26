@@ -1,0 +1,63 @@
+{
+  "id": "n_7df782fdb5d7",
+  "kind": "feature",
+  "title": "v1-migration",
+  "intent": "把 Python v1 账本一次性迁入 Go 账本，失败不破坏源数据。",
+  "parent_id": "n_65c89b949e6f",
+  "path": "root/data-migration/v1-migration",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "vm-1",
+      "text": "迁移前快照源库。"
+    },
+    {
+      "id": "vm-2",
+      "text": "重复迁移幂等。"
+    },
+    {
+      "id": "vm-3",
+      "text": "失败可回滚。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "detected",
+      "snapshotted",
+      "migrated",
+      "verified"
+    ],
+    "transitions": [
+      {
+        "from": "detected",
+        "to": "snapshotted",
+        "event": "snapshot"
+      },
+      {
+        "from": "snapshotted",
+        "to": "migrated",
+        "event": "write"
+      },
+      {
+        "from": "migrated",
+        "to": "verified",
+        "event": "verify"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "verified",
+        "to": "migrated"
+      },
+      {
+        "from": "detected",
+        "to": "migrated"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "8ca5452646e56361e0caa4082732487149199486823d7bbf12172e5ee1656707"
+  ],
+  "fingerprint": "a1095e9c2897bc7444b6244f9cb831e9759bdf987297d57bae6231a7bf124148",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "n_8bb5a36f0ff5",
+  "kind": "feature",
+  "title": "delivery",
+  "intent": "验证之后必须有显式交付终态，不能把 verified 当交付",
+  "parent_id": "n_66fe3404b218",
+  "path": "root/verification/delivery",
+  "status": "delivered",
+  "acs": [
+    {
+      "id": "delivery-1",
+      "text": "只有 verified 节点可以显式 deliver。"
+    },
+    {
+      "id": "delivery-2",
+      "text": "父节点 delivery 要求所有子节点 verified 或 delivered。"
+    }
+  ],
+  "child_fingerprints": [
+    "3b6d64da27c2d0d1662c142746e2638af4f9bd66b67dd6dabcd31c42a8d14d1d"
+  ],
+  "fingerprint": "48ec9a7a79d0160dfdcedb4764c703bacc9dec75da291bb044867f68eb6e632e",
+  "fingerprint_alg": "tree-json-v1"
+}

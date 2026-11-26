@@ -6,10 +6,10 @@
     {
       "id": "nroot_98a9c77a9519",
       "kind": "intent",
-      "status": "change_pending",
+      "status": "frozen",
       "title": "beacon-go",
       "path": "root",
-      "fingerprint": "257d96131a8706bbe9349f3580397d178e05327e109a18a5e934da0595977939",
+      "fingerprint": "6383fe32a924305c87705fa9e176b21301d4a13d79b9af6f6291b3504f849b4c",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -446,10 +446,10 @@
       "id": "n_0338b8fdd30a",
       "parent_id": "nroot_98a9c77a9519",
       "kind": "module",
-      "status": "change_pending",
+      "status": "frozen",
       "title": "self-host",
       "path": "root/self-host",
-      "fingerprint": "b21f000b3434b63fd042e2fe7ad4e0ebcf5d13de4f48d1db48077f283fcbddba",
+      "fingerprint": "b8678b239f8fdecf0371315fda43285a1f6c311b6eb9a0980660b154f749e769",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -506,10 +506,40 @@
       "id": "n_df70e224274d",
       "parent_id": "n_0338b8fdd30a",
       "kind": "feature",
-      "status": "draft",
+      "status": "frozen",
       "title": "experience next",
       "path": "root/self-host/experience-next",
-      "fingerprint": "4b24ffb7a30f735a346b3b46ce6a681d73b9a731af8e5a767e0d92b8503f1c06",
+      "fingerprint": "23fd4cbc0cab428d878f4134aa501aaad5d472f0f782f1d5eba0c7ef0980eccd",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_a0d613466a8f",
+      "parent_id": "n_df70e224274d",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "no internal ids",
+      "path": "root/self-host/experience-next/no-internal-ids",
+      "fingerprint": "24d92432f85d7233c9ff684eec3764550027d5952c126f41b577d1e8f0ed05ed",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_c04b48a476e6",
+      "parent_id": "n_df70e224274d",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "one verify",
+      "path": "root/self-host/experience-next/one-verify",
+      "fingerprint": "ff25698c615cfd7be3b922f283630ddf09172d471276ff75d1ff0b7f299d2f8a",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_1ab5a48661c4",
+      "parent_id": "n_df70e224274d",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "open cockpit",
+      "path": "root/self-host/experience-next/open-cockpit",
+      "fingerprint": "a50da948dafb2e323df211593b840e5797350eccf04002df5866da8414f0dd31",
       "fingerprint_alg": "tree-json-v1"
     },
     {

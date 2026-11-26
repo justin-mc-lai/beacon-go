@@ -1,0 +1,121 @@
+{
+  "id": "n_820af49910f0",
+  "kind": "feature",
+  "title": "rollup-audit",
+  "intent": "验证汇总与审计",
+  "parent_id": "n_66fe3404b218",
+  "path": "root/verification/rollup-audit",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "ra-1",
+      "text": "叶子 verify 绑定 artifact id/hash/by，状态变 verified。"
+    },
+    {
+      "id": "ra-2",
+      "text": "父级 rollup 只在全部子 verified 后生效，并重绑子指纹。"
+    },
+    {
+      "id": "ra-3",
+      "text": "audit 只读，检查 kind、孤儿、空 module、叶子验证、指纹。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "draft",
+      "frozen",
+      "implemented",
+      "verified",
+      "change_pending",
+      "deprecated"
+    ],
+    "transitions": [
+      {
+        "from": "draft",
+        "to": "frozen",
+        "event": "freeze"
+      },
+      {
+        "from": "frozen",
+        "to": "implemented",
+        "event": "implement"
+      },
+      {
+        "from": "implemented",
+        "to": "verified",
+        "event": "verify"
+      },
+      {
+        "from": "frozen",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "implemented",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "verified",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "frozen",
+        "to": "change_pending",
+        "event": "descendant_change"
+      },
+      {
+        "from": "implemented",
+        "to": "change_pending",
+        "event": "descendant_change"
+      },
+      {
+        "from": "verified",
+        "to": "change_pending",
+        "event": "descendant_change"
+      },
+      {
+        "from": "change_pending",
+        "to": "frozen",
+        "event": "refreeze"
+      },
+      {
+        "from": "change_pending",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "frozen",
+        "to": "deprecated",
+        "event": "deprecate"
+      },
+      {
+        "from": "verified",
+        "to": "deprecated",
+        "event": "deprecate"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "draft",
+        "to": "verified"
+      },
+      {
+        "from": "verified",
+        "to": "implemented"
+      },
+      {
+        "from": "deprecated",
+        "to": "frozen"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "67989b4ed56835ec3adfa5ca541737f5d33e7d33e4dc192207c47c9559011375",
+    "88c2c1bc9aa94e4f1c975c47cc209dd387805220a369df402200f698eb448800",
+    "c6c8d90bd5a2975f3bddde5d583919b991b4107d9fdd9e3d735f2fe35c86fefa"
+  ],
+  "fingerprint": "63c9692a6d1b009557d98b07b53a243854ac03505893b2a3b9b5a215147e4cc3",
+  "fingerprint_alg": "tree-json-v1"
+}

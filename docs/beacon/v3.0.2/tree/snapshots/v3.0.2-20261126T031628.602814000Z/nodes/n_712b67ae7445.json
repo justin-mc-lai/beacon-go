@@ -1,0 +1,30 @@
+{
+  "id": "n_712b67ae7445",
+  "kind": "feature",
+  "title": "requirement workbench",
+  "intent": "让需求树 HTML 成为清晰、单源、可筛选的工作台",
+  "parent_id": "n_0338b8fdd30a",
+  "path": "root/self-host/requirement-workbench",
+  "status": "delivered",
+  "acs": [
+    {
+      "id": "workbench-1",
+      "text": "HTML 顶层明确显示权威源路径与 source hash，并标注 HTML 为派生只读。"
+    },
+    {
+      "id": "workbench-2",
+      "text": "HTML 显示草稿/冻结/交付实现/验证的数量与可点击筛选。"
+    },
+    {
+      "id": "workbench-3",
+      "text": "未绑定 legacy 包的功能显示为 tree-native，而不是失败或未完成。"
+    }
+  ],
+  "child_fingerprints": [
+    "e9943e2ce66d9a0b40803f6bd3005d8900ac77aec0fea62934c4e52107599252",
+    "de218ccaa0762c12296418b4a73848a5ff1bc0d32b1ec1b613100ed7ec287d14",
+    "6823e262f019bdf6e4dcc61fda0e46d0da7ab71580bf3250e1884fdbe99d8d86"
+  ],
+  "fingerprint": "c0dee128a41f554baab6e49ac6f8a3448b3eeff41902ef80da10aaac3d1b8920",
+  "fingerprint_alg": "tree-json-v1"
+}

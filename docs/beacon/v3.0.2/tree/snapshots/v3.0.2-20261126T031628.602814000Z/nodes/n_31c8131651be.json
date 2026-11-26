@@ -1,0 +1,65 @@
+{
+  "id": "n_31c8131651be",
+  "kind": "touchpoint",
+  "title": "qa surfaces",
+  "intent": "status、score、autotest 三个面必须各自有独立契约",
+  "parent_id": "n_67c0fdcaa14a",
+  "path": "root/verification/qa-surface/qa-surfaces",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "qa-surface-1",
+      "text": "verify status 输出正式 gate 的最新结论。"
+    },
+    {
+      "id": "qa-surface-2",
+      "text": "verify score 只写评分历史，不改变 gate 或 release。"
+    },
+    {
+      "id": "qa-surface-3",
+      "text": "verify autotest 执行 tests.md 选择器并返回可登记结果。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "qa-surface-tc1",
+      "ac_id": "qa-surface-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestGateStatusShowsPlanAndImplementEvaluated -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "qa-surface-tc2",
+      "ac_id": "qa-surface-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestQAScoreAndHistoryCLI -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "qa-surface-tc3",
+      "ac_id": "qa-surface-3",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestQAAutotestCLI -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当分别调用 status/score/autotest 时，各自输出符合契约且不越权改验收"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_31c8131651be.txt",
+    "artifact_hash": "b7c330d3ad32ac86036ab6d5e54411a3f9858de366bc737d9888bd12fe286c53",
+    "at": "2026-11-26T03:07:23.482945Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_69d28289d1ee02d7aff56c90",
+    "content_hash": "b7c330d3ad32ac86036ab6d5e54411a3f9858de366bc737d9888bd12fe286c53",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:23.499674Z"
+  },
+  "fingerprint": "360af1014e5692316fad29cd36067e9c4d3b4b6398844ccc6e00fb3bf50d8a2f",
+  "fingerprint_alg": "tree-json-v1"
+}

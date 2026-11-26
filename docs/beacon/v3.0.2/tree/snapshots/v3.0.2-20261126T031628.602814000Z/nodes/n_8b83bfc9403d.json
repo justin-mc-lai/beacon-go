@@ -1,0 +1,32 @@
+{
+  "id": "n_8b83bfc9403d",
+  "kind": "module",
+  "title": "cli-surface",
+  "intent": "用户命令面与依赖门禁",
+  "parent_id": "nroot_98a9c77a9519",
+  "path": "root/cli-surface",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "cs-1",
+      "text": "用户可见入口是 plan/truth/change/implement/verify/release/goal 七组。"
+    },
+    {
+      "id": "cs-2",
+      "text": "已移除命令必须 fail closed，不得保留可用别名。"
+    },
+    {
+      "id": "cs-3",
+      "text": "依赖图与版本门禁在 CI 可执行，移除面不得回归。"
+    }
+  ],
+  "child_fingerprints": [
+    "6d000d1854b45438fe51a21c963118514df722a6918e9c735e07949a27bdf76c",
+    "58f0e0a5890416dceb194da9c2b939f673a4a5aa3c1d8fb9fbe9c9ac5d6cd9e3",
+    "765ffd077d3f1363fdb114710158b92bd208d51519bf776eff1680e05141d9f4",
+    "e11d731bff1682cab69044069297108662ed965352dea8a869547e46971925de",
+    "c8e1f394e2a286a51c978e82c922012e47e819250c6c6687605e044ac1b09120"
+  ],
+  "fingerprint": "01192ce1e574e1838ba11479dd8b310a61814926c7b8786cc5c6a1d11b53a196",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,76 @@
+{
+  "at": "2026-11-26T03:16:14.81847Z",
+  "children": [
+    {
+      "id": "n_1ab5a48661c4",
+      "kind": "touchpoint",
+      "title": "open cockpit",
+      "intent": "用户无需记忆版本/路径即可打开需求工作台",
+      "parent_id": "n_df70e224274d",
+      "path": "root/self-host/experience-next/open-cockpit",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "open-1",
+          "text": "beacon open 在当前项目/当前版本下打开需求工作台，不需要 --version、slug 或 run id。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当无参数执行 beacon open 时，定位当前项目与当前树并打开 HTML 工作台"
+      },
+      "fingerprint": "bb781adc13d0812312b9968d776fd6b41f2de20d1a1e9afbd1753e2c514f5102",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_c04b48a476e6",
+      "kind": "touchpoint",
+      "title": "one verify",
+      "intent": "一个节点验证动作完成检查、证据和 rollup",
+      "parent_id": "n_df70e224274d",
+      "path": "root/self-host/experience-next/one-verify",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "one-verify-1",
+          "text": "beacon verify \u003cnode\u003e 执行该节点声明的测试选择器，登记证据并在通过时 rollup。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当对已验证叶子执行一个 verify 命令时，测试输出成为 node-scope evidence，父级按条件 rollup"
+      },
+      "fingerprint": "fbc8eb980f71f45b0bbd42200585e09f840affaeab35a8ff5ee5ca918b63b815",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_a0d613466a8f",
+      "kind": "touchpoint",
+      "title": "no internal ids",
+      "intent": "正常用户路径不暴露内部标识",
+      "parent_id": "n_df70e224274d",
+      "path": "root/self-host/experience-next/no-internal-ids",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "no-ids-1",
+          "text": "open/verify/next 的默认路径不接受 run id、artifact path、slug 或 hash 作为必填参数。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当用户只提供项目与节点标题/路径时，系统解析内部 id；缺失时给出可执行提示"
+      },
+      "fingerprint": "1174618e04e8168d054fca443291d2eae6264427e57e0ea9846f936a7d781541",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_df70e224274d",
+  "provenance": {
+    "by": "beacon-self-audit",
+    "sources": [
+      "user next formal requirement 2026-11-26",
+      "P3 experience next draft"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "id": "n_f339bc8604a9",
+  "kind": "touchpoint",
+  "title": "router 3.x",
+  "intent": "路由文案为 3.x",
+  "parent_id": "n_4665926a0040",
+  "path": "root/self-host/skills/router-3x",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "n_f339bc8604a9-1",
+      "text": "router 首段写 3.x requirement-truth。"
+    },
+    {
+      "id": "n_f339bc8604a9-2",
+      "text": "安装后 skills verify OK。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_f339bc8604a9-tc1",
+      "ac_id": "n_f339bc8604a9-1",
+      "kind": "unit",
+      "ref": "go test ./skills -run TestRouterTableSchema -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "n_f339bc8604a9-tc2",
+      "ac_id": "n_f339bc8604a9-2",
+      "kind": "unit",
+      "ref": "go test ./skills -run TestRouterTableSchema -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当读取 beacon-go/SKILL.md 时，description 含 3.x requirement-truth"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_f339bc8604a9.txt",
+    "artifact_hash": "efa3f28052dec973baeb88453dd9209e56c398f607e646b085a720422ec120d7",
+    "at": "2026-11-26T03:07:14.402586Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_c65d72c6a45001f18ea1ddb0",
+    "content_hash": "efa3f28052dec973baeb88453dd9209e56c398f607e646b085a720422ec120d7",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:14.419438Z"
+  },
+  "fingerprint": "7171e854ca5ed7ca388b75ae8370759af221a066f4b603b63f314844f8c206f7",
+  "fingerprint_alg": "tree-json-v1"
+}

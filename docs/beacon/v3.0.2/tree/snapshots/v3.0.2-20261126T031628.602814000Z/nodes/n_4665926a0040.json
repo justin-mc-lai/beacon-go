@@ -1,0 +1,29 @@
+{
+  "id": "n_4665926a0040",
+  "kind": "feature",
+  "title": "skills",
+  "intent": "技能安装与路由",
+  "parent_id": "n_0338b8fdd30a",
+  "path": "root/self-host/skills",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "sk-1",
+      "text": "七个 skill 安装后 skills verify 显示 OK。"
+    },
+    {
+      "id": "sk-2",
+      "text": "router 文案为 3.x requirement-truth。"
+    },
+    {
+      "id": "sk-3",
+      "text": "skill 内容不引用已删命令。"
+    }
+  ],
+  "child_fingerprints": [
+    "7171e854ca5ed7ca388b75ae8370759af221a066f4b603b63f314844f8c206f7",
+    "17887062efdde7c376c37c3b96386f51bac50454a2fec7805a0bc7f2894be812"
+  ],
+  "fingerprint": "b469071a532978b6a9904b20b23c6b5bd548d64e98c749a20abfdfc7fe50878f",
+  "fingerprint_alg": "tree-json-v1"
+}

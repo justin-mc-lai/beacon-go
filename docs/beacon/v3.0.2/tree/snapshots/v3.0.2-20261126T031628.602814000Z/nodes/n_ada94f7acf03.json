@@ -1,0 +1,43 @@
+{
+  "id": "n_ada94f7acf03",
+  "kind": "touchpoint",
+  "title": "tree native",
+  "intent": "没有 legacy 包的功能不是失败，而是树原生需求",
+  "parent_id": "n_712b67ae7445",
+  "path": "root/self-host/requirement-workbench/tree-native",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "native-1",
+      "text": "无 truth_path 的功能在 HTML 显示 tree-native；summary 只给数量，不把全量 slug 当作错误列表。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "native-tc1",
+      "ac_id": "native-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestPlanTreeReportsUnlinked -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当功能没有 legacy 包时，HTML 和 summary 都使用 tree-native 文案"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_ada94f7acf03.txt",
+    "artifact_hash": "d55a62b0440a85c1c5a914b9336cff4ed003ec7e40d5d6f7a072f6225b49080f",
+    "at": "2026-11-26T03:07:13.70963Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_e4fedff0ca13af600605e1af",
+    "content_hash": "d55a62b0440a85c1c5a914b9336cff4ed003ec7e40d5d6f7a072f6225b49080f",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:13.724996Z"
+  },
+  "fingerprint": "6823e262f019bdf6e4dcc61fda0e46d0da7ab71580bf3250e1884fdbe99d8d86",
+  "fingerprint_alg": "tree-json-v1"
+}

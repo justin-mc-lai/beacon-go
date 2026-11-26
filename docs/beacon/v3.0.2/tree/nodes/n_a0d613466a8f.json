@@ -1,0 +1,21 @@
+{
+  "id": "n_a0d613466a8f",
+  "kind": "touchpoint",
+  "title": "no internal ids",
+  "intent": "正常用户路径不暴露内部标识",
+  "parent_id": "n_df70e224274d",
+  "path": "root/self-host/experience-next/no-internal-ids",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "no-ids-1",
+      "text": "open/verify/next 的默认路径不接受 run id、artifact path、slug 或 hash 作为必填参数。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当用户只提供项目与节点标题/路径时，系统解析内部 id；缺失时给出可执行提示"
+  },
+  "fingerprint": "24d92432f85d7233c9ff684eec3764550027d5952c126f41b577d1e8f0ed05ed",
+  "fingerprint_alg": "tree-json-v1"
+}
