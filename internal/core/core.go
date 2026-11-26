@@ -59,8 +59,8 @@ const (
 	RunClosed     RunStatus = "Closed"
 )
 
-// IterationResult is the mandatory output schema of every AgentBackend
-// (AC-042). Backends are implemented in internal/orchestrator in Phase P2.
+// IterationResult is the mandatory output schema of AC-042. The
+// host-facing surfaces build it; the kernel never fabricates one.
 type IterationResult struct {
 	Success        bool   `json:"success"`
 	Summary        string `json:"summary"`

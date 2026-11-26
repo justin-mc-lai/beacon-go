@@ -34,14 +34,11 @@ import (
 // prompt. The probe result itself remains a probe — FullBackend is
 // always false, and no "supports ACP" claim exists on this surface.
 //
-// session/prompt has a real implementation in acp_session.go:
-// RunACPSession opens a session, sends one prompt and maps the agent's
-// own answer onto the AC-042 result schema. AC-046 asks for an
-// integration iteration against a REAL ACP agent binary, and this
-// repository has no such target, so that evidence is still
-// outstanding: the implementation can only be proven against a real
-// agent, and until one is available the honest state is "implemented,
-// not yet proven against a real target".
+// session/prompt is deliberately NOT implemented here. The probe
+// proves only that a target can answer `initialize` and `session/new`;
+// FullBackend stays false so this surface never claims ACP support it
+// cannot prove. Real ACP sessions are the host agent's job, outside
+// the kernel (spec #15 / ADR-0002).
 
 // ACPProbeResult is the probe's evidence record.
 type ACPProbeResult struct {
@@ -265,69 +262,3 @@ func ProbeACP(ctx context.Context, argv []string, timeout time.Duration) (ACPPro
 		"session/prompt is NOT implemented (probe only)"
 	return res, nil
 }
-
-// AcpBackend is the AC-046 slot, at probe level only. It satisfies
-// the AgentBackend SHAPE so surfaces can reference it, but Iterate
-// refuses — honestly, with a reason code — instead of fabricating an
-// iteration. HealthCheck runs the two-step handshake probe.
-type AcpBackend struct {
-	argv    []string
-	timeout time.Duration
-}
-
-// NewAcpBackend binds the probe to a target command.
-func NewAcpBackend(argv []string, timeout time.Duration) *AcpBackend {
-	if timeout <= 0 {
-		timeout = 10 * time.Second
-	}
-	return &AcpBackend{argv: argv, timeout: timeout}
-}
-
-// Name implements AgentBackend: acp:<target>.
-func (b *AcpBackend) Name() string {
-	if len(b.argv) == 0 {
-		return "acp:unconfigured"
-	}
-	return "acp:" + b.argv[0]
-}
-
-// Iterate drives one real ACP session against the configured target:
-// initialize, session/new, then a single session/prompt. The agent's
-// own answer becomes the iteration result.
-//
-// A missing target, a refused handshake or an unanswered prompt comes
-// back as an error with a reason code — the backend never fabricates
-// an IterationResult. The prompt is taken from the stage-context file
-// when one was handed over; otherwise it falls back to the stage name.
-func (b *AcpBackend) Iterate(ctx context.Context, req IterationRequest) (IterationResult, error) {
-	prompt := acpPromptFromContext(req.ContextPath, req.Stage)
-	res, err := RunACPSession(ctx, b.argv, prompt, req.Workdir, b.timeout)
-	if err != nil {
-		return IterationResult{}, err
-	}
-	success := res.StopReason == "" || res.StopReason == "end_turn" || res.StopReason == "stop"
-	return IterationResult{
-		Success:        success,
-		Summary:        res.Content,
-		StopSignal:     res.StopReason,
-		AgentName:      res.AgentName,
-		StdoutText:     res.Content,
-		KeyChangesMade: nil,
-	}, nil
-}
-
-// HealthCheck runs the two-step handshake probe.
-func (b *AcpBackend) HealthCheck(ctx context.Context) HealthStatus {
-	res, err := ProbeACP(ctx, b.argv, b.timeout)
-	if err != nil {
-		return HealthStatus{Backend: b.Name(), OK: false, Detail: err.Error()}
-	}
-	return HealthStatus{Backend: b.Name(), OK: res.Responded && res.SessionCreated, Detail: res.Detail}
-}
-
-// Abort: no session is ever driven at probe level; a created probe
-// session dies with its process.
-func (b *AcpBackend) Abort(ctx context.Context) error { return nil }
-
-// ProbeTimeout exposes the probe's bounded wait (used in help text).
-func (b *AcpBackend) ProbeTimeout() time.Duration { return b.timeout }

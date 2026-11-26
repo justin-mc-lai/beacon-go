@@ -155,81 +155,6 @@ func TestProfileBackendResolvesContext(t *testing.T) {
 	}
 }
 
-// Ralph loop: two iterations, marker on the second -> completed.
-func TestRalphLoopCompletesSecondIteration(t *testing.T) {
-	dir := t.TempDir()
-	script := writeScript(t, dir, "ralph.sh", "#!/bin/sh\nn=$(cat count 2>/dev/null || echo 0)\nn=$((n+1))\necho $n > count\necho \"iteration $n\"\nif [ \"$n\" -ge 2 ]; then echo RALPH_DONE; fi\nexit 0\n")
-	b := NewRalphBackend([]string{script}, 0, 5)
-	artDir := filepath.Join(dir, "artifacts")
-	var seen []int
-	run, err := b.RunLoop(context.Background(), IterationRequest{RunID: "r1", Stage: "implement", Workdir: dir}, artDir,
-		func(i int, res IterationResult) { seen = append(seen, i) })
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !run.Completed || len(run.Iterations) != 2 || len(seen) != 2 {
-		t.Errorf("run = %+v seen=%v", run, seen)
-	}
-}
-
-// Ralph loop: no marker -> ceiling reached, NOT completed.
-func TestRalphLoopCeiling(t *testing.T) {
-	dir := t.TempDir()
-	script := writeScript(t, dir, "ralph.sh", "#!/bin/sh\necho still-working\nexit 0\n")
-	b := NewRalphBackend([]string{script}, 0, 3)
-	run, err := b.RunLoop(context.Background(), IterationRequest{Workdir: dir}, filepath.Join(dir, "a"), nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if run.Completed || run.ReasonCode != core.ReasonRalphMaxIterations || len(run.Iterations) != 3 {
-		t.Errorf("run = %+v", run)
-	}
-}
-
-// Ralph loop: a failing iteration ends the loop as failed at once.
-func TestRalphLoopFailureStops(t *testing.T) {
-	dir := t.TempDir()
-	script := writeScript(t, dir, "ralph.sh", "#!/bin/sh\nexit 4\n")
-	b := NewRalphBackend([]string{script}, 0, 5)
-	run, err := b.RunLoop(context.Background(), IterationRequest{Workdir: dir}, filepath.Join(dir, "a"), nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if run.Completed || run.ReasonCode != core.ReasonExecutorExitNonZero || len(run.Iterations) != 1 {
-		t.Errorf("run = %+v", run)
-	}
-}
-
-// ACP probe: a fake agent answering initialize is reported as a
-// probe response (protocol version + capabilities) — and the Acp
-// backend still refuses to iterate.
-func TestACPProbeHandshake(t *testing.T) {
-	dir := t.TempDir()
-	agent := writeScript(t, dir, "fake-acp.py", `#!/usr/bin/env python3
-import sys, json
-line = sys.stdin.readline()
-req = json.loads(line)
-resp = {"jsonrpc": "2.0", "id": req["id"], "result": {"protocolVersion": 1, "agentCapabilities": {"loadSession": True}, "authMethods": [], "agentInfo": {"name": "fake-agent", "version": "0.1"}}}
-sys.stdout.write(json.dumps(resp) + "\n")
-sys.stdout.flush()
-`)
-	res, err := ProbeACP(context.Background(), []string{agent}, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !res.Responded || res.ProtocolVersion != 1 || !res.HasAgentCapabilities || res.ImplementationName != "fake-agent" {
-		t.Errorf("probe = %+v", res)
-	}
-	if !res.Probe || res.FullBackend {
-		t.Errorf("probe flags = %+v (probe must stay labelled probe, full_backend false)", res)
-	}
-	b := NewAcpBackend([]string{agent}, 0)
-	_, err = b.Iterate(context.Background(), IterationRequest{})
-	if got := reasonOf(t, err); got != core.ReasonACPNotSupported {
-		t.Errorf("iterate reason = %s, want the honest refusal", got)
-	}
-}
-
 // ACP probe: a target that answers garbage gets Responded=false,
 // not a crash and not a pass.
 func TestACPProbeGarbageTarget(t *testing.T) {
@@ -241,45 +166,6 @@ func TestACPProbeGarbageTarget(t *testing.T) {
 	}
 	if res.Responded {
 		t.Errorf("probe = %+v, want no response", res)
-	}
-}
-
-// ACP probe, two-step (P4c): a fake agent answering initialize AND
-// session/new gets SessionCreated with its session id; the probe
-// still never claims a full backend and Iterate still refuses.
-func TestACPProbeTwoStepHandshake(t *testing.T) {
-	dir := t.TempDir()
-	agent := writeScript(t, dir, "fake-acp2.py", `#!/usr/bin/env python3
-import sys, json
-for line in sys.stdin:
-    req = json.loads(line)
-    method = req.get("method")
-    if method == "initialize":
-        resp = {"jsonrpc": "2.0", "id": req["id"], "result": {"protocolVersion": 1, "agentCapabilities": {"loadSession": True}, "authMethods": [], "agentInfo": {"name": "fake-agent-2step", "version": "0.2"}}}
-    elif method == "session/new":
-        resp = {"jsonrpc": "2.0", "id": req["id"], "result": {"sessionId": "sess-test-1"}}
-    else:
-        continue
-    sys.stdout.write(json.dumps(resp) + "\n")
-    sys.stdout.flush()
-`)
-	res, err := ProbeACP(context.Background(), []string{agent}, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !res.Responded || !res.SessionCreated || res.SessionID != "sess-test-1" || res.StoppedAt != "" {
-		t.Errorf("probe = %+v, want both steps answered with the session id", res)
-	}
-	if !res.Probe || res.FullBackend {
-		t.Errorf("probe flags = %+v (must stay probe, full_backend false)", res)
-	}
-	b := NewAcpBackend([]string{agent}, 0)
-	if hs := b.HealthCheck(context.Background()); !hs.OK {
-		t.Errorf("health check = %+v, want OK after a two-step handshake", hs)
-	}
-	_, err = b.Iterate(context.Background(), IterationRequest{})
-	if got := reasonOf(t, err); got != core.ReasonACPNotSupported {
-		t.Errorf("iterate reason = %s, want the honest refusal (probe is not a backend)", got)
 	}
 }
 

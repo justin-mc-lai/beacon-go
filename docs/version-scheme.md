@@ -42,7 +42,7 @@ const Version = "2.0.0"
 ```
 
 - `internal/cli/root.go`：`const Version = version.Version`。
-- `internal/harness/acp.go`、`acp_session.go`：`version.Version`。
+- `internal/harness/acp.go`：`version.Version`（探针超时默认值）。
 - `e2e/run_e2e.sh`：只校验 `^Beacon CLI v[0-9]+\.[0-9]+\.[0-9]+$`，不再写死版本。
 - `scripts/check_version_consistency.sh`：代码 vs README/README.zh-CN；AGENTS.md 禁止写死当前版本。
 

@@ -173,7 +173,7 @@ func NewSubprocessBackend(argv []string, timeout time.Duration) *SubprocessBacke
 	return &SubprocessBackend{backendName: name, argv: argv, timeout: timeout}
 }
 
-// Name implements AgentBackend.
+// Name reports the configured backend name.
 func (b *SubprocessBackend) Name() string { return b.backendName }
 
 // Argv returns the configured command (copied).

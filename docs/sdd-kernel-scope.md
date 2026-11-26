@@ -170,7 +170,8 @@ canonical_refs:
 | 处置 | 包/文件 |
 |---|---|
 | **保留（核心）** | `internal/core`（类型/错误/reason/fingerprint/protected_paths）、`internal/store`（上面的最小表）、`internal/gate`（truth 门）、`internal/orchestrator` 的 `truth*.go`、`intent.go`、`decompose.go`、`truthmap.go`、`feature_map.go`、`gates_eval.go`、`gates_facts.go`、`artifacts.go`、`internal/workspace`、`internal/versionmanifest`、`internal/sddroles`、`internal/changequality`、**goal 编排面：`engine.go`、`tick.go`、`exitgates.go`、`admission.go`、`complete.go`、`guardrails.go`、`driver.go`、`supervisor.go`、`external_stage_evidence.go`、`exec_resolve.go` 的 manual/external lane**、`internal/cli` 的 goal/truth/gate/spine/projects/fsm/helpers/version/doctor |
-| **quarantine（代码在，CLI 隐藏）** | `program*`、`topology*`、`worktree*`、`implement*`、`exec_*`、`delegate.go`、`exec_ralph.go`、`harness/acp*`、`agentapi`、`desktop`、`httpapi`、`llm`、`session`、`benchgate`、`evalgate`、`stride`、`archive`、`hooks`、`skills install`、`migrate` |
+| **quarantine（代码在，CLI 隐藏）** | `program*`、`topology*`、`worktree*`、`implement*`、`exec_*`、`delegate.go`、`harness/acp.go`（仅握手探针）、`benchgate`、`evalgate`、`stride`、`changequality`、`effectjournal`、`archive`、`hooks`、`skills install`、`migrate` |
+| **已删（2026-11-26 包袱清理）** | `internal/session`（desktop 遗留、零调用）、`internal/progressreview`（仅冻结 truth、实现未落地）、`harness/ralph.go`（内置 ralph 后端）、`harness/acp_session.go` 与 `AcpBackend`（ACP 全会话后端）、`AgentBackend` 接口；28 个残留间接依赖经 `go mod tidy` 移除。删除前 build/test/vet 全绿、kernel-deps 守卫通过。保留 `ParseArgvFlag` 与 `ProbeACP`。 |
 | **删除（第二遍）** | quarantine 中确认无 SDD 依赖、测试已迁移的部分 |
 
 原则：先隐藏 CLI，后删代码；删除前必须有 SDD-only e2e 绿。

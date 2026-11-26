@@ -136,8 +136,8 @@ func WriteStageContext(dir string, sc StageContext) (string, error) {
 	return path, nil
 }
 
-// ProfileBackend runs a profile's command template as an
-// AgentBackend. It IS the harness execution layer — profile argv
+// ProfileBackend runs a profile's command template against a concrete
+// stage context. It IS the harness execution layer — profile argv
 // resolved against a concrete stage context, executed via the
 // subprocess machinery, with the working directory aligned to the
 // run's bound worktree (AC-099/AC-100: the harness runs INSIDE the
@@ -157,7 +157,7 @@ func NewProfileBackend(p Profile, contextFile, prompt string, timeout time.Durat
 	return &ProfileBackend{profile: p, ctxFile: contextFile, prompt: prompt, timeout: timeout}
 }
 
-// Name implements AgentBackend: subprocess:<profile-name>.
+// Name reports the profile as subprocess:<profile-name>.
 func (b *ProfileBackend) Name() string { return "subprocess:" + b.profile.Name }
 
 // Profile returns the bound profile.
