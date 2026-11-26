@@ -122,12 +122,21 @@ func TestTreeExpandSchemaDAG(t *testing.T) {
 	}
 
 	goodPath := filepath.Join(base, "good.json")
-	if err := os.WriteFile(goodPath, []byte(`{"children":[{"kind":"module","title":"auth"}]}`), 0o644); err != nil {
+	if err := os.WriteFile(goodPath, []byte(`{"children":[{"kind":"module","title":"auth"}],"provenance":{"model":"host","sources":["area-a","area-b"]}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	out := mustRun(t, "plan", "expand", "--project", proj, "--node", rootID, "--children", goodPath, "--json")
 	if parseDoc(t, out)["allowed"] != true {
 		t.Fatalf("intent->module must be allowed: %s", out)
+	}
+	mustRun(t, "plan", "apply", "--project", proj, "--node", rootID, "--proposal", goodPath, "--json")
+	expFiles, _ := filepath.Glob(filepath.Join(proj, "docs", "beacon", "v0.1.0", "tree", "expansions", "*.json"))
+	if len(expFiles) == 0 {
+		t.Fatal("expansion provenance file missing")
+	}
+	expRaw, _ := os.ReadFile(expFiles[0])
+	if !strings.Contains(string(expRaw), "area-a") || !strings.Contains(string(expRaw), "area-b") {
+		t.Fatalf("merged provenance sources missing: %s", expRaw)
 	}
 
 	tooMany := filepath.Join(base, "many.json")

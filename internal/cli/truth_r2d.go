@@ -70,7 +70,8 @@ func newTruthBrainstormCmd() *cobra.Command {
 }
 
 func newTruthCode2TruthCmd() *cobra.Command {
-	var project, feature, version, target, by string
+	var project, feature, version, by string
+	var targets []string
 	var asJSON bool
 	c := &cobra.Command{
 		Use:   "code2truth",
@@ -89,7 +90,26 @@ func newTruthCode2TruthCmd() *cobra.Command {
 				return err
 			}
 			defer st.Close()
-			v, err := orchestrator.NewEngine(st).Code2TruthIntake(project, version, feature, target, by)
+			if len(targets) == 0 {
+				return fail("code2truth_target_missing", "truth code2truth", "at least one --target is required")
+			}
+			eng := orchestrator.NewEngine(st)
+			if len(targets) > 1 {
+				v, err := eng.Code2TruthIntakeMulti(project, version, feature, targets, by)
+				if err != nil {
+					return err
+				}
+				if asJSON {
+					return printJSON(cmd, v)
+				}
+				out := cmd.OutOrStdout()
+				fmt.Fprintf(out, "areas: %d\n", len(v.Regions))
+				for _, r := range v.Regions {
+					fmt.Fprintf(out, "  %-24s %s (files=%d claims=%d)\n", r.Slug, r.Target, r.Files, r.Claims)
+				}
+				return nil
+			}
+			v, err := eng.Code2TruthIntake(project, version, feature, targets[0], by)
 			if err != nil {
 				return err
 			}
@@ -108,6 +128,7 @@ func newTruthCode2TruthCmd() *cobra.Command {
 			for _, a := range v.Ambiguity {
 				fmt.Fprintf(out, "ambiguity: %s %s\n", a.ID, a.Reason)
 			}
+			fmt.Fprintf(out, "tree_mapping: %s\n", v.TreeMapping)
 			fmt.Fprintf(out, "intake:  %s\n", v.IntakeMarkdown)
 			return nil
 		},
@@ -115,10 +136,10 @@ func newTruthCode2TruthCmd() *cobra.Command {
 	c.Flags().StringVar(&project, "project", ".", "beacon project root path (must be registered)")
 	c.Flags().StringVar(&feature, "feature", "code2truth-project-intake", "feature slug for the draft package")
 	c.Flags().StringVar(&version, "version", "", "docs version (default: the project's current version)")
-	c.Flags().StringVar(&target, "target", "", "existing codebase root to scan (required)")
+	c.Flags().StringArrayVar(&targets, "target", nil, "existing codebase root to scan (repeat for multi-area intake)")
 	c.Flags().StringVar(&by, "by", "cli", "who runs the intake")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
-	_ = c.MarkFlagRequired("target")
+
 	return c
 }
 

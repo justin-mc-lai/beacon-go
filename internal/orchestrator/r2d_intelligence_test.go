@@ -382,3 +382,103 @@ func writeFixtureFile(t *testing.T, root, rel, body string) {
 		t.Fatal(err)
 	}
 }
+
+func TestCode2TruthClaimsHaveFileRefs(t *testing.T) {
+	env := newTruthEnv(t)
+	target := t.TempDir()
+	writeFixtureFile(t, target, "main.go", "package main\n\nfunc ExportedRun() {}\n")
+	writeFixtureFile(t, target, "api.go", "package main\n\nfunc register() {\n\tmux.HandleFunc(\"GET /orders\", handler)\n}\n\ntype OrderModel struct{}\n")
+	writeFixtureFile(t, target, "flow.go", "package main\n\nvar state = \"draft\"\nvar status = \"frozen\"\n")
+	v, err := env.eng.Code2TruthIntake(env.root, "", "refs-scan", target, "tester")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(v.Claims) == 0 {
+		t.Fatal("claims must not be empty for a source tree")
+	}
+	var hasRoute, hasModel, hasState bool
+	for _, c := range v.Claims {
+		for _, ref := range c.SourceRefs {
+			if !strings.Contains(ref, ":") {
+				t.Fatalf("claim %s ref %q has no file:line", c.ID, ref)
+			}
+		}
+		if strings.Contains(c.Claim, "GET /orders") {
+			hasRoute = true
+		}
+		if strings.Contains(c.Claim, "OrderModel") {
+			hasModel = true
+		}
+		if strings.Contains(c.Claim, "state") || strings.Contains(c.Claim, "status") {
+			hasState = true
+		}
+	}
+	if !hasRoute || !hasModel || !hasState {
+		t.Fatalf("claims missing route/model/state: route=%v model=%v state=%v\n%+v", hasRoute, hasModel, hasState, v.Claims)
+	}
+	if v.TreeMapping != "host_owned" {
+		t.Fatalf("tree mapping = %q, want host_owned", v.TreeMapping)
+	}
+}
+
+func TestCode2TruthEmptyClaimsRefused(t *testing.T) {
+	env := newTruthEnv(t)
+	target := t.TempDir()
+	writeFixtureFile(t, target, "notes.txt", "nothing to see\n")
+	_, err := env.eng.Code2TruthIntake(env.root, "", "empty-scan", target, "tester")
+	if err == nil {
+		t.Fatal("empty claim intake must fail")
+	}
+	if rc, _ := core.ReasonCodeOf(err); rc != core.ReasonCode2TruthClaimsEmpty {
+		t.Fatalf("want code2truth_claims_empty, got %v", err)
+	}
+}
+
+func TestCode2TruthMultiArea(t *testing.T) {
+	env := newTruthEnv(t)
+	a := t.TempDir()
+	b := t.TempDir()
+	writeFixtureFile(t, a, "main.go", "package main\n\nfunc Alpha() {}\n")
+	writeFixtureFile(t, b, "server.py", "@app.get('/beta')\ndef beta():\n    pass\n")
+	v, err := env.eng.Code2TruthIntakeMulti(env.root, "", "areas", []string{a, b}, "tester")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(v.Areas) != 2 || len(v.Regions) != 2 {
+		t.Fatalf("batch = %+v", v)
+	}
+	if v.Regions[0].Slug == v.Regions[1].Slug {
+		t.Fatalf("area slugs collide: %+v", v.Regions)
+	}
+	for _, area := range v.Areas {
+		if len(area.Claims) == 0 || area.TreeMapping != "host_owned" {
+			t.Fatalf("area missing claims/tree mapping: %+v", area)
+		}
+	}
+}
+
+func TestCode2TruthMultiAreaSlugCollision(t *testing.T) {
+	env := newTruthEnv(t)
+	root := t.TempDir()
+	a := filepath.Join(root, "a", "src")
+	b := filepath.Join(root, "b", "src")
+	writeFixtureFile(t, a, "main.go", "package main\n\nfunc Alpha() {}\n")
+	writeFixtureFile(t, b, "main.go", "package main\n\nfunc Beta() {}\n")
+	v, err := env.eng.Code2TruthIntakeMulti(env.root, "", "areas", []string{a, b}, "tester")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(v.Regions) != 2 || v.Regions[0].Slug == v.Regions[1].Slug {
+		t.Fatalf("same-basename areas collided: %+v", v.Regions)
+	}
+
+	nonslug := filepath.Join(root, "区域")
+	writeFixtureFile(t, nonslug, "main.go", "package main\n\nfunc Gamma() {}\n")
+	v, err = env.eng.Code2TruthIntakeMulti(env.root, "", "unicode", []string{nonslug}, "tester")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(v.Regions) != 1 || strings.HasSuffix(v.Regions[0].Slug, "-") {
+		t.Fatalf("non-ascii area slug = %+v", v.Regions)
+	}
+}

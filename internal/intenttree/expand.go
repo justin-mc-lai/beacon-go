@@ -25,12 +25,13 @@ type ProposalChild struct {
 // Provenance is the host/LLM record for one expansion. The kernel
 // stores it; it never calls the model itself.
 type Provenance struct {
-	Model      string  `json:"model,omitempty"`
-	PromptHash string  `json:"prompt_hash,omitempty"`
-	Skill      string  `json:"skill,omitempty"`
-	Tokens     int     `json:"tokens,omitempty"`
-	CostUSD    float64 `json:"cost_usd,omitempty"`
-	By         string  `json:"by,omitempty"`
+	Model      string   `json:"model,omitempty"`
+	PromptHash string   `json:"prompt_hash,omitempty"`
+	Skill      string   `json:"skill,omitempty"`
+	Tokens     int      `json:"tokens,omitempty"`
+	CostUSD    float64  `json:"cost_usd,omitempty"`
+	By         string   `json:"by,omitempty"`
+	Sources    []string `json:"sources,omitempty"`
 }
 
 // Proposal is one expansion request for an existing draft parent.

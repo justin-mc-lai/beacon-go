@@ -22,6 +22,7 @@
 package orchestrator
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -36,6 +37,10 @@ import (
 // EventTruthCode2Truth trails one intake that materialized a
 // draft package.
 const EventTruthCode2Truth = "truth_code2truth"
+
+// code2TruthTreeMapping is the one policy value for the claim-to-tree
+// boundary: the kernel emits evidence; the host owns reasoning/proposals.
+const code2TruthTreeMapping = "host_owned"
 
 // code2truthSkipDirs is code2truth._skip's ignored part set.
 var code2truthSkipDirs = map[string]bool{
@@ -81,7 +86,7 @@ func code2truthFileKind(rel string) string {
 func code2truthEntrypoint(rel string) bool {
 	low := strings.ToLower(rel)
 	switch filepath.Base(low) {
-	case "main.py", "app.py", "cli.py", "__main__.py", "index.ts", "index.js",
+	case "main.go", "main.py", "app.py", "cli.py", "__main__.py", "index.ts", "index.js",
 		"server.ts", "server.js", "skill.md":
 		return true
 	}
@@ -91,29 +96,31 @@ func code2truthEntrypoint(rel string) bool {
 
 // Static extraction patterns (Go extension).
 var (
-	symGoRe     = regexp.MustCompile(`^(?:func|type)\s+([A-Z]\w*)`)
-	symPyRe     = regexp.MustCompile(`^(?:def|class)\s+([A-Za-z_]\w*)`)
-	symTSRe     = regexp.MustCompile(`^export\s+(?:default\s+)?(?:function|class|const|interface|type)\s+([A-Za-z_]\w*)`)
-	routePyRe   = regexp.MustCompile(`@\w+\.(get|post|put|delete|patch|route)\s*\(\s*["']([^"']+)["']`)
-	routeGoRe   = regexp.MustCompile(`\.(GET|POST|PUT|DELETE|PATCH|HandleFunc)\s*\(\s*"([^"]+)"`)
-	routeTSRe   = regexp.MustCompile(`\b(?:app|router)\.(get|post|put|delete|patch)\s*\(\s*["']([^"']+)["']`)
-	modelDeclRe = regexp.MustCompile(`(?i)^(?:type|class)\s+(\w*(?:Model|Schema|Entity|Record|Row))\b`)
+	symGoRe         = regexp.MustCompile(`^(?:func|type)\s+([A-Z]\w*)`)
+	symPyRe         = regexp.MustCompile(`^(?:def|class)\s+([A-Za-z_]\w*)`)
+	symTSRe         = regexp.MustCompile(`^export\s+(?:default\s+)?(?:function|class|const|interface|type)\s+([A-Za-z_]\w*)`)
+	routePyRe       = regexp.MustCompile(`@\w+\.(get|post|put|delete|patch|route)\s*\(\s*["']([^"']+)["']`)
+	routeGoRe       = regexp.MustCompile(`\.(GET|POST|PUT|DELETE|PATCH|HandleFunc)\s*\(\s*"([^"]+)"`)
+	routeTSRe       = regexp.MustCompile(`\b(?:app|router)\.(get|post|put|delete|patch)\s*\(\s*["']([^"']+)["']`)
+	modelDeclRe     = regexp.MustCompile(`(?i)^(?:type|class)\s+(\w*(?:Model|Schema|Entity|Record|Row))\b`)
+	stateEvidenceRe = regexp.MustCompile(`(?i)\b(?:state|status|transition|from|to)\b\s*[:=]`)
 )
 
 // Code2TruthInventory is _collect_source_inventory's payload,
 // plus the Symbols summary (Go extension).
 type Code2TruthInventory struct {
-	Status      string            `json:"status"`
-	Root        string            `json:"root"`
-	FileCount   int               `json:"file_count"`
-	Counts      map[string]int    `json:"counts"`
-	Files       []Code2TruthFile  `json:"files"`
-	EntryPoints []string          `json:"entry_points"`
-	SkillFiles  []string          `json:"skill_files"`
-	TestFiles   []string          `json:"test_files"`
-	DocFiles    []string          `json:"doc_files"`
-	Truncated   bool              `json:"truncated"`
-	Symbols     CodeSymbolSummary `json:"symbols"`
+	Status      string               `json:"status"`
+	Root        string               `json:"root"`
+	FileCount   int                  `json:"file_count"`
+	Counts      map[string]int       `json:"counts"`
+	Files       []Code2TruthFile     `json:"files"`
+	EntryPoints []string             `json:"entry_points"`
+	SkillFiles  []string             `json:"skill_files"`
+	TestFiles   []string             `json:"test_files"`
+	DocFiles    []string             `json:"doc_files"`
+	Truncated   bool                 `json:"truncated"`
+	Symbols     CodeSymbolSummary    `json:"symbols"`
+	Evidence    []Code2TruthEvidence `json:"evidence,omitempty"`
 }
 
 // Code2TruthFile is one inventory row.
@@ -121,6 +128,14 @@ type Code2TruthFile struct {
 	Path       string `json:"path"`
 	Kind       string `json:"kind"`
 	Entrypoint bool   `json:"entrypoint"`
+}
+
+// Code2TruthEvidence is one static source fact with a stable file:line ref.
+type Code2TruthEvidence struct {
+	Kind string `json:"kind"` // entry | symbol | route | model | state
+	Name string `json:"name"`
+	Path string `json:"path"`
+	Line int    `json:"line"`
 }
 
 // CodeSymbolSummary is the static-extraction summary.
@@ -170,6 +185,9 @@ func collectCode2TruthInventory(root string) Code2TruthInventory {
 		inv.Files = append(inv.Files, row)
 		if row.Entrypoint {
 			inv.EntryPoints = append(inv.EntryPoints, rel)
+			if len(inv.Evidence) < 200 {
+				inv.Evidence = append(inv.Evidence, Code2TruthEvidence{Kind: "entry", Name: rel, Path: rel, Line: 1})
+			}
 		}
 		switch kind {
 		case "skill":
@@ -186,36 +204,52 @@ func collectCode2TruthInventory(root string) Code2TruthInventory {
 				continue
 			}
 			ext := strings.ToLower(filepath.Ext(rel))
-			for _, line := range strings.Split(string(raw), "\n") {
+			for lineNo, line := range strings.Split(string(raw), "\n") {
+				n := lineNo + 1
+				addEvidence := func(kind, name string) {
+					if len(inv.Evidence) < 200 {
+						inv.Evidence = append(inv.Evidence, Code2TruthEvidence{Kind: kind, Name: name, Path: rel, Line: n})
+					}
+				}
 				switch ext {
 				case ".go":
 					if m := symGoRe.FindStringSubmatch(line); m != nil {
 						symbolSet[m[1]] = true
+						addEvidence("symbol", m[1])
 					}
 					if m := routeGoRe.FindStringSubmatch(line); m != nil && !routeSeen[m[2]] {
 						routeSeen[m[2]] = true
 						routes = append(routes, m[1]+" "+m[2])
+						addEvidence("route", m[1]+" "+m[2])
 					}
 				case ".py":
 					if m := symPyRe.FindStringSubmatch(line); m != nil {
 						symbolSet[m[1]] = true
+						addEvidence("symbol", m[1])
 					}
 					if m := routePyRe.FindStringSubmatch(line); m != nil && !routeSeen[m[2]] {
 						routeSeen[m[2]] = true
 						routes = append(routes, strings.ToUpper(m[1])+" "+m[2])
+						addEvidence("route", strings.ToUpper(m[1])+" "+m[2])
 					}
 				case ".ts", ".tsx", ".js", ".jsx":
 					if m := symTSRe.FindStringSubmatch(line); m != nil {
 						symbolSet[m[1]] = true
+						addEvidence("symbol", m[1])
 					}
 					if m := routeTSRe.FindStringSubmatch(line); m != nil && !routeSeen[m[2]] {
 						routeSeen[m[2]] = true
 						routes = append(routes, strings.ToUpper(m[1])+" "+m[2])
+						addEvidence("route", strings.ToUpper(m[1])+" "+m[2])
 					}
 				}
 				if m := modelDeclRe.FindStringSubmatch(line); m != nil && !modelSeen[m[1]] {
 					modelSeen[m[1]] = true
 					models = append(models, m[1])
+					addEvidence("model", m[1])
+				}
+				if stateEvidenceRe.MatchString(line) {
+					addEvidence("state", strings.TrimSpace(line))
 				}
 			}
 		}
@@ -264,39 +298,53 @@ type Code2TruthAmbiguity struct {
 // (the provider-artifact CLAIM-004 needs the understand-
 // anything detection, included below).
 func buildCandidateClaims(inv Code2TruthInventory, providerAvailable bool, providerRefs []string) (claims []Code2TruthClaim, ambiguity []Code2TruthAmbiguity) {
-	if len(inv.EntryPoints) > 0 {
+	kindCount := map[string]int{}
+	add := func(kind, claim, confidence, ref string) {
+		kindCount[kind]++
 		claims = append(claims, Code2TruthClaim{
-			ID: "CLAIM-001", Confidence: "medium", Authority: "candidate_only",
-			Claim:      "Project behavior can be reconstructed from detected entry points.",
-			SourceRefs: capStrings(inv.EntryPoints, 10),
+			ID:    "CLAIM-" + strings.ToUpper(kind) + "-" + fmt.Sprintf("%03d", kindCount[kind]),
+			Claim: claim, Confidence: confidence, Authority: "candidate_only",
+			SourceRefs: []string{ref},
+		})
+	}
+	var symbolRefs []string
+	for _, ev := range inv.Evidence {
+		ref := fmt.Sprintf("%s:%d", ev.Path, ev.Line)
+		switch ev.Kind {
+		case "symbol":
+			if len(symbolRefs) < 10 {
+				symbolRefs = append(symbolRefs, ref)
+			}
+		case "entry":
+			add("entry", "Entry point detected: "+ev.Name, "high", ref)
+		case "route":
+			add("route", "HTTP route candidate: "+ev.Name, "medium", ref)
+		case "model":
+			add("model", "Data model candidate: "+ev.Name, "medium", ref)
+		case "state":
+			add("state", "State/transition candidate: "+ev.Name, "low", ref)
+		}
+	}
+	if len(symbolRefs) > 0 {
+		claims = append(claims, Code2TruthClaim{
+			ID: "CLAIM-SYMBOL-001", Claim: "Exported symbols provide candidate boundaries for behavior reconstruction.",
+			Confidence: "low", Authority: "candidate_only", SourceRefs: symbolRefs,
 		})
 	}
 	if len(inv.SkillFiles) > 0 {
-		claims = append(claims, Code2TruthClaim{
-			ID: "CLAIM-002", Confidence: "high", Authority: "candidate_only",
-			Claim:      "Skill files provide strong workflow evidence for candidate truth reconstruction.",
-			SourceRefs: capStrings(inv.SkillFiles, 10),
-		})
+		ref := inv.SkillFiles[0] + ":1"
+		add("skill", "Skill files provide strong workflow evidence for candidate truth reconstruction.", "high", ref)
 	}
 	if len(inv.TestFiles) > 0 {
-		claims = append(claims, Code2TruthClaim{
-			ID: "CLAIM-003", Confidence: "medium", Authority: "candidate_only",
-			Claim:      "Existing tests can be used as behavior evidence for coverage reconstruction.",
-			SourceRefs: capStrings(inv.TestFiles, 10),
-		})
+		ref := inv.TestFiles[0] + ":1"
+		add("test", "Existing tests can be used as behavior evidence for coverage reconstruction.", "medium", ref)
 	}
-	if providerAvailable {
-		claims = append(claims, Code2TruthClaim{
-			ID: "CLAIM-004", Confidence: "medium", Authority: "candidate_only",
-			Claim:      "Understand-Anything artifacts can enrich source graph navigation.",
-			SourceRefs: providerRefs,
-		})
-	}
-	if len(claims) == 0 {
-		ambiguity = append(ambiguity, Code2TruthAmbiguity{
-			ID: "AMB-001", Reason: "No strong source evidence was detected.",
-			Route: "Ask user for feature scope or run provider analysis before promotion.",
-		})
+	if providerAvailable && len(providerRefs) > 0 {
+		ref := providerRefs[0]
+		if !strings.Contains(ref, ":") {
+			ref += ":1"
+		}
+		add("provider", "Understand-Anything artifacts can enrich source graph navigation.", "medium", ref)
 	}
 	if len(inv.TestFiles) == 0 {
 		ambiguity = append(ambiguity, Code2TruthAmbiguity{
@@ -341,6 +389,23 @@ type Code2TruthView struct {
 	IntakeJSON     string                `json:"intake_json_path"`
 	IntakeMarkdown string                `json:"intake_markdown_path"`
 	PackageCreated bool                  `json:"package_created"`
+	TreeMapping    string                `json:"tree_mapping"`
+}
+
+// Code2TruthRegion is one area in a multi-area intake.
+type Code2TruthRegion struct {
+	Area   string `json:"area"`
+	Target string `json:"target"`
+	Slug   string `json:"slug"`
+	Files  int    `json:"files"`
+	Claims int    `json:"claims"`
+}
+
+// Code2TruthBatchView is the result of a multi-area intake.
+type Code2TruthBatchView struct {
+	BaseFeature string             `json:"base_feature"`
+	Areas       []Code2TruthView   `json:"areas"`
+	Regions     []Code2TruthRegion `json:"regions"`
 }
 
 // Code2TruthIntake runs one intake: scan the target, persist
@@ -361,8 +426,9 @@ func (e *Engine) Code2TruthIntake(projectRoot, version, slug, targetRoot, by str
 	inv := collectCode2TruthInventory(targetAbs)
 	providerAvailable, providerRefs := detectUnderstandAnything(targetAbs)
 	claims, ambiguity := buildCandidateClaims(inv, providerAvailable, providerRefs)
-	if claims == nil {
-		claims = []Code2TruthClaim{}
+	if len(claims) == 0 {
+		return Code2TruthView{}, core.NewError(core.ReasonCode2TruthClaimsEmpty, "truth.Code2Truth",
+			"intake produced no reviewable claim; empty claim tables are an intake failure")
 	}
 	if ambiguity == nil {
 		ambiguity = []Code2TruthAmbiguity{}
@@ -375,6 +441,7 @@ func (e *Engine) Code2TruthIntake(projectRoot, version, slug, targetRoot, by str
 		"status": "candidate", "feature": slug,
 		"target_project_root": targetAbs, "generated_at": nowISO(),
 		"authority": "support_evidence_only", "truth_authority": false,
+		"tree_mapping":      code2TruthTreeMapping,
 		"formal_truth_rule": "code can propose candidate truth; user-confirmed Beacon package Markdown is formal truth",
 		"source_inventory":  inv,
 		"candidate_truth": map[string]any{
@@ -423,13 +490,70 @@ func (e *Engine) Code2TruthIntake(projectRoot, version, slug, targetRoot, by str
 		Inventory: inv, Claims: claims, Ambiguity: ambiguity,
 		IntakeJSON:     ".beacon/code2truth/" + slug + "/intake.json",
 		IntakeMarkdown: ".beacon/code2truth/" + slug + "/intake.md",
-		PackageCreated: true,
+		PackageCreated: true, TreeMapping: code2TruthTreeMapping,
 	}, nil
+}
+
+// Code2TruthIntakeMulti runs one intake per target area. Each area gets
+// its own candidate package and the batch returns a region inventory.
+func (e *Engine) Code2TruthIntakeMulti(projectRoot, version, baseSlug string, targets []string, by string) (Code2TruthBatchView, error) {
+	if len(targets) == 0 {
+		return Code2TruthBatchView{}, core.NewError(core.ReasonCode2TruthTargetMissing, "truth.Code2TruthMulti", "at least one target is required")
+	}
+	out := Code2TruthBatchView{BaseFeature: baseSlug}
+	for _, target := range targets {
+		abs, err := filepath.Abs(target)
+		if err != nil {
+			return Code2TruthBatchView{}, err
+		}
+		area := filepath.Base(abs)
+		if area == "." || area == string(filepath.Separator) || area == "" {
+			area = "root"
+		}
+		areaSlug := code2truthSlug(area)
+		if areaSlug == "" {
+			areaSlug = "area"
+		}
+		h := sha256.Sum256([]byte(abs + "#" + fmt.Sprint(len(out.Regions))))
+		slug := fmt.Sprintf("%s-%s-%x", baseSlug, areaSlug, h[:4])
+		view, err := e.Code2TruthIntake(projectRoot, version, slug, target, by)
+		if err != nil {
+			if rc, _ := core.ReasonCodeOf(err); rc == core.ReasonCode2TruthClaimsEmpty {
+				return Code2TruthBatchView{}, core.NewError(core.ReasonCode2TruthClaimsEmpty, "truth.Code2TruthMulti",
+					"area "+area+" ("+target+"): "+err.Error())
+			}
+			return Code2TruthBatchView{}, err
+		}
+		out.Areas = append(out.Areas, view)
+		out.Regions = append(out.Regions, Code2TruthRegion{
+			Area: area, Target: abs, Slug: slug,
+			Files: view.Inventory.FileCount, Claims: len(view.Claims),
+		})
+	}
+	return out, nil
+}
+
+func code2truthSlug(s string) string {
+	s = strings.ToLower(strings.TrimSpace(s))
+	var b strings.Builder
+	lastDash := false
+	for _, r := range s {
+		ok := (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9')
+		if ok {
+			b.WriteRune(r)
+			lastDash = false
+		} else if !lastDash {
+			b.WriteByte('-')
+			lastDash = true
+		}
+	}
+	return strings.Trim(b.String(), "-")
 }
 
 func renderCode2TruthSection(target string, inv Code2TruthInventory, claims []Code2TruthClaim, ambiguity []Code2TruthAmbiguity) string {
 	var b strings.Builder
 	b.WriteString("**反推草稿待人确认**：本节由 `beacon truth code2truth` 从存量代码静态提取生成，权威级别 candidate_only（只是候选，不是正式真相）。\n")
+	b.WriteString("tree_mapping: `" + code2TruthTreeMapping + "`（claim 到 intent/module/feature 的推理与 `plan expand/apply` proposal 由宿主完成，内核只产出可核对事实）。\n")
 	b.WriteString("正式真相仍以人确认后的本文为准；冻结照常走意图门（签字、问题清零、覆盖矩阵），反推内容不豁免任何一道门。\n\n")
 	fmt.Fprintf(&b, "- target: `%s`\n", target)
 	fmt.Fprintf(&b, "- files_scanned: `%d`（source %d / test %d / doc %d / skill %d）\n",
@@ -454,7 +578,8 @@ func renderCode2TruthMarkdown(slug, target string, inv Code2TruthInventory, clai
 	var b strings.Builder
 	fmt.Fprintf(&b, "# Code2Truth Intake: %s\n\n", slug)
 	fmt.Fprintf(&b, "- target_project: `%s`\n", target)
-	b.WriteString("- authority: `support_evidence_only`\n\n")
+	b.WriteString("- authority: `support_evidence_only`\n")
+	b.WriteString("- tree_mapping: `" + code2TruthTreeMapping + "` (claims -> intent/module/feature is host reasoning; kernel emits evidence)\n\n")
 	b.WriteString("## Boundary\n\nCode and provider graphs can propose candidate truth. User-confirmed Beacon package Markdown is formal truth.\n\n")
 	b.WriteString("## Source Inventory\n\n")
 	fmt.Fprintf(&b, "- files_scanned: `%d`\n- source_files: `%d`\n- skill_files: `%d`\n- test_files: `%d`\n- doc_files: `%d`\n\n",

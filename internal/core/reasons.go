@@ -754,6 +754,7 @@ const (
 	ReasonDecomposeFrozen           = "decompose_frozen_package"   // NEW (R2d): decomposition materializes files; a frozen body is never rewritten by it
 	ReasonDecomposeNoIntents        = "decompose_no_intents"       // NEW (R2d): the utterance produced no clause of substance
 	ReasonCode2TruthTargetMissing   = "code2truth_target_missing"  // NEW (R2d): the intake target directory does not exist
+	ReasonCode2TruthClaimsEmpty     = "code2truth_claims_empty"    // #43: a scan with no reviewable claim is an intake failure
 	ReasonTruthReopenNotFrozen      = "truth_reopen_not_frozen"    // NEW (R2d): reopen opens a new revision of a frozen/active package; a draft is simply edited
 )
 

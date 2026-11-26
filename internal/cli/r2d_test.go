@@ -158,3 +158,31 @@ func TestTruthR2dFacesCLI(t *testing.T) {
 		t.Fatalf("reopen doc = %s", out)
 	}
 }
+
+func TestCode2TruthCLIMultiAreaAndEmptyClaims(t *testing.T) {
+	proj := treeTestEnv(t)
+	a := t.TempDir()
+	b := t.TempDir()
+	if err := os.WriteFile(filepath.Join(a, "main.go"), []byte("package main\n\nfunc Alpha() {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(b, "server.py"), []byte("@app.get('/beta')\ndef beta():\n    pass\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	out := mustRun(t, "truth", "code2truth", "--project", proj, "--feature", "areas",
+		"--target", a, "--target", b, "--json")
+	doc := parseDoc(t, out)
+	if len(doc["areas"].([]any)) != 2 || len(doc["regions"].([]any)) != 2 {
+		t.Fatalf("multi-area doc: %s", out)
+	}
+
+	empty := t.TempDir()
+	if err := os.WriteFile(filepath.Join(empty, "notes.txt"), []byte("nothing\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	_, err := runCLI(t, "truth", "code2truth", "--project", proj, "--feature", "empty",
+		"--target", empty, "--json")
+	if err == nil || !strings.Contains(err.Error(), "code2truth_claims_empty") {
+		t.Fatalf("empty claim intake must fail: %v", err)
+	}
+}
