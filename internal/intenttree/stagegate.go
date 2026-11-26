@@ -50,7 +50,7 @@ func StageGate(dir, stage, featureSlug string) (bool, string, error) {
 			return false, "tree_feature_not_frozen", nil
 		}
 	case "implement":
-		if feature.Status != StatusFrozen && feature.Status != StatusImplemented && feature.Status != StatusVerified {
+		if feature.Status != StatusFrozen && feature.Status != StatusImplemented && feature.Status != StatusVerified && feature.Status != StatusDelivered {
 			return false, "tree_feature_not_frozen", nil
 		}
 		for _, l := range leaves {
@@ -60,13 +60,13 @@ func StageGate(dir, stage, featureSlug string) (bool, string, error) {
 		}
 	case "qa":
 		for _, l := range leaves {
-			if l.Status != StatusVerified {
+			if l.Status != StatusVerified && l.Status != StatusDelivered {
 				return false, "tree_leaf_not_verified", nil
 			}
 		}
 	case "release":
 		root, ok := findEntry(idx, idx.RootID)
-		if !ok || root.Status != StatusVerified {
+		if !ok || (root.Status != StatusVerified && root.Status != StatusDelivered) {
 			return false, "tree_root_not_verified", nil
 		}
 	}

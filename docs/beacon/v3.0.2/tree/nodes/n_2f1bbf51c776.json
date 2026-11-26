@@ -5,7 +5,7 @@
   "intent": "需求包从提问、确认、冻结、变更到重冻与重开的生命周期。",
   "parent_id": "n_244f402ca9c7",
   "path": "root/truth-kernel/package-lifecycle",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "pl-1",
@@ -73,8 +73,8 @@
     ]
   },
   "child_fingerprints": [
-    "3a50ea1bd1d94f0148e6a6ec0d7afd6cc3e3f1fecbb9bf1b1c1a2836756da84e"
+    "78b0c84d55ddf7931ed46659f93ea97702ae398b44bcc2551746ff6944eacf95"
   ],
-  "fingerprint": "44a743eaa0e81dc55fa7c4b016d9a1f383e92c4663e59b49b8a2ca9bee3ecc4a",
+  "fingerprint": "d7e0822cef4668cb820565072e63cb4d5a5762b643cc30c1c1a684d90c04f0fb",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -5,7 +5,7 @@
   "intent": "用户命令面与依赖门禁",
   "parent_id": "nroot_98a9c77a9519",
   "path": "root/cli-surface",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "cs-1",
@@ -21,12 +21,12 @@
     }
   ],
   "child_fingerprints": [
-    "f093d06d9373f53102be5b59d84314b6c20e2a50e308d147ae2bf29a0f1ab57c",
-    "b35160ea68a76fff2dbb043ec731c2e0994a1c80ece4f99c71b5f0a4d64c753a",
-    "27bab22a84f3af8d67f06c2a4fe0d5c6c7169157159a5ef8371c7c72c4e90d87",
-    "74a628f69df0917c7640de78741c6ea56646cae02c957ca7939bc70b285bfd84",
-    "5925466240beb8eb6591fb8325ab2e6051b4f8d00c0af6d91bf3b009089774b6"
+    "6d000d1854b45438fe51a21c963118514df722a6918e9c735e07949a27bdf76c",
+    "58f0e0a5890416dceb194da9c2b939f673a4a5aa3c1d8fb9fbe9c9ac5d6cd9e3",
+    "765ffd077d3f1363fdb114710158b92bd208d51519bf776eff1680e05141d9f4",
+    "e11d731bff1682cab69044069297108662ed965352dea8a869547e46971925de",
+    "c8e1f394e2a286a51c978e82c922012e47e819250c6c6687605e044ac1b09120"
   ],
-  "fingerprint": "c53ff67da4fba52ca796559211edf4dbf6667be754a6d4973f1dea6ec07abc9a",
+  "fingerprint": "01192ce1e574e1838ba11479dd8b310a61814926c7b8786cc5c6a1d11b53a196",
   "fingerprint_alg": "tree-json-v1"
 }

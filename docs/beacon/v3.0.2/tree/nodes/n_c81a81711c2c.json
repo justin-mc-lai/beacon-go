@@ -5,7 +5,7 @@
   "intent": "树视图必须稳定、可读、可派生",
   "parent_id": "n_a8b3e6af8664",
   "path": "root/cli-surface/plan-surface/tree-render",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "render-1",
@@ -25,6 +25,19 @@
     "type": "test",
     "spec": "当渲染 md/html 时返回稳定文件与源 hash"
   },
-  "fingerprint": "afe5f22050d26f811e08e28ec679b62e432b434d93ca76f77bcf9acdf7f185ce",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_c81a81711c2c.txt",
+    "artifact_hash": "a4b4f88a39ad364859ed98dceefa7e146925cdb93a1f01507edb48a507d74aa3",
+    "at": "2026-11-26T03:06:53.067656Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_6569e5d4a1c79e075c72dc15",
+    "content_hash": "a4b4f88a39ad364859ed98dceefa7e146925cdb93a1f01507edb48a507d74aa3",
+    "by": "self-audit",
+    "at": "2026-11-26T03:06:53.080402Z"
+  },
+  "fingerprint": "e108a1cb3768fd4f4cd9e9b96e6b0a4b55c3a75c6af40f9f7c4b7a471e019487",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -5,7 +5,7 @@
   "intent": "执行完成必须留下可复查 artifact，不能口头完成",
   "parent_id": "n_7c5c1cfc7372",
   "path": "root/cli-surface/implement-surface/report-artifact",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "report-1",
@@ -25,6 +25,19 @@
     "type": "test",
     "spec": "当 report 成功时节点变 implemented 并记录 artifact hash；非 frozen 叶子被拒绝"
   },
-  "fingerprint": "89b1ee5251b0c7cdb24b60fe98d3f892994a050b554ff8084178d7cb1ad0228b",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_fb244a5894d7.txt",
+    "artifact_hash": "8cf545a670696558c92b6343a91cb2fdafcc02aa8864ada1f91420bf8fe08dca",
+    "at": "2026-11-26T03:06:47.529758Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_b177ce2da63a04faaccedea5",
+    "content_hash": "8cf545a670696558c92b6343a91cb2fdafcc02aa8864ada1f91420bf8fe08dca",
+    "by": "self-audit",
+    "at": "2026-11-26T03:06:47.54425Z"
+  },
+  "fingerprint": "6b0593bffb3dedeada45d6401735aa3980a24ab80d5819b7efc11e5a881f52a7",
   "fingerprint_alg": "tree-json-v1"
 }

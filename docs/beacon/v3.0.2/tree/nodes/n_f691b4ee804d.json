@@ -5,7 +5,7 @@
   "intent": "父级只在子全 verified 后 verified",
   "parent_id": "n_820af49910f0",
   "path": "root/verification/rollup-audit/parent-rollup",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "n_f691b4ee804d-1",
@@ -36,6 +36,19 @@
     "type": "test",
     "spec": "当子节点未 verified 时，verify rollup 返回 tree_parent_not_verified"
   },
-  "fingerprint": "3c2953df4dc0ea22adc6f4cca3e1d6ea63e238ee911d7d8725b12b5bc26a8f74",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_f691b4ee804d.txt",
+    "artifact_hash": "96ba7b52107f6ce2ac615ab3956aca785d3fcc6a709a3066bf49c3966ffdee05",
+    "at": "2026-11-26T03:07:24.605477Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_310a371176f462f463fda5ae",
+    "content_hash": "96ba7b52107f6ce2ac615ab3956aca785d3fcc6a709a3066bf49c3966ffdee05",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:24.620308Z"
+  },
+  "fingerprint": "88c2c1bc9aa94e4f1c975c47cc209dd387805220a369df402200f698eb448800",
   "fingerprint_alg": "tree-json-v1"
 }

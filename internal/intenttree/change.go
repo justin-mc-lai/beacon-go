@@ -39,7 +39,7 @@ func RequestChange(st *store.Store, dir, versionID, nodeID, summary, by, base st
 		return ChangeRecord{}, core.NewError(ReasonNodeNotFound, "intenttree.RequestChange", "node not found: "+nodeID)
 	}
 	switch target.Status {
-	case StatusFrozen, StatusImplemented, StatusVerified:
+	case StatusFrozen, StatusImplemented, StatusVerified, StatusDelivered:
 	default:
 		return ChangeRecord{}, core.NewError(ReasonChangeNotAllowed, "intenttree.RequestChange",
 			"change requires frozen truth; "+nodeID+" is "+string(target.Status))

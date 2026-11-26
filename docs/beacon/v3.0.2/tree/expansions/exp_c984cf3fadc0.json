@@ -1,0 +1,54 @@
+{
+  "at": "2026-11-26T03:05:01.067772Z",
+  "children": [
+    {
+      "id": "n_c60d441b66cc",
+      "kind": "touchpoint",
+      "title": "deliver terminal",
+      "intent": "交付必须是验证后的显式动作",
+      "parent_id": "n_8bb5a36f0ff5",
+      "path": "root/verification/delivery/deliver-terminal",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "deliver-1",
+          "text": "verified 节点 deliver 后状态为 delivered。"
+        },
+        {
+          "id": "deliver-2",
+          "text": "未 verified 节点或未验证子节点不能 deliver。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "deliver-tc1",
+          "ac_id": "deliver-1",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestTruthNodeDeliverRequiresVerifiedChildren -count=1",
+          "status": "existing"
+        },
+        {
+          "id": "deliver-tc2",
+          "ac_id": "deliver-2",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestTruthNodeDeliverRequiresVerifiedChildren -count=1",
+          "status": "existing"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当 deliver 未验证节点时拒绝；当 children 已验证时父节点 delivered"
+      },
+      "fingerprint": "163a59c204bf4671e4a4fcdc582f7d20cd9ad6390169e1b931fafa6532809f2c",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_8bb5a36f0ff5",
+  "provenance": {
+    "by": "beacon-self-audit",
+    "sources": [
+      "user P2 decision 2026-11-26",
+      "internal/intenttree/deliver.go"
+    ]
+  }
+}

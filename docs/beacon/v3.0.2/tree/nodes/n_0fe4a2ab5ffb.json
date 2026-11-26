@@ -5,7 +5,7 @@
   "intent": "项目注册与版本线是需求真相的稳定作用域",
   "parent_id": "n_65c89b949e6f",
   "path": "root/data-migration/projects-version",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "projects-1",
@@ -17,9 +17,9 @@
     }
   ],
   "child_fingerprints": [
-    "111a64c70a33876b196bfe6a1b357ce2bae35e44cce264240b2963191a6ff4cc",
-    "4475bf40c8119327b947e2b8f7c65e62fe102ad580af48d2ea811db188e92745"
+    "1b7225c0893dd2f49711e2578efb0ab9ffe574c81668b51d68aba0d6391f06bf",
+    "36dfcc980ed9d4d81134be445331b68744bf0424a811b54ded202020a3f4669a"
   ],
-  "fingerprint": "41b13d43c280a1f2d4e11dc750cd0bf67a10d5b6b4515e578495328424bb48b7",
+  "fingerprint": "e186940b2fae80db3c172b83aec40ec3ac27e48af5f3312c5aad9ff6fbe546df",
   "fingerprint_alg": "tree-json-v1"
 }

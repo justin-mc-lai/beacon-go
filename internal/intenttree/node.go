@@ -80,6 +80,7 @@ const (
 	StatusFrozen        Status = "frozen"
 	StatusImplemented   Status = "implemented"
 	StatusVerified      Status = "verified"
+	StatusDelivered     Status = "delivered"
 	StatusChangePending Status = "change_pending"
 	StatusDeprecated    Status = "deprecated"
 )

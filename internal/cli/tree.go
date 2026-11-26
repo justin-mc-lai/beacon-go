@@ -359,7 +359,7 @@ func newDoctorRebuildTreeCmd() *cobra.Command {
 // covered, and where the readable view is. Machine data stays behind --json.
 func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[string]intenttree.Node, dir, projRoot string) error {
 	var modules, features, leaves, acs, fsm, planned, existing, linked, mismatch int
-	var draft, frozen, implemented, verified, changePending, deprecated int
+	var draft, frozen, implemented, verified, delivered, changePending, deprecated int
 	var unlinked []string
 	for _, e := range idx.Nodes {
 		switch e.Kind {
@@ -379,6 +379,8 @@ func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[strin
 			implemented++
 		case intenttree.StatusVerified:
 			verified++
+		case intenttree.StatusDelivered:
+			delivered++
 		case intenttree.StatusChangePending:
 			changePending++
 		case intenttree.StatusDeprecated:
@@ -416,7 +418,7 @@ func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[strin
 		fmt.Fprintf(out, "%s\n\n", root.Intent)
 	}
 	fmt.Fprintf(out, "%d 模块 · %d 功能 · %d 触达点 · %d 条 AC · %d 个状态机\n", modules, features, leaves, acs, fsm)
-	fmt.Fprintf(out, "状态：草稿 %d · 冻结 %d · 已交付/实现 %d · 已验证 %d · 变更中 %d · 废弃 %d\n", draft, frozen, implemented, verified, changePending, deprecated)
+	fmt.Fprintf(out, "状态：草稿 %d · 冻结 %d · 已交付/实现 %d · 已验证 %d · 已交付 %d · 变更中 %d · 废弃 %d\n", draft, frozen, implemented, verified, delivered, changePending, deprecated)
 	fmt.Fprintf(out, "测试：%d 已绑定 · %d 计划中；已验证节点 %d/%d\n", existing, planned, verified, len(idx.Nodes))
 	fmt.Fprintf(out, "legacy 包链（可选）：%d/%d 个功能节点已 link，状态不一致 %d\n", linked, features, mismatch)
 	if len(unlinked) > 0 {

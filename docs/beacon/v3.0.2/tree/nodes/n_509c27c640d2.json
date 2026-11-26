@@ -5,7 +5,7 @@
   "intent": "受保护路径写入必须显式批准，默认拒绝。",
   "parent_id": "n_b635840fe744",
   "path": "root/security-boundary/protected-paths",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "pp-1",
@@ -21,8 +21,8 @@
     }
   ],
   "child_fingerprints": [
-    "eabc5186d6c7293480d48a4292f48f6462f8d3f303538e1efef7bb24ea77f574"
+    "85ab0c4dfb2b6155165861538dc71a537c30b6036dea99062bf1153ccb9ead96"
   ],
-  "fingerprint": "26ab1107f54d79ffffe9fb101500491b9df1d8d5cc5222d740ec6bbef0b3ba91",
+  "fingerprint": "04f1e8aaf1ef39d3628aeb238b46ce379e895447283521d006c7bc550b1d2a05",
   "fingerprint_alg": "tree-json-v1"
 }

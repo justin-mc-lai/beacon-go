@@ -1,0 +1,15 @@
+{
+  "id": "chg_fbeb63054563",
+  "node_id": "n_eedd1f82a0f6",
+  "summary": "P1 replace planned refs with real tests",
+  "by": "beacon-self-audit",
+  "base_fingerprint": "e14246f81e6dd57628ba3b5c4b2a350195906a8f11cfae7762d5ee6dbf25f21f",
+  "affected": [
+    "n_03cce053c26f",
+    "n_2980cc742489",
+    "n_9ca42580d7b4",
+    "n_e32e3c830868",
+    "n_eedd1f82a0f6"
+  ],
+  "created_at": "2026-11-26T03:06:07.5311Z"
+}

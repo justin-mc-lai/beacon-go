@@ -5,7 +5,7 @@
   "intent": "用自身能力验证自身",
   "parent_id": "nroot_98a9c77a9519",
   "path": "root/self-host",
-  "status": "frozen",
+  "status": "change_pending",
   "acs": [
     {
       "id": "sh-1",
@@ -26,6 +26,6 @@
     "028d1350a599e8ab070d8a553ae1338ffda1bbaa1f22d74c57e97783eae65149",
     "9665c635389fd0a87b9caa43ac97c101d2852876351de313e0714d6760decb8b"
   ],
-  "fingerprint": "24cb5343dd4359098d5d11804e3361c56d5e1252b99df93e3d0732ef6feacf38",
+  "fingerprint": "b21f000b3434b63fd042e2fe7ad4e0ebcf5d13de4f48d1db48077f283fcbddba",
   "fingerprint_alg": "tree-json-v1"
 }

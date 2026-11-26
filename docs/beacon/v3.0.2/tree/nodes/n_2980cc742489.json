@@ -5,7 +5,7 @@
   "intent": "创建 run 后 tick 推进一个阶段。",
   "parent_id": "n_eedd1f82a0f6",
   "path": "root/goal-orchestration/run-lifecycle/run-create-tick",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "rc-1",
@@ -18,24 +18,37 @@
   ],
   "test_cases": [
     {
-      "id": "rc-tc1",
+      "id": "n_2980cc742489-tc1",
       "ac_id": "rc-1",
       "kind": "unit",
-      "ref": "go test ./internal/orchestrator -run TestManualExecutorRunAdvancesViaTick",
-      "status": "planned"
+      "ref": "go test ./internal/orchestrator -run TestCreateRunStageOrder -count=1",
+      "status": "existing"
     },
     {
-      "id": "rc-tc2",
+      "id": "n_2980cc742489-tc2",
       "ac_id": "rc-2",
       "kind": "unit",
-      "ref": "go test ./internal/orchestrator -run TestTickWithoutExecutorBlocks",
-      "status": "planned"
+      "ref": "go test ./internal/orchestrator -run TestManualExecutorRunAdvancesViaTick -count=1",
+      "status": "existing"
     }
   ],
   "verification": {
     "type": "test",
     "spec": "创建 run 并 tick，阶段序号加一；无执行者时状态 blocked。"
   },
-  "fingerprint": "ecb0b185b27e412d43f36b763467be9073115b9f9dfda993f80396064a1d7e81",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_2980cc742489.txt",
+    "artifact_hash": "7c2026f6f088ecab4da7eff5ad16e355943f6fc6338c59fc79173c1a57e5a01e",
+    "at": "2026-11-26T03:07:02.292847Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_ea5558cae95c93939cc67590",
+    "content_hash": "7c2026f6f088ecab4da7eff5ad16e355943f6fc6338c59fc79173c1a57e5a01e",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:02.310732Z"
+  },
+  "fingerprint": "e9411eccba470a6933b5387207e774ec3392ddc8e46bd94b6cd6702afa49dec4",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -5,7 +5,7 @@
   "intent": "需求真相的存储、冻结与变更",
   "parent_id": "nroot_98a9c77a9519",
   "path": "root/truth-kernel",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "tk-1",
@@ -21,11 +21,11 @@
     }
   ],
   "child_fingerprints": [
-    "4cc334fe0fb2b43c678d4ddd49b217cebf6a9bf0ca3669dca82dc4108d28c7d7",
-    "b49353c996bd8d361ded1c821097585fb334a85bdd69258770346e68aedc2d2b",
-    "44a743eaa0e81dc55fa7c4b016d9a1f383e92c4663e59b49b8a2ca9bee3ecc4a",
-    "c2bd9cc6cf38576f3a12766d1aad5d9e6fa99b0a5e910cdb3f028962b9102718"
+    "16aa45833a8d4e74913cbcd7eeaf96b8767271de61e78f2d42de89a092158010",
+    "814ae0a52307e4c1fba31d3c7dbbffb45087f1452b192e7a3a0377c75a56859e",
+    "d7e0822cef4668cb820565072e63cb4d5a5762b643cc30c1c1a684d90c04f0fb",
+    "10f8032360007ab3b0f411ff6c1350df2ec73610b5b1ff47c7ea8fa269908c47"
   ],
-  "fingerprint": "1228caee415f4377b6c36b37428498bfd658be7abf57840ff3080b0aa4f10692",
+  "fingerprint": "159ff620b86500e7bdbe6120d2e68ba29e456f24587862af7ad6a37d775e26a3",
   "fingerprint_alg": "tree-json-v1"
 }

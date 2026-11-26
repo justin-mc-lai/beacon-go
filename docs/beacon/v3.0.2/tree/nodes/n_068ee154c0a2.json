@@ -5,7 +5,7 @@
   "intent": "七命令组",
   "parent_id": "n_8b83bfc9403d",
   "path": "root/cli-surface/seven-groups",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "7g-1",
@@ -21,9 +21,9 @@
     }
   ],
   "child_fingerprints": [
-    "aa4a0c8bd58584b47a6a1d9830951027b5d62b9d1ab3f2ba19686856433db6b9",
-    "fb4a0ec9630cb4c13b2dbc2860dbd6d8d52a5e4fc5b32e6609efdea0e79fe021"
+    "5f45597090491c635ac462a93a2b48ea240abddc3d5f1a023cb08e8296af5692",
+    "2a4655e41e7f809f918db20f6f2e54b7bfc0ccb062b77c81c61bccce64f46b99"
   ],
-  "fingerprint": "5925466240beb8eb6591fb8325ab2e6051b4f8d00c0af6d91bf3b009089774b6",
+  "fingerprint": "c8e1f394e2a286a51c978e82c922012e47e819250c6c6687605e044ac1b09120",
   "fingerprint_alg": "tree-json-v1"
 }

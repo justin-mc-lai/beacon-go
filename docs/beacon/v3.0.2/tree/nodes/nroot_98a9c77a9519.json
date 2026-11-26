@@ -4,7 +4,7 @@
   "title": "beacon-go",
   "intent": "让宿主 agent 用一棵可冻结的意图树驱动需求真相、实现、验证与发布",
   "path": "root",
-  "status": "frozen",
+  "status": "change_pending",
   "acs": [
     {
       "id": "root-1",
@@ -28,6 +28,6 @@
     "1228caee415f4377b6c36b37428498bfd658be7abf57840ff3080b0aa4f10692",
     "8b702055da312519ca08259e2af2993ff65de0c91ffcd5c21847d3fb0c673d62"
   ],
-  "fingerprint": "0cf4269343cea6b625fc243ec4491d79d1319d65c1057bc745bfd4b1ba914589",
+  "fingerprint": "257d96131a8706bbe9349f3580397d178e05327e109a18a5e934da0595977939",
   "fingerprint_alg": "tree-json-v1"
 }

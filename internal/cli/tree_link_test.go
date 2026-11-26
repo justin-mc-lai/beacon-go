@@ -275,3 +275,46 @@ func TestTreeSummaryShowsStatusCounts(t *testing.T) {
 		t.Fatalf("status counts missing or wrong: %s", out)
 	}
 }
+
+func TestGoalRunAdoptsTreeFeatureWithoutPackage(t *testing.T) {
+	proj := treeTestEnv(t)
+	fid, _ := seedFeatureNode(t, proj, "tree-only-feature", "tree-only-feature")
+	mustRun(t, "truth", "node", "freeze", "--project", proj, "--node", fid, "--json")
+	out := mustRun(t, "goal", "run", "--project", proj, "--feature", "tree-only-feature", "--json")
+	run := parseDoc(t, out)
+	if run["run_id"] == "" || run["feature_slug"] != "tree-only-feature" {
+		t.Fatalf("goal run did not adopt tree feature: %s", out)
+	}
+	truthPath := filepath.Join(proj, "docs", "beacon", "v0.1.0", "features", "tree-only-feature", "truth.md")
+	raw, err := os.ReadFile(truthPath)
+	if err != nil {
+		t.Fatalf("derived truth.md missing: %v", err)
+	}
+	if !strings.Contains(string(raw), "source: tree") || !strings.Contains(string(raw), "tree_node_id: "+fid) {
+		t.Fatalf("derived package lacks tree provenance: %s", raw)
+	}
+}
+
+func TestTruthNodeDeliverRequiresVerifiedChildren(t *testing.T) {
+	proj := treeTestEnv(t)
+	seedFreezeTree(t, proj, false)
+	for _, id := range []string{"t1", "t2", "f"} {
+		mustRun(t, "truth", "node", "freeze", "--project", proj, "--node", id, "--json")
+	}
+	if _, err := runCLI(t, "truth", "node", "deliver", "--project", proj, "--node", "f", "--by", "qa"); err == nil {
+		t.Fatal("delivery before verification must fail")
+	}
+	artifact := filepath.Join(t.TempDir(), "proof.txt")
+	if err := os.WriteFile(artifact, []byte("verified\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, id := range []string{"t1", "t2"} {
+		mustRun(t, "implement", "report", "--project", proj, "--node", id, "--by", "dev", "--artifact", artifact, "--json")
+		mustRun(t, "verify", "leaf", "--project", proj, "--node", id, "--by", "qa", "--artifact", artifact, "--json")
+	}
+	mustRun(t, "verify", "rollup", "--project", proj, "--node", "f", "--json")
+	out := mustRun(t, "truth", "node", "deliver", "--project", proj, "--node", "f", "--by", "qa", "--json")
+	if parseDoc(t, out)["status"] != "delivered" {
+		t.Fatalf("deliver output: %s", out)
+	}
+}

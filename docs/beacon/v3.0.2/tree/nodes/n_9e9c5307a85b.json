@@ -5,7 +5,7 @@
   "intent": "所有写入口留下可回放回执。",
   "parent_id": "n_b635840fe744",
   "path": "root/security-boundary/write-audit",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "wa-1",
@@ -17,8 +17,8 @@
     }
   ],
   "child_fingerprints": [
-    "d7cf6b4665a5b927ff7f2aa77da6203d3c658ff8bb9b7c41ccd49ae49925759d"
+    "694a2176d91a93b3e4370ea286c19fe5fd27749ea30e1fc4e964461dd160ab82"
   ],
-  "fingerprint": "520deafae5557a0fc626821beb731154a976525cc8af2ba35dfe5a31b3fe594e",
+  "fingerprint": "a7c1abc256e4ff189d516945ccc2820bf7b5daf75cb613459838a8a2498797ea",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -5,7 +5,7 @@
   "intent": "哈希可复查",
   "parent_id": "n_f2b317a84be5",
   "path": "root/verification/evidence-scope/hash-recheck",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "n_091c9aeebdd2-1",
@@ -36,6 +36,19 @@
     "type": "test",
     "spec": "当改写已登记文件后，门禁读取标记 stale"
   },
-  "fingerprint": "939625a8cc18695f0589332ac6698af90b1285fafb1e38c27c8d3890546baff1",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_091c9aeebdd2.txt",
+    "artifact_hash": "8884a37b1719e7cfbd74424245d994267d6cc22c43640700fa3a22da2641b38e",
+    "at": "2026-11-26T03:07:20.736367Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_e51b9faf4716c306d436ee80",
+    "content_hash": "8884a37b1719e7cfbd74424245d994267d6cc22c43640700fa3a22da2641b38e",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:20.751152Z"
+  },
+  "fingerprint": "a7e8f9659e37dcef06a4ee7f567369be859f9330ad5e11ea81e14e7534ddf686",
   "fingerprint_alg": "tree-json-v1"
 }

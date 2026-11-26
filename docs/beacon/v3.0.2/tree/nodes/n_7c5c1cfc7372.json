@@ -5,7 +5,7 @@
   "intent": "实现阶段只能消费冻结需求，并把执行和证据分离开",
   "parent_id": "n_8b83bfc9403d",
   "path": "root/cli-surface/implement-surface",
-  "status": "frozen",
+  "status": "delivered",
   "acs": [
     {
       "id": "implement-1",
@@ -17,9 +17,9 @@
     }
   ],
   "child_fingerprints": [
-    "89b1ee5251b0c7cdb24b60fe98d3f892994a050b554ff8084178d7cb1ad0228b",
-    "d7ca4ce9df359d9082a533b3e4eb4b1d559bebf3038f16e1cc28871944aa68e5"
+    "6b0593bffb3dedeada45d6401735aa3980a24ab80d5819b7efc11e5a881f52a7",
+    "61c7e85e0b267761696cf570bd0c0e852079ccf3a2848701004d99ffa7bc73e9"
   ],
-  "fingerprint": "27bab22a84f3af8d67f06c2a4fe0d5c6c7169157159a5ef8371c7c72c4e90d87",
+  "fingerprint": "5e953a7611b07b99b0d9430a945283645a0358281fb67979dc310ebfdda98d67",
   "fingerprint_alg": "tree-json-v1"
 }

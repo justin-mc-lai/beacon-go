@@ -39,16 +39,16 @@
   "implementation": {
     "by": "self-audit",
     "outcome": "done",
-    "artifact_path": "/tmp/beacon-evidence/n_b954812aae42.txt",
-    "artifact_hash": "646f70f0f9b62b6fa176ef9d8a78329e103e48580a3e4b1dd53a3a264ab0abec",
-    "at": "2026-11-26T02:43:00.425395Z"
+    "artifact_path": "/tmp/beacon-evidence/all/n_b954812aae42.txt",
+    "artifact_hash": "f726ea7f7fcc78d2e00b4124b66bcea776484d7ef05fcebbc5a5688ffbbb0073",
+    "at": "2026-11-26T03:07:12.86565Z"
   },
   "verification_evidence": {
-    "artifact_id": "art_5ea9a75d8ba43c3c543cc576",
-    "content_hash": "646f70f0f9b62b6fa176ef9d8a78329e103e48580a3e4b1dd53a3a264ab0abec",
+    "artifact_id": "art_d020d2e2bc7ae7d5f7496f7d",
+    "content_hash": "f726ea7f7fcc78d2e00b4124b66bcea776484d7ef05fcebbc5a5688ffbbb0073",
     "by": "self-audit",
-    "at": "2026-11-26T02:43:00.435964Z"
+    "at": "2026-11-26T03:07:12.880901Z"
   },
-  "fingerprint": "9c6da4e8d91100be0cfa72921dc8bf6cc58724863173bd68e1916b7374833e75",
+  "fingerprint": "de218ccaa0762c12296418b4a73848a5ff1bc0d32b1ec1b613100ed7ec287d14",
   "fingerprint_alg": "tree-json-v1"
 }

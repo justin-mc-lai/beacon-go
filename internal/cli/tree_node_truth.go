@@ -320,6 +320,8 @@ func statusRank(s intenttree.Status) int {
 		return 3
 	case intenttree.StatusVerified:
 		return 4
+	case intenttree.StatusDelivered:
+		return 5
 	}
 	return -1
 }
@@ -334,6 +336,8 @@ func statusMatches(node intenttree.Status, pkg string) bool {
 		return node == intenttree.StatusChangePending
 	case "verified":
 		return node == intenttree.StatusVerified
+	case "delivered":
+		return node == intenttree.StatusDelivered
 	}
 	return false
 }

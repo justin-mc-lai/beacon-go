@@ -5,7 +5,7 @@
   "intent": "迁移前先快照，写入失败保留快照。",
   "parent_id": "n_7df782fdb5d7",
   "path": "root/data-migration/v1-migration/snapshot-before-write",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "sv-1",
@@ -18,24 +18,37 @@
   ],
   "test_cases": [
     {
-      "id": "sv-tc1",
+      "id": "n_375e008bae8f-tc1",
       "ac_id": "sv-1",
       "kind": "unit",
-      "ref": "planned: internal/cli TestMigrationReadStoreSnapshotsCommittedWALThroughSymlink",
-      "status": "planned"
+      "ref": "go test ./internal/cli -run TestMigrationReadStoreSnapshotsCommittedWALThroughSymlink -count=1",
+      "status": "existing"
     },
     {
-      "id": "sv-tc2",
+      "id": "n_375e008bae8f-tc2",
       "ac_id": "sv-2",
       "kind": "unit",
-      "ref": "planned: migration rollback test",
-      "status": "planned"
+      "ref": "go test ./internal/cli -run TestMigrationReadStoreSnapshotsCommittedWALThroughSymlink -count=1",
+      "status": "existing"
     }
   ],
   "verification": {
     "type": "test",
     "spec": "当迁移被中断时，源库哈希不变且快照可读取。"
   },
-  "fingerprint": "f742e1f03699445eb45d39ac42f9f798ad5d405a8e902d392a8029406ba0ed2b",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_375e008bae8f.txt",
+    "artifact_hash": "7144224e2d6dff8e6711857f92820de74651e91769934aa3058dc72243bbc419",
+    "at": "2026-11-26T03:06:58.101795Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_5a44d9bb0a6fb62b67ef7605",
+    "content_hash": "7144224e2d6dff8e6711857f92820de74651e91769934aa3058dc72243bbc419",
+    "by": "self-audit",
+    "at": "2026-11-26T03:06:58.117024Z"
+  },
+  "fingerprint": "8ca5452646e56361e0caa4082732487149199486823d7bbf12172e5ee1656707",
   "fingerprint_alg": "tree-json-v1"
 }

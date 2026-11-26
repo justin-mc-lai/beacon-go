@@ -5,7 +5,7 @@
   "intent": "验证汇总与审计",
   "parent_id": "n_66fe3404b218",
   "path": "root/verification/rollup-audit",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "ra-1",
@@ -112,10 +112,10 @@
     ]
   },
   "child_fingerprints": [
-    "547747d8a56e3f6f0cfe9d530a2c0597254aa47a0927539ecec847ffb41d5bfe",
-    "3c2953df4dc0ea22adc6f4cca3e1d6ea63e238ee911d7d8725b12b5bc26a8f74",
-    "83ac9c34ee40cdf4a6d5cba2cc25791afa444497c99f848eff469c26222e78de"
+    "67989b4ed56835ec3adfa5ca541737f5d33e7d33e4dc192207c47c9559011375",
+    "88c2c1bc9aa94e4f1c975c47cc209dd387805220a369df402200f698eb448800",
+    "c6c8d90bd5a2975f3bddde5d583919b991b4107d9fdd9e3d735f2fe35c86fefa"
   ],
-  "fingerprint": "5cdbceb48ef65095c4a1d69f70398e6c8e2a440384b0b183e1747a65a4b057df",
+  "fingerprint": "63c9692a6d1b009557d98b07b53a243854ac03505893b2a3b9b5a215147e4cc3",
   "fingerprint_alg": "tree-json-v1"
 }

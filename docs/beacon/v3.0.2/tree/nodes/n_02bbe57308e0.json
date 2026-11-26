@@ -5,7 +5,7 @@
   "intent": "依赖与版本门禁",
   "parent_id": "n_8b83bfc9403d",
   "path": "root/cli-surface/dependency-gate",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "dg-1",
@@ -21,9 +21,9 @@
     }
   ],
   "child_fingerprints": [
-    "f967669be258dfb4c2ba7218c53d5e781b5052cac01d0d43055a103ce64d00c1",
-    "5a73fc171e4a89716d4fc6cf54180119119fb04d2f9f64c1d6ce802a6d9b3a39"
+    "6b10f72be37a71c922e7ef0635fe467b15b34b2a5f1a38bea2b9410327ef6eb4",
+    "028e8511d96da0651a5fb4c9821e7d26bcbb54c4c301de4e9fef7675912a9040"
   ],
-  "fingerprint": "f093d06d9373f53102be5b59d84314b6c20e2a50e308d147ae2bf29a0f1ab57c",
+  "fingerprint": "6d000d1854b45438fe51a21c963118514df722a6918e9c735e07949a27bdf76c",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -5,7 +5,7 @@
   "intent": "叶子 implemented→verified",
   "parent_id": "n_820af49910f0",
   "path": "root/verification/rollup-audit/leaf-verification",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "n_5c432d1ce4c7-1",
@@ -36,6 +36,19 @@
     "type": "test",
     "spec": "当对 implemented 叶子执行 verify leaf 时，状态变 verified"
   },
-  "fingerprint": "547747d8a56e3f6f0cfe9d530a2c0597254aa47a0927539ecec847ffb41d5bfe",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_5c432d1ce4c7.txt",
+    "artifact_hash": "abdd0d66fc32fd2df16480870292bfcb64fe2e188564df672a8b5e819ff45700",
+    "at": "2026-11-26T03:07:24.379932Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_4da21a678ae367f5ecc3b49f",
+    "content_hash": "abdd0d66fc32fd2df16480870292bfcb64fe2e188564df672a8b5e819ff45700",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:24.396548Z"
+  },
+  "fingerprint": "67989b4ed56835ec3adfa5ca541737f5d33e7d33e4dc192207c47c9559011375",
   "fingerprint_alg": "tree-json-v1"
 }

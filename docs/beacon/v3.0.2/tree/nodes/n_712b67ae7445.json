@@ -5,7 +5,7 @@
   "intent": "让需求树 HTML 成为清晰、单源、可筛选的工作台",
   "parent_id": "n_0338b8fdd30a",
   "path": "root/self-host/requirement-workbench",
-  "status": "verified",
+  "status": "delivered",
   "acs": [
     {
       "id": "workbench-1",
@@ -21,10 +21,10 @@
     }
   ],
   "child_fingerprints": [
-    "6fd6667423f0f037bed834aaff35c4482880bead14d7011feeac80f908ca2766",
-    "9c6da4e8d91100be0cfa72921dc8bf6cc58724863173bd68e1916b7374833e75",
-    "6e532f545eebeb334889f039b29e29806525389dcf45a0912c275d08f00cb6ee"
+    "e9943e2ce66d9a0b40803f6bd3005d8900ac77aec0fea62934c4e52107599252",
+    "de218ccaa0762c12296418b4a73848a5ff1bc0d32b1ec1b613100ed7ec287d14",
+    "6823e262f019bdf6e4dcc61fda0e46d0da7ab71580bf3250e1884fdbe99d8d86"
   ],
-  "fingerprint": "27f5ab7c4add39a5a49e82a3c5e4fe1bd03af6f0e2c4a74c64cd0c157a4e0c85",
+  "fingerprint": "c0dee128a41f554baab6e49ac6f8a3448b3eeff41902ef80da10aaac3d1b8920",
   "fingerprint_alg": "tree-json-v1"
 }

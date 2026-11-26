@@ -5,7 +5,7 @@
   "intent": "证据绑到节点",
   "parent_id": "n_f2b317a84be5",
   "path": "root/verification/evidence-scope/node-scope-registration",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "n_d806badcae4c-1",
@@ -21,21 +21,34 @@
       "id": "n_d806badcae4c-tc1",
       "ac_id": "n_d806badcae4c-1",
       "kind": "unit",
-      "ref": "planned: evidence scope registration CLI test",
-      "status": "planned"
+      "ref": "go test ./internal/cli -run TestArtifactCLIExplicitNodeScope -count=1",
+      "status": "existing"
     },
     {
       "id": "n_d806badcae4c-tc2",
       "ac_id": "n_d806badcae4c-2",
       "kind": "unit",
-      "ref": "planned: evidence scope registration CLI test",
-      "status": "planned"
+      "ref": "go test ./internal/cli -run TestArtifactCLIExplicitNodeScope -count=1",
+      "status": "existing"
     }
   ],
   "verification": {
     "type": "test",
     "spec": "当登记 node scope 证据后，按 scope 查询返回该工件"
   },
-  "fingerprint": "5cbfd121a6e597952bcf4c6ef795a48c2d97a806a00763c76ad7a64bcb6fcb6c",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_d806badcae4c.txt",
+    "artifact_hash": "c363a42e06dff30fdae2ff1233b3f6dc0284a7599fe4bfd1762234e09c4443ff",
+    "at": "2026-11-26T03:07:21.51011Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_2e9dd2f8a6dcd6c8923ff92a",
+    "content_hash": "c363a42e06dff30fdae2ff1233b3f6dc0284a7599fe4bfd1762234e09c4443ff",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:21.524887Z"
+  },
+  "fingerprint": "ceee195be8a15df6c231eef28ad011886052207b4407a9c3a010d261b2675485",
   "fingerprint_alg": "tree-json-v1"
 }

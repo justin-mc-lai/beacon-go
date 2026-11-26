@@ -158,7 +158,7 @@ func writeTreePane(b *strings.Builder, idx Index, children map[string][]IndexEnt
 	fmt.Fprintf(b, `<div class="source-note">权威源：tree/index.json · %s<br>HTML 派生只读</div>`, esc(shortHash(SourceHash(idx))))
 	b.WriteString(`<input id="filter" class="filter" placeholder="搜索节点、AC、状态" autocomplete="off">`)
 	b.WriteString(`<div class="status-legend"><button type="button" class="status-filter active" data-status-filter="">全部 <b>` + fmt.Sprint(len(idx.Nodes)) + `</b></button>`)
-	for _, st := range []Status{StatusDraft, StatusFrozen, StatusImplemented, StatusVerified, StatusChangePending} {
+	for _, st := range []Status{StatusDraft, StatusFrozen, StatusImplemented, StatusVerified, StatusDelivered, StatusChangePending} {
 		fmt.Fprintf(b, `<button type="button" class="status-filter status-badge status-%s" data-status-filter="%s">%s <b>%d</b></button>`, esc(string(st)), esc(string(st)), esc(statusLabel(st)), counts[st])
 	}
 	b.WriteString(`</div>`)

@@ -5,7 +5,7 @@
   "intent": "证据作用域",
   "parent_id": "n_66fe3404b218",
   "path": "root/verification/evidence-scope",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "es-1",
@@ -21,9 +21,9 @@
     }
   ],
   "child_fingerprints": [
-    "939625a8cc18695f0589332ac6698af90b1285fafb1e38c27c8d3890546baff1",
-    "5cbfd121a6e597952bcf4c6ef795a48c2d97a806a00763c76ad7a64bcb6fcb6c"
+    "a7e8f9659e37dcef06a4ee7f567369be859f9330ad5e11ea81e14e7534ddf686",
+    "ceee195be8a15df6c231eef28ad011886052207b4407a9c3a010d261b2675485"
   ],
-  "fingerprint": "a93d2ea5f47dab2c37a0d38dff909bc0f9b992915e885ef45c5db26dbc2ce4a8",
+  "fingerprint": "62d7505d6ce60e643782d3bd73c82e3ff6b354b792ab5d6ad5298df35234c44b",
   "fingerprint_alg": "tree-json-v1"
 }

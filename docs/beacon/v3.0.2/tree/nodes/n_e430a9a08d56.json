@@ -5,7 +5,7 @@
   "intent": "树审计必须只读，并能定位结构/kind/孤儿/未验证叶子",
   "parent_id": "n_820af49910f0",
   "path": "root/verification/rollup-audit/tree-audit",
-  "status": "implemented",
+  "status": "verified",
   "acs": [
     {
       "id": "audit-1",
@@ -39,16 +39,16 @@
   "implementation": {
     "by": "self-audit",
     "outcome": "done",
-    "artifact_path": "/tmp/beacon-evidence/n_e430a9a08d56-final.txt",
-    "artifact_hash": "1f6b7f0d97637c84f9fe9f561fefddd59869e4aed7946c910074171f8c0869c4",
-    "at": "2026-11-26T02:50:59.043735Z"
+    "artifact_path": "/tmp/beacon-evidence/all/n_e430a9a08d56.txt",
+    "artifact_hash": "6801bb074992ed2e792ac5f0b6f993c50f2fd7e532d8d0bd45b0a6887139e89c",
+    "at": "2026-11-26T03:07:25.501088Z"
   },
   "verification_evidence": {
-    "artifact_id": "art_d7944cb091c30e77f00f2f2f",
-    "content_hash": "d7aa9d4087c821b4ad877e0330bcd95933659be0918d550c56d04dfa681a0e2a",
+    "artifact_id": "art_ca27634b53509ba32119193e",
+    "content_hash": "6801bb074992ed2e792ac5f0b6f993c50f2fd7e532d8d0bd45b0a6887139e89c",
     "by": "self-audit",
-    "at": "2026-11-26T02:42:59.26116Z"
+    "at": "2026-11-26T03:07:25.52218Z"
   },
-  "fingerprint": "5d98321e351396e07f27482368480da39a0f51e9ed3498102279d1543ff8f3b9",
+  "fingerprint": "c6c8d90bd5a2975f3bddde5d583919b991b4107d9fdd9e3d735f2fe35c86fefa",
   "fingerprint_alg": "tree-json-v1"
 }

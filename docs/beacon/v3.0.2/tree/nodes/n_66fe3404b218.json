@@ -5,7 +5,7 @@
   "intent": "证据、叶子验证与父级汇总",
   "parent_id": "nroot_98a9c77a9519",
   "path": "root/verification",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "vf-1",
@@ -21,11 +21,12 @@
     }
   ],
   "child_fingerprints": [
-    "a93d2ea5f47dab2c37a0d38dff909bc0f9b992915e885ef45c5db26dbc2ce4a8",
-    "3b2eda92f3708b8caf38702ac72302c464ecbc94993d96852072c9ada5102171",
-    "307fbb40c276a98f297eb569e86a0a38c27652155e9f628170443c8f2e329fa8",
-    "5cdbceb48ef65095c4a1d69f70398e6c8e2a440384b0b183e1747a65a4b057df"
+    "05715a2a5fc23e1fd44f540d3de1dd4d89fa6f73e41aeee5cc2c8e4ac5037e7e",
+    "62d7505d6ce60e643782d3bd73c82e3ff6b354b792ab5d6ad5298df35234c44b",
+    "d88c8cb4256c45aca7067baccb738ce0cbcd9f1b4e4a174ee267017c1b5047e6",
+    "27047ef193d43caf54ed55cb81af672f5d84c3c3f493df437978f18dedb0f052",
+    "63c9692a6d1b009557d98b07b53a243854ac03505893b2a3b9b5a215147e4cc3"
   ],
-  "fingerprint": "8b702055da312519ca08259e2af2993ff65de0c91ffcd5c21847d3fb0c673d62",
+  "fingerprint": "881b71cf9bd288271fef176df47d5e8096cec97aaf495a482c339443536d9769",
   "fingerprint_alg": "tree-json-v1"
 }

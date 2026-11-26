@@ -1,0 +1,12 @@
+{
+  "id": "chg_5d6a1fabac20",
+  "node_id": "n_e7a2c69c27ab",
+  "summary": "P1 source-hash real ref",
+  "by": "beacon-self-audit",
+  "base_fingerprint": "c2bd9cc6cf38576f3a12766d1aad5d9e6fa99b0a5e910cdb3f028962b9102718",
+  "affected": [
+    "n_23f0b5d0e496",
+    "n_e7a2c69c27ab"
+  ],
+  "created_at": "2026-11-26T03:06:28.374728Z"
+}

@@ -5,7 +5,7 @@
   "intent": "SQLite 缓存可从树 JSON 重建，不成为第二真相。",
   "parent_id": "n_65c89b949e6f",
   "path": "root/data-migration/store-cache",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "sc-1",
@@ -51,8 +51,8 @@
     ]
   },
   "child_fingerprints": [
-    "52f8d0acf34d636e943ac7ce9189454d5429a0a8f1cb86dfa985c843406af607"
+    "3b8c2da2ed0fae576633703ca0f5fe55ed708dc55099eaee13176759c8f20b0e"
   ],
-  "fingerprint": "37718dbb28f1413efa394124ea7fcf3ceb2b9a2a7cdda29d04486a68e04a16e9",
+  "fingerprint": "47b4f74950e36dfb3efe307248d370ede75e920bb2023e20e1a16f11a3fbf07d",
   "fingerprint_alg": "tree-json-v1"
 }

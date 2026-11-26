@@ -5,7 +5,7 @@
   "intent": "单次长跑的阶段推进与门禁",
   "parent_id": "nroot_98a9c77a9519",
   "path": "root/goal-orchestration",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "go-1",
@@ -21,10 +21,10 @@
     }
   ],
   "child_fingerprints": [
-    "354da58b5b066bf0678c9a0853e3972574d20e9ab77ae9af24b2a811520addda",
-    "b8390594540ed936d3661ad72191440558bfd088ed9af674cf3c718b27cfd12f",
-    "f64040f1133ad94db7d4da4267e5bef639da3e62f704cf23b98a5ae00d0bb05c"
+    "78a43ac45d32f5db23492904d7826a2035ddb89b8d03506d9da5d26958ed0d61",
+    "ee924e0d0938df5381510c6beddd82761ac03e3d70492339f2a8e7a21118d2c3",
+    "55bbc7957727862f076a2b92011f82d4dde1fc6affd462625801958b185a567c"
   ],
-  "fingerprint": "0543a93dfcca963cd14d7f0dbdf3a7f8bb2fc4561882ad96ac180ef0390064fb",
+  "fingerprint": "ae7ff92c33ba331349179a2e3e898f0dc3a22943e788c52184133a4375f57608",
   "fingerprint_alg": "tree-json-v1"
 }

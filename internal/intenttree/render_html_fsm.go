@@ -171,6 +171,8 @@ func statusLabel(s Status) string {
 		return "已交付/实现"
 	case StatusVerified:
 		return "已验证"
+	case StatusDelivered:
+		return "已交付"
 	case StatusChangePending:
 		return "变更中"
 	case StatusDeprecated:

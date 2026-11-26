@@ -5,7 +5,7 @@
   "intent": "失败输出 reason code 与非零退出码。",
   "parent_id": "n_d5b8e9a5716f",
   "path": "root/cli-surface/error-contract/reason-exit",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "re-1",
@@ -18,24 +18,37 @@
   ],
   "test_cases": [
     {
-      "id": "re-tc1",
+      "id": "n_363997977d4a-tc1",
       "ac_id": "re-1",
       "kind": "unit",
-      "ref": "planned: CLI error contract test",
-      "status": "planned"
+      "ref": "go test ./internal/cli -run TestNotFoundReasonCodes -count=1",
+      "status": "existing"
     },
     {
-      "id": "re-tc2",
+      "id": "n_363997977d4a-tc2",
       "ac_id": "re-2",
       "kind": "unit",
-      "ref": "planned: CLI exit code test",
-      "status": "planned"
+      "ref": "go test ./internal/cli -run TestNotFoundReasonCodes -count=1",
+      "status": "existing"
     }
   ],
   "verification": {
     "type": "test",
     "spec": "执行被拒绝的命令，stdout 含 reason code 且退出码非零。"
   },
-  "fingerprint": "faf46fcb294522628f23875a1ce26cf041dd77a5d2e74788d821175be1a868e7",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_363997977d4a.txt",
+    "artifact_hash": "9b88dfa0633b8401247d53ba9ef36d7b9312554efbb14a135c559a8abcb499e0",
+    "at": "2026-11-26T03:06:46.616532Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_fd8669796fb90049ab8ff2e9",
+    "content_hash": "9b88dfa0633b8401247d53ba9ef36d7b9312554efbb14a135c559a8abcb499e0",
+    "by": "self-audit",
+    "at": "2026-11-26T03:06:46.63124Z"
+  },
+  "fingerprint": "00a5dffcbb40f450099226fe8e648e8861343845143fa308e77dd6af33761382",
   "fingerprint_alg": "tree-json-v1"
 }

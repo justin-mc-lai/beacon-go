@@ -5,7 +5,7 @@
   "intent": "从树 JSON 重建缓存并保持内容一致。",
   "parent_id": "n_c6a5bcdb86c0",
   "path": "root/data-migration/store-cache/rebuild-from-json",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "rb-1",
@@ -18,24 +18,37 @@
   ],
   "test_cases": [
     {
-      "id": "rb-tc1",
+      "id": "n_b13a0884f790-tc1",
       "ac_id": "rb-1",
       "kind": "unit",
-      "ref": "go test ./internal/cli -run TestTreeRebuildAndMarkdownRender",
-      "status": "planned"
+      "ref": "go test ./internal/cli -run TestTreeRebuildAndMarkdownRender -count=1",
+      "status": "existing"
     },
     {
-      "id": "rb-tc2",
+      "id": "n_b13a0884f790-tc2",
       "ac_id": "rb-2",
       "kind": "unit",
-      "ref": "go test ./internal/cli -run TestTreeRebuildAndMarkdownRender",
-      "status": "planned"
+      "ref": "go test ./internal/cli -run TestTreeRebuildAndMarkdownRender -count=1",
+      "status": "existing"
     }
   ],
   "verification": {
     "type": "test",
     "spec": "删除缓存后运行重建，树索引字节不变。"
   },
-  "fingerprint": "52f8d0acf34d636e943ac7ce9189454d5429a0a8f1cb86dfa985c843406af607",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_b13a0884f790.txt",
+    "artifact_hash": "576495ecefd60c84f9bdfb70e2f77daced7dad7f9f51f6494e07fc186e5c4372",
+    "at": "2026-11-26T03:06:57.294342Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_1f3feeb5434bc104253f9ffd",
+    "content_hash": "576495ecefd60c84f9bdfb70e2f77daced7dad7f9f51f6494e07fc186e5c4372",
+    "by": "self-audit",
+    "at": "2026-11-26T03:06:57.308929Z"
+  },
+  "fingerprint": "3b8c2da2ed0fae576633703ca0f5fe55ed708dc55099eaee13176759c8f20b0e",
   "fingerprint_alg": "tree-json-v1"
 }

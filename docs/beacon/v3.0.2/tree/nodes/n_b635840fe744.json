@@ -5,7 +5,7 @@
   "intent": "受保护路径与写入口必须有明确批准与回执。",
   "parent_id": "nroot_98a9c77a9519",
   "path": "root/security-boundary",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "sb-1",
@@ -17,9 +17,9 @@
     }
   ],
   "child_fingerprints": [
-    "26ab1107f54d79ffffe9fb101500491b9df1d8d5cc5222d740ec6bbef0b3ba91",
-    "520deafae5557a0fc626821beb731154a976525cc8af2ba35dfe5a31b3fe594e"
+    "04f1e8aaf1ef39d3628aeb238b46ce379e895447283521d006c7bc550b1d2a05",
+    "a7c1abc256e4ff189d516945ccc2820bf7b5daf75cb613459838a8a2498797ea"
   ],
-  "fingerprint": "cf8e1fed6f712fb1e1747a41c385585b49ce809ae6e9eb7dcf8c00db3df10169",
+  "fingerprint": "7b5717780ecb6eb9049e3832cf72ac9efc004a82eb7302a29ed4eee40ab5f734",
   "fingerprint_alg": "tree-json-v1"
 }

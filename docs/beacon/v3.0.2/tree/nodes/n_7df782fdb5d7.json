@@ -5,7 +5,7 @@
   "intent": "把 Python v1 账本一次性迁入 Go 账本，失败不破坏源数据。",
   "parent_id": "n_65c89b949e6f",
   "path": "root/data-migration/v1-migration",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "vm-1",
@@ -56,8 +56,8 @@
     ]
   },
   "child_fingerprints": [
-    "f742e1f03699445eb45d39ac42f9f798ad5d405a8e902d392a8029406ba0ed2b"
+    "8ca5452646e56361e0caa4082732487149199486823d7bbf12172e5ee1656707"
   ],
-  "fingerprint": "3748f4f5765b0d52b6dd6823a03c2f08f79594755afb0efebe8a83bab9aad308",
+  "fingerprint": "a1095e9c2897bc7444b6244f9cb831e9759bdf987297d57bae6231a7bf124148",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -5,7 +5,7 @@
   "intent": "完整树链可跑",
   "parent_id": "n_036eb6e70d4a",
   "path": "root/self-host/dogfood/badminton-chain",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "n_62abbe8a407b-1",
@@ -36,6 +36,19 @@
     "type": "test",
     "spec": "当运行 run_dogfood.sh 时，输出 verdict=PASS 且 audit=true"
   },
-  "fingerprint": "0140d07b677146aa2413fb851e555381230c38bb8ffc287720be498c1e1db8e5",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_62abbe8a407b.txt",
+    "artifact_hash": "07a9a6ce1af55b7d5f6f4afa53e03d17d72edb712a29af8c4c96aa71011ff2db",
+    "at": "2026-11-26T03:07:10.973844Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_21092dd186e7e1c466919dc1",
+    "content_hash": "07a9a6ce1af55b7d5f6f4afa53e03d17d72edb712a29af8c4c96aa71011ff2db",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:10.989447Z"
+  },
+  "fingerprint": "4de5a04ad4843e7aad7c6f639e3a8d51b572e31ca94817bee824965b0876047a",
   "fingerprint_alg": "tree-json-v1"
 }

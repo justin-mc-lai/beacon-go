@@ -5,7 +5,7 @@
   "intent": "阶段门禁",
   "parent_id": "n_2f9cbcff36f4",
   "path": "root/goal-orchestration/stage-gate",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "sg-1",
@@ -72,10 +72,10 @@
     ]
   },
   "child_fingerprints": [
-    "4bb67bd5c1635cdc90b9fa7db5ae026f13041b87b5da32759fc38582cac3689e",
-    "8d9dfcb9bc764e4dd04152a57c95160ce32ead98c04865de4bca25369a62df7d",
-    "e3cbc9508f4c0ad5b4dcc15b239fa53be0fcc250647d5c5ccaa649bf420124b9"
+    "fe443d7adae1d8f4754c6e82c16fe99a712980ce6f07e2c74ac2e833d9f74c00",
+    "e52109a1009d18968cf8fd3a7717e82162517ac7ca4156f7fbfaa697b634e803",
+    "0378c8264c8f34096a381aaf2b947e13ebfd018d7a40d5510ef9d1d4c6084e51"
   ],
-  "fingerprint": "f64040f1133ad94db7d4da4267e5bef639da3e62f704cf23b98a5ae00d0bb05c",
+  "fingerprint": "55bbc7957727862f076a2b92011f82d4dde1fc6affd462625801958b185a567c",
   "fingerprint_alg": "tree-json-v1"
 }

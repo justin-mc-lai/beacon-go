@@ -5,7 +5,7 @@
   "intent": "用户只看到稳定 reason code 与可操作提示，不看到内部栈。",
   "parent_id": "n_8b83bfc9403d",
   "path": "root/cli-surface/error-contract",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "ec-1",
@@ -21,8 +21,8 @@
     }
   ],
   "child_fingerprints": [
-    "faf46fcb294522628f23875a1ce26cf041dd77a5d2e74788d821175be1a868e7"
+    "00a5dffcbb40f450099226fe8e648e8861343845143fa308e77dd6af33761382"
   ],
-  "fingerprint": "b35160ea68a76fff2dbb043ec731c2e0994a1c80ece4f99c71b5f0a4d64c753a",
+  "fingerprint": "58f0e0a5890416dceb194da9c2b939f673a4a5aa3c1d8fb9fbe9c9ac5d6cd9e3",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -5,7 +5,7 @@
   "intent": "羽毛球 dogfood",
   "parent_id": "n_0338b8fdd30a",
   "path": "root/self-host/dogfood",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "df-1",
@@ -21,9 +21,9 @@
     }
   ],
   "child_fingerprints": [
-    "0140d07b677146aa2413fb851e555381230c38bb8ffc287720be498c1e1db8e5",
-    "ba6e68cf7766768ab8b422822ee28c9695c8a8aec3dd5d63d9cab1814ae427f7"
+    "4de5a04ad4843e7aad7c6f639e3a8d51b572e31ca94817bee824965b0876047a",
+    "7ff97587327134affbd7f8d5d00b5a8b00b1e3e520e7aa0ebc0fa54667186c79"
   ],
-  "fingerprint": "9c7e08b31e4c33cba8a9f4516fe07a73e90031301bdc3020ae889cf3c4244c47",
+  "fingerprint": "6524c65b1feedaa7b8cca8ac928028ddaea1ec001e46fce01029b78be0133251",
   "fingerprint_alg": "tree-json-v1"
 }

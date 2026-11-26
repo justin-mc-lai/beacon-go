@@ -28,16 +28,16 @@
   "implementation": {
     "by": "self-audit",
     "outcome": "done",
-    "artifact_path": "/tmp/beacon-evidence/n_ada94f7acf03.txt",
-    "artifact_hash": "f3ff7a98eb353468be83f3ca61525992ec40378d53f28980c097dcbe985131dc",
-    "at": "2026-11-26T02:43:00.966175Z"
+    "artifact_path": "/tmp/beacon-evidence/all/n_ada94f7acf03.txt",
+    "artifact_hash": "d55a62b0440a85c1c5a914b9336cff4ed003ec7e40d5d6f7a072f6225b49080f",
+    "at": "2026-11-26T03:07:13.70963Z"
   },
   "verification_evidence": {
-    "artifact_id": "art_bfe0fede8f8b4e62effff461",
-    "content_hash": "f3ff7a98eb353468be83f3ca61525992ec40378d53f28980c097dcbe985131dc",
+    "artifact_id": "art_e4fedff0ca13af600605e1af",
+    "content_hash": "d55a62b0440a85c1c5a914b9336cff4ed003ec7e40d5d6f7a072f6225b49080f",
     "by": "self-audit",
-    "at": "2026-11-26T02:43:00.976158Z"
+    "at": "2026-11-26T03:07:13.724996Z"
   },
-  "fingerprint": "6e532f545eebeb334889f039b29e29806525389dcf45a0912c275d08f00cb6ee",
+  "fingerprint": "6823e262f019bdf6e4dcc61fda0e46d0da7ab71580bf3250e1884fdbe99d8d86",
   "fingerprint_alg": "tree-json-v1"
 }

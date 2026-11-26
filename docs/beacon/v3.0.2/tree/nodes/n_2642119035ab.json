@@ -5,7 +5,7 @@
   "intent": "祖先自动失效",
   "parent_id": "n_b5046d07c9aa",
   "path": "root/truth-kernel/freeze-change/change-cascade",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "n_2642119035ab-1",
@@ -36,6 +36,19 @@
     "type": "test",
     "spec": "当对叶子发起 change 时，其 feature/module/root 状态为 change_pending"
   },
-  "fingerprint": "96d49a75780fa1f7d266eb740df67b17837eb7a3c45eeb6f630c1c6de26c3bd6",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_2642119035ab.txt",
+    "artifact_hash": "b7eefab951a513deb2daaa028e1698e4f8e118299072df95a07cdd03b94e8db1",
+    "at": "2026-11-26T03:07:16.775204Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_3ffc197da2ae71fab1300466",
+    "content_hash": "b7eefab951a513deb2daaa028e1698e4f8e118299072df95a07cdd03b94e8db1",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:16.789753Z"
+  },
+  "fingerprint": "2a9dadf87008dd109c0be02dc995ea87761b61395725201f95a55f09034e00c8",
   "fingerprint_alg": "tree-json-v1"
 }

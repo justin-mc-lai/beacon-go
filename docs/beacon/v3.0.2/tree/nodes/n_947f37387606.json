@@ -5,7 +5,7 @@
   "intent": "显式 slug 控制节点路径，不能静默变成 node",
   "parent_id": "n_a8b3e6af8664",
   "path": "root/cli-surface/plan-surface/proposal-slug",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "slug-1",
@@ -36,6 +36,19 @@
     "type": "test",
     "spec": "当 proposal 带/不带合法 slug 时，路径末段与拒绝码符合契约"
   },
-  "fingerprint": "2ae783f0d5a2f3be0d1f6f85c30bbcc1923b7daa60f058976965f0341235d296",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_947f37387606.txt",
+    "artifact_hash": "70d440c15e13e7b12b98649e89860aaaf26547ab67616c46d204f5368f081b00",
+    "at": "2026-11-26T03:06:52.222278Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_f02138822590183d2cbda774",
+    "content_hash": "70d440c15e13e7b12b98649e89860aaaf26547ab67616c46d204f5368f081b00",
+    "by": "self-audit",
+    "at": "2026-11-26T03:06:52.236064Z"
+  },
+  "fingerprint": "a9ac618035a972db266accba5cc98ce91b074d42616225eac44ec41abda4d14c",
   "fingerprint_alg": "tree-json-v1"
 }

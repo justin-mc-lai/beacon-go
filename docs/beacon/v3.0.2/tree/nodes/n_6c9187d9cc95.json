@@ -5,7 +5,7 @@
   "intent": "固定键序与字段序",
   "parent_id": "n_99a31e588da7",
   "path": "root/truth-kernel/canonical-json/canonical-serialization",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "n_6c9187d9cc95-1",
@@ -36,6 +36,19 @@
     "type": "test",
     "spec": "当同一节点写两次时，两字节流 SHA-256 相同"
   },
-  "fingerprint": "8929d336a97e0a391d5cee821b4c38c2eaa7e4bf6bd05dff73d6ace81a8df442",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_6c9187d9cc95.txt",
+    "artifact_hash": "4c351bca1789fb9c4aa41c9a0a55153d273e225af4db47402c76a0bf231940a3",
+    "at": "2026-11-26T03:07:15.87533Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_42f3a1167f4f886c445118e1",
+    "content_hash": "4c351bca1789fb9c4aa41c9a0a55153d273e225af4db47402c76a0bf231940a3",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:15.891992Z"
+  },
+  "fingerprint": "e7c5ce76c9193f4bfd4a27ea391c27931171aa1802488d3e2be93d74d6cc2f1a",
   "fingerprint_alg": "tree-json-v1"
 }

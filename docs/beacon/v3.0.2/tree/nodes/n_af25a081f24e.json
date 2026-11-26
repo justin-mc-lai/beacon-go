@@ -5,7 +5,7 @@
   "intent": "AC 变化移动指纹",
   "parent_id": "n_99a31e588da7",
   "path": "root/truth-kernel/canonical-json/ac-fingerprint",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "n_af25a081f24e-1",
@@ -36,6 +36,19 @@
     "type": "test",
     "spec": "当 AC 文本变化时，tree-json-v1 指纹变化"
   },
-  "fingerprint": "18527cc93f59fa9872c4cadbb5066ad4cfa66c713d261ff7f8fce669a0f33c3b",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_af25a081f24e.txt",
+    "artifact_hash": "bef083701ac26a2d44c908d30255fa73df0576a2da7334233b8340d7b91f2711",
+    "at": "2026-11-26T03:07:15.619167Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_5e337a929d5a8992535c0b67",
+    "content_hash": "bef083701ac26a2d44c908d30255fa73df0576a2da7334233b8340d7b91f2711",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:15.647254Z"
+  },
+  "fingerprint": "96da4e99c47509bb864eaaddd31988264dad28547b53598501630147fb2e732e",
   "fingerprint_alg": "tree-json-v1"
 }

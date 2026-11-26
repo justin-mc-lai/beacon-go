@@ -5,7 +5,7 @@
   "intent": "canonical JSON 与指纹",
   "parent_id": "n_244f402ca9c7",
   "path": "root/truth-kernel/canonical-json",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "cj-1",
@@ -21,9 +21,9 @@
     }
   ],
   "child_fingerprints": [
-    "18527cc93f59fa9872c4cadbb5066ad4cfa66c713d261ff7f8fce669a0f33c3b",
-    "8929d336a97e0a391d5cee821b4c38c2eaa7e4bf6bd05dff73d6ace81a8df442"
+    "96da4e99c47509bb864eaaddd31988264dad28547b53598501630147fb2e732e",
+    "e7c5ce76c9193f4bfd4a27ea391c27931171aa1802488d3e2be93d74d6cc2f1a"
   ],
-  "fingerprint": "4cc334fe0fb2b43c678d4ddd49b217cebf6a9bf0ca3669dca82dc4108d28c7d7",
+  "fingerprint": "16aa45833a8d4e74913cbcd7eeaf96b8767271de61e78f2d42de89a092158010",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -5,7 +5,7 @@
   "intent": "旧账本与仓库真相之间的单向迁移；先快照，再写入，可回滚。",
   "parent_id": "nroot_98a9c77a9519",
   "path": "root/data-migration",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "dm-1",
@@ -17,10 +17,10 @@
     }
   ],
   "child_fingerprints": [
-    "41b13d43c280a1f2d4e11dc750cd0bf67a10d5b6b4515e578495328424bb48b7",
-    "37718dbb28f1413efa394124ea7fcf3ceb2b9a2a7cdda29d04486a68e04a16e9",
-    "3748f4f5765b0d52b6dd6823a03c2f08f79594755afb0efebe8a83bab9aad308"
+    "e186940b2fae80db3c172b83aec40ec3ac27e48af5f3312c5aad9ff6fbe546df",
+    "47b4f74950e36dfb3efe307248d370ede75e920bb2023e20e1a16f11a3fbf07d",
+    "a1095e9c2897bc7444b6244f9cb831e9759bdf987297d57bae6231a7bf124148"
   ],
-  "fingerprint": "1395fa5e07811c0bda3512723fb24f4771571635dfac2c028d77629ef514cfa0",
+  "fingerprint": "311f973063b0c9a85c1b147e79f6c85ef2298d9a94b05191d425c5e139a13f33",
   "fingerprint_alg": "tree-json-v1"
 }

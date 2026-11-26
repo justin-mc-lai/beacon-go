@@ -5,7 +5,7 @@
   "intent": "goal run 从创建到运行、阻塞、完成，阻塞必须显式解除。",
   "parent_id": "n_2f9cbcff36f4",
   "path": "root/goal-orchestration/run-lifecycle",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "rl-1",
@@ -61,10 +61,11 @@
     ]
   },
   "child_fingerprints": [
-    "d440537d8a6155ff9150d829de0b65f26bfdb0d37ceb892aad7b28bfff62691c",
-    "ecb0b185b27e412d43f36b763467be9073115b9f9dfda993f80396064a1d7e81",
-    "27466084951e14073d6917f91830bada3b92c87a38bf290975744c908a020054"
+    "ae228e2e14e08dc54309ce9147d5cfaab264fd6404a650b063b208e2a592d76e",
+    "e9411eccba470a6933b5387207e774ec3392ddc8e46bd94b6cd6702afa49dec4",
+    "a52dd750dc372de02bb3b87d5fd191db1e5ede3f8dc4ae1c930f9a6429095b26",
+    "2cc333632ea523c20c64c2bd950e9a8add9e9bcd65422098a3e52a9188375898"
   ],
-  "fingerprint": "b8390594540ed936d3661ad72191440558bfd088ed9af674cf3c718b27cfd12f",
+  "fingerprint": "ee924e0d0938df5381510c6beddd82761ac03e3d70492339f2a8e7a21118d2c3",
   "fingerprint_alg": "tree-json-v1"
 }

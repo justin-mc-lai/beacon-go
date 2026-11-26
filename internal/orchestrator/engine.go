@@ -470,8 +470,13 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 	}
 	root := store.ResolveRootPath(opts.ProjectRoot)
 	ctx, err := e.store.ResolveFeature(root, opts.FeatureSlug, opts.Version)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		var found bool
+		ctx, found, err = e.ensureTreeFeature(root, opts.Version, opts.FeatureSlug)
+		if err != nil {
+			return RunView{}, err
+		}
+		if !found {
 			if opts.FeatureSlug != "" {
 				return RunView{}, core.NewError(ReasonFeatureNotFound, "goal.CreateRun",
 					"feature "+opts.FeatureSlug+" not found under "+root)
@@ -479,6 +484,7 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 			return RunView{}, core.NewError(ReasonProjectNotRegistered, "goal.CreateRun",
 				"no features registered under project root "+root)
 		}
+	} else if err != nil {
 		return RunView{}, err
 	}
 	// Intent contract bridge (AC-002): a run the kernel drives itself

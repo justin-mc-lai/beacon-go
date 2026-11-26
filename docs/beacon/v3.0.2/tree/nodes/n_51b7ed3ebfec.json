@@ -5,7 +5,7 @@
   "intent": "历史树可浏览",
   "parent_id": "n_036eb6e70d4a",
   "path": "root/self-host/dogfood/html-history",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "n_51b7ed3ebfec-1",
@@ -36,6 +36,19 @@
     "type": "test",
     "spec": "当 truth tree --format html 后，index.html 存在"
   },
-  "fingerprint": "ba6e68cf7766768ab8b422822ee28c9695c8a8aec3dd5d63d9cab1814ae427f7",
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_51b7ed3ebfec.txt",
+    "artifact_hash": "f3f43d20276702048c10703e2993e2c12751267b5055286eb62d8eff68d552b5",
+    "at": "2026-11-26T03:07:11.638056Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_0614dea867e668c0be438e77",
+    "content_hash": "f3f43d20276702048c10703e2993e2c12751267b5055286eb62d8eff68d552b5",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:11.659772Z"
+  },
+  "fingerprint": "7ff97587327134affbd7f8d5d00b5a8b00b1e3e520e7aa0ebc0fa54667186c79",
   "fingerprint_alg": "tree-json-v1"
 }

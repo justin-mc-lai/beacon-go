@@ -1,0 +1,25 @@
+{
+  "id": "n_df70e224274d",
+  "kind": "feature",
+  "title": "experience next",
+  "intent": "下一轮用户体验需求：一个入口、一个验证动作、不暴露内部 ID",
+  "parent_id": "n_0338b8fdd30a",
+  "path": "root/self-host/experience-next",
+  "status": "draft",
+  "acs": [
+    {
+      "id": "exp-1",
+      "text": "用户只运行 beacon open 就能打开当前项目需求工作台。"
+    },
+    {
+      "id": "exp-2",
+      "text": "用户只运行 beacon verify \u003cnode\u003e 就能完成检查、证据登记与 rollup。"
+    },
+    {
+      "id": "exp-3",
+      "text": "用户不需要输入 run id、artifact path、slug 或 hash。"
+    }
+  ],
+  "fingerprint": "4b24ffb7a30f735a346b3b46ce6a681d73b9a731af8e5a767e0d92b8503f1c06",
+  "fingerprint_alg": "tree-json-v1"
+}
