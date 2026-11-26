@@ -33,6 +33,16 @@
       "fingerprint_alg": "tree-json-v1"
     },
     {
+      "id": "n_5e13a94c202d",
+      "parent_id": "nroot_6b8991789867",
+      "kind": "module",
+      "status": "draft",
+      "title": "self drive",
+      "path": "root/self-drive",
+      "fingerprint": "b935d84b70b8872b01bdcf3b8ac7b8c80cc7f5b214f9706426fa435d26a98887",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
       "id": "n_47544230bf1e",
       "parent_id": "nroot_6b8991789867",
       "kind": "module",
@@ -50,6 +60,16 @@
       "title": "truth binding",
       "path": "root/truth-binding",
       "fingerprint": "631e5779fee5057e89fcd0437a8c33e9159698945ab4b9cf96d7d833be7aa1b3",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_75ea19c0c144",
+      "parent_id": "nroot_6b8991789867",
+      "kind": "module",
+      "status": "draft",
+      "title": "version evolution",
+      "path": "root/version-evolution",
+      "fingerprint": "77e8d3a4271a16ad89da9970c247076ef01b2244fefe0087c27a05ab949af521",
       "fingerprint_alg": "tree-json-v1"
     }
   ]

@@ -1,0 +1,37 @@
+{
+  "at": "2026-11-26T10:55:59.73069Z",
+  "children": [
+    {
+      "id": "n_75ea19c0c144",
+      "kind": "module",
+      "title": "version evolution",
+      "intent": "纯 x.y.z 版本演进：严格区分两条轴——beacon-go runtime version（二进制/仓库/tag，唯一源 internal/version/version.go）与需求树文档版本（docs/beacon/\u003cversion\u003e/，用于 beacon-go 驱动其它项目交付时的版本线）；两轴平时独立、发布时对齐；文档版本由 projects bump 按 patch/minor/major 演进，runtime 版本按 V-01..V-11 规则；任何项目不共享彼此的文档版本号。",
+      "parent_id": "nroot_6b8991789867",
+      "path": "root/version-evolution",
+      "status": "draft",
+      "fingerprint": "77e8d3a4271a16ad89da9970c247076ef01b2244fefe0087c27a05ab949af521",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_5e13a94c202d",
+      "kind": "module",
+      "title": "self drive",
+      "intent": "自驱迭代能力：用 beacon-go 自身的能力持续迭代 beacon-go 自己（dogfooding）——把自己的需求树当真相、按树展开 feature/touchpoint、走 goal/tasks/evidence/gate 实现与验收、用 worktree 并行交付模块；迭代中发现的缺陷（如节点 id 跨项目撞主键）回流为树节点修复，形成闭环。",
+      "parent_id": "nroot_6b8991789867",
+      "path": "root/self-drive",
+      "status": "draft",
+      "fingerprint": "b935d84b70b8872b01bdcf3b8ac7b8c80cc7f5b214f9706426fa435d26a98887",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "nroot_6b8991789867",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-tree",
+    "by": "main",
+    "sources": [
+      "用户原话：版本演进双轴 + 自驱迭代",
+      "docs/version-scheme.md V-01..V-11"
+    ]
+  }
+}
