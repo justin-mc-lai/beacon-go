@@ -1,0 +1,41 @@
+{
+  "id": "n_947f37387606",
+  "kind": "touchpoint",
+  "title": "proposal slug",
+  "intent": "显式 slug 控制节点路径，不能静默变成 node",
+  "parent_id": "n_a8b3e6af8664",
+  "path": "root/cli-surface/plan-surface/proposal-slug",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "slug-1",
+      "text": "带 slug 的 proposal 生成的 feature 路径末段等于该 slug。"
+    },
+    {
+      "id": "slug-2",
+      "text": "纯中文标题未给 slug 时返回 tree_node_slug_missing。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "slug-tc1",
+      "ac_id": "slug-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestProposalSlugControlsFeaturePath -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "slug-tc2",
+      "ac_id": "slug-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestProposalChineseTitleWithoutSlugIsRejected -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 proposal 带/不带合法 slug 时，路径末段与拒绝码符合契约"
+  },
+  "fingerprint": "2ae783f0d5a2f3be0d1f6f85c30bbcc1923b7daa60f058976965f0341235d296",
+  "fingerprint_alg": "tree-json-v1"
+}

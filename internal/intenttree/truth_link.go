@@ -8,9 +8,10 @@ import (
 	"beacon-go/internal/store"
 )
 
-// LinkTruthPath records a feature node's requirement-package path. It is
-// a pointer, not a second truth body: the package remains authoritative.
-// Only editable nodes can be linked; frozen nodes need a change first.
+// LinkTruthPath records an optional legacy package path on a feature node.
+// The canonical tree remains authoritative; the package is only historical
+// evidence or a migration source. Only editable nodes can be linked; frozen
+// nodes need a change first.
 func LinkTruthPath(st *store.Store, dir, nodeID, truthPath string) (Node, error) {
 	truthPath = strings.TrimSpace(truthPath)
 	if truthPath == "" {

@@ -149,11 +149,20 @@ table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px}th,td{text
 
 func writeTreePane(b *strings.Builder, idx Index, children map[string][]IndexEntry, bodies map[string]Node, related, own map[string]string) {
 	root := bodies[idx.RootID]
+	counts := map[Status]int{}
+	for _, e := range idx.Nodes {
+		counts[e.Status]++
+	}
 	b.WriteString(`<aside class="pane tree-pane">`)
 	fmt.Fprintf(b, `<div class="brand">%s</div><div class="sub">需求树 · %d 节点</div>`, esc(root.Title), len(idx.Nodes))
-	b.WriteString(`<input id="filter" class="filter" placeholder="筛选节点或 status:frozen" autocomplete="off">`)
+	fmt.Fprintf(b, `<div class="source-note">权威源：tree/index.json · %s<br>HTML 派生只读</div>`, esc(shortHash(SourceHash(idx))))
+	b.WriteString(`<input id="filter" class="filter" placeholder="搜索节点、AC、状态" autocomplete="off">`)
+	b.WriteString(`<div class="status-legend"><button type="button" class="status-filter active" data-status-filter="">全部 <b>` + fmt.Sprint(len(idx.Nodes)) + `</b></button>`)
+	for _, st := range []Status{StatusDraft, StatusFrozen, StatusImplemented, StatusVerified, StatusChangePending} {
+		fmt.Fprintf(b, `<button type="button" class="status-filter status-badge status-%s" data-status-filter="%s">%s <b>%d</b></button>`, esc(string(st)), esc(string(st)), esc(statusLabel(st)), counts[st])
+	}
+	b.WriteString(`</div>`)
 	b.WriteString(`<div class="tree-tools"><button type="button" id="tree-expand">全部展开</button><button type="button" id="tree-collapse">全部收起</button></div>`)
-	b.WriteString(`<div class="status-legend"><span class="status-badge status-draft">草稿</span><span class="status-badge status-frozen">已冻结</span><span class="status-badge status-implemented">已实现</span><span class="status-badge status-verified">已验证</span><span class="status-badge status-change_pending">变更中</span><span class="status-badge status-blocked">阻塞</span></div>`)
 	b.WriteString(`<ul class="tree">`)
 	writeTreeNode(b, idx.RootID, children, bodies, related, own)
 	b.WriteString(`</ul></aside>`)
@@ -225,8 +234,11 @@ func writeNodePanel(b *strings.Builder, n Node, rootID string, truth map[string]
 	if n.Intent != "" {
 		fmt.Fprintf(b, `<p class="intent">%s</p>`, esc(n.Intent))
 	}
+	if n.EffectiveTruthPath() == "" && n.Kind == KindFeature {
+		b.WriteString(`<div class="verify"><b>需求源：</b>树原生（无 legacy 包链）</div>`)
+	}
 	if n.EffectiveTruthPath() != "" {
-		b.WriteString(`<div class="verify"><b>需求包：</b>` + esc(n.EffectiveTruthPath()))
+		b.WriteString(`<div class="verify"><b>需求包（legacy）：</b>` + esc(n.EffectiveTruthPath()))
 		if st, ok := truth[n.ID]; ok {
 			if st.PackageStatus != "" {
 				b.WriteString(` · 包状态：` + esc(st.PackageStatus))
@@ -328,6 +340,9 @@ buttons.forEach(b=>b.addEventListener('click',()=>select(b.dataset.node)));
 document.querySelectorAll('[data-select]').forEach(b=>b.addEventListener('click',()=>select(b.dataset.select)));
 document.querySelectorAll('.fsm-toggle').forEach(b=>b.addEventListener('click',()=>{const slot=b.closest('.fsm-slot');slot.classList.toggle('show-exceptions');b.textContent=slot.classList.contains('show-exceptions')?'隐藏异常转移':'显示异常转移';}));
 const filter=document.getElementById('filter');
+let activeStatus='';
+const statusButtons=[...document.querySelectorAll('[data-status-filter]')];
+statusButtons.forEach(b=>b.addEventListener('click',()=>{activeStatus=b.dataset.statusFilter||'';statusButtons.forEach(x=>x.classList.toggle('active',x===b));applyFilter();}));
 const TREE_KEY='beacon-tree-open-v1';
 function treeItems(){return [...document.querySelectorAll('.tree-item')];}
 function saveTree(){try{localStorage.setItem(TREE_KEY,JSON.stringify(treeItems().filter(i=>i.classList.contains('open')).map(i=>i.dataset.treeId)));}catch(e){}}
@@ -337,7 +352,7 @@ const expand=document.getElementById('tree-expand'), collapse=document.getElemen
 if(expand){expand.addEventListener('click',()=>{treeItems().forEach(i=>i.classList.add('open'));saveTree();});}
 if(collapse){collapse.addEventListener('click',()=>{treeItems().forEach(i=>i.classList.remove('open'));saveTree();});}
 function ownMatch(li,text,status){const b=li.querySelector(':scope > .tree-row .node');if(!b)return false;if(status&&b.dataset.status!==status)return false;return !text||(b.dataset.search||'').includes(text);}
-function applyFilter(){const raw=(filter&&filter.value.trim().toLowerCase())||'';let status='',text=raw;if(raw.startsWith('status:')){status=raw.slice(7).trim();text='';}function walk(li){const kids=[...li.querySelectorAll(':scope > .tree-children > .tree-item')];let child=false;kids.forEach(k=>{if(walk(k))child=true;});const own=ownMatch(li,text,status);const show=own||child;li.classList.toggle('hidden',!show);if(child)li.classList.add('open');return show;}treeItems().filter(i=>!i.parentElement.closest('.tree-item')).forEach(walk);}
+function applyFilter(){const raw=(filter&&filter.value.trim().toLowerCase())||'';let status=activeStatus,text=raw;if(raw.startsWith('status:')){status=raw.slice(7).trim();text='';}function walk(li){const kids=[...li.querySelectorAll(':scope > .tree-children > .tree-item')];let child=false;kids.forEach(k=>{if(walk(k))child=true;});const own=ownMatch(li,text,status);const show=own||child;li.classList.toggle('hidden',!show);if(child)li.classList.add('open');return show;}treeItems().filter(i=>!i.parentElement.closest('.tree-item')).forEach(walk);}
 if(filter){filter.addEventListener('input',applyFilter);}
 restoreTree();
 select(location.hash.slice(1)||'%s');
@@ -353,6 +368,13 @@ func orderedFSMNodes(idx Index, bodies map[string]Node) []IndexEntry {
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].Path < out[j].Path })
 	return out
+}
+
+func shortHash(h string) string {
+	if len(h) > 12 {
+		return h[:12]
+	}
+	return h
 }
 
 func boolStr(v bool) string {

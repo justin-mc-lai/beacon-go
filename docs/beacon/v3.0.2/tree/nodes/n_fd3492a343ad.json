@@ -1,0 +1,30 @@
+{
+  "id": "n_fd3492a343ad",
+  "kind": "touchpoint",
+  "title": "version line",
+  "intent": "版本线只能显式打开，不能隐式升级",
+  "parent_id": "n_0fe4a2ab5ffb",
+  "path": "root/data-migration/projects-version/version-line",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "version-1",
+      "text": "projects bump 默认 patch，显式 minor/major；docs root 与 current 标记随新版本变化。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "version-tc1",
+      "ac_id": "version-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestProjectsBumpPatch -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 projects bump patch 时，新版本线被创建且旧版本不被改写"
+  },
+  "fingerprint": "4475bf40c8119327b947e2b8f7c65e62fe102ad580af48d2ea811db188e92745",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,35 @@
+{
+  "at": "2026-11-26T02:45:11.08327Z",
+  "children": [
+    {
+      "id": "n_7c5c1cfc7372",
+      "kind": "feature",
+      "title": "implement surface",
+      "intent": "实现阶段只能消费冻结需求，并把执行和证据分离开",
+      "parent_id": "n_8b83bfc9403d",
+      "path": "root/cli-surface/implement-surface",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "implement-1",
+          "text": "implement report 只接受 frozen 叶子，成功必须带 artifact 与 hash。"
+        },
+        {
+          "id": "implement-2",
+          "text": "tick、delegate、admit 共用同一个准入判定，不能各自放宽。"
+        }
+      ],
+      "fingerprint": "b31196a43994023bbe7b7c094095735983bf8c9dbac2cc4b4661e1334e35dac5",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_8b83bfc9403d",
+  "provenance": {
+    "by": "beacon-self-audit",
+    "sources": [
+      "README.md seven groups",
+      "docs/migration-3.0.0.md",
+      "internal/intenttree/implement.go"
+    ]
+  }
+}

@@ -69,8 +69,18 @@ func TestPlanTreeReportsUnlinked(t *testing.T) {
 	mod := parseDoc(t, mustRun(t, "plan", "apply", "--project", proj, "--node", root, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "module", "title": "m", "intent": "m"}}}), "--json"))["nodes"].([]any)[0].(map[string]any)["id"].(string)
 	mustRun(t, "plan", "apply", "--project", proj, "--node", mod, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "feature", "title": "Unlinked Feature", "intent": "x"}}}), "--json")
 	out := mustRun(t, "plan", "tree", "--project", proj)
-	if !strings.Contains(out, "unlinked:") || !strings.Contains(out, "unlinked-feature") {
-		t.Fatalf("unlinked report must use the package slug: %s", out)
+	if !strings.Contains(out, "tree-native: 1") {
+		t.Fatalf("tree-native count missing: %s", out)
+	}
+	doc := parseDoc(t, mustRun(t, "plan", "tree", "--project", proj, "--json"))
+	found := false
+	for _, raw := range doc["unlinked"].([]any) {
+		if raw == "unlinked-feature" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("unlinked JSON must use the package slug: %s", doc)
 	}
 }
 
@@ -254,5 +264,14 @@ func TestProposalInvalidAndCollidingExplicitSlug(t *testing.T) {
 	_, err = runCLI(t, "plan", "apply", "--project", proj, "--node", mod, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "feature", "title": "Second", "slug": "same", "intent": "x"}}}), "--json")
 	if err == nil || !strings.Contains(err.Error(), "tree_node_slug_collision") {
 		t.Fatalf("colliding explicit slug must fail: %v", err)
+	}
+}
+
+func TestTreeSummaryShowsStatusCounts(t *testing.T) {
+	proj := treeTestEnv(t)
+	mustRun(t, "plan", "init", "--project", proj, "--title", "root", "--intent", "root", "--json")
+	out := mustRun(t, "plan", "tree", "--project", proj)
+	if !strings.Contains(out, "状态：草稿 1 · 冻结 0 · 已交付/实现 0 · 已验证 0") {
+		t.Fatalf("status counts missing or wrong: %s", out)
 	}
 }

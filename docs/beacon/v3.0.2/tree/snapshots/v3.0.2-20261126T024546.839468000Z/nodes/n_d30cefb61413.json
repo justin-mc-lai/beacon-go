@@ -1,0 +1,30 @@
+{
+  "id": "n_d30cefb61413",
+  "kind": "touchpoint",
+  "title": "shared admission",
+  "intent": "所有实现入口共用同一套准入判定",
+  "parent_id": "n_7c5c1cfc7372",
+  "path": "root/cli-surface/implement-surface/shared-admission",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "admit-1",
+      "text": "tick、delegate、admit 对同一 run 返回一致准入结论；任一阻塞项阻止写入。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "admit-tc1",
+      "ac_id": "admit-1",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestAdmissionSharedAcrossTickDelegateAdmit -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当准入项失败时三个入口都返回同一阻塞原因"
+  },
+  "fingerprint": "d7ca4ce9df359d9082a533b3e4eb4b1d559bebf3038f16e1cc28871944aa68e5",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -9,7 +9,7 @@
       "status": "frozen",
       "title": "beacon-go",
       "path": "root",
-      "fingerprint": "c024a52a843d1125d52142e1c27b25df0cec3de3532e335c9044d7cf6d5258b4",
+      "fingerprint": "0cf4269343cea6b625fc243ec4491d79d1319d65c1057bc745bfd4b1ba914589",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -19,7 +19,7 @@
       "status": "frozen",
       "title": "cli-surface",
       "path": "root/cli-surface",
-      "fingerprint": "a01986595fac65933705112d73fa81798b9a80ae8cffb086ec0290911e1a8581",
+      "fingerprint": "c53ff67da4fba52ca796559211edf4dbf6667be754a6d4973f1dea6ec07abc9a",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -73,6 +73,76 @@
       "fingerprint_alg": "tree-json-v1"
     },
     {
+      "id": "n_7c5c1cfc7372",
+      "parent_id": "n_8b83bfc9403d",
+      "kind": "feature",
+      "status": "frozen",
+      "title": "implement surface",
+      "path": "root/cli-surface/implement-surface",
+      "fingerprint": "27bab22a84f3af8d67f06c2a4fe0d5c6c7169157159a5ef8371c7c72c4e90d87",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_fb244a5894d7",
+      "parent_id": "n_7c5c1cfc7372",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "report artifact",
+      "path": "root/cli-surface/implement-surface/report-artifact",
+      "fingerprint": "89b1ee5251b0c7cdb24b60fe98d3f892994a050b554ff8084178d7cb1ad0228b",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_d30cefb61413",
+      "parent_id": "n_7c5c1cfc7372",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "shared admission",
+      "path": "root/cli-surface/implement-surface/shared-admission",
+      "fingerprint": "d7ca4ce9df359d9082a533b3e4eb4b1d559bebf3038f16e1cc28871944aa68e5",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_a8b3e6af8664",
+      "parent_id": "n_8b83bfc9403d",
+      "kind": "feature",
+      "status": "frozen",
+      "title": "plan surface",
+      "path": "root/cli-surface/plan-surface",
+      "fingerprint": "74a628f69df0917c7640de78741c6ea56646cae02c957ca7939bc70b285bfd84",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_33e9b36fed1f",
+      "parent_id": "n_a8b3e6af8664",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "proposal guards",
+      "path": "root/cli-surface/plan-surface/proposal-guards",
+      "fingerprint": "fd132e2b15888f5f10cb576fa9fe2ffb0782584c28516f538387f0afd0a5310d",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_947f37387606",
+      "parent_id": "n_a8b3e6af8664",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "proposal slug",
+      "path": "root/cli-surface/plan-surface/proposal-slug",
+      "fingerprint": "2ae783f0d5a2f3be0d1f6f85c30bbcc1923b7daa60f058976965f0341235d296",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_c81a81711c2c",
+      "parent_id": "n_a8b3e6af8664",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "tree render",
+      "path": "root/cli-surface/plan-surface/tree-render",
+      "fingerprint": "afe5f22050d26f811e08e28ec679b62e432b434d93ca76f77bcf9acdf7f185ce",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
       "id": "n_068ee154c0a2",
       "parent_id": "n_8b83bfc9403d",
       "kind": "feature",
@@ -109,7 +179,37 @@
       "status": "frozen",
       "title": "data-migration",
       "path": "root/data-migration",
-      "fingerprint": "77a3c11583616cd15e9aa839e68bac592e2e8b66757861ccb3e73a35665435f7",
+      "fingerprint": "1395fa5e07811c0bda3512723fb24f4771571635dfac2c028d77629ef514cfa0",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_0fe4a2ab5ffb",
+      "parent_id": "n_65c89b949e6f",
+      "kind": "feature",
+      "status": "frozen",
+      "title": "projects version",
+      "path": "root/data-migration/projects-version",
+      "fingerprint": "41b13d43c280a1f2d4e11dc750cd0bf67a10d5b6b4515e578495328424bb48b7",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_13ca4dbe56f7",
+      "parent_id": "n_0fe4a2ab5ffb",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "project registry",
+      "path": "root/data-migration/projects-version/project-registry",
+      "fingerprint": "111a64c70a33876b196bfe6a1b357ce2bae35e44cce264240b2963191a6ff4cc",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_fd3492a343ad",
+      "parent_id": "n_0fe4a2ab5ffb",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "version line",
+      "path": "root/data-migration/projects-version/version-line",
+      "fingerprint": "4475bf40c8119327b947e2b8f7c65e62fe102ad580af48d2ea811db188e92745",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -159,7 +259,7 @@
       "status": "frozen",
       "title": "goal-orchestration",
       "path": "root/goal-orchestration",
-      "fingerprint": "7abc898e22c4942b7ef3bea37f1e682ea47cdbfe60b068911d6d7a6b1c0bbd41",
+      "fingerprint": "0543a93dfcca963cd14d7f0dbdf3a7f8bb2fc4561882ad96ac180ef0390064fb",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -169,7 +269,7 @@
       "status": "frozen",
       "title": "manual-run",
       "path": "root/goal-orchestration/manual-run",
-      "fingerprint": "61e64feb0f3a3f23087a7488f1c227663ad41d83fc3950c3f43b4412621aa5e4",
+      "fingerprint": "354da58b5b066bf0678c9a0853e3972574d20e9ab77ae9af24b2a811520addda",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -180,6 +280,16 @@
       "title": "checkpoint resume",
       "path": "root/goal-orchestration/manual-run/checkpoint-resume",
       "fingerprint": "32003f2a266f1b629d464e935d2fb851e418584f3899e646424ab6bc808c6312",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_691cddfe9236",
+      "parent_id": "n_4aafa3895e8d",
+      "kind": "touchpoint",
+      "status": "verified",
+      "title": "driver turn",
+      "path": "root/goal-orchestration/manual-run/driver-turn",
+      "fingerprint": "c2ce355f553bed77c6dd2f39dc358eaeab9a58c179520b1dd34a18e7db05a331",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -199,7 +309,17 @@
       "status": "frozen",
       "title": "run-lifecycle",
       "path": "root/goal-orchestration/run-lifecycle",
-      "fingerprint": "55584c318cbd95fa78399f99e7bd91fa26481bd359057b8969f0628a4d22ec7f",
+      "fingerprint": "b8390594540ed936d3661ad72191440558bfd088ed9af674cf3c718b27cfd12f",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_9ca42580d7b4",
+      "parent_id": "n_eedd1f82a0f6",
+      "kind": "touchpoint",
+      "status": "verified",
+      "title": "block recover",
+      "path": "root/goal-orchestration/run-lifecycle/block-recover",
+      "fingerprint": "a30628729ec38e661d0968a1cb7d8e9abf5bc5e013c2e0a5cbd23c3d448fcdf7",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -213,13 +333,23 @@
       "fingerprint_alg": "tree-json-v1"
     },
     {
+      "id": "n_e32e3c830868",
+      "parent_id": "n_eedd1f82a0f6",
+      "kind": "touchpoint",
+      "status": "verified",
+      "title": "stage plan",
+      "path": "root/goal-orchestration/run-lifecycle/stage-plan",
+      "fingerprint": "70233fe29f5810f9dbfcd0992f77403acf4f896fc4c6e6c8133fabc41874d80c",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
       "id": "n_542ddf4aff0d",
       "parent_id": "n_2f9cbcff36f4",
       "kind": "feature",
       "status": "frozen",
       "title": "stage-gate",
       "path": "root/goal-orchestration/stage-gate",
-      "fingerprint": "b0ce7cdf48e73de3649803d745be7eb8bcb28a19eb85bba2ebc873dbd754b5b9",
+      "fingerprint": "f64040f1133ad94db7d4da4267e5bef639da3e62f704cf23b98a5ae00d0bb05c",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -240,6 +370,16 @@
       "title": "tree stage readiness",
       "path": "root/goal-orchestration/stage-gate/tree-stage-readiness",
       "fingerprint": "8d9dfcb9bc764e4dd04152a57c95160ce32ead98c04865de4bca25369a62df7d",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_17570ee68fcf",
+      "parent_id": "n_542ddf4aff0d",
+      "kind": "touchpoint",
+      "status": "verified",
+      "title": "verifier attach",
+      "path": "root/goal-orchestration/stage-gate/verifier-attach",
+      "fingerprint": "0378c8264c8f34096a381aaf2b947e13ebfd018d7a40d5510ef9d1d4c6084e51",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -299,7 +439,7 @@
       "status": "frozen",
       "title": "self-host",
       "path": "root/self-host",
-      "fingerprint": "4be3b1f22b8ba1bf457a335085039e90c64b3ea1abdf97e526b1e05e957d0727",
+      "fingerprint": "24cb5343dd4359098d5d11804e3361c56d5e1252b99df93e3d0732ef6feacf38",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -350,6 +490,46 @@
       "title": "html history",
       "path": "root/self-host/dogfood/html-history",
       "fingerprint": "ba6e68cf7766768ab8b422822ee28c9695c8a8aec3dd5d63d9cab1814ae427f7",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_712b67ae7445",
+      "parent_id": "n_0338b8fdd30a",
+      "kind": "feature",
+      "status": "verified",
+      "title": "requirement workbench",
+      "path": "root/self-host/requirement-workbench",
+      "fingerprint": "27f5ab7c4add39a5a49e82a3c5e4fe1bd03af6f0e2c4a74c64cd0c157a4e0c85",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_c1c7d8208321",
+      "parent_id": "n_712b67ae7445",
+      "kind": "touchpoint",
+      "status": "verified",
+      "title": "source authority",
+      "path": "root/self-host/requirement-workbench/source-authority",
+      "fingerprint": "6fd6667423f0f037bed834aaff35c4482880bead14d7011feeac80f908ca2766",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_b954812aae42",
+      "parent_id": "n_712b67ae7445",
+      "kind": "touchpoint",
+      "status": "verified",
+      "title": "status counts",
+      "path": "root/self-host/requirement-workbench/status-counts",
+      "fingerprint": "9c6da4e8d91100be0cfa72921dc8bf6cc58724863173bd68e1916b7374833e75",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_ada94f7acf03",
+      "parent_id": "n_712b67ae7445",
+      "kind": "touchpoint",
+      "status": "verified",
+      "title": "tree native",
+      "path": "root/self-host/requirement-workbench/tree-native",
+      "fingerprint": "6e532f545eebeb334889f039b29e29806525389dcf45a0912c275d08f00cb6ee",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -499,7 +679,7 @@
       "status": "frozen",
       "title": "verification",
       "path": "root/verification",
-      "fingerprint": "ba429097fae3f447c8b2970dbbf5d80dc354b34e1bcdd5abe08539985b37383c",
+      "fingerprint": "8b702055da312519ca08259e2af2993ff65de0c91ffcd5c21847d3fb0c673d62",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -553,13 +733,33 @@
       "fingerprint_alg": "tree-json-v1"
     },
     {
+      "id": "n_67c0fdcaa14a",
+      "parent_id": "n_66fe3404b218",
+      "kind": "feature",
+      "status": "frozen",
+      "title": "qa surface",
+      "path": "root/verification/qa-surface",
+      "fingerprint": "307fbb40c276a98f297eb569e86a0a38c27652155e9f628170443c8f2e329fa8",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_31c8131651be",
+      "parent_id": "n_67c0fdcaa14a",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "qa surfaces",
+      "path": "root/verification/qa-surface/qa-surfaces",
+      "fingerprint": "145b690ceb554239ed32388b573053dfbb76e7b8f8e38e744e539f7dd42a017f",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
       "id": "n_820af49910f0",
       "parent_id": "n_66fe3404b218",
       "kind": "feature",
       "status": "frozen",
       "title": "rollup-audit",
       "path": "root/verification/rollup-audit",
-      "fingerprint": "a64d7c6b8c846bbca01346757107d91b3860b0a4b9d259dd7e3b094408d6ab98",
+      "fingerprint": "5cdbceb48ef65095c4a1d69f70398e6c8e2a440384b0b183e1747a65a4b057df",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -580,6 +780,16 @@
       "title": "parent rollup",
       "path": "root/verification/rollup-audit/parent-rollup",
       "fingerprint": "3c2953df4dc0ea22adc6f4cca3e1d6ea63e238ee911d7d8725b12b5bc26a8f74",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_e430a9a08d56",
+      "parent_id": "n_820af49910f0",
+      "kind": "touchpoint",
+      "status": "implemented",
+      "title": "tree audit",
+      "path": "root/verification/rollup-audit/tree-audit",
+      "fingerprint": "5d98321e351396e07f27482368480da39a0f51e9ed3498102279d1543ff8f3b9",
       "fingerprint_alg": "tree-json-v1"
     }
   ]

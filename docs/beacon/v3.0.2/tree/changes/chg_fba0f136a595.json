@@ -1,0 +1,13 @@
+{
+  "id": "chg_fba0f136a595",
+  "node_id": "n_4aafa3895e8d",
+  "summary": "补齐 driver turn 叶子",
+  "by": "beacon-self-audit",
+  "base_fingerprint": "61e64feb0f3a3f23087a7488f1c227663ad41d83fc3950c3f43b4412621aa5e4",
+  "affected": [
+    "n_4aafa3895e8d",
+    "n_77ece7e1beb1",
+    "n_79f7bfd68155"
+  ],
+  "created_at": "2026-11-26T02:41:05.835815Z"
+}

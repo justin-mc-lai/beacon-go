@@ -1,0 +1,41 @@
+{
+  "id": "n_17570ee68fcf",
+  "kind": "touchpoint",
+  "title": "verifier attach",
+  "intent": "完成 run 前必须有独立验证者，maker 不能自证",
+  "parent_id": "n_542ddf4aff0d",
+  "path": "root/goal-orchestration/stage-gate/verifier-attach",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "verifier-1",
+      "text": "goal complete 要求已 attach 独立 verifier，且 maker 与 checker 不同。"
+    },
+    {
+      "id": "verifier-2",
+      "text": "attach verifier 不能清除未解决的人工门阻塞。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "verifier-tc1",
+      "ac_id": "verifier-1",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestAttachVerifierMakerChecker -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "verifier-tc2",
+      "ac_id": "verifier-2",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestAttachVerifierDoesNotClearUnresolvedBlock -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 run 没有独立 verifier 时 complete 被拒绝；attach 后仍不能绕过人工门"
+  },
+  "fingerprint": "e3cbc9508f4c0ad5b4dcc15b239fa53be0fcc250647d5c5ccaa649bf420124b9",
+  "fingerprint_alg": "tree-json-v1"
+}

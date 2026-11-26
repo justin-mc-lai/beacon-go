@@ -1,0 +1,30 @@
+{
+  "id": "n_c1c7d8208321",
+  "kind": "touchpoint",
+  "title": "source authority",
+  "intent": "HTML 必须让人一眼看出权威源和派生物",
+  "parent_id": "n_712b67ae7445",
+  "path": "root/self-host/requirement-workbench/source-authority",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "source-1",
+      "text": "HTML 显示 tree/index.json 的 source hash 和“HTML 派生只读”。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "source-tc1",
+      "ac_id": "source-1",
+      "kind": "unit",
+      "ref": "go test ./internal/intenttree -run TestRenderHTMLTreeShowsRequirementBodies -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当生成 HTML 时，页面包含权威源 hash 和派生只读标识"
+  },
+  "fingerprint": "36e4d52dbe17ddca2432832e09df507207aa1bc7813da8c9139d6e12c38da531",
+  "fingerprint_alg": "tree-json-v1"
+}

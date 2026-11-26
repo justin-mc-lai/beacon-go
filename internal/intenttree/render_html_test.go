@@ -19,7 +19,7 @@ func TestRenderHTMLTreeShowsRequirementBodies(t *testing.T) {
 		States: []string{"draft", "frozen"}, Transitions: []FSMTransition{{From: "draft", To: "frozen", Event: "freeze"}},
 		Illegal: []FSMTransition{{From: "frozen", To: "draft"}}}}
 	html := string(RenderHTMLTree(idx, map[string]Node{"r": {ID: "r", Kind: KindIntent, Intent: "根意图"}, "t": tp, "f": f}))
-	for _, want := range []string{"用户能登录", "正确凭证返回会话", "当凭证正确时返回会话", "验收标准", "业务状态机", "freeze", "frozen→draft", "data-panel", "data-node", "fsm-canvas", "转移明细", "tree-toggle", "status-badge", "全部展开", "localStorage"} {
+	for _, want := range []string{"用户能登录", "正确凭证返回会话", "当凭证正确时返回会话", "验收标准", "业务状态机", "freeze", "frozen→draft", "data-panel", "data-node", "fsm-canvas", "转移明细", "tree-toggle", "status-badge", "全部展开", "localStorage", "权威源", "HTML 派生只读", "已交付"} {
 		if !strings.Contains(html, want) {
 			t.Fatalf("html missing %q", want)
 		}
@@ -39,6 +39,20 @@ func TestRenderHTMLTreeShowsTruthLinkMismatch(t *testing.T) {
 		"f": {Path: body.TruthPath, PackageStatus: "frozen", Match: false},
 	}))
 	for _, want := range []string{"需求包", "包状态：frozen", "状态不一致"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("html missing %q", want)
+		}
+	}
+}
+
+func TestRenderHTMLTreeCountsDelivered(t *testing.T) {
+	idx := Index{Schema: Schema, Version: "v0.1.0", RootID: "r", Nodes: []IndexEntry{
+		{ID: "r", Kind: KindIntent, Status: StatusVerified, Title: "root", Path: "root", Fingerprint: "aa"},
+		{ID: "f", ParentID: "r", Kind: KindFeature, Status: StatusImplemented, Title: "feature", Path: "root/feature", Fingerprint: "bb"},
+	}}
+	body := Node{ID: "f", Kind: KindFeature, Title: "feature", Status: StatusImplemented, Implementation: &ImplementationRecord{By: "dev"}}
+	out := string(RenderHTMLTree(idx, map[string]Node{"r": {ID: "r", Kind: KindIntent}, "f": body}))
+	for _, want := range []string{"已交付/实现 <b>1</b>"} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("html missing %q", want)
 		}

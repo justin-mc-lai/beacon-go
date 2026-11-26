@@ -1,0 +1,96 @@
+{
+  "at": "2026-11-26T02:40:45.479149Z",
+  "children": [
+    {
+      "id": "n_e32e3c830868",
+      "kind": "touchpoint",
+      "title": "stage plan",
+      "intent": "goal run 创建完整阶段计划，而不是只建一行 run",
+      "parent_id": "n_eedd1f82a0f6",
+      "path": "root/goal-orchestration/run-lifecycle/stage-plan",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "stage-plan-1",
+          "text": "goal run 创建 run 时写入完整 stage plan，顺序为 plan/truth/implement/qa/release；--ux 才插入 design。"
+        },
+        {
+          "id": "stage-plan-2",
+          "text": "stage plan 的第一阶段为 active，其余为 pending。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "stage-plan-tc1",
+          "ac_id": "stage-plan-1",
+          "kind": "unit",
+          "ref": "go test ./internal/orchestrator -run TestCreateRunStageOrder -count=1",
+          "status": "existing"
+        },
+        {
+          "id": "stage-plan-tc2",
+          "ac_id": "stage-plan-2",
+          "kind": "unit",
+          "ref": "go test ./internal/orchestrator -run TestCreateRunStageOrder -count=1",
+          "status": "existing"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当 goal run 带/不带 --ux 创建 run 时，stage plan 顺序和 active/pending 与文档一致"
+      },
+      "fingerprint": "a213a307dbdc91698383c736cb9422fe146409c0ddaf7206af6190fe22836304",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_9ca42580d7b4",
+      "kind": "touchpoint",
+      "title": "block recover",
+      "intent": "可恢复阻塞与人工发布门必须有明确边界",
+      "parent_id": "n_eedd1f82a0f6",
+      "path": "root/goal-orchestration/run-lifecycle/block-recover",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "block-recover-1",
+          "text": "可恢复阻塞可以带身份 recover；拒绝无身份清除。"
+        },
+        {
+          "id": "block-recover-2",
+          "text": "人工发布门原因不能被 recover 清除，只能由人工确认解除。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "block-recover-tc1",
+          "ac_id": "block-recover-1",
+          "kind": "unit",
+          "ref": "go test ./internal/orchestrator -run TestRecoverClearsRecoverableBlockAndResetsStreak -count=1",
+          "status": "existing"
+        },
+        {
+          "id": "block-recover-tc2",
+          "ac_id": "block-recover-2",
+          "kind": "unit",
+          "ref": "go test ./internal/orchestrator -run TestRecoverRefusesHumanGateReasonsWithoutStateChange -count=1",
+          "status": "existing"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当 recover 清除可恢复阻塞时状态回到原阶段；当 recover 指向人工门时状态不变并记录拒绝"
+      },
+      "fingerprint": "32b4bff0c657ce52b02e5fce47db31b7439e973d1ad4d40ced4eee76fd9cb8e9",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_eedd1f82a0f6",
+  "provenance": {
+    "by": "beacon-self-audit",
+    "sources": [
+      "agent://TreeGapGoalVerify",
+      "docs/adr/ADR-0002-intent-tree-truth-model.md",
+      "README.md"
+    ]
+  }
+}

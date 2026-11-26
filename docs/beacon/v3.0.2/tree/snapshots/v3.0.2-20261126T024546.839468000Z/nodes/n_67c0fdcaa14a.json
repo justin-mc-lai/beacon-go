@@ -1,0 +1,28 @@
+{
+  "id": "n_67c0fdcaa14a",
+  "kind": "feature",
+  "title": "qa surface",
+  "intent": "verify 组承接原 qa 的 status/score/autotest，且不冒充发布",
+  "parent_id": "n_66fe3404b218",
+  "path": "root/verification/qa-surface",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "qa-1",
+      "text": "verify status 读取正式 gate 结论，不从 prose 推断。"
+    },
+    {
+      "id": "qa-2",
+      "text": "verify score 只评分，不改验收/发布结论。"
+    },
+    {
+      "id": "qa-3",
+      "text": "verify autotest 执行声明的测试选择器并登记结果。"
+    }
+  ],
+  "child_fingerprints": [
+    "145b690ceb554239ed32388b573053dfbb76e7b8f8e38e744e539f7dd42a017f"
+  ],
+  "fingerprint": "307fbb40c276a98f297eb569e86a0a38c27652155e9f628170443c8f2e329fa8",
+  "fingerprint_alg": "tree-json-v1"
+}

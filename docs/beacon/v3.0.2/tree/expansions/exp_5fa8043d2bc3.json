@@ -1,0 +1,39 @@
+{
+  "at": "2026-11-26T02:41:43.433302Z",
+  "children": [
+    {
+      "id": "n_712b67ae7445",
+      "kind": "feature",
+      "title": "requirement workbench",
+      "intent": "让需求树 HTML 成为清晰、单源、可筛选的工作台",
+      "parent_id": "n_0338b8fdd30a",
+      "path": "root/self-host/requirement-workbench",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "workbench-1",
+          "text": "HTML 顶层明确显示权威源路径与 source hash，并标注 HTML 为派生只读。"
+        },
+        {
+          "id": "workbench-2",
+          "text": "HTML 显示草稿/冻结/交付实现/验证的数量与可点击筛选。"
+        },
+        {
+          "id": "workbench-3",
+          "text": "未绑定 legacy 包的功能显示为 tree-native，而不是失败或未完成。"
+        }
+      ],
+      "fingerprint": "e24bb8d5f2de367d0b4f94e04a8bcd92863b316019cb8fdc363ec50fb1118134",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_0338b8fdd30a",
+  "provenance": {
+    "by": "beacon-self-audit",
+    "sources": [
+      "user requirement 2026-11-26",
+      "agent://TreeStatusHtml",
+      "internal/intenttree/render_html.go"
+    ]
+  }
+}

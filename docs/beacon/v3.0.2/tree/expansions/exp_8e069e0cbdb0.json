@@ -1,0 +1,73 @@
+{
+  "at": "2026-11-26T02:44:58.144463Z",
+  "children": [
+    {
+      "id": "n_13ca4dbe56f7",
+      "kind": "touchpoint",
+      "title": "project registry",
+      "intent": "一个项目根路径只对应一个注册实体",
+      "parent_id": "n_0fe4a2ab5ffb",
+      "path": "root/data-migration/projects-version/project-registry",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "registry-1",
+          "text": "projects register 幂等；show/list 返回 root、versions、current version。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "registry-tc1",
+          "ac_id": "registry-1",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestProjectsRegisterListShowClosure -count=1",
+          "status": "existing"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当注册同一路径两次并 show/list 时，仍只有一个项目且当前版本正确"
+      },
+      "fingerprint": "a83d8c322f80210e43a293f07ea2ca9d02006f9c14f1f6ebdfa8c3720ea76d2a",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_fd3492a343ad",
+      "kind": "touchpoint",
+      "title": "version line",
+      "intent": "版本线只能显式打开，不能隐式升级",
+      "parent_id": "n_0fe4a2ab5ffb",
+      "path": "root/data-migration/projects-version/version-line",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "version-1",
+          "text": "projects bump 默认 patch，显式 minor/major；docs root 与 current 标记随新版本变化。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "version-tc1",
+          "ac_id": "version-1",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestProjectsBumpPatch -count=1",
+          "status": "existing"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当 projects bump patch 时，新版本线被创建且旧版本不被改写"
+      },
+      "fingerprint": "7d85e4cc0ffdbcfcbfa53b9b4ffbab52fcc32893ed102373db8bfb87393e5374",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_0fe4a2ab5ffb",
+  "provenance": {
+    "by": "beacon-self-audit",
+    "sources": [
+      "README.md",
+      "internal/cli/projects*.go"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "id": "n_b954812aae42",
+  "kind": "touchpoint",
+  "title": "status counts",
+  "intent": "草稿、冻结、交付、验证必须有数量和筛选",
+  "parent_id": "n_712b67ae7445",
+  "path": "root/self-host/requirement-workbench/status-counts",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "status-1",
+      "text": "HTML 显示草稿/冻结/交付实现/验证计数，并可点击筛选。"
+    },
+    {
+      "id": "status-2",
+      "text": "CLI summary 输出同样的状态计数。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "status-tc1",
+      "ac_id": "status-1",
+      "kind": "unit",
+      "ref": "go test ./internal/intenttree -run TestRenderHTMLTreeShowsRequirementBodies -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "status-tc2",
+      "ac_id": "status-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestTreeSummaryShowsStatusCounts -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当渲染 HTML 或 summary 时，四类状态计数存在且与 index 一致"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/n_b954812aae42.txt",
+    "artifact_hash": "646f70f0f9b62b6fa176ef9d8a78329e103e48580a3e4b1dd53a3a264ab0abec",
+    "at": "2026-11-26T02:43:00.425395Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_5ea9a75d8ba43c3c543cc576",
+    "content_hash": "646f70f0f9b62b6fa176ef9d8a78329e103e48580a3e4b1dd53a3a264ab0abec",
+    "by": "self-audit",
+    "at": "2026-11-26T02:43:00.435964Z"
+  },
+  "fingerprint": "9c6da4e8d91100be0cfa72921dc8bf6cc58724863173bd68e1916b7374833e75",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,126 @@
+{
+  "at": "2026-11-26T02:44:41.252544Z",
+  "children": [
+    {
+      "id": "n_947f37387606",
+      "kind": "touchpoint",
+      "title": "proposal slug",
+      "intent": "显式 slug 控制节点路径，不能静默变成 node",
+      "parent_id": "n_a8b3e6af8664",
+      "path": "root/cli-surface/plan-surface/proposal-slug",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "slug-1",
+          "text": "带 slug 的 proposal 生成的 feature 路径末段等于该 slug。"
+        },
+        {
+          "id": "slug-2",
+          "text": "纯中文标题未给 slug 时返回 tree_node_slug_missing。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "slug-tc1",
+          "ac_id": "slug-1",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestProposalSlugControlsFeaturePath -count=1",
+          "status": "existing"
+        },
+        {
+          "id": "slug-tc2",
+          "ac_id": "slug-2",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestProposalChineseTitleWithoutSlugIsRejected -count=1",
+          "status": "existing"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当 proposal 带/不带合法 slug 时，路径末段与拒绝码符合契约"
+      },
+      "fingerprint": "37eea1695466a15f81a4514c88d64029c9d3b286a252e909de120851f345f23f",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_33e9b36fed1f",
+      "kind": "touchpoint",
+      "title": "proposal guards",
+      "intent": "非法或冲突的显式 slug 必须拒绝，不能覆盖已有路径",
+      "parent_id": "n_a8b3e6af8664",
+      "path": "root/cli-surface/plan-surface/proposal-guards",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "guard-1",
+          "text": "非法显式 slug 返回 tree_node_slug_invalid。"
+        },
+        {
+          "id": "guard-2",
+          "text": "显式 slug 与已有路径冲突时返回 tree_node_slug_collision，不静默加后缀。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "guard-tc1",
+          "ac_id": "guard-1",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestProposalInvalidAndCollidingExplicitSlug -count=1",
+          "status": "existing"
+        },
+        {
+          "id": "guard-tc2",
+          "ac_id": "guard-2",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestProposalInvalidAndCollidingExplicitSlug -count=1",
+          "status": "existing"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当显式 slug 非法或重复时 plan apply 非零退出并返回对应 reason code"
+      },
+      "fingerprint": "f5f77ff55a75e2971f21aeefecb05142893d31d7426f7f763d010641ef168d3b",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_c81a81711c2c",
+      "kind": "touchpoint",
+      "title": "tree render",
+      "intent": "树视图必须稳定、可读、可派生",
+      "parent_id": "n_a8b3e6af8664",
+      "path": "root/cli-surface/plan-surface/tree-render",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "render-1",
+          "text": "plan tree 支持 summary/json/md/html，HTML 写入权威源 hash 与 source 标识。"
+        }
+      ],
+      "test_cases": [
+        {
+          "id": "render-tc1",
+          "ac_id": "render-1",
+          "kind": "unit",
+          "ref": "go test ./internal/cli -run TestTreeRebuildAndMarkdownRender -count=1",
+          "status": "existing"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "当渲染 md/html 时返回稳定文件与源 hash"
+      },
+      "fingerprint": "7db2c06c4057576ac10a6c5fbb401586020ac9313fbe92e82dae0b16d694246a",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_a8b3e6af8664",
+  "provenance": {
+    "by": "beacon-self-audit",
+    "sources": [
+      "issue #44",
+      "internal/cli/tree.go",
+      "internal/intenttree/render_html.go"
+    ]
+  }
+}

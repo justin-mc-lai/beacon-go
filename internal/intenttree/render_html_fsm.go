@@ -168,7 +168,7 @@ func statusLabel(s Status) string {
 	case StatusFrozen:
 		return "已冻结"
 	case StatusImplemented:
-		return "已实现"
+		return "已交付/实现"
 	case StatusVerified:
 		return "已验证"
 	case StatusChangePending:

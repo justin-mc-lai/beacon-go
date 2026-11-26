@@ -1,0 +1,13 @@
+{
+  "id": "chg_26e9cacc62a7",
+  "node_id": "n_820af49910f0",
+  "summary": "补齐 tree audit 叶子",
+  "by": "beacon-self-audit",
+  "base_fingerprint": "a64d7c6b8c846bbca01346757107d91b3860b0a4b9d259dd7e3b094408d6ab98",
+  "affected": [
+    "n_5c432d1ce4c7",
+    "n_820af49910f0",
+    "n_f691b4ee804d"
+  ],
+  "created_at": "2026-11-26T02:41:29.704151Z"
+}

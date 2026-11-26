@@ -113,8 +113,9 @@
   },
   "child_fingerprints": [
     "547747d8a56e3f6f0cfe9d530a2c0597254aa47a0927539ecec847ffb41d5bfe",
-    "3c2953df4dc0ea22adc6f4cca3e1d6ea63e238ee911d7d8725b12b5bc26a8f74"
+    "3c2953df4dc0ea22adc6f4cca3e1d6ea63e238ee911d7d8725b12b5bc26a8f74",
+    "83ac9c34ee40cdf4a6d5cba2cc25791afa444497c99f848eff469c26222e78de"
   ],
-  "fingerprint": "a64d7c6b8c846bbca01346757107d91b3860b0a4b9d259dd7e3b094408d6ab98",
+  "fingerprint": "5cdbceb48ef65095c4a1d69f70398e6c8e2a440384b0b183e1747a65a4b057df",
   "fingerprint_alg": "tree-json-v1"
 }

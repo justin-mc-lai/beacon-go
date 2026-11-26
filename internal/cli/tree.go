@@ -225,20 +225,31 @@ func treeReport(dir string, idx intenttree.Index) (map[string]any, error) {
 		counts[string(n.Kind)]++
 	}
 	out := map[string]any{
-		"schema":     idx.Schema,
-		"version":    idx.Version,
-		"root_id":    idx.RootID,
-		"tree_dir":   dir,
-		"node_count": len(idx.Nodes),
-		"counts":     counts,
-		"nodes":      idx.Nodes,
+		"schema":        idx.Schema,
+		"version":       idx.Version,
+		"root_id":       idx.RootID,
+		"tree_dir":      dir,
+		"node_count":    len(idx.Nodes),
+		"counts":        counts,
+		"status_counts": statusCounts(idx),
+		"nodes":         idx.Nodes,
 	}
 	unlinked, err := unlinkedFeatureSlugs(dir, idx)
 	if err != nil {
 		return nil, err
 	}
 	out["unlinked"] = unlinked
+	out["tree_native"] = unlinked
+	out["delivered_count"] = statusCounts(idx)[string(intenttree.StatusImplemented)]
 	return out, nil
+}
+
+func statusCounts(idx intenttree.Index) map[string]int {
+	out := map[string]int{}
+	for _, n := range idx.Nodes {
+		out[string(n.Status)]++
+	}
+	return out
 }
 
 func unlinkedFeatureSlugs(dir string, idx intenttree.Index) ([]string, error) {
@@ -347,7 +358,8 @@ func newDoctorRebuildTreeCmd() *cobra.Command {
 // printTreeSummary is the human default: what the project is, how much is
 // covered, and where the readable view is. Machine data stays behind --json.
 func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[string]intenttree.Node, dir, projRoot string) error {
-	var modules, features, leaves, acs, fsm, planned, existing, verified, linked, mismatch int
+	var modules, features, leaves, acs, fsm, planned, existing, linked, mismatch int
+	var draft, frozen, implemented, verified, changePending, deprecated int
 	var unlinked []string
 	for _, e := range idx.Nodes {
 		switch e.Kind {
@@ -358,8 +370,19 @@ func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[strin
 		case intenttree.KindTouchpoint:
 			leaves++
 		}
-		if e.Status == intenttree.StatusVerified {
+		switch e.Status {
+		case intenttree.StatusDraft:
+			draft++
+		case intenttree.StatusFrozen:
+			frozen++
+		case intenttree.StatusImplemented:
+			implemented++
+		case intenttree.StatusVerified:
 			verified++
+		case intenttree.StatusChangePending:
+			changePending++
+		case intenttree.StatusDeprecated:
+			deprecated++
 		}
 		n, ok := bodies[e.ID]
 		if !ok {
@@ -393,10 +416,11 @@ func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[strin
 		fmt.Fprintf(out, "%s\n\n", root.Intent)
 	}
 	fmt.Fprintf(out, "%d 模块 · %d 功能 · %d 触达点 · %d 条 AC · %d 个状态机\n", modules, features, leaves, acs, fsm)
+	fmt.Fprintf(out, "状态：草稿 %d · 冻结 %d · 已交付/实现 %d · 已验证 %d · 变更中 %d · 废弃 %d\n", draft, frozen, implemented, verified, changePending, deprecated)
 	fmt.Fprintf(out, "测试：%d 已绑定 · %d 计划中；已验证节点 %d/%d\n", existing, planned, verified, len(idx.Nodes))
-	fmt.Fprintf(out, "真相关联：%d/%d 个功能节点已 link，状态不一致 %d\n", linked, features, mismatch)
+	fmt.Fprintf(out, "legacy 包链（可选）：%d/%d 个功能节点已 link，状态不一致 %d\n", linked, features, mismatch)
 	if len(unlinked) > 0 {
-		fmt.Fprintf(out, "unlinked: %s\n", strings.Join(unlinked, ", "))
+		fmt.Fprintf(out, "tree-native: %d 个功能无 legacy 包（可选）\n", len(unlinked))
 	}
 	if planned > 0 {
 		fmt.Fprintf(out, "\n还不能宣称已验证：%d 条测试仍是计划状态。\n", planned)

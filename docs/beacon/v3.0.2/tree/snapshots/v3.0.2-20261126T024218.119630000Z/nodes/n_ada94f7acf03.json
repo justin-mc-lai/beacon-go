@@ -1,0 +1,30 @@
+{
+  "id": "n_ada94f7acf03",
+  "kind": "touchpoint",
+  "title": "tree native",
+  "intent": "没有 legacy 包的功能不是失败，而是树原生需求",
+  "parent_id": "n_712b67ae7445",
+  "path": "root/self-host/requirement-workbench/tree-native",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "native-1",
+      "text": "无 truth_path 的功能在 HTML 显示 tree-native；summary 只给数量，不把全量 slug 当作错误列表。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "native-tc1",
+      "ac_id": "native-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestPlanTreeReportsUnlinked -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当功能没有 legacy 包时，HTML 和 summary 都使用 tree-native 文案"
+  },
+  "fingerprint": "3c28a7bdba85a377a639284d0b88893c0ad6444d60d9151856fde1b491143a52",
+  "fingerprint_alg": "tree-json-v1"
+}

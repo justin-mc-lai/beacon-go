@@ -1,0 +1,30 @@
+{
+  "id": "n_2f9cbcff36f4",
+  "kind": "module",
+  "title": "goal-orchestration",
+  "intent": "单次长跑的阶段推进与门禁",
+  "parent_id": "nroot_98a9c77a9519",
+  "path": "root/goal-orchestration",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "go-1",
+      "text": "goal 的阶段推进必须委托树阶段门，不另写第二套判定。"
+    },
+    {
+      "id": "go-2",
+      "text": "阶段执行归宿主；manual lane 用 goal tick --by 记账。"
+    },
+    {
+      "id": "go-3",
+      "text": "中断后 checkpoint/resume 不重放已结算阶段。"
+    }
+  ],
+  "child_fingerprints": [
+    "354da58b5b066bf0678c9a0853e3972574d20e9ab77ae9af24b2a811520addda",
+    "b8390594540ed936d3661ad72191440558bfd088ed9af674cf3c718b27cfd12f",
+    "f64040f1133ad94db7d4da4267e5bef639da3e62f704cf23b98a5ae00d0bb05c"
+  ],
+  "fingerprint": "0543a93dfcca963cd14d7f0dbdf3a7f8bb2fc4561882ad96ac180ef0390064fb",
+  "fingerprint_alg": "tree-json-v1"
+}

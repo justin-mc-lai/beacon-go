@@ -1,0 +1,30 @@
+{
+  "id": "n_a8b3e6af8664",
+  "kind": "feature",
+  "title": "plan surface",
+  "intent": "plan 组必须把树构建、proposal 校验和渲染收成一个清晰入口",
+  "parent_id": "n_8b83bfc9403d",
+  "path": "root/cli-surface/plan-surface",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "plan-1",
+      "text": "proposal 可带可选 slug；显式 slug 生成路径末段，重复或非法 slug fail closed。"
+    },
+    {
+      "id": "plan-2",
+      "text": "纯中文标题未给 slug 时拒绝，错误码可读。"
+    },
+    {
+      "id": "plan-3",
+      "text": "plan tree 支持 summary/json/md/html，HTML 标出权威源与派生只读。"
+    }
+  ],
+  "child_fingerprints": [
+    "fd132e2b15888f5f10cb576fa9fe2ffb0782584c28516f538387f0afd0a5310d",
+    "2ae783f0d5a2f3be0d1f6f85c30bbcc1923b7daa60f058976965f0341235d296",
+    "afe5f22050d26f811e08e28ec679b62e432b434d93ca76f77bcf9acdf7f185ce"
+  ],
+  "fingerprint": "74a628f69df0917c7640de78741c6ea56646cae02c957ca7939bc70b285bfd84",
+  "fingerprint_alg": "tree-json-v1"
+}

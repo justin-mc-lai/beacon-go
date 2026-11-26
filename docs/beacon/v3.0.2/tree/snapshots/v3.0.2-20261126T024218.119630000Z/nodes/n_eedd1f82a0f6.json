@@ -1,0 +1,70 @@
+{
+  "id": "n_eedd1f82a0f6",
+  "kind": "feature",
+  "title": "run-lifecycle",
+  "intent": "goal run 从创建到运行、阻塞、完成，阻塞必须显式解除。",
+  "parent_id": "n_2f9cbcff36f4",
+  "path": "root/goal-orchestration/run-lifecycle",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "rl-1",
+      "text": "创建后按阶段推进。"
+    },
+    {
+      "id": "rl-2",
+      "text": "阻塞不自动跳过。"
+    },
+    {
+      "id": "rl-3",
+      "text": "解除阻塞后从原阶段继续。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "created",
+      "running",
+      "blocked",
+      "completed"
+    ],
+    "transitions": [
+      {
+        "from": "created",
+        "to": "running",
+        "event": "start"
+      },
+      {
+        "from": "running",
+        "to": "blocked",
+        "event": "block"
+      },
+      {
+        "from": "blocked",
+        "to": "running",
+        "event": "recover"
+      },
+      {
+        "from": "running",
+        "to": "completed",
+        "event": "complete"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "created",
+        "to": "completed"
+      },
+      {
+        "from": "completed",
+        "to": "running"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "d440537d8a6155ff9150d829de0b65f26bfdb0d37ceb892aad7b28bfff62691c",
+    "ecb0b185b27e412d43f36b763467be9073115b9f9dfda993f80396064a1d7e81",
+    "27466084951e14073d6917f91830bada3b92c87a38bf290975744c908a020054"
+  ],
+  "fingerprint": "b8390594540ed936d3661ad72191440558bfd088ed9af674cf3c718b27cfd12f",
+  "fingerprint_alg": "tree-json-v1"
+}

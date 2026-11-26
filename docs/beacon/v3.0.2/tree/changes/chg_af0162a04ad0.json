@@ -1,0 +1,12 @@
+{
+  "id": "chg_af0162a04ad0",
+  "node_id": "n_eedd1f82a0f6",
+  "summary": "补齐 run lifecycle 的 stage plan 与 block recover 叶子",
+  "by": "beacon-self-audit",
+  "base_fingerprint": "55584c318cbd95fa78399f99e7bd91fa26481bd359057b8969f0628a4d22ec7f",
+  "affected": [
+    "n_2980cc742489",
+    "n_eedd1f82a0f6"
+  ],
+  "created_at": "2026-11-26T02:40:41.076131Z"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "chg_a14588cc6813",
+  "node_id": "n_542ddf4aff0d",
+  "summary": "补齐 verifier attach 叶子",
+  "by": "beacon-self-audit",
+  "base_fingerprint": "b0ce7cdf48e73de3649803d745be7eb8bcb28a19eb85bba2ebc873dbd754b5b9",
+  "affected": [
+    "n_4fbcca4f8b09",
+    "n_542ddf4aff0d",
+    "n_b138a0444f54"
+  ],
+  "created_at": "2026-11-26T02:41:18.602352Z"
+}

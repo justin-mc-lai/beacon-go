@@ -1,0 +1,41 @@
+{
+  "id": "n_691cddfe9236",
+  "kind": "touchpoint",
+  "title": "driver turn",
+  "intent": "driver 每一轮都要留下心跳、checkpoint 和下一步提示",
+  "parent_id": "n_4aafa3895e8d",
+  "path": "root/goal-orchestration/manual-run/driver-turn",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "driver-turn-1",
+      "text": "driver run-once 记录本轮 run 状态、心跳和 checkpoint，不自动完成或发布。"
+    },
+    {
+      "id": "driver-turn-2",
+      "text": "driver 在 release gate 前停止，不越过人工确认。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "driver-turn-tc1",
+      "ac_id": "driver-turn-1",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestDriverRunOnceTurnBookkeeping -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "driver-turn-tc2",
+      "ac_id": "driver-turn-2",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestDriverRunLoopStopsAtReleaseGate -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 driver 执行一轮时，run 的 driver 状态、心跳和 checkpoint 都向前推进；到 release gate 停止"
+  },
+  "fingerprint": "cca3671177944cdabc1fde60b829690c6bc601b25d801ce1e1ec256018633c27",
+  "fingerprint_alg": "tree-json-v1"
+}

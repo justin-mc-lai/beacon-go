@@ -1,0 +1,30 @@
+{
+  "id": "n_13ca4dbe56f7",
+  "kind": "touchpoint",
+  "title": "project registry",
+  "intent": "一个项目根路径只对应一个注册实体",
+  "parent_id": "n_0fe4a2ab5ffb",
+  "path": "root/data-migration/projects-version/project-registry",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "registry-1",
+      "text": "projects register 幂等；show/list 返回 root、versions、current version。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "registry-tc1",
+      "ac_id": "registry-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestProjectsRegisterListShowClosure -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当注册同一路径两次并 show/list 时，仍只有一个项目且当前版本正确"
+  },
+  "fingerprint": "111a64c70a33876b196bfe6a1b357ce2bae35e44cce264240b2963191a6ff4cc",
+  "fingerprint_alg": "tree-json-v1"
+}

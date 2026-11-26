@@ -20,14 +20,13 @@ import (
 func newTruthCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "truth",
-		Short: "Truth ability: feature packages — create / freeze / change / refreeze / show / list",
-		Long: "Truth is where requirement truth lives: one package per feature under\n" +
-			"docs/beacon/<version>/features/<slug>/ (truth.md + tests.md + tasks.md +\n" +
-			"evidence.md). create lays down the skeleton; freeze locks a draft after\n" +
-			"the completeness + integrity precheck; change registers a change\n" +
-			"against frozen truth WITHOUT touching the body; refreeze closes the\n" +
-			"change after the author edited. `goal` orchestrates runs over these\n" +
-			"packages; truth is the single-package tool entry.",
+		Short: "Truth ability: canonical tree + optional legacy requirement packages",
+		Long: "Requirement truth is the canonical tree under\n" +
+			"docs/beacon/<version>/tree/ (intent -> module -> feature -> touchpoint).\n" +
+			"The old docs/beacon/<version>/features/<slug>/ packages remain readable\n" +
+			"legacy evidence; their truth.md is not a second authority. create/freeze\n" +
+			"operate on the legacy package surface and keep it compatible; the tree\n" +
+			"commands (plan/tree/node) are the canonical path.",
 	}
 	c.AddCommand(
 		newTruthCreateCmd(), newTruthFreezeCmd(false), newTruthFreezeCmd(true),
