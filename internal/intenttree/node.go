@@ -56,6 +56,9 @@ const (
 	ReasonTruthPathMissing     = "tree_truth_path_missing"
 	ReasonTruthPathInvalid     = "tree_truth_path_invalid"
 	ReasonTruthSlugMismatch    = "tree_truth_slug_mismatch"
+	ReasonChildSlugMissing     = "tree_node_slug_missing"
+	ReasonChildSlugInvalid     = "tree_node_slug_invalid"
+	ReasonChildSlugCollision   = "tree_node_slug_collision"
 	ReasonTruthLinkNotDraft    = "tree_truth_link_not_draft"
 )
 

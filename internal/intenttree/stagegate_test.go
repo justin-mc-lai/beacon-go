@@ -50,3 +50,32 @@ func TestStageGateNoTreeIsLegacyAllowed(t *testing.T) {
 		t.Fatal("missing tree must not block legacy projects")
 	}
 }
+
+func TestStageGateMatchesLegacyNodeTruthPath(t *testing.T) {
+	dir := t.TempDir()
+	n := Node{
+		ID: "f", Kind: KindFeature, Title: "派工会话复用", ParentID: "m",
+		Path: "m/node", Status: StatusFrozen,
+		LegacyTruthPath: "docs/beacon/v0.1.0/features/dispatch-thread-reuse/truth.md",
+	}
+	var err error
+	n, err = Stamp(n)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := WriteNode(dir, n); err != nil {
+		t.Fatal(err)
+	}
+	idx := Index{Schema: Schema, Version: "v0.1.0", RootID: "root", Nodes: []IndexEntry{
+		{ID: "root", Kind: KindIntent, Status: StatusDraft, Path: "root"},
+		{ID: "m", ParentID: "root", Kind: KindModule, Status: StatusDraft, Path: "m"},
+		{ID: "f", ParentID: "m", Kind: KindFeature, Status: StatusFrozen, Title: n.Title,
+			Path: n.Path, Fingerprint: n.Fingerprint, FingerprintAlg: n.FingerprintAlg},
+	}}
+	if err := WriteIndex(dir, idx); err != nil {
+		t.Fatal(err)
+	}
+	if ok, reason, err := StageGate(dir, "implement", "dispatch-thread-reuse"); err != nil || !ok {
+		t.Fatalf("legacy truth path must match: ok=%v reason=%q err=%v", ok, reason, err)
+	}
+}

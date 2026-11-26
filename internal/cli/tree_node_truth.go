@@ -55,9 +55,13 @@ func newTruthNodeLinkCmd() *cobra.Command {
 			}
 			slug := strings.TrimSpace(scalars["slug"])
 			base := filepath.Base(n.Path)
-			if slug == "" || (slug != base && slug != n.Title) {
+			matched := slug == base || slug == n.Title
+			if !matched && intenttree.Slugify(n.Title) == "" && intenttree.TruthPathSlug(rel) == slug {
+				matched = true
+			}
+			if slug == "" || !matched {
 				return fail("tree_truth_slug_mismatch", "truth node link",
-					"truth slug "+slug+" does not match node slug "+base)
+					"truth slug "+slug+" does not match node slug "+base+"; use a matching path or a legacy Chinese-titled node")
 			}
 			linked, err := intenttree.LinkTruthPath(st, dir, nodeID, rel)
 			if err != nil {
@@ -209,7 +213,7 @@ func readTruthStatus(projRoot string, n intenttree.Node) truthSyncStatus {
 	out.PackageStatus = strings.TrimSpace(scalars["status"])
 	out.PackageSlug = strings.TrimSpace(scalars["slug"])
 	base := filepath.Base(n.Path)
-	out.SlugOK = out.PackageSlug != "" && (out.PackageSlug == base || out.PackageSlug == n.Title)
+	out.SlugOK = out.PackageSlug != "" && (out.PackageSlug == base || out.PackageSlug == n.Title || intenttree.TruthPathSlug(p) == out.PackageSlug)
 	out.Match = out.SlugOK && statusMatches(n.Status, out.PackageStatus)
 	return out
 }
@@ -246,11 +250,11 @@ func autoLinkTruthNode(st *store.Store, projectRoot, version, slug, truthPath st
 		if err != nil {
 			return err
 		}
-		if n.EffectiveTruthPath() != "" {
+		if filepath.Base(n.Path) != slug && n.Title != slug && intenttree.TruthPathSlug(n.EffectiveTruthPath()) != slug {
 			continue
 		}
-		if filepath.Base(n.Path) != slug && n.Title != slug {
-			continue
+		if n.EffectiveTruthPath() != "" {
+			return nil
 		}
 		if n.Status != intenttree.StatusDraft && n.Status != intenttree.StatusChangePending {
 			return nil

@@ -3,6 +3,7 @@ package intenttree
 import (
 	"fmt"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 type ProposalChild struct {
 	Kind         Kind          `json:"kind"`
 	Title        string        `json:"title"`
+	Slug         string        `json:"slug,omitempty"`
 	Intent       string        `json:"intent,omitempty"`
 	ACs          []AC          `json:"acs,omitempty"`
 	TestCases    []TestCase    `json:"test_cases,omitempty"`
@@ -53,6 +55,15 @@ func ValidateProposal(parent Kind, p Proposal) error {
 	for _, ch := range p.Children {
 		if strings.TrimSpace(ch.Title) == "" {
 			return core.NewError(ReasonInvalidIndex, "intenttree.ValidateProposal", "child title is required")
+		}
+		segment := proposalSegment(ch.Title, ch.Slug)
+		if segment == "" {
+			return core.NewError(ReasonChildSlugMissing, "intenttree.ValidateProposal",
+				"child title has no ASCII slug; set the optional slug: "+ch.Title)
+		}
+		if !nodeSlugRe.MatchString(segment) {
+			return core.NewError(ReasonChildSlugInvalid, "intenttree.ValidateProposal",
+				"child slug must match "+nodeSlugRe.String()+": "+segment)
 		}
 		if err := ValidateChild(parent, ch.Kind); err != nil {
 			return err
@@ -124,8 +135,13 @@ func ApplyProposal(st *store.Store, dir, versionID, parentID string, p Proposal)
 	var nodes []Node
 	var cache []store.TreeNode
 	for i, ch := range p.Children {
-		path := parent.Path + "/" + slugify(ch.Title)
+		explicitSlug := strings.TrimSpace(ch.Slug) != ""
+		path := parent.Path + "/" + proposalSegment(ch.Title, ch.Slug)
 		if usedPaths[path] {
+			if explicitSlug {
+				return nil, core.NewError(ReasonChildSlugCollision, "intenttree.ApplyProposal",
+					"explicit child slug collides with an existing path: "+path)
+			}
 			path = fmt.Sprintf("%s-%d", path, i+1)
 		}
 		usedPaths[path] = true
@@ -182,19 +198,32 @@ func ApplyProposal(st *store.Store, dir, versionID, parentID string, p Proposal)
 	return nodes, nil
 }
 
-func slugify(s string) string {
+var nodeSlugRe = regexp.MustCompile(`^[a-z0-9]+(?:[-_][a-z0-9]+)*$`)
+
+func proposalSegment(title, explicit string) string {
+	if slug := strings.TrimSpace(explicit); slug != "" {
+		return slug
+	}
+	return Slugify(title)
+}
+
+// Slugify keeps ASCII letters, digits, spaces, hyphens, underscores and
+// slashes; non-ASCII text is ignored. An empty result means the caller
+// must provide an explicit slug.
+func Slugify(s string) string {
 	var b strings.Builder
+	separator := false
 	for _, r := range strings.ToLower(strings.TrimSpace(s)) {
 		switch {
 		case r >= 'a' && r <= 'z', r >= '0' && r <= '9':
 			b.WriteRune(r)
+			separator = false
 		case r == ' ' || r == '-' || r == '_' || r == '/':
-			b.WriteByte('-')
+			if b.Len() > 0 && !separator {
+				b.WriteByte('-')
+				separator = true
+			}
 		}
 	}
-	out := strings.Trim(b.String(), "-")
-	if out == "" {
-		return "node"
-	}
-	return out
+	return strings.Trim(b.String(), "-")
 }

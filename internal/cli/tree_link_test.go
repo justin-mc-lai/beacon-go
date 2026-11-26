@@ -162,3 +162,97 @@ func TestPlanTreeOldVersionExplainsMaterialization(t *testing.T) {
 		t.Fatalf("missing explicit old-version message: %v", err)
 	}
 }
+
+func seedFeatureNode(t *testing.T, proj, title, slug string) (string, string) {
+	t.Helper()
+	mustRun(t, "plan", "init", "--project", proj, "--title", "root", "--intent", "root", "--json")
+	root := parseDoc(t, mustRun(t, "plan", "tree", "--project", proj, "--json"))["root_id"].(string)
+	mod := parseDoc(t, mustRun(t, "plan", "apply", "--project", proj, "--node", root, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "module", "title": "m", "intent": "m"}}}), "--json"))["nodes"].([]any)[0].(map[string]any)["id"].(string)
+	child := map[string]any{"kind": "feature", "title": title, "intent": "x"}
+	if slug != "" {
+		child["slug"] = slug
+	}
+	doc := parseDoc(t, mustRun(t, "plan", "apply", "--project", proj, "--node", mod, "--proposal", writeJSON(t, map[string]any{"children": []any{child}}), "--json"))
+	return doc["nodes"].([]any)[0].(map[string]any)["id"].(string), doc["nodes"].([]any)[0].(map[string]any)["path"].(string)
+}
+
+func TestProposalSlugControlsFeaturePath(t *testing.T) {
+	proj := treeTestEnv(t)
+	_, path := seedFeatureNode(t, proj, "派工会话复用", "dispatch-thread-reuse")
+	if !strings.HasSuffix(path, "/dispatch-thread-reuse") {
+		t.Fatalf("path = %q, want slug terminal segment", path)
+	}
+}
+
+func TestProposalChineseTitleWithoutSlugIsRejected(t *testing.T) {
+	proj := treeTestEnv(t)
+	mustRun(t, "plan", "init", "--project", proj, "--title", "root", "--intent", "root", "--json")
+	root := parseDoc(t, mustRun(t, "plan", "tree", "--project", proj, "--json"))["root_id"].(string)
+	mod := parseDoc(t, mustRun(t, "plan", "apply", "--project", proj, "--node", root, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "module", "title": "m", "intent": "m"}}}), "--json"))["nodes"].([]any)[0].(map[string]any)["id"].(string)
+	_, err := runCLI(t, "plan", "apply", "--project", proj, "--node", mod, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "feature", "title": "派工会话复用", "intent": "x"}}}), "--json")
+	if err == nil || !strings.Contains(err.Error(), "tree_node_slug_missing") {
+		t.Fatalf("Chinese title without slug must fail with tree_node_slug_missing: %v", err)
+	}
+}
+
+func TestTruthNodeLinkChineseLegacyNodeByPackageSlug(t *testing.T) {
+	proj := treeTestEnv(t)
+	_, path := seedFeatureNode(t, proj, "派工会话复用", "node")
+	if !strings.HasSuffix(path, "/node") {
+		t.Fatalf("fixture path = %q", path)
+	}
+	if _, err := runCLI(t, "truth", "create", "--project", proj, "--slug", "dispatch-thread-reuse", "--json"); err != nil {
+		t.Fatal(err)
+	}
+	nodeID := ""
+	treeDir := filepath.Join(proj, "docs", "beacon", "v0.1.0", "tree")
+	idx, err := intenttree.ReadIndex(treeDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range idx.Nodes {
+		if e.Kind == intenttree.KindFeature {
+			nodeID = e.ID
+		}
+	}
+	if nodeID == "" {
+		t.Fatal("feature node not found")
+	}
+	mustRun(t, "truth", "node", "link", "--project", proj, "--node", nodeID,
+		"--truth", "docs/beacon/v0.1.0/features/dispatch-thread-reuse/truth.md", "--json")
+	ok, reason, err := intenttree.StageGate(treeDir, "implement", "dispatch-thread-reuse")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason == "tree_feature_not_found" {
+		t.Fatal("linked legacy node must match by truth_path directory slug")
+	}
+	if ok || reason != "tree_feature_not_frozen" {
+		t.Fatalf("StageGate = %v %q, want frozen gate after link", ok, reason)
+	}
+	// Once linked, the package status can be applied even though the node
+	// title/path are Chinese legacy values.
+	if err := os.WriteFile(filepath.Join(proj, "docs", "beacon", "v0.1.0", "features", "dispatch-thread-reuse", "truth.md"), []byte("---\nslug: dispatch-thread-reuse\nstatus: frozen\n---\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	mustRun(t, "truth", "node", "sync-status", "--project", proj, "--node", nodeID, "--apply", "--json")
+	if ok, reason, err := intenttree.StageGate(treeDir, "implement", "dispatch-thread-reuse"); err != nil || !ok {
+		t.Fatalf("after sync, linked legacy node must pass implement gate: ok=%v reason=%q err=%v", ok, reason, err)
+	}
+}
+
+func TestProposalInvalidAndCollidingExplicitSlug(t *testing.T) {
+	proj := treeTestEnv(t)
+	mustRun(t, "plan", "init", "--project", proj, "--title", "root", "--intent", "root", "--json")
+	root := parseDoc(t, mustRun(t, "plan", "tree", "--project", proj, "--json"))["root_id"].(string)
+	mod := parseDoc(t, mustRun(t, "plan", "apply", "--project", proj, "--node", root, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "module", "title": "m", "intent": "m"}}}), "--json"))["nodes"].([]any)[0].(map[string]any)["id"].(string)
+	_, err := runCLI(t, "plan", "apply", "--project", proj, "--node", mod, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "feature", "title": "Bad", "slug": "Bad--Slug", "intent": "x"}}}), "--json")
+	if err == nil || !strings.Contains(err.Error(), "tree_node_slug_invalid") {
+		t.Fatalf("invalid explicit slug must fail: %v", err)
+	}
+	mustRun(t, "plan", "apply", "--project", proj, "--node", mod, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "feature", "title": "First", "slug": "same", "intent": "x"}}}), "--json")
+	_, err = runCLI(t, "plan", "apply", "--project", proj, "--node", mod, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "feature", "title": "Second", "slug": "same", "intent": "x"}}}), "--json")
+	if err == nil || !strings.Contains(err.Error(), "tree_node_slug_collision") {
+		t.Fatalf("colliding explicit slug must fail: %v", err)
+	}
+}
