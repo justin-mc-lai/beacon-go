@@ -1,0 +1,15 @@
+{
+  "id": "n_47544230bf1e",
+  "kind": "module",
+  "title": "tree visual",
+  "intent": "需求树 HTML：点模块看子节点需求真相、FSM 下的测试用例、按用例绑定验收的交互闭环；复杂度内聚系统，用户只点选。本模块只展示 verdict 并提供 AC↔TestCase 点选绑定入口；verdict 生成和 TC↔FSM 绑定规则归 acceptance-binding 模块。",
+  "parent_id": "nroot_6b8991789867",
+  "path": "root/tree-visual",
+  "status": "frozen",
+  "child_fingerprints": [
+    "4b85645a588c7458b30573b7108cc7bd7cd4f5cea1d18f79c6cfe1507cfec9b3",
+    "8874c95930cabea60e87855ccad26b4b6d26656f5c22648c9903b51dc1a0b9f3"
+  ],
+  "fingerprint": "3f3844e8e96296c76272a0f03293e6705754d7345fc2b7a0f58a3675a219883c",
+  "fingerprint_alg": "tree-json-v1"
+}

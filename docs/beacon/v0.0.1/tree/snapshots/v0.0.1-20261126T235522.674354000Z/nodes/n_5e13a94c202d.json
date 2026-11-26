@@ -1,0 +1,16 @@
+{
+  "id": "n_5e13a94c202d",
+  "kind": "module",
+  "title": "self drive",
+  "intent": "自驱迭代能力：用 beacon-go 自身的能力持续迭代 beacon-go 自己（dogfooding）——把自己的需求树当真相、按树展开 feature/touchpoint、走 goal/tasks/evidence/gate 实现与验收、用 worktree 并行交付模块；迭代中发现的缺陷回流由本模块下的 defect-feedback 承接为树节点修复或 change 记录，形成闭环。节点 id 命名空间等版本隔离需求归 version-evolution 模块，不属本模块闭环。",
+  "parent_id": "nroot_6b8991789867",
+  "path": "root/self-drive",
+  "status": "frozen",
+  "child_fingerprints": [
+    "52935cc25db4f54647fb75d1d2dc9c66ada9424277ed2246208edf98163c04a7",
+    "f19db4b6b9337d3634a3b7496a88d600ab7d7e940c046dbf332709ecc2a14a7a",
+    "8acb76db770ea7ec7bec09b925da092f27c2b77a61937c922ed73e15b597e09b"
+  ],
+  "fingerprint": "89ab8c2da8060bc5fc27fd433470bb3ca53d743328f94053b331c13cc286cb54",
+  "fingerprint_alg": "tree-json-v1"
+}

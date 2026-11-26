@@ -1,0 +1,17 @@
+{
+  "id": "chg_13fae71dbb14",
+  "node_id": "n_3c1f1d8ec396",
+  "summary": "澄清 acceptance-binding 与 tree-visual verdict 生成/展示边界",
+  "by": "agent-ste",
+  "base_fingerprint": "e2fe72a6fcd40817c83181a70c8f660fa2c093473d5eed7502cd32cc488e3c50",
+  "affected": [
+    "n_12c7f50ea594",
+    "n_1ebfb857b26f",
+    "n_2b2a883e7f64",
+    "n_3c1f1d8ec396",
+    "n_673d03783f60",
+    "n_799afe679d02",
+    "n_dbab29f9640e"
+  ],
+  "created_at": "2026-11-26T23:55:16.525854Z"
+}

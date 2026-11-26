@@ -1,0 +1,19 @@
+{
+  "id": "chg_8b25910fb83e",
+  "node_id": "n_5e13a94c202d",
+  "summary": "澄清 self-drive 与 version-evolution 缺陷归属边界",
+  "by": "agent-ste",
+  "base_fingerprint": "fb58b2bdd28c1d921224c4c420f431bdb5e7f1391a72a06d5db05de6a0498bf1",
+  "before_snapshot_id": "v0.0.1-20261126T235516.422039000Z",
+  "affected": [
+    "n_1c00934a592b",
+    "n_41398c3173e0",
+    "n_5e13a94c202d",
+    "n_5e74132fe68f",
+    "n_657f878cb0ab",
+    "n_b935c7e6837a",
+    "n_e11ba0e98451",
+    "n_e203874ad8d4"
+  ],
+  "created_at": "2026-11-26T23:55:16.416508Z"
+}
