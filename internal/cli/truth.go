@@ -150,6 +150,9 @@ func newTruthCreateCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if err := autoLinkTruthNode(st, v.ProjectRoot, v.Version, v.Slug, v.TruthPath); err != nil {
+				return err
+			}
 			return printTruthView(cmd, v, asJSON)
 		},
 	}
@@ -193,6 +196,9 @@ func newTruthFreezeCmd(refreeze bool) *cobra.Command {
 				v, err = eng.FreezeTruthPackage(ctx, by)
 			}
 			if v.Slug != "" {
+				if lerr := autoLinkTruthNode(st, v.ProjectRoot, v.Version, v.Slug, v.TruthPath); lerr != nil {
+					return lerr
+				}
 				if perr := printTruthView(cmd, v, asJSON); perr != nil {
 					return perr
 				}
@@ -242,6 +248,9 @@ func newTruthChangeCmd() *cobra.Command {
 			}
 			v, err := eng.RequestTruthChange(ctx, summary, by)
 			if v.Slug != "" {
+				if lerr := autoLinkTruthNode(st, v.ProjectRoot, v.Version, v.Slug, v.TruthPath); lerr != nil {
+					return lerr
+				}
 				if perr := printTruthView(cmd, v, asJSON); perr != nil {
 					return perr
 				}
@@ -287,6 +296,9 @@ func newTruthBaselineCmd() *cobra.Command {
 			eng := orchestrator.NewEngine(st)
 			v, err := eng.BaselineTruth(ctx, by)
 			if v.Slug != "" {
+				if lerr := autoLinkTruthNode(st, v.ProjectRoot, v.Version, v.Slug, v.TruthPath); lerr != nil {
+					return lerr
+				}
 				if perr := printTruthView(cmd, v, asJSON); perr != nil {
 					return perr
 				}

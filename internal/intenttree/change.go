@@ -129,6 +129,19 @@ func ListChanges(dir string) ([]ChangeRecord, error) {
 	return out, nil
 }
 
+// SetNodeStatus applies one explicit status transition to a node and its
+// cached index rows. The caller owns the transition's policy checks.
+func SetNodeStatus(st *store.Store, dir, id string, status Status) error {
+	idx, err := ReadIndex(dir)
+	if err != nil {
+		return err
+	}
+	if err := setNodeStatus(st, dir, &idx, id, status); err != nil {
+		return err
+	}
+	return WriteIndex(dir, idx)
+}
+
 func setNodeStatus(st *store.Store, dir string, idx *Index, id string, status Status) error {
 	entry, ok := findEntry(*idx, id)
 	if !ok {

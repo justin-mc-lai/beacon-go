@@ -72,11 +72,12 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 			if format == "" {
 				format = "summary"
 			}
-			if format == "json" {
-				return printJSON(cmd, treeReport(dir, idx))
-			}
-			if asJSON {
-				return printJSON(cmd, treeReport(dir, idx))
+			if format == "json" || asJSON {
+				report, rerr := treeReport(dir, idx)
+				if rerr != nil {
+					return rerr
+				}
+				return printJSON(cmd, report)
 			}
 			if format == "summary" {
 				bodies := map[string]intenttree.Node{}
@@ -174,7 +175,11 @@ func resolveTree(st *store.Store, project, version string) (string, string, inte
 	idx, err := intenttree.ReadIndex(dir)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) || strings.Contains(err.Error(), "no such file") {
-			return "", "", intenttree.Index{}, core.NewError("tree_not_migrated", "resolveTree", "tree not migrated; run: beacon migrate tree --project "+root+" --version "+ver.Version)
+			msg := "tree is not materialized for version " + ver.Version + "; run: beacon migrate tree --project " + root + " --version " + ver.Version
+			if !ver.IsCurrent {
+				msg = "tree only covers materialized versions; version " + ver.Version + " has no tree. Old versions are not materialized by default; run: beacon migrate tree --project " + root + " --version " + ver.Version + " to create it"
+			}
+			return "", "", intenttree.Index{}, core.NewError("tree_version_not_materialized", "resolveTree", msg)
 		}
 		return "", "", intenttree.Index{}, err
 	}
@@ -214,12 +219,12 @@ func resolveProjectVersion(st *store.Store, projectID, version string) (store.Pr
 	return store.ProjectVersion{}, core.NewError(intenttree.ReasonVersionNotFound, "resolveProjectVersion", "version not found: "+norm)
 }
 
-func treeReport(dir string, idx intenttree.Index) map[string]any {
+func treeReport(dir string, idx intenttree.Index) (map[string]any, error) {
 	counts := map[string]int{}
 	for _, n := range idx.Nodes {
 		counts[string(n.Kind)]++
 	}
-	return map[string]any{
+	out := map[string]any{
 		"schema":     idx.Schema,
 		"version":    idx.Version,
 		"root_id":    idx.RootID,
@@ -228,6 +233,29 @@ func treeReport(dir string, idx intenttree.Index) map[string]any {
 		"counts":     counts,
 		"nodes":      idx.Nodes,
 	}
+	unlinked, err := unlinkedFeatureSlugs(dir, idx)
+	if err != nil {
+		return nil, err
+	}
+	out["unlinked"] = unlinked
+	return out, nil
+}
+
+func unlinkedFeatureSlugs(dir string, idx intenttree.Index) ([]string, error) {
+	out := []string{}
+	for _, e := range idx.Nodes {
+		if e.Kind != intenttree.KindFeature {
+			continue
+		}
+		n, err := intenttree.ReadNode(dir, e.ID)
+		if err != nil {
+			return nil, err
+		}
+		if n.EffectiveTruthPath() == "" {
+			out = append(out, filepath.Base(e.Path))
+		}
+	}
+	return out, nil
 }
 
 func writeTreeRender(outPath, treeDir, defaultName string, data []byte) (string, error) {
@@ -320,6 +348,7 @@ func newDoctorRebuildTreeCmd() *cobra.Command {
 // covered, and where the readable view is. Machine data stays behind --json.
 func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[string]intenttree.Node, dir, projRoot string) error {
 	var modules, features, leaves, acs, fsm, planned, existing, verified, linked, mismatch int
+	var unlinked []string
 	for _, e := range idx.Nodes {
 		switch e.Kind {
 		case intenttree.KindModule:
@@ -353,6 +382,8 @@ func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[strin
 			if !st.Match || st.Error != "" {
 				mismatch++
 			}
+		} else if e.Kind == intenttree.KindFeature {
+			unlinked = append(unlinked, filepath.Base(e.Path))
 		}
 	}
 	root := bodies[idx.RootID]
@@ -364,6 +395,9 @@ func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[strin
 	fmt.Fprintf(out, "%d 模块 · %d 功能 · %d 触达点 · %d 条 AC · %d 个状态机\n", modules, features, leaves, acs, fsm)
 	fmt.Fprintf(out, "测试：%d 已绑定 · %d 计划中；已验证节点 %d/%d\n", existing, planned, verified, len(idx.Nodes))
 	fmt.Fprintf(out, "真相关联：%d/%d 个功能节点已 link，状态不一致 %d\n", linked, features, mismatch)
+	if len(unlinked) > 0 {
+		fmt.Fprintf(out, "unlinked: %s\n", strings.Join(unlinked, ", "))
+	}
 	if planned > 0 {
 		fmt.Fprintf(out, "\n还不能宣称已验证：%d 条测试仍是计划状态。\n", planned)
 	}

@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,6 +11,7 @@ import (
 
 	"beacon-go/internal/gate"
 	"beacon-go/internal/intenttree"
+	"beacon-go/internal/store"
 )
 
 func newTruthNodeLinkCmd() *cobra.Command {
@@ -77,13 +80,21 @@ func newTruthNodeLinkCmd() *cobra.Command {
 
 func newTruthNodeSyncStatusCmd() *cobra.Command {
 	var project, version, nodeID string
-	var asJSON bool
+	var asJSON, apply bool
 	c := &cobra.Command{
 		Use:   "sync-status",
-		Short: "Report node vs linked truth-package status (read-only; never mutates state)",
+		Short: "Report or apply node vs linked truth-package status (package is authoritative)",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			st, exists, err := openReadStore()
+			var st *store.Store
+			var exists bool
+			var err error
+			if apply {
+				st, err = openWriteStore()
+				exists = true
+			} else {
+				st, exists, err = openReadStore()
+			}
 			if err != nil {
 				return err
 			}
@@ -115,6 +126,17 @@ func newTruthNodeSyncStatusCmd() *cobra.Command {
 				status.Title = n.Title
 				status.NodeStatus = string(n.Status)
 				status.Match = status.SlugOK && statusMatches(n.Status, status.PackageStatus)
+				if apply {
+					applied, aerr := applyTruthStatus(st, dir, idx, n, status)
+					if aerr != nil {
+						status.Error = aerr.Error()
+						status.Match = false
+					} else if applied {
+						status.Applied = true
+						status.NodeStatus = string(truthStatusTarget(status.PackageStatus))
+						status.Match = true
+					}
+				}
 				out = append(out, status)
 			}
 			res := map[string]any{"ok": true, "nodes": out}
@@ -146,6 +168,7 @@ func newTruthNodeSyncStatusCmd() *cobra.Command {
 	c.Flags().StringVar(&version, "version", "", "docs version (default current)")
 	c.Flags().StringVar(&nodeID, "node", "", "only this feature node")
 	c.Flags().BoolVar(&asJSON, "json", false, "print JSON")
+	c.Flags().BoolVar(&apply, "apply", false, "write package status into the node when children allow it")
 	return c
 }
 
@@ -158,6 +181,7 @@ type truthSyncStatus struct {
 	NodeStatus    string `json:"node_status"`
 	SlugOK        bool   `json:"slug_ok"`
 	Match         bool   `json:"match"`
+	Applied       bool   `json:"applied,omitempty"`
 	Error         string `json:"error,omitempty"`
 }
 
@@ -186,7 +210,114 @@ func readTruthStatus(projRoot string, n intenttree.Node) truthSyncStatus {
 	out.PackageSlug = strings.TrimSpace(scalars["slug"])
 	base := filepath.Base(n.Path)
 	out.SlugOK = out.PackageSlug != "" && (out.PackageSlug == base || out.PackageSlug == n.Title)
+	out.Match = out.SlugOK && statusMatches(n.Status, out.PackageStatus)
 	return out
+}
+
+// autoLinkTruthNode links a same-slug feature node when the tree already
+// exists. Missing trees are not an error: truth packages are valid without
+// a tree, and `plan tree` reports the unlinked feature.
+func autoLinkTruthNode(st *store.Store, projectRoot, version, slug, truthPath string) error {
+	slug = strings.TrimSpace(slug)
+	if slug == "" || truthPath == "" {
+		return nil
+	}
+	proj, err := st.Projects().GetByRootPath(store.ResolveRootPath(projectRoot))
+	if err != nil {
+		return err
+	}
+	ver, err := resolveProjectVersion(st, proj.ID, version)
+	if err != nil {
+		return err
+	}
+	dir := intenttree.TreeDir(proj.RootPath, ver.DocsRoot)
+	idx, err := intenttree.ReadIndex(dir)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) || strings.Contains(err.Error(), "no such file") {
+			return nil
+		}
+		return err
+	}
+	for _, e := range idx.Nodes {
+		if e.Kind != intenttree.KindFeature {
+			continue
+		}
+		n, err := intenttree.ReadNode(dir, e.ID)
+		if err != nil {
+			return err
+		}
+		if n.EffectiveTruthPath() != "" {
+			continue
+		}
+		if filepath.Base(n.Path) != slug && n.Title != slug {
+			continue
+		}
+		if n.Status != intenttree.StatusDraft && n.Status != intenttree.StatusChangePending {
+			return nil
+		}
+		_, err = intenttree.LinkTruthPath(st, dir, n.ID, truthPath)
+		return err
+	}
+	return nil
+}
+
+// applyTruthStatus mirrors a package status into a feature node. It never
+// downgrades a node and refuses a parent whose children are not ready.
+func applyTruthStatus(st *store.Store, dir string, idx intenttree.Index, n intenttree.Node, status truthSyncStatus) (bool, error) {
+	target := truthStatusTarget(status.PackageStatus)
+	if target == "" || !status.SlugOK {
+		return false, nil
+	}
+	if statusMatches(n.Status, status.PackageStatus) {
+		return false, nil
+	}
+	if statusRank(target) <= statusRank(n.Status) {
+		return false, nil
+	}
+	for _, e := range idx.Nodes {
+		if e.ParentID != n.ID {
+			continue
+		}
+		if target == intenttree.StatusVerified {
+			if e.Status != intenttree.StatusVerified {
+				return false, fmt.Errorf("tree_children_not_verified: child %s is %s", e.ID, e.Status)
+			}
+			continue
+		}
+		if e.Status != intenttree.StatusFrozen && e.Status != intenttree.StatusImplemented && e.Status != intenttree.StatusVerified {
+			return false, fmt.Errorf("tree_children_not_frozen: child %s is %s", e.ID, e.Status)
+		}
+	}
+	if err := intenttree.SetNodeStatus(st, dir, n.ID, target); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func truthStatusTarget(pkg string) intenttree.Status {
+	switch pkg {
+	case "frozen":
+		return intenttree.StatusFrozen
+	case "verified":
+		return intenttree.StatusVerified
+	}
+	return ""
+}
+
+func statusRank(s intenttree.Status) int {
+	switch s {
+	case intenttree.StatusDraft:
+		return 0
+	case intenttree.StatusChangePending:
+		return 1
+	case intenttree.StatusFrozen:
+		return 2
+	case intenttree.StatusImplemented:
+		return 3
+	case intenttree.StatusVerified:
+		return 4
+	}
+	return -1
 }
 
 func statusMatches(node intenttree.Status, pkg string) bool {
@@ -197,6 +328,8 @@ func statusMatches(node intenttree.Status, pkg string) bool {
 		return node == intenttree.StatusDraft
 	case "change_pending":
 		return node == intenttree.StatusChangePending
+	case "verified":
+		return node == intenttree.StatusVerified
 	}
 	return false
 }
