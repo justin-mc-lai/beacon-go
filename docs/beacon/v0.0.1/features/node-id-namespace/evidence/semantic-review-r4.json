@@ -1,0 +1,10 @@
+{
+  "fingerprint": "27238ba52e3160743d34131806b6fef5229c68bbc35556ce1d96cbd44379612b",
+  "reviewer": "SemReviewNodeID3-r4-wording",
+  "verdict": "pass",
+  "findings": [
+    {"severity": "info", "point": "仅修辞修订", "detail": "相对 R3 pass 收据，仅去掉 Q1/AC-001 中的模糊量词，改为显式列举身份 id 前缀；AC/TC/TASK 绑定、fsm_required=false、白名单审计实跑通过、测试覆盖 5 类身份 id 均未变。"},
+    {"severity": "info", "point": "复核命令", "detail": "go test ./internal/intenttree -run TestShortIDNamespacedByVersionID -count=1 PASS；白名单 grep 无输出 PASS；指纹匹配当前包。"}
+  ],
+  "summary": "措辞修订后语义不变，原 pass 结论保持；指纹与当前包匹配。"
+}

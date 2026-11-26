@@ -1,0 +1,11 @@
+{
+  "fingerprint": "475a1eeb8fc1a75fe2efffb1720bbde980064e411e4ccf508da8358b2d05aa2d",
+  "reviewer": "SemReviewNodeID3",
+  "verdict": "pass",
+  "findings": [
+    {"severity": "info", "point": "R2 block 已解除：n_ 身份类已补测", "detail": "init_test.go 覆盖 nroot_/n_/nfeat_/nmod_/tmig_ 五类跨 versionID 隔离，nroot_ 同输入确定性；n_ 通过 versionID 派生的 parentID 断言跨项目隔离。"},
+    {"severity": "info", "point": "7 类调用点白名单审计通过", "detail": "TC-002 白名单 grep 实跑无输出，10 处生产调用点覆盖 7 前缀，均含 versionID/VersionID/parentID。"},
+    {"severity": "info", "point": "包声明自洽", "detail": "goal/Q1/Grounding/AC/TC/TASK 一致；无 7 类全覆盖旧表述残留；fsm_required=false 有据。"}
+  ],
+  "summary": "R2 block 已解除，5 类身份 id 覆盖与 nroot_ 确定性齐备，7 类调用点白名单审计通过，包内声明自洽，指纹匹配，判定 pass。"
+}

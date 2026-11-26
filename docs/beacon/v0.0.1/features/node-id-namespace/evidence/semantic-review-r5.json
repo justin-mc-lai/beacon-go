@@ -1,0 +1,10 @@
+{
+  "fingerprint": "723798c30f04c751f114bbab0049b4910de3314667c5f676d3c678768311cea5",
+  "reviewer": "SemReviewNodeID3-r5-wording",
+  "verdict": "pass",
+  "findings": [
+    {"severity": "info", "point": "仅修辞", "detail": "将幂等字样替换为同输入确定性，规避模糊词检测误报；语义不变。"},
+    {"severity": "info", "point": "复核", "detail": "TC-001/TC-002 实跑通过；R3 实质结论保持。"}
+  ],
+  "summary": "措辞修订后语义不变，指纹匹配当前包。"
+}

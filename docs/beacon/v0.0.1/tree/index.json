@@ -419,7 +419,8 @@
       "status": "draft",
       "title": "node id namespace",
       "path": "root/version-evolution/node-id-namespace",
-      "fingerprint": "4800c2ae4e8df50b97099d3cc923da409c63f13c6b6654c37cda34be79bb4ebb",
+      "truth_path": "docs/beacon/v0.0.1/features/node-id-namespace/truth.md",
+      "fingerprint": "02e5fd2ea2c7d237de7c318fd2d1612b3a203efcd8fb2525764c0045885680d0",
       "fingerprint_alg": "tree-json-v1"
     },
     {

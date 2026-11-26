@@ -25,6 +25,17 @@ func TestShortIDNamespacedByVersionID(t *testing.T) {
 		}
 	}
 
+	// Node ids from expand.go are derived from parentID; they land in the
+	// global tree_nodes primary key, so they must inherit the versionID
+	// namespace through the parent rather than collide across projects.
+	parentA := shortID("nroot_", "ver_projectA")
+	parentB := shortID("nroot_", "ver_projectB")
+	nA := shortID("n_", parentA, "feature", "title", "0")
+	nB := shortID("n_", parentB, "feature", "title", "0")
+	if nA == nB {
+		t.Fatalf("n_: different versionID parents produced the same node id %s", nA)
+	}
+
 	// The old derivation (version string only) must differ from the new one,
 	// so pre-fix callers cannot silently keep the colliding shape.
 	if legacy := shortID("nroot_", version); legacy == idA || legacy == idB {

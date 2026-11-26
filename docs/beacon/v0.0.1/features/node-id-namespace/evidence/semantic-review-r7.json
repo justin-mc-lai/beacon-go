@@ -1,0 +1,1 @@
+{"fingerprint":"357d53b14f26ddb6b189406473724e328817c6b32a4cbccde5d141fd5adf1756","reviewer":"SemReviewNodeID3-r7-freeze-gates","verdict":"pass","findings":[{"severity":"info","point":"门禁格式修订","detail":"新增 TC-004/005/006 负向用例满足 sdd_negative_tc_min；TASK-001 Depends 改为 ASCII 连字符满足 DAG 解析；TC ID 纯数字满足 sdd_tc_identity。实质语义、AC、测试命令与 R3 pass 一致。"}],"summary":"格式与门禁修订后语义不变，指纹匹配当前包。"}

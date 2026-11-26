@@ -1,0 +1,1 @@
+{"fingerprint":"252ade13446297741d1830d0617454105d5b5a69d5a9a5570366c56034272e44","reviewer":"SemReviewNodeID3-r6-wording","verdict":"pass","findings":[{"severity":"info","point":"措辞","detail":"去掉模糊连词或，改为明确条件；语义不变。"}],"summary":"措辞修订后语义不变，指纹匹配当前包。"}
