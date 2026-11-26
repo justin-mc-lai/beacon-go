@@ -1,7 +1,7 @@
 // Implementation review face (R2b, parity audit M15): Python
-// commands/review.py runs three reviews over a delivered package —
-// spec (does the package still say what was agreed), quality (did
-// verification actually close) and design (does the design hold) —
+// commands/review.py runs two reviews over a delivered package —
+// spec (does the package still say what was agreed) and quality
+// (did verification actually close) —
 // each emitting issues with critical/warn severities, a status
 // (fail when any critical, else warn when any issue, else pass)
 // and gate_ready = no critical. This file ports the CORE subset of
@@ -19,11 +19,10 @@ import (
 	"beacon-go/internal/store"
 )
 
-// Review kinds (review.py's three subcommands).
+// Review kinds (review.py's two subcommands).
 const (
 	ReviewSpec    = "spec"
 	ReviewQuality = "quality"
-	ReviewDesign  = "design"
 )
 
 // ReviewIssue is one review finding (review.py's issue shape:
@@ -47,7 +46,7 @@ type ReviewView struct {
 	RouteReasonCode string        `json:"route_reason_code,omitempty"`
 }
 
-// reviewFacts are the gathered facts the three checklists read.
+// reviewFacts are the gathered facts the two checklists read.
 type reviewFacts struct {
 	pkg            gate.PackageFiles
 	frozen         bool
@@ -58,9 +57,7 @@ type reviewFacts struct {
 	qaCount        int
 	qaStale        int
 	implementSeen  bool
-	designSeen     bool
 	qaGateVerdict  string
-	designVerdict  string
 	planBlocked    bool
 	hasRun         bool
 	runID          string
@@ -112,8 +109,6 @@ func (e *Engine) gatherReviewFacts(fc store.FeatureContext) (reviewFacts, error)
 		switch g.GateType {
 		case string(gate.GateQA):
 			f.qaGateVerdict = g.Verdict
-		case string(gate.GateDesign):
-			f.designVerdict = g.Verdict
 		case string(gate.GateImplement):
 			f.implementSeen = true
 		}
@@ -143,8 +138,6 @@ func (e *Engine) gatherReviewFacts(fc store.FeatureContext) (reviewFacts, error)
 				if stale, _ := store.ArtifactStaleness(a); stale {
 					f.qaStale++
 				}
-			case isDesignKind(a.Kind):
-				f.designSeen = true
 			case isImplementKind(a.Kind):
 				f.implementSeen = true
 			}
@@ -156,14 +149,6 @@ func (e *Engine) gatherReviewFacts(fc store.FeatureContext) (reviewFacts, error)
 func isImplementKind(kind string) bool {
 	switch kind {
 	case "implement", "implementation", "code", "patch":
-		return true
-	}
-	return false
-}
-
-func isDesignKind(kind string) bool {
-	switch kind {
-	case "design", "design_html", "prototype":
 		return true
 	}
 	return false
@@ -243,45 +228,9 @@ func qualityIssues(f reviewFacts) []ReviewIssue {
 // quality checklist (one number, one home: gate.CoverageThreshold).
 const CoverageThresholdQ = gate.CoverageThreshold
 
-// designIssues ports run_design_review's core: required documents,
-// prototype/design presence (severity depends on whether the
-// spec itself exists, as in the source), and the design gate's
-// own verdict.
-func designIssues(f reviewFacts) []ReviewIssue {
-	var out []ReviewIssue
-	crit := func(code, detail string) {
-		out = append(out, ReviewIssue{Code: code, Severity: "critical", Detail: detail})
-	}
-	warn := func(code, detail string) {
-		out = append(out, ReviewIssue{Code: code, Severity: "warn", Detail: detail})
-	}
-	if !f.pkg.Truth.Present {
-		crit("prd_missing", "truth.md (the design's spec input) is missing")
-	}
-	if !f.designSeen && f.designVerdict == "" {
-		// prototype_missing: critical when the truth/spec is also
-		// missing, warn otherwise (the source's rule).
-		if !f.pkg.Truth.Present {
-			crit("prototype_missing", "no design artifact or design gate verdict, and the spec is missing too")
-		} else {
-			warn("prototype_missing", "no design artifact or design gate verdict on record")
-		}
-	}
-	switch f.designVerdict {
-	case string(gate.VerdictBlocked), "fail":
-		crit("design_review_blocked", "the latest design gate verdict blocks")
-	case "warn":
-		warn("design_review_revise", "the latest design gate verdict asks for revision")
-	}
-	if f.drift {
-		warn(core.ReasonReviewSpecDrift, "the package drifted from its frozen record since the design was made")
-	}
-	return out
-}
-
-// Review runs one of the three reviews over a feature package and
-// writes the verdict back through the H5 channel when the feature
-// has a goal run.
+// Review runs one of the reviews over a feature package and writes
+// the verdict back through the H5 channel when the feature has a
+// goal run.
 func (e *Engine) Review(projectRoot, slug, kind string) (ReviewView, error) {
 	root := store.ResolveRootPath(projectRoot)
 	fc, err := e.store.ResolveFeature(root, slug, "")
@@ -298,11 +247,9 @@ func (e *Engine) Review(projectRoot, slug, kind string) (ReviewView, error) {
 		issues = specIssues(f)
 	case ReviewQuality:
 		issues = qualityIssues(f)
-	case ReviewDesign:
-		issues = designIssues(f)
 	default:
 		return ReviewView{}, core.NewError(core.ReasonGateTypeUnknown, "review.Review",
-			"unknown review kind "+kind+" (spec|quality|design)")
+			"unknown review kind "+kind+" (spec|quality)")
 	}
 	v := ReviewView{Kind: kind, FeatureSlug: fc.Feature.Slug, Issues: issues, GateReady: true, Status: "pass"}
 	hasCritical := false

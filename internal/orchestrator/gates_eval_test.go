@@ -134,64 +134,6 @@ func TestTruthFreezeGateBlockedDraft(t *testing.T) {
 	}
 }
 
-func TestDesignGateFlow(t *testing.T) {
-	env := newGateEnv(t, frozenTruthDoc)
-	run, err := env.eng.CreateRun(CreateRunOptions{ProjectRoot: env.root, FeatureSlug: "feat-a", UXRequired: true, ExecutorID: "host-1"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	ev, err := env.eng.EvaluateGate(env.ctx, "design", run.RunID, "design-bot")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if ev.Verdict != gate.VerdictBlocked || ev.ReasonCodes[0] != core.ReasonDesignPrimitiveNotBound {
-		t.Fatalf("unbound UX run must block design, got %+v", ev)
-	}
-	if _, err := env.eng.BindDesignPrimitive(run.RunID, DesignBinding{PrimitiveSet: "ds-core", Version: "ds-v1", BoundBy: "lai"}); err != nil {
-		t.Fatal(err)
-	}
-	ev, err = env.eng.EvaluateGate(env.ctx, "design", run.RunID, "design-bot")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if ev.Verdict != gate.VerdictPass {
-		t.Fatalf("bound run must pass design, got %+v", ev)
-	}
-	// A feature-scoped drift event must NOT leak into the design
-	// facts (they read the RUN trail only).
-	if _, err := env.st.AppendEvent(store.LifecycleEvent{
-		FeatureID: env.feature.ID,
-		Payload:   json.RawMessage(`{"primitive_set":"ds-core","version":"ds-v2"}`),
-		EventType: "design_primitive_bound",
-	}); err != nil {
-		t.Fatal(err)
-	}
-	ev, err = env.eng.EvaluateGate(env.ctx, "design", run.RunID, "design-bot")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if ev.Verdict != gate.VerdictPass {
-		t.Fatalf("feature-scoped event must not affect the run's design gate, got %+v", ev)
-	}
-	// The same drift on the RUN trail blocks with the mismatch code
-	// (snapshot binding version no longer matches the latest
-	// binding event).
-	run2, _, _, err := env.eng.loadRun(run.RunID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := env.eng.appendEvent(run2, "design_primitive_bound", map[string]any{"primitive_set": "ds-core", "version": "ds-v2"}); err != nil {
-		t.Fatal(err)
-	}
-	ev, err = env.eng.EvaluateGate(env.ctx, "design", run.RunID, "design-bot")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if ev.Verdict != gate.VerdictBlocked || !strings.Contains(strings.Join(ev.ReasonCodes, ","), core.ReasonDesignBindingVersionMism) {
-		t.Fatalf("run-trail version drift must block with mismatch, got %+v", ev)
-	}
-}
-
 func TestImplementGateIsAdmission(t *testing.T) {
 	env := newGateEnv(t, frozenTruthDoc)
 	run := env.createRun(t)

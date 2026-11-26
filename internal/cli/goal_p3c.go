@@ -1,20 +1,15 @@
-// Goal P3c command surfaces: real integration.
+// Goal P3c command surfaces: host-facing configuration and git worktrees.
 //
-//   - goal run gains --exec-cmd / --ralph-cmd / --profile /
-//     --reviewer-cmd (argv configuration, recorded on the run; the
-//     command VALUE is one program path — extra arguments travel as
-//     repeated --exec-arg / --ralph-arg values, never a shell
-//     string).
-//   - goal tick / continue and goal driver run-once / run-loop
-//     accept --executor subprocess | subprocess:<profile> | ralph
-//     in addition to the P2a recording placeholder. An unconfigured
-//     subprocess selection refuses (executor_not_configured) — it
-//     NEVER falls back to recording and calls it real.
-//   - goal worktree create/merge/cleanup/status (real git worktrees
-//     from the recorded parallel plan).
-//   - goal planner-review (real reviewer subprocesses, AC-102).
-//   - goal acp-probe (initialize handshake PROBE only; the help text
-//     says probe, the output says probe, full ACP is P4).
+//   - goal run accepts --exec-cmd / --ralph-cmd / --profile /
+//     --reviewer-cmd. These are RECORDED on the run (argv: one program
+//     path, extra arguments via repeatable --exec-arg / --ralph-arg,
+//     never a shell string). The kernel never executes them; the host
+//     agent does the work and reports it with `goal tick --by`.
+//   - goal worktree create/merge/cleanup/status manages real git
+//     worktrees from the recorded parallel plan.
+//   - goal planner-review records reviewer argv for the host.
+//   - goal acp-probe (initialize + session/new handshake PROBE only;
+//     FullBackend stays false — the kernel claims no ACP support).
 package cli
 
 import (
@@ -70,24 +65,23 @@ func (f *execFlags) empty() bool {
 }
 
 func addExecFlags(c *cobra.Command, f *execFlags, withReviewer bool) {
-	c.Flags().StringVar(&f.execCmd, "exec-cmd", "", "real executor command: ONE program path (argv execution, never a shell string)")
+	c.Flags().StringVar(&f.execCmd, "exec-cmd", "", "executor command to RECORD on the run (not executed by the kernel; one program path, never a shell string)")
 	c.Flags().StringArrayVar(&f.execArgs, "exec-arg", nil, "argument for --exec-cmd (repeatable; each value is one argv element)")
-	c.Flags().StringVar(&f.ralphCmd, "ralph-cmd", "", "ralph loop command: ONE program path (real loop when set)")
-	c.Flags().StringArrayVar(&f.ralphArgs, "ralph-arg", nil, "argument for --ralph-cmd (repeatable)")
-	c.Flags().IntVar(&f.ralphMax, "ralph-max-iterations", 0, "ralph loop ceiling (default 8)")
-	c.Flags().StringVar(&f.profile, "profile", "", "agent profile for subprocess:<profile> (codex-style|claude-style)")
-	c.Flags().IntVar(&f.timeoutSec, "exec-timeout-sec", 0, "per-stage/iteration timeout seconds (default 3600)")
+	c.Flags().StringVar(&f.ralphCmd, "ralph-cmd", "", "ralph command to RECORD (not executed by the kernel; one program path)")
+	c.Flags().StringArrayVar(&f.ralphArgs, "ralph-arg", nil, "argument for --ralph-cmd (repeatable; recorded only)")
+	c.Flags().IntVar(&f.ralphMax, "ralph-max-iterations", 0, "ralph ceiling recorded on the run (default 8)")
+	c.Flags().StringVar(&f.profile, "profile", "", "agent profile label to RECORD (codex-style|claude-style); not executed by the kernel")
+	c.Flags().IntVar(&f.timeoutSec, "exec-timeout-sec", 0, "per-stage timeout recorded on the run (default 3600)")
 	if withReviewer {
 		c.Flags().StringVar(&f.reviewerCmd, "reviewer-cmd", "", "planner-review reviewer command: ONE program path")
 	}
 }
 
-// realGoalEngine builds an engine and resolves the --executor
-// selector for the run. Selector semantics (see exec_resolve.go):
-// "" leaves the engine executor-less (ticks block honestly) unless
-// the driver path overrides it; "recording" is the placeholder;
-// "subprocess"/"subprocess:<profile>"/"ralph" are real and refuse
-// when unconfigured.
+// realGoalEngine builds an engine and resolves the --executor selector.
+// The kernel has no built-in executors: "" leaves it executor-less (ticks
+// block honestly), "recording" is a no-work placeholder, and every other
+// selector is refused by exec_resolve.go. Real work is recorded by the
+// host via `goal tick --by`.
 func realGoalEngine(runID, selector string, ef *execFlags) (*orchestrator.Engine, func(), error) {
 	st, err := openWriteStore()
 	if err != nil {

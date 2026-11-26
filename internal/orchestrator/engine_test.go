@@ -100,14 +100,6 @@ func TestCreateRunStageOrder(t *testing.T) {
 	if v.StagePlan[0].Status != "active" || v.StagePlan[0].Skills[0] != "beacon-plan" {
 		t.Errorf("first stage = %+v", v.StagePlan[0])
 	}
-	// UX inserts design after truth.
-	v2, err := env.eng.CreateRun(CreateRunOptions{ProjectRoot: env.root, FeatureSlug: "feat-a", UXRequired: true})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(v2.StagePlan) != 6 || v2.StagePlan[2].Stage != StageDesign {
-		t.Errorf("ux plan = %+v", v2.StagePlan)
-	}
 }
 
 // Tick idempotency (AC-143): a blocked tick consumes the state; repeating
@@ -438,8 +430,6 @@ func TestEvaluateStageExitBranches(t *testing.T) {
 		{"truth missing", ExitInput{Stage: StageTruth, HasFeature: true}, ReasonStageExitTruthMissing},
 		{"truth draft", ExitInput{Stage: StageTruth, HasFeature: true, TruthPackagePresent: true, TruthDraftPresent: true}, ReasonStageExitTruthNotFroz},
 		{"truth ack", ExitInput{Stage: StageTruth, HasFeature: true, TruthPackagePresent: true}, ReasonFreezeAckRequired},
-		{"design missing", ExitInput{Stage: StageDesign}, ReasonStageExitDesignIncompl},
-		{"design ok", ExitInput{Stage: StageDesign, DesignEvidence: true}, ""},
 		{"implement admission blocked", ExitInput{Stage: StageImplement, LatestGates: map[string]GateFact{"implement_admission": {Verdict: "blocked"}}}, ReasonStageExitImplementBlk},
 		{"qa no evidence", ExitInput{Stage: StageQA, LatestGates: map[string]GateFact{}}, ReasonStageExitQAEvidence},
 		{"qa artifacts", ExitInput{Stage: StageQA, ArtifactCount: 2, LatestGates: map[string]GateFact{}}, ReasonStageExitQAEvidence},

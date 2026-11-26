@@ -173,7 +173,7 @@ func contains(list []string, want string) bool {
 func execStageBlocked(t *testing.T) (Observation, error) {
 	draft := strings.Replace(baseTruthDoc, "status: frozen", "status: draft", 1)
 	f := newFixtureWithStatus(t, draft, "draft")
-	f.parkAtTruth(false)
+	f.parkAtTruth()
 	v, err := f.eng.Tick(context.Background(), f.runID)
 	if err != nil {
 		return Observation{}, err
@@ -195,7 +195,7 @@ func execStageBlocked(t *testing.T) (Observation, error) {
 // implement.
 func execStagePass(t *testing.T) (Observation, error) {
 	f := newFixture(t, baseTruthDoc)
-	f.parkAtTruth(false)
+	f.parkAtTruth()
 	v, err := f.eng.Tick(context.Background(), f.runID)
 	if err != nil {
 		return Observation{}, err

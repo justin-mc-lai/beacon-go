@@ -1,5 +1,5 @@
-// Package gate is the Go counterpart of the frozen v2 design's beacon-gate
-// crate: truth_freeze / design / implement / qa / release gate evaluations
+// Package gate is the Go counterpart of the frozen kernel's beacon-gate
+// crate: truth_freeze / implement / qa / release gate evaluations
 // plus the Truth Integrity Gate (AC-101). Every evaluation is persisted to
 // gate_results with reason_codes bound to the FSM (AC-013, AC-028, D-05).
 //
@@ -13,7 +13,7 @@
 package gate
 
 // GateType enumerates the gate axes (truth.md Diagram Truth Layer,
-// extended with the design gate and the integrity gate of AC-101).
+// extended with the integrity gate of AC-101).
 type GateType string
 
 const (
@@ -23,7 +23,6 @@ const (
 	// but it is a first-class gate axis for `gate status`.
 	GatePlan           GateType = "plan"
 	GateTruthFreeze    GateType = "truth_freeze"
-	GateDesign         GateType = "design"
 	GateImplement      GateType = "implement"
 	GateQA             GateType = "qa"
 	GateRelease        GateType = "release"
@@ -34,13 +33,13 @@ const (
 // reports, in pipeline order (integrity last: it stands apart from
 // the four stage gates + release composition).
 var OrderedGateTypes = []GateType{
-	GatePlan, GateTruthFreeze, GateDesign, GateImplement, GateQA, GateRelease, GateTruthIntegrity,
+	GatePlan, GateTruthFreeze, GateImplement, GateQA, GateRelease, GateTruthIntegrity,
 }
 
 // Known reports whether t is one of the evaluable gate types.
 func (t GateType) Known() bool {
 	switch t {
-	case GatePlan, GateTruthFreeze, GateDesign, GateImplement, GateQA, GateRelease, GateTruthIntegrity:
+	case GatePlan, GateTruthFreeze, GateImplement, GateQA, GateRelease, GateTruthIntegrity:
 		return true
 	}
 	return false

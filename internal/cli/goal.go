@@ -25,8 +25,8 @@ func newGoalCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "goal",
 		Short: "Drive one staged delivery run (create, tick, complete, resume)",
-		Long: "Goal is the formal user entry for the loop ability (charter decision 5).\n" +
-			"A goal run walks plan -> truth -> (design) -> implement -> verify -> release\n" +
+		Long: "Goal drives one staged delivery run.\n" +
+			"A goal run walks plan -> truth -> implement -> verify -> release\n" +
 			"under the loop-goal state machine; release completion always needs\n" +
 			"human confirmation, an attached verifier and a passing verify gate.",
 	}
@@ -47,9 +47,9 @@ func newGoalCmd() *cobra.Command {
 		newGoalSteerCmd(), newGoalTodoCmd(),
 		// P2c delegation & parallel: implement lanes (G-22), admit
 		// (G-04), delegate-ralph + receive-result (G-10),
-		// parallel-plan (G-11), design-stage (G-18).
+		// parallel-plan (G-11).
 		newGoalImplementCmd(), newGoalAdmitCmd(),
-		newGoalReceiveResultCmd(), newGoalDesignStageCmd(),
+		newGoalReceiveResultCmd(),
 		// P2d orchestration extensions: program (G-12), hotfix-plan
 		// (G-13), multi-version-plan (G-14), memory (G-15),
 		// axis (G-16).
@@ -228,7 +228,7 @@ func blockedErr(v orchestrator.RunView) error {
 func newGoalRunCmd() *cobra.Command {
 	var project, version, feature, executorID, executorMode, scale, releasePolicy string
 	var lakes []string
-	var ux, asJSON bool
+	var asJSON bool
 	var ef execFlags
 	c := &cobra.Command{
 		Use:   "run [utterance]",
@@ -259,7 +259,7 @@ func newGoalRunCmd() *cobra.Command {
 			defer closeFn()
 			v, err := eng.CreateRun(orchestrator.CreateRunOptions{
 				ProjectRoot: project, Version: version, FeatureSlug: feature,
-				Utterance: utterance, UXRequired: ux, ExecutorID: executorID,
+				Utterance: utterance, ExecutorID: executorID,
 				ExecutorMode: executorMode, ExecutorDefaulted: executorDefaulted,
 				Lakes: lakes, Scale: scale, Exec: execCfg, ReleasePolicy: releasePolicy,
 			})
@@ -285,13 +285,12 @@ func newGoalRunCmd() *cobra.Command {
 	c.Flags().StringVarP(&project, "project", "p", ".", "project root path")
 	c.Flags().StringVarP(&version, "version", "v", "", "docs version (default: current)")
 	c.Flags().StringVarP(&feature, "feature", "f", "", "feature slug (default: first of the project)")
-	c.Flags().BoolVar(&ux, "ux", false, "UX/design work required (inserts the design stage; explicit signal, no guessing)")
 	c.Flags().StringArrayVar(&lakes, "lane", nil, "lane slugs (recorded on the run; lane routing and parallel plans consult them)")
 	c.Flags().StringArrayVar(&lakes, "lake", nil, "deprecated alias of --lane")
 	c.Flags().StringVar(&scale, "scale", "", "task scale field (large routes the implement lane to ralph)")
 	c.Flags().StringVar(&executorID, "executor-id", "", "identity of the executing agent (maker, for maker!=checker)")
 	c.Flags().StringVar(&executorMode, "executor", "",
-		"executor selector: manual | external (not auto-driven; record with goal tick --by) | recording | subprocess | subprocess:<profile> | ralph")
+		"executor selector: manual | external (not auto-driven; record with goal tick --by) | recording (placeholder, no real work)")
 	c.Flags().StringVar(&releasePolicy, "release-policy", "", "release confirmation policy: human (default) | auto_shadow (preview only; auto is refused)")
 	addExecFlags(c, &ef, true)
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
@@ -360,7 +359,7 @@ func newGoalTickCmd(cont bool) *cobra.Command {
 	}
 	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
 	c.Flags().StringVarP(&project, "project", "p", "", "project root path (accepted for v1 parity)")
-	c.Flags().StringVar(&executor, "executor", "", "stage executor: recording (placeholder, no real work) | subprocess (real, needs --exec-cmd or a recorded one) | subprocess:<profile> (real harness profile) | ralph (real loop, implement lane)")
+	c.Flags().StringVar(&executor, "executor", "", "stage executor: recording (placeholder, no real work); manual/external record via goal tick --by")
 	c.Flags().StringVar(&note, "note", "", "free-form note (accepted for v1 parity)")
 	c.Flags().StringVar(&by, "by", "", "who records this stage as complete (required for manual/external runs)")
 	addExecFlags(c, &ef, false)
@@ -474,7 +473,7 @@ func newGoalCompleteCmd() *cobra.Command {
 	var humanConfirmed, force, asJSON bool
 	c := &cobra.Command{
 		Use:   "complete",
-		Short: "Complete the run at release_gate (human confirmed + verifier + qa pass required)",
+		Short: "Complete the run at release_gate (human confirmed + verifier + verification gate pass required)",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			eng, closeFn, err := goalEngine("")

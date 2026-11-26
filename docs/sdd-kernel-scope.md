@@ -1,6 +1,6 @@
 # Beacon Go：需求真相内核 / SDD 规范边界（2026-11-24）
 
-> **2026-11-24 更新**：本文中「goal 从 CLI 隐藏」「不做长跑 driver / supervisor / checkpoint」「runs / checkpoints 移出核心」等段落已被 [ADR-0002](adr/ADR-0002-intent-tree-truth-model.md) 与 spec #15 取代。当前口径：goal 单命令工作流保留；内置 agent 后端与外围面移出。其余段落仍有效。
+> **2026-11-26 更新**：命令面的唯一权威是七组 `plan|truth|change|implement|verify|release|goal`，由 `internal/harness.Abilities` 单点定义、`internal/cli/root.go` 从该表装配。旧「六能力」（loop/truth/design/implement/qa/release）及其 loop→goal、qa→verify 改名记录属历史，见 `docs/changes/change-goal-entry-rename.md`；需求真相是意图树。本文 §2 的六能力列举仅作历史背景。**worktree 是核心能力**（并行 worktree 交付，`implement` 组可见、admission 硬门禁）；下文 §3/§4/§7/§8 把 worktree 列为"移出核心/quarantine"的段落均为已作废的历史口径，以 `AGENTS.md`「唯一真源」为准。
 
 > 决定：Python Beacon 只作参考，不再维护；Go 线不再追求 1:1 迁移。
 > 目标：一个**需求真相内核**，只负责 SDD（Spec-Driven Development）规范的定义、冻结、变更与验收证据绑定。
@@ -10,7 +10,7 @@
 
 **Beacon Go = SDD 规范内核：把一句话变成可冻结、可变更、可验证、可追溯的需求真相包，并用硬 gate 阻止“没想清楚就开工”。**
 
-它保留一条命令跑完整条工作流（plan→truth→design→implement→verify→release），但不替 agent 写代码、不内置 agent 后端、不负责发版部署。那些是宿主 agent / CI / 人的事。
+它保留一条命令跑完整条工作流（plan→truth→implement→verify→release；design 阶段已按 2026-11-26 真源移除），但不替 agent 写代码、不内置 agent 后端、不负责发版部署。那些是宿主 agent / CI / 人的事。
 
 ## 2. 内核必须有的六件事
 
@@ -30,7 +30,7 @@
 | 1:1 迁移 Python 77 条命令 | Python 是参考实现，不是目标合同。 |
 | ~~长跑 driver / supervisor / checkpoint~~（已由 ADR-0002 改为保留） | goal 单命令工作流保留；仅内置执行后端移出。 |
 | agent executor（subprocess / ralph / ACP / team lane） | 执行归宿主；内核只验收证据。 |
-| program / sea / topology / worktree | 多湖编排与多仓拓扑不是 SDD 规范的最小必需。 |
+| ~~program / sea / topology / worktree~~（worktree 已按 2026-11-26 真源恢复为核心能力） | program/sea/topology 不是 SDD 规范最小必需；worktree 例外，见文首更新说明。 |
 | 桌面端 / Web 控制台 / agentapi / llm / session | UI 与对话不是真相内核。 |
 | v1 迁移 / bench / archive 治理外壳 / hooks | 与 SDD 规范无关；需要时由外部脚本做。 |
 | labs 产品分析工具箱、loom 双品牌 | 与编码主线无关。 |
@@ -40,7 +40,7 @@
 ```text
 beacon projects register|list|bump
 beacon truth create|decompose|intent|ask|answer|confirm|freeze|change|refreeze|drift|rebase|show|list|map
-beacon gate evaluate <truth_freeze|design|implement|qa|release>
+beacon gate evaluate <truth_freeze|implement|qa|release>
 beacon gate integrity
 beacon gate status
 beacon spine show|list|artifacts|gate

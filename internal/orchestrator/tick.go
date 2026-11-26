@@ -268,7 +268,7 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 		m.StagePlan[m.CurrentStageIdx].Status = "active"
 		target := LoopStageForProductStage(nextStage)
 		if ls.CurrentStage != target {
-			if err := ls.Transition(target, false, e.stopWhen); err != nil {
+			if err := ls.Transition(target, false); err != nil {
 				return RunView{}, err
 			}
 			m.applyLoopState(ls)

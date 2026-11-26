@@ -11,7 +11,7 @@
 // written by `beacon gate evaluate`), the qa and release exits are
 // FORMAL-FIRST — a recorded verdict for the stage's gate decides,
 // and the old derived judgement runs only when no formal verdict
-// exists (the verdict then carries Derived=true). truth / design /
+// exists (the verdict then carries Derived=true). truth and
 // implement keep their derived judgements (their formal records are
 // surfaced via FormalVerdict) — see the p3a report for the per-stage
 // rationale.
@@ -31,7 +31,6 @@ const (
 	ReasonStageExitPlanIncompl   = core.ReasonStageExitPlanIncomplete
 	ReasonStageExitTruthNotFroz  = core.ReasonStageExitTruthNotFrozen
 	ReasonStageExitTruthMissing  = core.ReasonStageExitTruthMissing
-	ReasonStageExitDesignIncompl = core.ReasonStageExitDesignIncompl
 	ReasonStageExitImplementBlk  = core.ReasonStageExitImplementBlock
 	ReasonStageExitQAEvidence    = core.ReasonStageExitQAEvidenceMiss
 	ReasonFreezeAckRequired      = core.ReasonFreezeAckRequired
@@ -99,11 +98,6 @@ type ExitInput struct {
 	ArtifactCount int
 	QAEligible    bool
 	QAReason      string
-	// DesignEvidence: lifecycle at Prototype/Completed or design gate pass.
-	DesignEvidence bool
-	// DesignEvidenceFormal: a formal design gate pass is (part of)
-	// the evidence for DesignEvidence.
-	DesignEvidenceFormal bool
 }
 
 // ExitVerdict is one exit decision. Derived marks that the decision
@@ -150,8 +144,8 @@ func passVerdict() ExitVerdict {
 }
 
 // runVerdictOf returns the latest verdict recorded BY THIS RUN for a
-// gate type ("" when this run never evaluated it). Design and implement
-// exits use only this: a sibling run's pass is not this run's evidence.
+// gate type ("" when this run never evaluated it). The implement exit
+// uses only this: a sibling run's pass is not this run's evidence.
 func runVerdictOf(in ExitInput, gateType string) string {
 	if g, ok := in.LatestGates[gateType]; ok {
 		return g.Verdict
@@ -253,16 +247,6 @@ func EvaluateStageExit(in ExitInput) ExitVerdict {
 		v := blockedVerdict(ReasonFreezeAckRequired, core.ResumeAwaitFreezeAck, "beacon-gen-truth")
 		v.FrozenSource = in.FrozenSource
 		return v
-	case StageDesign:
-		if in.DesignEvidence {
-			v := passVerdict()
-			v.Derived = !in.DesignEvidenceFormal
-			setRunFormal(&v, in, "design")
-			return v
-		}
-		v := blockedVerdict(ReasonStageExitDesignIncompl, core.ResumeLoadNextSkill, "beacon-design")
-		setRunFormal(&v, in, "design")
-		return v
 	case StageImplement:
 		if g, ok := in.LatestGates["implement_admission"]; ok && g.Verdict == "blocked" {
 			v := blockedVerdict(firstCode(g.ReasonCodes, ReasonStageExitImplementBlk),
@@ -352,9 +336,6 @@ func (e *Engine) buildExitInput(run store.Run, m *runMeta) (ExitInput, error) {
 	if lc, err := e.store.Features().GetLifecycle(run.FeatureID); err == nil {
 		in.LifecycleStage = string(lc.Stage)
 		in.LifecycleStatus = string(lc.Status)
-		if lc.Stage == core.StagePrototype && lc.Status == core.StatusCompleted {
-			in.DesignEvidence = true
-		}
 	}
 	// Frozenness is the ONE shared determination (frozen_fact.go) —
 	// the lifecycle snapshot no longer feeds it.
@@ -364,12 +345,6 @@ func (e *Engine) buildExitInput(run store.Run, m *runMeta) (ExitInput, error) {
 		in.TruthChangePending = ff.ChangePending
 		in.FrozenSource = ff.Source
 		in.TruthBaselineUncommitted = ff.BaselineStatus == BaselineUncommitted
-	}
-	// Design evidence is run-scoped: another run's design gate pass is
-	// not this run's evidence (review B3).
-	if g, ok := in.LatestGates["design"]; ok && g.Verdict == "pass" {
-		in.DesignEvidence = true
-		in.DesignEvidenceFormal = true
 	}
 	// Artifact presence is this run's evidence, not the feature's
 	// pooled pointer count (review B3).

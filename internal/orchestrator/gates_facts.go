@@ -53,37 +53,6 @@ func (e *Engine) evalTruthFreeze(ctx store.FeatureContext, evaluator string) (ga
 	return gate.EvaluateTruthFreeze(f, evaluator), nil
 }
 
-// evalDesign gathers the design facts from the run's binding record.
-func (e *Engine) evalDesign(ctx store.FeatureContext, run store.Run, evaluator string) (gate.Evaluation, error) {
-	_, m, _, err := e.loadRun(run.ID)
-	if err != nil {
-		return gate.Evaluation{}, err
-	}
-	f := gate.DesignFacts{HasRun: true, Required: designRequired(m), Bound: designBound(m)}
-	if m.DesignBinding != nil {
-		f.BindingSet = m.DesignBinding.PrimitiveSet
-		f.BindingVersion = m.DesignBinding.Version
-	}
-	events, err := e.store.ListEventsByRun(run.ID)
-	if err != nil {
-		return gate.Evaluation{}, err
-	}
-	for _, ev := range events {
-		if ev.EventType != "design_primitive_bound" {
-			continue
-		}
-		var p struct {
-			Version string `json:"version"`
-		}
-		if len(ev.Payload) > 0 {
-			_ = json.Unmarshal(ev.Payload, &p)
-		}
-		f.HasBoundEvent = true
-		f.EventVersion = p.Version
-	}
-	return gate.EvaluateDesign(f, evaluator), nil
-}
-
 // evalImplement wraps the ONE shared admission checker (G-04): the
 // gate's verdict is the admission verdict, with the admission items
 // mapped 1:1 — no second judgement is implemented here. The ONE item
@@ -226,21 +195,19 @@ func (e *Engine) releaseFacts(ctx store.FeatureContext) (gate.ReleaseFacts, erro
 		return gate.GateFact{Present: true, Verdict: g.Verdict, ReasonCodes: g.ReasonCodes}
 	}
 	f.TruthFreeze = fact(gate.GateTruthFreeze)
-	f.Design = fact(gate.GateDesign)
 	f.Implement = fact(gate.GateImplement)
 	f.QA = fact(gate.GateQA)
 	// M7 (R2a): materials freshness — a surface still marked
 	// stale after a truth change blocks the release verdict.
 	f.MaterialsStale = e.staleMaterialSurfaces(ctx)
-	// Design applicability + human confirmation both live on the
-	// newest goal run; the release_confirmed event is the trail-side
-	// record of the same confirmation (P2a口径).
+	// Human confirmation lives on the newest goal run; the
+	// release_confirmed event is the trail-side record of the same
+	// confirmation (P2a口径).
 	_, m, has, err := e.latestGoalRun(ctx, "")
 	if err != nil {
 		return gate.ReleaseFacts{}, err
 	}
 	if has {
-		f.DesignApplicable = designRequired(m)
 		f.HumanConfirmed = m.ReleaseHumanConfirmed
 		f.HumanConfirmedBy = m.HumanConfirmedBy
 	}

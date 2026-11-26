@@ -1,4 +1,0 @@
-interface:
-  display_name: "Beacon Design"
-  short_description: "Bind design primitives before implementation"
-  default_prompt: "Use $beacon-go-design to bind the required design primitives before implementation starts."

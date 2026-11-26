@@ -1,6 +1,6 @@
 {
   "name": "beacon-go",
-  "version": "2.0.0-go.17",
+  "version": "0.0.1",
   "description": "Beacon Go — evidence-first requirement truth and hard gates for coding agents. Skills that can prove they did the work.",
   "author": {
     "name": "justin-mc-lai",
@@ -21,7 +21,7 @@
     "./skills/goal",
     "./skills/plan",
     "./skills/truth",
-    "./skills/design",
+    "./skills/change",
     "./skills/implement",
     "./skills/verify",
     "./skills/release"

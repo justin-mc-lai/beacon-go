@@ -1,5 +1,5 @@
 // Skills surface: the seven embedded public skills (Scheme A 1+6:
-// goal facade + plan/truth/design/implement/qa/release), listable
+// goal facade + plan/truth/implement/qa/release), listable
 // and readable without a model call, and installable into a host
 // skill directory (skills_install.go). This restores the v1 kept
 // `skill` support surface (charter: slim, not dropped).

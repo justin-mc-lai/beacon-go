@@ -12,7 +12,7 @@ import (
 func newVerifyCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "verify",
-		Short: "Verification group: audit, evidence, qa gate, score, autotest",
+		Short: "Verification group: audit, evidence, gate, score, autotest",
 		Long: "The single verification entry. Tree audit/leaf/rollup live here, and\n" +
 			"the former qa face is folded in: status, evaluate, planner-review,\n" +
 			"score, score-history, autotest, strategy, agentscore, agenteval,\n" +
@@ -115,7 +115,7 @@ func newVerifyLeafCmd() *cobra.Command {
 	var asJSON bool
 	c := &cobra.Command{
 		Use:   "leaf",
-		Short: "Register leaf evidence under the node scope and mark it verified",
+		Short: "WRITES: register leaf evidence under node scope and mark it verified",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			st, err := openWriteStore()
@@ -165,7 +165,7 @@ func newVerifyRollupCmd() *cobra.Command {
 	var asJSON bool
 	c := &cobra.Command{
 		Use:   "rollup",
-		Short: "Mark a parent verified only when every child is verified",
+		Short: "WRITES: mark a parent verified only when every child is verified",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			st, err := openWriteStore()

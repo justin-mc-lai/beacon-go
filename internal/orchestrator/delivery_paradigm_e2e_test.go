@@ -11,24 +11,19 @@ import (
 )
 
 // AC-008 / TC-012: one delivery end to end. A run is created and walks
-// plan -> truth -> design -> implement -> qa -> release; the plan exit
-// record plus the truth_freeze / design / implement / qa / release gate
-// verdicts all exist with evaluated=true, and conformance recognises
-// the delivery — then the same judgement demonstrably fails when a
-// required fact is missing.
+// plan -> truth -> implement -> qa -> release; the plan exit record
+// plus the truth_freeze / implement / qa / release gate verdicts all
+// exist with evaluated=true, and conformance recognises the delivery —
+// then the same judgement demonstrably fails when a required fact is
+// missing.
 func TestDeliveryParadigmEndToEnd(t *testing.T) {
 	env := newGateEnv(t, frozenTruthDoc)
 	ctx := context.Background()
 	run, err := env.eng.CreateRun(CreateRunOptions{
-		ProjectRoot: env.root, FeatureSlug: "feat-a", UXRequired: true,
+		ProjectRoot: env.root, FeatureSlug: "feat-a",
 		ExecutorID: "maker", ExecutorMode: ExecutorModeRecording,
 	})
 	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := env.eng.BindDesignPrimitive(run.RunID, DesignBinding{
-		PrimitiveSet: "beacon-design", Version: "1.0.0", SourceRef: "docs/design.md", BoundBy: "designer",
-	}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -44,16 +39,7 @@ func TestDeliveryParadigmEndToEnd(t *testing.T) {
 		}
 	}
 	step(StageTruth)
-	step(StageDesign)
 
-	// The design gate is a real evaluation over the bound primitives.
-	ev, err := env.eng.EvaluateGate(env.ctx, string(gate.GateDesign), run.RunID, "designer")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if ev.Verdict != gate.VerdictPass {
-		t.Fatalf("design gate = %+v, want pass", ev)
-	}
 	step(StageImplement)
 	step(StageQA)
 	productReport := prepareProductQA(t, env.testEnv, run.RunID, "independent-verifier")
@@ -88,7 +74,7 @@ func TestDeliveryParadigmEndToEnd(t *testing.T) {
 		t.Fatalf("release gate = %+v, want pass", relEv)
 	}
 
-	for _, gt := range []string{"plan", "truth_freeze", "design", "implement", "qa", "release"} {
+	for _, gt := range []string{"plan", "truth_freeze", "implement", "qa", "release"} {
 		g, err := env.st.Gates().Latest(env.feature.ID, gt)
 		if err != nil {
 			t.Fatalf("gate %s has no recorded verdict: %v", gt, err)

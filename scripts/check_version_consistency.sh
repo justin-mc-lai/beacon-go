@@ -12,6 +12,7 @@ go_version="$ROOT/internal/version/version.go"
 readme="$ROOT/README.md"
 readme_zh="$ROOT/README.zh-CN.md"
 agents="$ROOT/AGENTS.md"
+plugin="$ROOT/.claude-plugin/plugin.json"
 
 fail=0
 
@@ -47,7 +48,7 @@ check_current() {
 
 check_current "$readme" 'Current release' "README.md"
 check_current "$readme_zh" '当前版本' "README.zh-CN.md"
-
+check_current "$plugin" '"version"[[:space:]]*:' ".claude-plugin/plugin.json"
 if [ -f "$agents" ]; then
   if grep -nE '当前版本[：:][[:space:]]*\*{0,2}v?[0-9]+\.[0-9]+\.[0-9]+' "$agents" >&2; then
     echo "version-consistency: AGENTS.md hard-codes a current version; point to 'beacon --version' instead" >&2

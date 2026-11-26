@@ -5,11 +5,10 @@
 // the package is materialized into its skill directory (see
 // Install), or through the CLI's references face.
 //
-// The set is the Scheme A 1+6 public surface of the Python package
-// (skills/beacon/): the goal facade plus plan / truth / design /
-// implement / qa / release. plan joined in R2c (parity audit H9):
-// before that the Go set silently replaced plan with goal and
-// shipped no references at all, so a host had nothing to discover.
+// The set is the seven first-class abilities (AGENTS.md "唯一真源"):
+// goal facade plus plan / truth / change / implement / verify / release.
+// The canonical ability list is internal/harness.Abilities; this order
+// must match it. design was removed entirely (AGENTS.md truth source).
 package skills
 
 import (
@@ -23,7 +22,7 @@ import (
 	"strings"
 )
 
-//go:embed beacon-go-goal beacon-go-plan beacon-go-truth beacon-go-design beacon-go-implement beacon-go-verify beacon-go-release
+//go:embed beacon-go-goal beacon-go-plan beacon-go-truth beacon-go-change beacon-go-implement beacon-go-verify beacon-go-release
 var files embed.FS
 
 // Skill is one embedded public skill.
@@ -40,7 +39,7 @@ type RefFile struct {
 	Body string `json:"body,omitempty"`
 }
 
-var order = []string{"goal", "plan", "truth", "design", "implement", "verify", "release"}
+var order = []string{"goal", "plan", "truth", "change", "implement", "verify", "release"}
 
 // packageDir is the source directory for one skill id. It is the same
 // name the installer writes, so the embedded package and the installed
@@ -323,7 +322,7 @@ description: >
   Beacon Go 3.x requirement-truth router. Always means the Go binary §beacon-go§
   (never the Python v1 §beacon§). The abilities are installed next to this
   file as beacon-go-goal / beacon-go-plan / beacon-go-truth /
-  beacon-go-design / beacon-go-implement / beacon-go-verify / beacon-go-release;
+  beacon-go-change / beacon-go-implement / beacon-go-verify / beacon-go-release;
   select one directly or load it by skill id with the CLI.
 ---
 

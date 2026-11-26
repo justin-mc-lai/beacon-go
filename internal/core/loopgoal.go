@@ -12,9 +12,8 @@
 //     gate, independent of any auto-decide flag).
 //   - increment_repair_loop(): counts implement/qa repair loops; exceeding
 //     MaxRepairLoops (3) routes the run to error_recovery.
-//   - check_stop_when() evaluation is an injected hook: callers register a
-//     StopWhenEvaluator; with no evaluator the machine only enforces the
-//     mechanical rules above (P2a scope).
+//   - check_stop_when(): the machine enforces a pending stop_when marker
+//     on every transition; there is no injected evaluator.
 package core
 
 // LoopStage is one state of the loop-goal runtime axis (12 states).
@@ -142,29 +141,15 @@ func NewLoopState() LoopState {
 	return LoopState{CurrentStage: LoopIdle, StageHistory: []string{string(LoopIdle)}}
 }
 
-// StopWhenEvaluator is the stop_when judgement hook (P2a: interface only;
-// concrete evaluators land with the gate work in P3). It returns a
-// non-empty reason_code when the stop condition is satisfied.
-type StopWhenEvaluator interface {
-	EvaluateStopWhen(st LoopState) (reasonCode string, satisfied bool)
-}
-
 // Transition moves the state to toStage following loop_goal_state.py
 // transition() semantics. On success the state is updated in place; on
 // failure a typed error carries the source reason_code and the state is
 // left unchanged.
-func (st *LoopState) Transition(to LoopStage, releaseConfirmed bool, ev StopWhenEvaluator) error {
+func (st *LoopState) Transition(to LoopStage, releaseConfirmed bool) error {
 	if !to.Valid() {
 		return NewError(ReasonInvalidLoopStage, "LoopState.Transition", "unknown loop stage "+string(to))
 	}
-	if ev != nil {
-		if code, satisfied := ev.EvaluateStopWhen(*st); satisfied {
-			if code == "" {
-				code = ReasonStopWhenSatisfied
-			}
-			return NewError(code, "LoopState.Transition", "stop_when already satisfied")
-		}
-	}
+
 	if st.StopWhen != "" {
 		return NewError(ReasonStopWhenSatisfied, "LoopState.Transition",
 			"pending stop_when from a previous step: "+st.StopWhen)

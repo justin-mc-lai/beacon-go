@@ -56,12 +56,12 @@ func TestSkillsOrderTheReferenceRead(t *testing.T) {
 	}
 }
 
-// AC-127/AC-144: the six public abilities each expose route examples,
-// every referenced example file exists in the embedded package, and the
-// set covers the four example chains the frozen surface names. Examples
-// are explicitly not requirement authority.
+// AC-127/AC-144: every public ability skill except the goal facade exposes
+// route examples, every referenced example file exists in the embedded
+// package, and the set covers the four example chains the frozen surface
+// names. Examples are explicitly not requirement authority.
 func TestRouteExamplesCoverFourChains(t *testing.T) {
-	six := []string{"plan", "truth", "design", "implement", "verify", "release"}
+	six := []string{"plan", "truth", "change", "implement", "verify", "release"}
 	fileRef := regexp.MustCompile("`(examples/[^`]+\\.md)`")
 	chainRef := regexp.MustCompile("chain `([a-z-]+)`")
 	seen := map[string]bool{}

@@ -1,6 +1,6 @@
 // beacon review (R2b, M15): the implementation review face —
-// Python commands/review.py's spec/quality/design reviews over a
-// feature package, with the verdict written back through the H5
+// Python commands/review.py's spec/quality reviews over a feature
+// package, with the verdict written back through the H5
 // review-decision channel when the feature has a goal run.
 package cli
 
@@ -15,12 +15,11 @@ import (
 func newReviewCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "review",
-		Short: "Implementation reviews over a feature package: spec | quality | design (review.py)",
+		Short: "Implementation reviews over a feature package: spec | quality (review.py)",
 	}
 	c.AddCommand(
 		newReviewKindCmd(orchestrator.ReviewSpec, "Spec review: required documents, implementation marker, drift, stale materials"),
 		newReviewKindCmd(orchestrator.ReviewQuality, "Quality review: verification + evidence closure, package closure, coverage, plan state"),
-		newReviewKindCmd(orchestrator.ReviewDesign, "Design review: spec input, prototype presence, the design gate's verdict"),
 	)
 	return c
 }

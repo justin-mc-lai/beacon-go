@@ -45,7 +45,9 @@ var Catalog = []Role{
 	{ID: "product-manager", Title: "Spec author", Category: "product", Stage: "spec", Inputs: "answered questions", Outputs: "user stories, acceptance criteria, out-of-scope", Always: true},
 	{ID: "domain-fsm-architect", Title: "FSM / lifecycle architect", Category: "architecture", Stage: "spec", Inputs: "user stories with state", Outputs: "entities, states, transitions, illegal slots"},
 	{ID: "microservices-architect", Title: "System architect", Category: "architecture", Stage: "spec", Inputs: "user stories + repo context", Outputs: "services, contracts, data flow"},
-	{ID: "ui-designer", Title: "Interaction designer", Category: "design", Stage: "spec", Inputs: "user stories with screens", Outputs: "flows, states, empty/error views"},
+	// Interaction-design expertise is a recommendation role, not the
+	// removed design stage/ability. Category is product (2026-11-26).
+	{ID: "ui-designer", Title: "Interaction designer", Category: "product", Stage: "spec", Inputs: "user stories with screens", Outputs: "flows, states, empty/error views"},
 	{ID: "database-administrator", Title: "Data architect", Category: "data", Stage: "spec", Inputs: "entities + migrations", Outputs: "schema, indexes, migration order"},
 	{ID: "security-engineer", Title: "Security reviewer", Category: "security", Stage: "spec", Inputs: "auth/payment/secret surfaces", Outputs: "threats, trust boundaries, controls"},
 	{ID: "devops-engineer", Title: "Delivery engineer", Category: "infrastructure", Stage: "spec", Inputs: "runtime + release rules", Outputs: "pipeline, environments, rollback"},

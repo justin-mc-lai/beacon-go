@@ -7,8 +7,7 @@ package version
 
 // Version is the current build version.
 //
-// History: the old Go track used 2.0.0-go.N prerelease strings. Per the
-// 2026-11-24 normalization decision (docs/version-scheme.md), those were
-// prereleases of 2.0.0. 2.0.0 was never tagged; 3.0.0 is the first
-// stable release of the intent-tree kernel.
-const Version = "3.0.8"
+// The version axis was reset to 0.0.1 when the product was redesigned from
+// scratch under the AGENTS.md "唯一真源" contract. Earlier version lines are
+// gone with the historical frozen artifacts.
+const Version = "0.0.1"

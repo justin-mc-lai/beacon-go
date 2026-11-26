@@ -1,27 +1,13 @@
-// Executor resolution (P3c): one place turns an --executor selector
-// string plus a configuration into a StageExecutor — or refuses
-// honestly. Selector grammar:
+// Executor resolution. The kernel runs no agent (spec #15 / ADR-0002):
 //
-//	"" / "none"            -> no executor (nil, nil): the engine blocks
-//	                          with stage_executor_not_registered, exactly
-//	                          like P2a — an absent executor is never
-//	                          quietly replaced by a placeholder.
-//	"recording"            -> the RecordingExecutor placeholder (labelled
-//	                          simulated in its own evidence; kept from P2a).
-//	"subprocess"           -> the real subprocess backend over cfg.Argv;
-//	                          no argv configured -> executor_not_configured
-//	                          (NEVER a fallback to recording).
-//	"subprocess:<profile>" -> the real profile (harness) backend over
-//	                          the named profile (codex-style |
-//	                          claude-style, or cfg.Profile's name), with
-//	                          cfg.ProfileArgv / cfg.Argv as its command.
+//	"" / "none"  -> no executor; ticks block with stage_executor_not_registered
+//	"recording"  -> a no-work placeholder, labelled simulated in its evidence
+//	anything else -> refused with stage_executor_not_registered
 //
-// The cfg argument is per-invocation (CLI flags); when it carries no
-// command, the run's recorded Exec (m.Exec) fills the gap, so a run
-// created with --exec-cmd can be ticked later without repeating the
-// command. Configuration precedence: invocation > run record >
-// profile default binary name (which then fails honestly at
-// selection when the binary is absent).
+// Real work is done by the host agent and recorded with `goal tick --by`.
+// The exec configuration (--exec-cmd / --ralph-cmd / --profile) is still
+// merged and stored on the run as host-facing metadata; it never selects
+// an executable backend here.
 package orchestrator
 
 import (

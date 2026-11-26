@@ -1,27 +1,36 @@
-// Package harness is the Go counterpart of the frozen v2 design's
-// beacon-harness contract: exactly six first-class abilities and nothing
-// else (AC-059, AC-063, AC-109). Internal governance surfaces (doctor,
-// router, hooks, metadata, status, archive, debug) stay internal modules
-// and must never reappear as first-class abilities (AC-125).
+// Package harness owns the one canonical list of first-class command groups.
+//
+// The seven groups are the public surface of the requirement-truth kernel:
+//
+//	plan | truth | change | implement | verify | release | goal
+//
+// Requirement truth is the intent tree; SQLite is a rebuildable cache. Every
+// other command (gate, spine, projects, migrate, doctor, review, archive,
+// hooks, fsm, version) is a maintenance surface, hidden from help. design
+// was removed entirely (AGENTS.md truth source), as was the old six-ability
+// set; neither is a second source of truth.
 package harness
 
-// Ability is one first-class kernel ability.
+// Ability is one first-class command group.
 type Ability struct {
 	ID          string
 	Description string
 }
 
-// Abilities is the closed v2 public kernel surface, in pipeline order.
+// Abilities is the closed public command surface, in pipeline order.
+// This is the single list the CLI root builds from; do not keep a second
+// copy in cli/root.go.
 var Abilities = []Ability{
-	{ID: "loop", Description: "Cross-harness orchestration: truth -> design? -> implement -> qa-evidence -> release"},
-	{ID: "truth", Description: "Pre-freeze intent capture, prompt snapshots, decision packet, freeze/refreeze"},
-	{ID: "design", Description: "Design primitive contract (design_primitives.v1) gating implement when design is required"},
-	{ID: "implement", Description: "Consume frozen truth + bound design + admitted worktree; run agent/backend loop"},
-	{ID: "qa", Description: "qa-evidence: behavior evidence, confidence chain, business FSM coverage, defect repair chain"},
+	{ID: "plan", Description: "Create and expand the intent tree"},
+	{ID: "truth", Description: "Freeze nodes, record intent, change and refreeze"},
+	{ID: "change", Description: "Invalidate a frozen subtree and refreeze bottom-up"},
+	{ID: "implement", Description: "Admit a leaf and record execution evidence"},
+	{ID: "verify", Description: "Register evidence, verify leaves, roll up and audit"},
 	{ID: "release", Description: "Final go/no-go gate; human confirmation is an invariant"},
+	{ID: "goal", Description: "One staged delivery run from create to release"},
 }
 
-// IDs returns the six ability ids in pipeline order.
+// IDs returns the seven group ids in pipeline order.
 func IDs() []string {
 	ids := make([]string, len(Abilities))
 	for i, a := range Abilities {

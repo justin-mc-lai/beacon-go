@@ -53,7 +53,7 @@ type Engine struct {
 	store         *store.Store
 	executors     map[string]StageExecutor
 	laneExecutors map[string]StageExecutor
-	stopWhen      core.StopWhenEvaluator
+
 	// implementWorkGate is the implement_work_gate config switch
 	// (implement-work-gate truth 配置项). "" and "on" both mean on
 	// — the zero value must never silently disable a gate.
@@ -114,14 +114,10 @@ func (e *Engine) RegisterExecutor(stage string, ex StageExecutor) {
 
 // RegisterExecutorForAllStages binds one executor to every stage.
 func (e *Engine) RegisterExecutorForAllStages(ex StageExecutor) {
-	for _, s := range []string{StagePlan, StageTruth, StageDesign, StageImplement, StageQA, StageRelease} {
+	for _, s := range []string{StagePlan, StageTruth, StageImplement, StageQA, StageRelease} {
 		e.executors[s] = ex
 	}
 }
-
-// SetStopWhenEvaluator installs the stop_when judgement hook (core
-// interface; P2a leaves concrete evaluators to P3 gate work).
-func (e *Engine) SetStopWhenEvaluator(ev core.StopWhenEvaluator) { e.stopWhen = ev }
 
 // RunView is the stable JSON surface of one goal run (AC-065 style:
 // snake_case, one document).
@@ -170,7 +166,6 @@ type RunView struct {
 	// corresponding state exists on the run).
 	Implement     *ImplementView `json:"implement,omitempty"`
 	ParallelPlan  *ParallelPlan  `json:"parallel_plan,omitempty"`
-	DesignBinding *DesignBinding `json:"design_binding,omitempty"`
 	// P2d orchestration-extension surfaces (present only when the
 	// corresponding state exists on the run).
 	Program      *ProgramState     `json:"program,omitempty"`
@@ -293,7 +288,7 @@ func viewOf(run store.Run, m *runMeta, slug string) RunView {
 		Driver:       m.Driver, Supervisor: m.Supervisor, Budget: m.Budget,
 		Todos: m.todoSummary(), PendingSteering: m.pendingSteering(),
 		FromQueueItem: m.FromQueueItem,
-		ParallelPlan:  m.ParallelPlan, DesignBinding: m.DesignBinding,
+		ParallelPlan:  m.ParallelPlan,
 		Program: m.Program, Hotfix: m.Hotfix,
 		MultiVersion: m.MultiVersion, MainAxis: m.MainAxis,
 		Topology: m.Topology,
@@ -421,14 +416,13 @@ func applyBlockView(v *RunView, b blockView) {
 
 // ---- CreateRun (G-01) ----
 
-// CreateRunOptions carries the explicit create inputs. UXRequired is an
-// explicit signal (flag/field) — P2a does no utterance heuristics.
+// CreateRunOptions carries the explicit create inputs.
 type CreateRunOptions struct {
 	ProjectRoot string
 	Version     string
 	FeatureSlug string
 	Utterance   string
-	UXRequired  bool
+
 	ExecutorID  string
 	// ExecutorMode is the explicit executor selector (manual |
 	// external | recording | subprocess | subprocess:<profile> |
@@ -497,10 +491,10 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 			"kernel-driven run needs a confirmed intent at "+intentRelPath(ctx.Feature.TruthPath)+
 				"; record one with `beacon truth intent record --project <root> --feature "+ctx.Feature.Slug+" --briefing <briefing.json>`")
 	}
-	stages := BuildStageOrder(opts.UXRequired)
+	stages := BuildStageOrder()
 	m := &runMeta{
 		Utterance:         opts.Utterance,
-		UXRequired:        opts.UXRequired,
+
 		CurrentStageIdx:   0,
 		ExecutorID:        opts.ExecutorID,
 		ExecutorMode:      execMode,
@@ -517,7 +511,7 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 		Topology: e.topologyFactFor(ctx),
 	}
 	ls := core.NewLoopState()
-	if err := ls.Transition(core.LoopGovernancePrecheck, false, e.stopWhen); err != nil {
+	if err := ls.Transition(core.LoopGovernancePrecheck, false); err != nil {
 		return RunView{}, err
 	}
 	m.applyLoopState(ls)
@@ -547,7 +541,7 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 			return err
 		}
 		if err := e.appendEventOn(tx, run, "goal_run_created", map[string]any{
-			"utterance": opts.Utterance, "stages": stages, "ux_required": opts.UXRequired,
+			"utterance": opts.Utterance, "stages": stages,
 			"feature_slug": ctx.Feature.Slug, "loop_stage": m.LoopStage,
 		}); err != nil {
 			return err

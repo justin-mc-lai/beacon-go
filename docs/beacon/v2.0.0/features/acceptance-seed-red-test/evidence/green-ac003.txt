@@ -1,4 +1,0 @@
-=== RUN   TestHarvestRequiresSeedRedEvidence
---- PASS: TestHarvestRequiresSeedRedEvidence (0.15s)
-PASS
-ok  	beacon-go/internal/orchestrator	0.567s

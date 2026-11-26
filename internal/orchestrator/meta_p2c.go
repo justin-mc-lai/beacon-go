@@ -1,9 +1,9 @@
 // P2c delegation-and-parallel state types: implement lanes (G-22),
-// ralph delegation (G-10), parallel-lake plans (G-11), design
-// primitive bindings (G-18) and the implement admission result
-// (G-04). Like every other goal state, these live inside
-// runs.metadata_json — the single store snapshot owned by the engine —
-// never in package-owned JSON files (charter rule 7, frozen AC-016).
+// ralph delegation (G-10), parallel-lake plans (G-11) and the
+// implement admission result (G-04). Like every other goal state,
+// these live inside runs.metadata_json — the single store snapshot
+// owned by the engine — never in package-owned JSON files (charter
+// rule 7, frozen AC-016).
 package orchestrator
 
 // ---- Implement lanes (G-22) ----
@@ -262,40 +262,6 @@ const (
 	ParallelSingle = "single_worktree"
 	ParallelPool   = "main_star_satellite_pool"
 )
-
-// ---- Design primitive binding (G-18) ----
-
-// DesignBinding is the run's record that a design primitive set (the
-// frozen visual rules: colours, spacing, components) is bound to this
-// run. The binding lives in the run snapshot — it is a property of
-// the run, and gate_results stay reserved for gate evaluations (P3
-// write-back). P2c records bindings only; it generates no prototype
-// files (generation is the host bridge's job, charter 3.4).
-type DesignBinding struct {
-	PrimitiveSet string `json:"primitive_set"`
-	Version      string `json:"version,omitempty"`
-	SourceRef    string `json:"source_ref,omitempty"`
-	BoundBy      string `json:"bound_by,omitempty"`
-	BoundAt      string `json:"bound_at"`
-}
-
-// DesignStageView is the design-stage surface: whether design is
-// required for this run, whether the primitives are bound, and the
-// bridge note for prototype generation.
-type DesignStageView struct {
-	RunID        string         `json:"run_id"`
-	Required     bool           `json:"required"`
-	StagePresent bool           `json:"stage_present"`
-	Bound        bool           `json:"bound"`
-	Binding      *DesignBinding `json:"binding,omitempty"`
-	StageStatus  string         `json:"stage_status,omitempty"`
-	ReasonCode   string         `json:"reason_code,omitempty"`
-	BridgeNote   string         `json:"bridge_note"`
-}
-
-// DesignBridgeNote is stated on every design surface: prototype
-// generation is delegated to the host agent, never done here.
-const DesignBridgeNote = "prototype generation is delegated to the host agent via the design bridge (P3); P2c records primitive bindings only and generates no prototype files"
 
 // ---- Implement admission (G-04) ----
 

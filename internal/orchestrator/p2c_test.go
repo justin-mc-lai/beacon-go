@@ -324,62 +324,6 @@ func TestApplyParallelPlanBindsWorktree(t *testing.T) {
 	}
 }
 
-// --- Design stage (G-18) + admission design item ---
-
-func TestDesignBindingAdmission(t *testing.T) {
-	env := newTestEnv(t, "active")
-	env.seedTruthFrozen(t)
-	run, err := env.eng.CreateRun(CreateRunOptions{
-		ProjectRoot: env.root, FeatureSlug: "feat-a", UXRequired: true, ExecutorID: "host-1",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Status before binding: required, unbound, bridge point stated.
-	sv, err := env.eng.DesignStageStatus(run.RunID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !sv.Required || sv.Bound || sv.ReasonCode != core.ReasonDesignPrimitiveNotBound || sv.BridgeNote == "" {
-		t.Errorf("design status = %+v", sv)
-	}
-	// Admission refuses: design item carries the code.
-	adm, err := env.eng.CheckImplementAdmission(run.RunID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if adm.AllowImplement {
-		t.Fatalf("admission must refuse unbound UX run: %+v", adm)
-	}
-	if it := admissionItem(adm, "design_bound"); it.OK || it.ReasonCode != core.ReasonDesignPrimitiveNotBound {
-		t.Errorf("design item = %+v", it)
-	}
-	// Bind -> admission's design item passes and the gate opens.
-	sv, err = env.eng.BindDesignPrimitive(run.RunID, DesignBinding{
-		PrimitiveSet: "restrained-product", Version: "v1", SourceRef: "DESIGN.md", BoundBy: "lai",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !sv.Bound || sv.Binding.PrimitiveSet != "restrained-product" {
-		t.Errorf("after bind = %+v", sv)
-	}
-	adm, err = env.eng.CheckImplementAdmission(run.RunID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !adm.AllowImplement {
-		t.Errorf("admission after bind = %+v", adm)
-	}
-	// Binding on a run without a design stage is refused.
-	plain := env.createRun(t)
-	if _, err := env.eng.BindDesignPrimitive(plain.RunID, DesignBinding{PrimitiveSet: "x"}); err == nil {
-		t.Error("bind without design stage must fail")
-	} else if rc, _ := core.ReasonCodeOf(err); rc != core.ReasonDesignStageNotRequired {
-		t.Errorf("reason = %s", rc)
-	}
-}
-
 // --- Admission: each of the five items fails with its own code ---
 
 func TestAdmissionItemsEachFail(t *testing.T) {

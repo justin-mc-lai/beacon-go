@@ -274,30 +274,3 @@ func TestGoalConformanceAllPassAndFailure(t *testing.T) {
 	}
 }
 
-// AC-006 / TC-010: gate integrity warns (audit) on a UX mismatch and
-// blocks it under --strict.
-func TestGateIntegrityStrictBlocksUxMismatch(t *testing.T) {
-	root, _ := seedGateProject(t, true)
-	truth := filepath.Join(root, "truth.md")
-	raw, err := os.ReadFile(truth)
-	if err != nil {
-		t.Fatal(err)
-	}
-	updated := strings.Replace(string(raw), "status: frozen", "status: frozen\nux_required: false", 1) +
-		"\n## UI 规格说明书\n\n- 首页布局\n"
-	if err := os.WriteFile(truth, []byte(updated), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if out, err := runCLI(t, "gate", "integrity", "--project", root, "--feature", "feat-gate",
-		"--evaluator", "qa-bot"); err != nil {
-		t.Fatalf("default integrity must stay audit-only: %v\n%s", err, out)
-	}
-	out, err := runCLI(t, "gate", "integrity", "--project", root, "--feature", "feat-gate",
-		"--evaluator", "qa-bot", "--strict")
-	if err == nil {
-		t.Fatalf("--strict must block the ux mismatch:\n%s", out)
-	}
-	if !strings.Contains(out, "truth_ux_requirement_mismatch") {
-		t.Fatalf("finding must be reported:\n%s", out)
-	}
-}

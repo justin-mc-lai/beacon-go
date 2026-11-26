@@ -7,9 +7,13 @@ import (
 	"beacon-go/internal/store"
 )
 
+// newChangeCmd is the single entry for every change to frozen truth.
+// `request`/`list` operate on the canonical intent tree; `legacy` keeps
+// the pre-tree feature-package path reachable under the one ability,
+// so "change" has exactly one command group.
 func newChangeCmd() *cobra.Command {
-	c := &cobra.Command{Use: "change", Short: "Subtree change: invalidate frozen truth and refreeze bottom-up"}
-	c.AddCommand(newChangeRequestCmd(), newChangeListCmd())
+	c := &cobra.Command{Use: "change", Short: "Change frozen truth: invalidate a tree subtree or a legacy package"}
+	c.AddCommand(newChangeRequestCmd(), newChangeListCmd(), newTruthChangeCmd())
 	return c
 }
 

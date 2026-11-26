@@ -6,7 +6,7 @@ import (
 
 // P2c CLI chain: admit + implement plan -> parallel-plan (conflict)
 // -> delegate-ralph --simulate -> receive-result (reject then accept)
-// on one run; design-stage bind flow on a UX run of the same feature.
+// on one run.
 func TestGoalP2CChain(t *testing.T) {
 	root, _ := seedGoalProject(t)
 
@@ -39,12 +39,11 @@ func TestGoalP2CChain(t *testing.T) {
 	if adm["allow_implement"] != true || adm["reason_code"] != "goal_implement_admission_ok" {
 		t.Errorf("admission = %v", adm)
 	}
-	// S3 (declared change): admission grew the AC-173 topology_gate
-	// item — 7 -> 8 items (not_applicable on this non-git fixture).
-	// R2b (H5): admission grew the review_decision item — 8 -> 9
-	// items (not_applicable when no review routing is unresolved).
-	if items, _ := adm["items"].([]any); len(items) != 9 {
-		t.Errorf("admission items = %d, want 9", len(items))
+	// Admission items: truth_frozen, worktree_binding, blocker_streak,
+	// steering_ack, baseline_merged, dirty_policy, topology_gate and
+	// review_decision (non-applicable ones still reported).
+	if items, _ := adm["items"].([]any); len(items) != 8 {
+		t.Errorf("admission items = %d, want 8", len(items))
 	}
 
 	// implement plan with an explicit ralph ask.
@@ -56,41 +55,5 @@ func TestGoalP2CChain(t *testing.T) {
 	dec, _ := plan["decision"].(map[string]any)
 	if dec["lane"] != "ralph" || dec["source"] != "explicit" {
 		t.Errorf("decision = %v", dec)
-	}
-
-	// Design flow on a UX run of the same feature: unbound refuses
-	// admission; binding opens it.
-	out, err = runCLI(t, "goal", "run", "make it pretty",
-		"--project", root, "--feature", "feat-a", "--ux", "--json")
-	if err != nil {
-		t.Fatalf("goal run --ux: %v", err)
-	}
-	uxRun := strField(t, parseDoc(t, out), "run_id")
-
-	out, err = runCLI(t, "goal", "design-stage", "status", "--run-id", uxRun, "--json")
-	if err != nil {
-		t.Fatalf("design-stage status: %v", err)
-	}
-	ds := parseDoc(t, out)
-	if ds["required"] != true || ds["bound"] != false || ds["reason_code"] != "design_primitive_not_bound" {
-		t.Errorf("design status = %v", ds)
-	}
-	if _, err = runCLI(t, "goal", "admit", "--run-id", uxRun, "--json"); err == nil {
-		t.Fatal("admit must refuse an unbound UX run")
-	}
-	out, err = runCLI(t, "goal", "design-stage", "bind", "--run-id", uxRun,
-		"--primitive-set", "restrained-product", "--version", "v1", "--source-ref", "DESIGN.md", "--json")
-	if err != nil {
-		t.Fatalf("design-stage bind: %v (out %s)", err, out)
-	}
-	if parseDoc(t, out)["bound"] != true {
-		t.Errorf("after bind = %s", out)
-	}
-	out, err = runCLI(t, "goal", "admit", "--run-id", uxRun, "--json")
-	if err != nil {
-		t.Fatalf("admit after bind: %v (out %s)", err, out)
-	}
-	if parseDoc(t, out)["allow_implement"] != true {
-		t.Errorf("admission after bind = %s", out)
 	}
 }

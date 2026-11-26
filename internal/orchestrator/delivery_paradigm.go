@@ -69,8 +69,6 @@ func stageGateType(stage string) string {
 		return string(gate.GatePlan)
 	case StageTruth:
 		return string(gate.GateTruthFreeze)
-	case StageDesign:
-		return string(gate.GateDesign)
 	case StageImplement:
 		return string(gate.GateImplement)
 	case StageQA:
@@ -118,8 +116,8 @@ func (e *Engine) stageGateView(runID, stage string) *StageGateView {
 		return v
 	}
 	// A formal gate evaluation bound to this run is also run-scoped
-	// evidence (e.g. `gate evaluate design --run <id>`), never another
-	// run's row.
+	// evidence (e.g. `gate evaluate implement --run <id>`), never
+	// another run's row.
 	if rec, ok := byGate[gt]; ok {
 		v.Evaluated = true
 		v.Verdict = rec.Verdict
@@ -288,7 +286,7 @@ func (e *Engine) ReceiveExternalResult(runID string, in ExternalResultInput) (Ru
 	at := time.Now().UTC().Format(time.RFC3339Nano)
 	ls := m.loopState()
 	if ls.CurrentStage != core.LoopReleaseGate {
-		if err := ls.Transition(core.LoopReleaseGate, false, e.stopWhen); err != nil {
+		if err := ls.Transition(core.LoopReleaseGate, false); err != nil {
 			return RunView{}, err
 		}
 	}

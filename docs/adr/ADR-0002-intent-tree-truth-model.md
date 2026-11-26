@@ -21,10 +21,10 @@
 1. **意图树是唯一需求真相模型**；海/湖退役，旧 feature 包 1:1 导入为 `feature` 节点。
 2. **goal 单命令工作流保留**：`goal run` 建 run + 全阶段计划，`goal tick` / driver / checkpoint / resume / verifier / 人工 release gate 全部保留。
 3. **内核不调 LLM**：删除 `internal/llm` 直连与 ChiefOfStaff 路径；外部 LLM 由宿主 agent 按 skill 契约调用，内核只校验、记账、冻结。
-4. **内置 agent 后端移出**：subprocess / ralph / profile / ACP 执行与 program / topology / worktree / desktop / agentapi 等外围面不进内核。
+4. **内置 agent 后端移出**：subprocess / ralph / profile / ACP 执行与 program / topology / desktop / agentapi 等外围面不进内核。worktree 除外——它是核心能力（见 AGENTS.md 真源 #3）。
 5. **真相存储**：仓库内 canonical JSON 是权威源；SQLite 是可重建索引缓存；Markdown 与 HTML 是带来源哈希的渲染物。
 6. **命令面**：`plan / truth / change / implement / verify / release / goal` 七组；`qa` 并入 `verify`，不留旧名。
-7. **版本**：以上作为 3.0.0 的 breaking change 发布，附迁移指南。
+7. **版本**：以上决定按 AGENTS.md 唯一真源执行；版本轴已重置，从 `0.0.1` 重新开始。
 
 ## Consequences
 

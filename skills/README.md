@@ -2,7 +2,7 @@
 
 The seven public skill packages are embedded in the binary under their
 installed names: `beacon-go-goal`, `beacon-go-plan`, `beacon-go-truth`,
-`beacon-go-design`, `beacon-go-implement`, `beacon-go-verify`, and
+`beacon-go-change`, `beacon-go-implement`, `beacon-go-verify`, and
 `beacon-go-release`. Each directory carries a `SKILL.md` (the always-loaded
 surface), `agents/openai.yaml`, `references/`, `examples/`, and `evals/`.
 

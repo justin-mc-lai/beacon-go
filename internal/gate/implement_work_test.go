@@ -113,25 +113,21 @@ func TestOtherGatesUnchanged(t *testing.T) {
 	if got := strings.Join(checkNames(truthFreeze), ","); got != "truth_file_present,truth_file_nonempty,tests_file_present,tests_file_nonempty,frozen_marker,lifecycle_corroboration,no_pending_change" {
 		t.Fatalf("truth_freeze check set changed: %s", got)
 	}
-	design := EvaluateDesign(DesignFacts{HasRun: true, Required: false}, "qa-bot")
-	if got := strings.Join(checkNames(design), ","); got != "design_required" {
-		t.Fatalf("design check set changed: %s", got)
-	}
 	qa := EvaluateQA(QAFacts{QAArtifactCount: 1, QAStageExecuted: true}, "qa-bot")
 	// qa-surface-e2e AC-008/AC-009 deliberately extend the QA gate with
-	// two fail-closed doors; the other three gates below stay pinned.
+	// two fail-closed doors; the other gates stay pinned.
 	if got := strings.Join(checkNames(qa), ","); got != "qa_artifacts_present,qa_stage_executed,qa_artifact_refs_valid,qa_autotest_recorded,qa_surface_evidence" {
 		t.Fatalf("qa check set changed: %s", got)
 	}
 	passFact := GateFact{Present: true, Verdict: string(VerdictPass)}
 	release := EvaluateRelease(ReleaseFacts{
-		TruthFreeze: passFact, Design: passFact, Implement: passFact, QA: passFact,
-		DesignApplicable: true, HumanConfirmed: true,
+		TruthFreeze: passFact, Implement: passFact, QA: passFact,
+		HumanConfirmed: true,
 	}, "qa-bot")
-	if got := strings.Join(checkNames(release), ","); got != "gate_truth_freeze_passed,gate_design_passed,gate_implement_passed,gate_qa_passed,truth_materials_fresh,human_confirmation" {
+	if got := strings.Join(checkNames(release), ","); got != "gate_truth_freeze_passed,gate_implement_passed,gate_qa_passed,truth_materials_fresh,human_confirmation" {
 		t.Fatalf("release check set changed: %s", got)
 	}
-	for _, ev := range []Evaluation{truthFreeze, design, qa, release} {
+	for _, ev := range []Evaluation{truthFreeze, qa, release} {
 		if _, found := findItem(ev, CheckImplementWorkRecorded); found {
 			t.Fatalf("gate %s must not carry implement_work_recorded: %v", ev.GateType, checkNames(ev))
 		}

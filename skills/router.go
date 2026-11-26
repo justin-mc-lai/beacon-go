@@ -79,10 +79,10 @@ func routerData() []RouterEntry {
 			MustRead: []string{"references/core.md"},
 		},
 		{
-			Skill:    "design",
-			Summary:  "设计：界面与交互的形态决策，含设计原语绑定",
-			Signals:  []Signal{{"设计", 2}, {"界面", 2}, {"原型", 3}, {"交互", 2}, {"UI", 2}},
-			Samples:  []string{"设计一下这个界面", "出个原型"},
+			Skill:    "change",
+			Summary:  "变更：冻结需求后要改，登记变更、失效子树、自底向上重冻",
+			Signals:  []Signal{{"变更", 3}, {"改需求", 3}, {"要改", 2}, {"重冻", 3}, {"失效", 2}, {"change", 2}},
+			Samples:  []string{"需求冻好了要改 AC", "改需求，登记一个变更", "把变更重冻一下"},
 			MustRead: []string{"references/core.md"},
 		},
 		{

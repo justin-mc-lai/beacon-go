@@ -20,22 +20,14 @@ import (
 const (
 	StagePlan      = "plan"
 	StageTruth     = "truth"
-	StageDesign    = "design"
 	StageImplement = "implement"
 	StageQA        = "qa"
 	StageRelease   = "release"
 )
 
-// BuildStageOrder returns the stage plan order: the base pipeline
-// plan/truth/implement/qa/release, with design inserted after truth
-// when UX work is required (build_stage_order semantics). UX detection
-// is an explicit caller input in P2a — no heuristic guessing.
-func BuildStageOrder(uxRequired bool) []string {
-	stages := []string{StagePlan, StageTruth}
-	if uxRequired {
-		stages = append(stages, StageDesign)
-	}
-	return append(stages, StageImplement, StageQA, StageRelease)
+// BuildStageOrder returns the fixed stage plan order.
+func BuildStageOrder() []string {
+	return []string{StagePlan, StageTruth, StageImplement, StageQA, StageRelease}
 }
 
 // ProgressiveSkills is the static per-stage skill table, ported from
@@ -43,7 +35,6 @@ func BuildStageOrder(uxRequired bool) []string {
 var ProgressiveSkills = map[string][]string{
 	StagePlan:      {"beacon-plan", "mode:pln-program", "mode:pln-program-auto", "mode:pln-program-interactive", "mode:pln-review", "mode:pln-friction", "mode:pln-brainstorm", "mode:pln-source"},
 	StageTruth:     {"beacon-truth", "mode:gen-truth", "mode:gen-truth-init", "mode:gen-change", "mode:gen-refreeze"},
-	StageDesign:    {"beacon-design", "mode:gen-design", "mode:gen-design-init", "mode:gen-design-system", "mode:gen-design-explore", "mode:gen-design-polish", "mode:gen-prototype"},
 	StageImplement: {"beacon-implement", "mode:gen-implement"},
 	StageQA:        {"beacon-qa", "mode:eval-qa", "mode:eval-qa-deep", "mode:eval-real-project", "mode:eval-agent"},
 	StageRelease:   {"beacon-release", "mode:eval-release"},
@@ -51,16 +42,13 @@ var ProgressiveSkills = map[string][]string{
 }
 
 // LoopStageForProductStage maps a product stage to its loop-axis
-// routing state. DERIVED: loop_goal_state.py has no design routing
-// state; design work is reviewed at review_routing.
+// routing state. DERIVED mapping.
 func LoopStageForProductStage(stage string) core.LoopStage {
 	switch stage {
 	case StagePlan:
 		return core.LoopGovernancePrecheck
 	case StageTruth:
 		return core.LoopTruthRouting
-	case StageDesign:
-		return core.LoopReviewRouting
 	case StageImplement:
 		return core.LoopImplementRouting
 	case StageQA:
@@ -81,8 +69,6 @@ func workflowStageForProductStage(stage string) core.WorkflowStage {
 		return core.StagePrd
 	case StageTruth:
 		return core.StageFreeze
-	case StageDesign:
-		return core.StagePrototype
 	case StageImplement:
 		return core.StageImplement
 	case StageQA:
@@ -113,7 +99,7 @@ type VerifierInfo struct {
 // runMeta is the goal snapshot persisted in runs.metadata_json.
 type runMeta struct {
 	Utterance       string           `json:"utterance,omitempty"`
-	UXRequired      bool             `json:"ux_required"`
+
 	LoopStage       string           `json:"loop_stage"`
 	StageHistory    []string         `json:"stage_history,omitempty"`
 	CurrentStageIdx int              `json:"current_stage_idx"`
@@ -178,13 +164,12 @@ type runMeta struct {
 	FromQueueItem        string           `json:"from_queue_item,omitempty"`
 	DiscoverySource      string           `json:"discovery_source,omitempty"`
 	// P2c delegation-and-parallel fields (lanes / delegation /
-	// parallel plan / design binding / routing inputs). Same rule:
-	// runs.metadata_json is the only snapshot; no side files.
-	Lakes         []string        `json:"lakes,omitempty"`
-	TaskScale     string          `json:"task_scale,omitempty"`
-	Implement     *ImplementState `json:"implement,omitempty"`
-	ParallelPlan  *ParallelPlan   `json:"parallel_plan,omitempty"`
-	DesignBinding *DesignBinding  `json:"design_binding,omitempty"`
+	// parallel plan / routing inputs). Same rule: runs.metadata_json
+	// is the only snapshot; no side files.
+	Lakes        []string        `json:"lakes,omitempty"`
+	TaskScale    string          `json:"task_scale,omitempty"`
+	Implement    *ImplementState `json:"implement,omitempty"`
+	ParallelPlan *ParallelPlan   `json:"parallel_plan,omitempty"`
 	// P2d orchestration-extension fields (program / hotfix /
 	// multi-version / memory / axis). Same rule: runs.metadata_json
 	// is the only snapshot; no side files, no extra tables.

@@ -12,7 +12,7 @@ intent -> module -> feature -> touchpoint
 
 每个节点有不可变 id、canonical JSON 正文、`tree-json-v1` 指纹，以及五态生命周期。海/湖模型已退役；旧包以 `feature` 节点导入。
 
-当前版本：**v3.0.8**（纯 SemVer，见 [version-scheme.md](docs/version-scheme.md)）。发布说明：[docs/beacon/v3.0.8/release/3.0.8.md](docs/beacon/v3.0.8/release/3.0.8.md)；迁移指南：[docs/migration-3.0.2.md](docs/migration-3.0.2.md)。
+当前版本：**v0.0.1**（纯 SemVer，见 [version-scheme.md](docs/version-scheme.md)）——按 AGENTS.md 唯一真源重新设计的首个版本。发布历史：[CHANGELOG.md](CHANGELOG.md)。
 
 ## 为什么重构
 
@@ -55,7 +55,7 @@ Go 版按一份书面口径执行（[`docs/scope-charter.md`](docs/scope-charter
 
 ```sh
 go build -o bin/beacon ./cmd/beacon
-./bin/beacon --version          # Beacon CLI v3.0.8
+./bin/beacon --version          # Beacon CLI v0.0.1
 ```
 
 典型树流程：
@@ -85,7 +85,7 @@ beacon verify audit      --project . --json
 | `beacon-go-goal` | 一句话要跑成一段有阶段的交付 |
 | `beacon-go-plan` | 规划、展开树、评审、FSM、调研、棕地接手 |
 | `beacon-go-truth` | 建包、签字、冻结、变更 |
-| `beacon-go-design` | UI 实现前绑定设计原语 |
+| `beacon-go-change` | 登记变更、失效子树、自底向上重冻 |
 | `beacon-go-implement` | 准入、worktree 隔离、实现回报 |
 | `beacon-go-verify` | 证据、叶子验证、父级汇总、审计、评分、并行 code review |
 | `beacon-go-release` | 发布门与人工确认 |
@@ -108,13 +108,13 @@ beacon skills verify --host codex      # 已安装与内嵌是否漂移
 - `bash scripts/check_kernel_deps.sh`：已删面不得回归。
 - [`e2e/run_e2e.sh`](e2e/run_e2e.sh)：manual lane 全链（注册 → 需求包 → 冻结 → 基线 → goal run/tick → 证据 → 门禁 → verifier → 完成）。
 - [`e2e/run_dogfood.sh`](e2e/run_dogfood.sh)：羽毛球队列 22 节点 / 12 叶子 / 2 快照；冻结、实现、验证、汇总、change+refreeze、HTML、审计全过。
-- v3.0.2 证据汇总：[docs/beacon/v3.0.8/release/3.0.8.md](docs/beacon/v3.0.8/release/3.0.8.md)。
+
 
 ## 已知边界（如实写明）
 
 - 内核不跑 agent。没有宿主时，goal run 会停在原地说清楚原因。
 - orchestrator 内部 `program_*` 实现仍编译在包内，但没有 CLI/API 入口，属待删死代码。
-- `wails.json` 仍保留：它绑在冻结的 desktop 需求包上；desktop 与 HTTP 面已在 3.0.0 移除。
+- desktop 与 HTTP 面已移除，仓库内不再保留 UI 配置。
 - 真实模型驱动的 skill eval 不在 CI 内；当前 skill eval 是结构校验。
 
 ## 文档

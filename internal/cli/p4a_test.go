@@ -182,10 +182,11 @@ func TestTruthCLIChain(t *testing.T) {
 		t.Fatalf("re-freeze doc = %v, want already_frozen", doc)
 	}
 
-	out, err = runCLI(t, "truth", "change", "--project", root, "--feature", "login-2fa",
+	// The one change entry: legacy package mutation lives at `change legacy`.
+	out, err = runCLI(t, "change", "legacy", "--project", root, "--feature", "login-2fa",
 		"--summary", "widen AC-001 to cover SSO", "--by", "alice", "--json")
 	if err != nil {
-		t.Fatalf("truth change: %v (%s)", err, out)
+		t.Fatalf("change legacy: %v (%s)", err, out)
 	}
 	doc = parseDoc(t, out)
 	if doc["status"] != "change_pending" || doc["change_id"] == "" || doc["change_id"] == nil {
@@ -244,54 +245,24 @@ func TestThinFacesAgreeWithGoalAndGate(t *testing.T) {
 	truthFreeze(t, root, "feat-a")
 
 	out, err := runCLI(t, "goal", "run", "add login", "--project", root, "--feature", "feat-a",
-		"--ux", "--executor-id", "host-1", "--json")
+		"--executor-id", "host-1", "--json")
 	if err != nil {
 		t.Fatalf("goal run: %v (%s)", err, out)
 	}
 	runID := strField(t, parseDoc(t, out), "run_id")
 
-	// Design face vs goal design-stage: same status document.
-	faceOut, err := runCLI(t, "design", "status", "--run-id", runID, "--json")
-	if err != nil {
-		t.Fatalf("design status: %v", err)
-	}
-	goalOut, err := runCLI(t, "goal", "design-stage", "status", "--run-id", runID, "--json")
-	if err != nil {
-		t.Fatalf("goal design-stage status: %v", err)
-	}
-	faceDoc, goalDoc := parseDoc(t, faceOut), parseDoc(t, goalOut)
-	if !reflect.DeepEqual(faceDoc, goalDoc) {
-		t.Fatalf("design face != goal design-stage:\nface %v\ngoal %v", faceDoc, goalDoc)
-	}
-	if faceDoc["bound"] != false || faceDoc["reason_code"] != "design_primitive_not_bound" {
-		t.Fatalf("unbound design doc = %v", faceDoc)
-	}
-
 	// Implement face vs goal admit: the same admission verdict.
 	faceOut, faceErr := runCLI(t, "implement", "admit", "--run-id", runID, "--json")
 	goalOut, goalErr := runCLI(t, "goal", "admit", "--run-id", runID, "--json")
-	if faceErr == nil || goalErr == nil {
-		t.Fatalf("admission must block unbound UX work: face err=%v goal err=%v", faceErr, goalErr)
+	if faceErr != nil || goalErr != nil {
+		t.Fatalf("admission must pass on a frozen package: face err=%v goal err=%v", faceErr, goalErr)
 	}
-	faceDoc, goalDoc = parseDoc(t, faceOut), parseDoc(t, goalOut)
+	faceDoc, goalDoc := parseDoc(t, faceOut), parseDoc(t, goalOut)
 	if faceDoc["reason_code"] != goalDoc["reason_code"] || faceDoc["allow_implement"] != goalDoc["allow_implement"] {
 		t.Fatalf("admission verdicts differ:\nface %v\ngoal %v", faceDoc, goalDoc)
 	}
-	if faceDoc["allow_implement"] != false {
-		t.Fatalf("admission doc = %v, want allow_implement=false", faceDoc)
-	}
-
-	// Bind through the face; the goal entry must see the same binding.
-	out, err = runCLI(t, "design", "bind", "--run-id", runID, "--primitive-set", "acme-ds", "--version", "v1", "--json")
-	if err != nil {
-		t.Fatalf("design bind: %v (%s)", err, out)
-	}
-	goalOut, err = runCLI(t, "goal", "design-stage", "status", "--run-id", runID, "--json")
-	if err != nil {
-		t.Fatalf("goal design-stage status after bind: %v", err)
-	}
-	if doc := parseDoc(t, goalOut); doc["bound"] != true {
-		t.Fatalf("goal sees binding = %v, want bound", doc)
+	if faceDoc["allow_implement"] != true {
+		t.Fatalf("admission doc = %v, want allow_implement=true", faceDoc)
 	}
 
 	// QA face status vs gate status: identical gate tables.

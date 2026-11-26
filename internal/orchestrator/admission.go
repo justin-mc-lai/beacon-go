@@ -8,8 +8,8 @@
 // packs the stage) and the `goal admit` surface all call
 // checkAdmission — there is no second implementation.
 //
-// Five items, each with its own reason code; any failure closes the
-// gate and the headline reason is the first failing item's code:
+// Each item carries its own reason code; any failure closes the gate
+// and the headline reason is the first failing item's code:
 //  1. truth_frozen      — the requirement truth must be frozen,
 //     by the ONE shared determination (Engine.FrozenFact,
 //     frozen_fact.go: pending change -> not frozen; the document's
@@ -27,35 +27,32 @@
 //     its parallel plan assigns (satellite path in pool mode); with
 //     no plan the binding is the project root itself (single_worktree
 //     default) and always exists.
-//  3. design_bound      — only when the run requires design (UX):
-//     the design primitives must be bound (G-18); unbound never
-//     starts implementing (charter 3.4).
-//  4. blocker_streak    — a hard-blocked run (streak >= 3) is not
+//  3. blocker_streak    — a hard-blocked run (streak >= 3) is not
 //     admitted until a human deals with the blocker. A streak built
 //     by the repair loop itself (stage failures being retried under
 //     the MAX_REPAIR_LOOPS ceiling, P2a) is not "uncleared" in this
 //     sense — the ceiling, not admission, governs those retries —
 //     so the item only fires when no repair loop is in progress.
-//  5. steering_ack      — an unacknowledged direction change (G-21)
+//  4. steering_ack      — an unacknowledged direction change (G-21)
 //     blocks admission: the implementer must not start on a stale
 //     objective.
-//  6. baseline_merged   — S2 (AC-141): when the project is a git
+//  5. baseline_merged   — S2 (AC-141): when the project is a git
 //     repository and the run is bound to a real worktree/branch, the
 //     bound HEAD must already contain the S1 truth_baseline_commit
 //     (truth_baseline_commit_missing / truth_baseline_not_merged).
 //     Non-git projects and planned-only bindings report
 //     not_applicable and never block.
-//  7. dirty_policy      — S2 (AC-141): the bound worktree must not
+//  6. dirty_policy      — S2 (AC-141): the bound worktree must not
 //     carry dirty state in the requirement-package directory or on
 //     the P4c protected-path denylist (unscoped_dirty_state).
 //     Ordinary code files dirty at the pre-implement point are not
 //     a violation (DERIVED caliber, baseline_check.go).
-//  8. topology_gate     — S3 (AC-173): loop/implement must consume
+//  7. topology_gate     — S3 (AC-173): loop/implement must consume
 //     the topology gate. On a git project a recorded, confirmed
 //     BranchContext (AC-171) is required and its live gate
 //     (AC-172) must pass: topology_gate_missing /
 //     topology_gate_blocked. Non-git projects are not_applicable.
-//  9. review_decision   — R2b (H5): an unresolved routed review
+//  8. review_decision   — R2b (H5): an unresolved routed review
 //     decision (P0 / user-decision / drift) refuses implement with
 //     the routing's own code, until a later review routes onward.
 package orchestrator
@@ -162,22 +159,7 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 			Detail: "bound to " + bound})
 	}
 
-	// 3. design bound (only when the run requires design).
-	if designRequired(m) {
-		if designBound(m) {
-			ok(AdmissionItem{Check: "design_bound", OK: true, Applicable: true,
-				Detail: "primitives bound: " + m.DesignBinding.PrimitiveSet})
-		} else {
-			fail(AdmissionItem{Check: "design_bound", Applicable: true,
-				ReasonCode: core.ReasonDesignPrimitiveNotBound,
-				Detail:     "UX run has no design primitive binding; bind before implementing"})
-		}
-	} else {
-		ok(AdmissionItem{Check: "design_bound", OK: true, Applicable: false,
-			Detail: "run requires no design (no --ux)"})
-	}
-
-	// 4. blocker streak clear of the hard-block line (outside an
+	// 3. blocker streak clear of the hard-block line (outside an
 	// active repair loop — see the package comment).
 	if m.BlockedStreak >= 3 && m.RepairLoopCount == 0 {
 		fail(AdmissionItem{Check: "blocker_streak", Applicable: true,
@@ -187,7 +169,7 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 		ok(AdmissionItem{Check: "blocker_streak", OK: true, Applicable: true, Detail: "no uncleared hard block"})
 	}
 
-	// 5. no unacknowledged steering.
+	// 4. no unacknowledged steering.
 	if p := m.pendingSteering(); p != nil {
 		fail(AdmissionItem{Check: "steering_ack", Applicable: true,
 			ReasonCode: core.ReasonSteeringUnacknowledged,
@@ -196,7 +178,7 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 		ok(AdmissionItem{Check: "steering_ack", OK: true, Applicable: true, Detail: "no pending steering"})
 	}
 
-	// 6+7. S2 (AC-141): baseline-merged + dirty policy over the
+	// 5+6. S2 (AC-141): baseline-merged + dirty policy over the
 	// bound worktree (baseline_check.go — the same judgement the
 	// admission bundle's branch-governance and diff items reuse).
 	merged, _, err := e.evalBaselineMerged(run, m, slug)
@@ -218,7 +200,7 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 		fail(dirty)
 	}
 
-	// 8. topology gate (S3, AC-173): on a git project the run's
+	// 7. topology gate (S3, AC-173): on a git project the run's
 	// feature must have a recorded, confirmed BranchContext whose
 	// live topology gate passes — missing ref reports
 	// topology_gate_missing, a non-pass gate topology_gate_blocked.
@@ -235,7 +217,7 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 		fail(topo)
 	}
 
-	// 9. review decision clear (R2b, H5): an unresolved routed
+	// 8. review decision clear (R2b, H5): an unresolved routed
 	// review block (record_review_decision's error_recovery /
 	// drift_routing outcome) refuses implement with the routing's
 	// own reason code — a P0 the reviewers found must stop the

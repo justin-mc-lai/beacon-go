@@ -1,8 +1,6 @@
 package gate
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -86,23 +84,3 @@ func TestValidateTaskBindingKeepsExistingVerdicts(t *testing.T) {
 	}
 }
 
-func TestHostPackagesTaskBindingsClean(t *testing.T) {
-	for _, slug := range []string{
-		"agent-desktop-workspace", "agent-runtime-dual-mode",
-		"agent-session-streaming", "p0-executor-desktop",
-	} {
-		data, err := os.ReadFile(filepath.Join("..", "..", "docs", "beacon", "v2.0.0", "features", slug, "tasks.md"))
-		if err != nil {
-			t.Fatalf("%s: %v", slug, err)
-		}
-		fs := ValidateFeaturePackage(PackageFiles{
-			Slug:  slug,
-			Tasks: PackageFile{Path: "tasks.md", Present: true, Text: string(data)},
-		}, nil, nil)
-		for _, f := range fs {
-			if strings.Contains(f.Detail, "task_binding_missing") || strings.Contains(f.Detail, "checkbox_checked_without_evidence_file") {
-				t.Errorf("%s: %s", slug, f.Detail)
-			}
-		}
-	}
-}

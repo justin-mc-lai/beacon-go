@@ -1,12 +1,10 @@
-// Goal P2c command surfaces: implement lanes (G-22), delegate-ralph
-// (G-10), parallel-plan (G-11), design-stage (G-18) and admit (G-04).
+// Goal P2c command surfaces: implement lanes (G-22), delegation
+// (G-10) and admit (G-04).
 //
-// Honesty rules on these surfaces: the ralph executor is NOT
-// implemented in P2c (real integration is P3) — a delegated execution
-// only ever happens through the recording placeholder and is labelled
-// simulated everywhere; parallel-plan is planned-only (no worktree
-// is created); design-stage records primitive bindings and generates
-// no prototype files.
+// Honesty rules: the kernel runs no agent. Delegation and executor
+// commands are recorded on the run for the host agent; the host does
+// the work and reports it with `goal tick --by`. Lanes are metadata,
+// not parallel executors.
 package cli
 
 import (
@@ -190,87 +188,5 @@ func newGoalReceiveResultCmd() *cobra.Command {
 	c.Flags().StringVar(&kind, "kind", "implement_artifact", "artifact kind for --artifact pointers")
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("run-id")
-	return c
-}
-
-func newGoalDesignStageCmd() *cobra.Command {
-	c := &cobra.Command{
-		Use:   "design-stage",
-		Short: "Design stage: primitive binding status and binding (no prototypes are generated)",
-		Long: "The design stage minds only whether the design primitives (the frozen " +
-			"visual rules) are bound to the run — unbound UX work may not start " +
-			"implementing. Prototype generation is delegated to the host agent " +
-			"via the design bridge (P3); nothing is drawn or generated here.",
-	}
-	c.AddCommand(newGoalDesignStageStatusCmd(), newGoalDesignStageBindCmd())
-	return c
-}
-
-func newGoalDesignStageStatusCmd() *cobra.Command {
-	var runID string
-	var asJSON bool
-	c := &cobra.Command{
-		Use:   "status",
-		Short: "Show whether design is required and the primitives are bound (read-only)",
-		Args:  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			eng, closeFn, err := goalReadEngine()
-			if err != nil {
-				return err
-			}
-			defer closeFn()
-			v, err := eng.DesignStageStatus(runID)
-			if err != nil {
-				return err
-			}
-			if asJSON {
-				return printJSON(cmd, v)
-			}
-			fmt.Fprintf(cmd.OutOrStdout(), "required: %v bound: %v stage: %s\nbridge: %s\n",
-				v.Required, v.Bound, v.StageStatus, v.BridgeNote)
-			return nil
-		},
-	}
-	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
-	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
-	_ = c.MarkFlagRequired("run-id")
-	return c
-}
-
-func newGoalDesignStageBindCmd() *cobra.Command {
-	var runID, primitiveSet, version, sourceRef, boundBy string
-	var asJSON bool
-	c := &cobra.Command{
-		Use:   "bind",
-		Short: "Bind a design primitive set to the run (records the binding; generates nothing)",
-		Args:  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			eng, closeFn, err := goalEngine("")
-			if err != nil {
-				return err
-			}
-			defer closeFn()
-			v, err := eng.BindDesignPrimitive(runID, orchestrator.DesignBinding{
-				PrimitiveSet: primitiveSet, Version: version, SourceRef: sourceRef, BoundBy: boundBy,
-			})
-			if err != nil {
-				return err
-			}
-			if asJSON {
-				return printJSON(cmd, v)
-			}
-			fmt.Fprintf(cmd.OutOrStdout(), "bound: %v primitives: %s (%s)\n", v.Bound,
-				v.Binding.PrimitiveSet, v.Binding.Version)
-			return nil
-		},
-	}
-	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
-	c.Flags().StringVar(&primitiveSet, "primitive-set", "", "design primitive set name (required)")
-	c.Flags().StringVar(&version, "version", "", "primitive set version")
-	c.Flags().StringVar(&sourceRef, "source-ref", "", "where the primitives live (reference only)")
-	c.Flags().StringVar(&boundBy, "bound-by", "cli", "who binds")
-	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
-	_ = c.MarkFlagRequired("run-id")
-	_ = c.MarkFlagRequired("primitive-set")
 	return c
 }

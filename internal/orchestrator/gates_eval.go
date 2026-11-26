@@ -31,11 +31,10 @@ const (
 	EventTruthIntegrityEvaluated = "truth_integrity_evaluated"
 )
 
-// GateTypes are the five stage gates `gate evaluate` accepts (the
+// GateTypes are the four stage gates `gate evaluate` accepts (the
 // integrity gate has its own entry, EvaluateIntegrity).
 var evaluableGateTypes = map[string]bool{
 	string(gate.GateTruthFreeze): true,
-	string(gate.GateDesign):      true,
 	string(gate.GateImplement):   true,
 	string(gate.GateQA):          true,
 	string(gate.GateRelease):     true,
@@ -158,10 +157,10 @@ func (e *Engine) persistGateResult(ctx store.FeatureContext, ev gate.Evaluation,
 	return ev, nil
 }
 
-// EvaluateGate formally evaluates one of the five stage gates for a
+// EvaluateGate formally evaluates one of the stage gates for a
 // feature and persists the verdict. runID binds run-scoped gates
-// (design / implement / release) to a specific run; empty means the
-// feature's newest goal run.
+// (implement) to a specific run; empty means the feature's newest
+// goal run.
 func (e *Engine) EvaluateGate(ctx store.FeatureContext, gateType, runID, evaluator string) (gate.Evaluation, error) {
 	if strings.TrimSpace(evaluator) == "" {
 		return gate.Evaluation{}, core.NewError(core.ReasonGateEvaluatorRequired, "gate.EvaluateGate",
@@ -178,17 +177,6 @@ func (e *Engine) EvaluateGate(ctx store.FeatureContext, gateType, runID, evaluat
 	switch gate.GateType(gateType) {
 	case gate.GateTruthFreeze:
 		ev, err = e.evalTruthFreeze(ctx, evaluator)
-	case gate.GateDesign:
-		run, _, has, rerr := e.latestGoalRun(ctx, runID)
-		if rerr != nil {
-			return gate.Evaluation{}, rerr
-		}
-		if has {
-			boundRun = run.ID
-			ev, err = e.evalDesign(ctx, run, evaluator)
-		} else {
-			ev = gate.EvaluateDesign(gate.DesignFacts{HasRun: false}, evaluator)
-		}
 	case gate.GateImplement:
 		run, _, has, rerr := e.latestGoalRun(ctx, runID)
 		if rerr != nil {

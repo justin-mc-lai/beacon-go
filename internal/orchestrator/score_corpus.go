@@ -71,7 +71,7 @@ func embeddedCorpus() ScoreCorpus {
 		Version:  "v1",
 		Baseline: []string{"with_skill", "no_skill"},
 		PublicSkills: []string{
-			"beacon-goal", "beacon-plan", "beacon-truth", "beacon-design",
+			"beacon-goal", "beacon-plan", "beacon-truth", "beacon-change",
 			"beacon-implement", "beacon-qa", "beacon-release",
 		},
 		Rubric: []string{

@@ -13,22 +13,17 @@ import (
 // ---- helpers ----
 
 // deliverParadigmRun walks one run through plan -> release exactly as a
-// real delivery does (recording executor, bound design primitive, QA
-// artifact, verifier, human completion, release verdict) and returns
-// its id. Exported state is the caller's choice (B5).
+// real delivery does (recording executor, QA artifact, verifier, human
+// completion, release verdict) and returns its id. Exported state is
+// the caller's choice (B5).
 func deliverParadigmRun(t *testing.T, env gateTestEnv) string {
 	t.Helper()
 	ctx := context.Background()
 	run, err := env.eng.CreateRun(CreateRunOptions{
-		ProjectRoot: env.root, FeatureSlug: "feat-a", UXRequired: true,
+		ProjectRoot: env.root, FeatureSlug: "feat-a",
 		ExecutorID: "maker", ExecutorMode: ExecutorModeRecording,
 	})
 	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := env.eng.BindDesignPrimitive(run.RunID, DesignBinding{
-		PrimitiveSet: "beacon-design", Version: "1.0.0", SourceRef: "docs/design.md", BoundBy: "designer",
-	}); err != nil {
 		t.Fatal(err)
 	}
 	step := func(want string) {
@@ -42,10 +37,6 @@ func deliverParadigmRun(t *testing.T, env gateTestEnv) string {
 		}
 	}
 	step(StageTruth)
-	step(StageDesign)
-	if ev, err := env.eng.EvaluateGate(env.ctx, "design", run.RunID, "designer"); err != nil || ev.Verdict != "pass" {
-		t.Fatalf("design gate = %+v err=%v", ev, err)
-	}
 	step(StageImplement)
 	step(StageQA)
 	productReport := prepareProductQA(t, env.testEnv, run.RunID, "independent-verifier")
@@ -216,38 +207,32 @@ func TestManualImplementEntryBlocksOnAdmission(t *testing.T) {
 }
 
 // B3: gate reads are run-scoped. A fresh run reports evaluated=false;
-// a sibling run's design pass is not its formal verdict; and a sibling
-// run's QA artifact does not open this run's QA exit.
+// a sibling run's QA gate pass is not this run's formal verdict, and
+// a sibling run's artifact does not open this run's QA exit.
 func TestGateFactsAreRunScoped(t *testing.T) {
 	env := newGateEnv(t, frozenTruthDoc)
 	ctx := context.Background()
 
-	// Run A: deliver design, then register a QA artifact, and leave a
-	// feature-level design pass + artifact behind.
+	// Run A: walk to QA, register its own artifact and QA verdict,
+	// then leave QA for release — leaving a feature-level qa pass
+	// and artifact a sibling must not inherit.
 	a, err := env.eng.CreateRun(CreateRunOptions{
-		ProjectRoot: env.root, FeatureSlug: "feat-a", UXRequired: true,
+		ProjectRoot: env.root, FeatureSlug: "feat-a",
 		ExecutorID: "maker-a", ExecutorMode: ExecutorModeRecording,
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := env.eng.BindDesignPrimitive(a.RunID, DesignBinding{
-		PrimitiveSet: "beacon-design", Version: "1.0.0", SourceRef: "docs/design.md", BoundBy: "designer",
-	}); err != nil {
-		t.Fatal(err)
-	}
-	for _, want := range []string{StageTruth, StageDesign} {
+	stepA := func(want string) {
+		t.Helper()
 		v, err := env.eng.Tick(ctx, a.RunID)
 		if err != nil || v.CurrentStage != want {
 			t.Fatalf("run A tick = %+v err=%v", v, err)
 		}
 	}
-	if ev, err := env.eng.EvaluateGate(env.ctx, "design", a.RunID, "designer"); err != nil || ev.Verdict != "pass" {
-		t.Fatalf("design gate = %+v err=%v", ev, err)
-	}
-	if v, err := env.eng.Tick(ctx, a.RunID); err != nil || v.CurrentStage != StageImplement {
-		t.Fatalf("run A implement tick = %+v err=%v", v, err)
-	}
+	stepA(StageTruth)
+	stepA(StageImplement)
+	stepA(StageQA)
 	qaArtifact := filepath.Join(t.TempDir(), "qa-a.md")
 	if err := os.WriteFile(qaArtifact, []byte("# qa\n"), 0o644); err != nil {
 		t.Fatal(err)
@@ -255,10 +240,13 @@ func TestGateFactsAreRunScoped(t *testing.T) {
 	if _, err := env.eng.RegisterArtifact(a.RunID, "qa_evidence", qaArtifact, "qa-a"); err != nil {
 		t.Fatal(err)
 	}
+	prepareProductQA(t, env.testEnv, a.RunID, "qa-a")
+	stepA(StageRelease)
 
-	// Run B: same feature, new run, staged at design.
+	// Run B: same feature, new run, staged at QA with none of A's
+	// verdicts or artifacts on its own trail.
 	b, err := env.eng.CreateRun(CreateRunOptions{
-		ProjectRoot: env.root, FeatureSlug: "feat-a", UXRequired: true,
+		ProjectRoot: env.root, FeatureSlug: "feat-a",
 		ExecutorID: "maker-b", ExecutorMode: ExecutorModeRecording,
 	})
 	if err != nil {
@@ -271,54 +259,18 @@ func TestGateFactsAreRunScoped(t *testing.T) {
 	if st.StageGate == nil || st.StageGate.Evaluated {
 		t.Fatalf("a fresh run must not inherit another run's gate green: %+v", st.StageGate)
 	}
-	for _, want := range []string{StageTruth, StageDesign} {
+	for _, want := range []string{StageTruth, StageImplement, StageQA} {
 		v, err := env.eng.Tick(ctx, b.RunID)
 		if err != nil || v.CurrentStage != want {
 			t.Fatalf("run B tick = %+v err=%v", v, err)
 		}
 	}
-	v, err := env.eng.ExitGate(b.RunID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if v.Allowed || v.FormalVerdict == "pass" {
-		t.Fatalf("run B design exit borrowed run A's evidence: %+v", v)
-	}
-	// B records its own design evaluation, then advances to QA.
-	if _, err := env.eng.BindDesignPrimitive(b.RunID, DesignBinding{
-		PrimitiveSet: "beacon-design", Version: "1.0.0", SourceRef: "docs/design.md", BoundBy: "designer-b",
-	}); err != nil {
-		t.Fatal(err)
-	}
-	if ev, err := env.eng.EvaluateGate(env.ctx, "design", b.RunID, "designer-b"); err != nil || ev.Verdict != "pass" {
-		t.Fatalf("run B design gate = %+v err=%v", ev, err)
-	}
-	// Run B reaches QA without its own artifact: A's pointer must not
-	// open B's QA exit.
-	if v, err := env.eng.Tick(ctx, a.RunID); err != nil || v.CurrentStage != StageQA {
-		t.Fatalf("run A qa tick = %+v err=%v", v, err)
-	}
-	// A leaves QA using its own artifact, recording a feature-level qa
-	// pass that a sibling must not inherit.
-	prepareProductQA(t, env.testEnv, a.RunID, "qa-a")
-	if v, err := env.eng.Tick(ctx, a.RunID); err != nil || v.CurrentStage != StageRelease {
-		t.Fatalf("run A release tick = %+v err=%v", v, err)
-	}
-	for i := 0; i < 2; i++ {
-		if v, err := env.eng.Tick(ctx, b.RunID); err != nil {
-			t.Fatalf("run B advance: %v", err)
-		} else if v.Blocked {
-			t.Fatalf("run B advance blocked: %+v", v)
-		}
-	}
 	if st, err := env.eng.Status(b.RunID); err != nil {
 		t.Fatal(err)
-	} else if st.CurrentStage != StageQA {
-		t.Fatalf("run B must be at qa, got %s", st.CurrentStage)
 	} else if st.StageGate == nil || st.StageGate.Evaluated {
 		t.Fatalf("run B status inherited a sibling qa verdict: %+v", st.StageGate)
 	}
-	v, err = env.eng.ExitGate(b.RunID)
+	v, err := env.eng.ExitGate(b.RunID)
 	if err != nil {
 		t.Fatal(err)
 	}

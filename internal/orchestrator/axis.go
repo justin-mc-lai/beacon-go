@@ -24,8 +24,6 @@ func stageCriterion(stage string) string {
 		return "stage plan recorded; plan exit gate passes"
 	case StageTruth:
 		return "truth package frozen (lifecycle Freeze/Completed or truth_freeze gate pass)"
-	case StageDesign:
-		return "design primitives bound to the run; design evidence present"
 	case StageImplement:
 		return "implement admission passes; artifacts registered and stage evidence harvested"
 	case StageQA:

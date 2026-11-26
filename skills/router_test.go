@@ -82,7 +82,7 @@ func TestRouterRefusesToGuess(t *testing.T) {
 		t.Errorf("a miss must not name a skill, got %q", res.Skill)
 	}
 
-	amb := Route("设计和实现")
+	amb := Route("冻结和验收")
 	if amb.Hit {
 		t.Fatalf("an equally-matching sentence must not be forced onto one skill: got %q", amb.Skill)
 	}

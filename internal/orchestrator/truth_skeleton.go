@@ -27,7 +27,7 @@ version: %s
 status: draft
 language: zh
 domain_required: false
-ux_required: false
+
 parser_contract: beacon-feature-package-v2
 truth_source_model: feature_package_authoritative
 package_maturity: draft
@@ -196,7 +196,7 @@ version: %[2]s
 status: draft
 language: zh
 domain_required: false
-ux_required: false
+
 parser_contract: beacon-feature-package-v2
 package_contract: truth-tasks
 package_maturity: scaffold

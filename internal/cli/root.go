@@ -84,11 +84,9 @@ func hidden(c *cobra.Command) *cobra.Command {
 	return c
 }
 
-// NewRootCmd builds the beacon root command with the six first-class
-// abilities as real command groups (P4a convergence): goal (the loop
-// ability's formal entry), truth (real package lifecycle), and the
-// thin design / implement / qa / release faces that route to the
-// same implementations goal and gate use. No placeholders remain.
+// NewRootCmd builds the CLI from harness.Abilities — the single canonical
+// list of seven command groups. Everything else is a maintenance surface,
+// hidden from help but still executable.
 func NewRootCmd() *cobra.Command {
 	root := &cobra.Command{
 		Use:   "beacon",
@@ -103,24 +101,30 @@ func NewRootCmd() *cobra.Command {
 	}
 	root.SetVersionTemplate("Beacon CLI v{{.Version}}\n")
 
-	for _, ability := range harness.Abilities {
-		id := ability.ID // capture for closure
-		switch id {
-		case "truth":
-			root.AddCommand(newTruthCmd())
-		case "design":
-			root.AddCommand(hidden(newDesignCmd()))
-		case "implement":
-			root.AddCommand(newImplementCmd())
-		case "release":
-			root.AddCommand(newReleaseCmd())
-		}
+	// The seven groups come from the one canonical list. A missing
+	// constructor is a programming error, never a silently absent group.
+	constructors := map[string]func() *cobra.Command{
+		"plan":      newPlanCmd,
+		"truth":     newTruthCmd,
+		"change":    newChangeCmd,
+		"implement": newImplementCmd,
+		"verify":    newVerifyCmd,
+		"release":   newReleaseCmd,
+		"goal":      newGoalCmd,
 	}
-	// P1 read surfaces (AC-017..021): Operator Spine + projects registry.
-	// These are support surfaces, not first-class abilities.
-	// P2a: the goal command group (the loop ability's formal entry).
-	// P3a: the gate command group (formal evaluation write-back).
-	// P3b: migrate v1 (AC-077..079) + doctor rebuild (AC-011).
-	root.AddCommand(hidden(newSpineCmd()), hidden(newProjectsCmd()), newGoalCmd(), hidden(newGateCmd()), hidden(newMigrateCmd()), hidden(newDoctorCmd()), newSkillsCmd(), hidden(newReviewCmd()), hidden(newArchiveCmd()), hidden(newHooksCmd()), hidden(newFSMCmd()), hidden(newVersionCmd()), newPlanCmd(), newVerifyCmd(), newChangeCmd())
+	for _, ability := range harness.Abilities {
+		ctor, ok := constructors[ability.ID]
+		if !ok {
+			panic("no CLI constructor for ability " + ability.ID)
+		}
+		root.AddCommand(ctor())
+	}
+	// Maintenance surfaces: executable but hidden from help.
+	root.AddCommand(
+		hidden(newSpineCmd()), hidden(newProjectsCmd()),
+		hidden(newGateCmd()), hidden(newMigrateCmd()), hidden(newDoctorCmd()),
+		newSkillsCmd(), hidden(newReviewCmd()), hidden(newArchiveCmd()),
+		hidden(newHooksCmd()), hidden(newFSMCmd()), hidden(newVersionCmd()),
+	)
 	return root
 }

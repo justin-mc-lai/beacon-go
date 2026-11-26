@@ -36,35 +36,6 @@ func TestTruthFreezePassAndBlock(t *testing.T) {
 	}
 }
 
-func TestDesignGate(t *testing.T) {
-	na := EvaluateDesign(DesignFacts{HasRun: true, Required: false}, "qa-bot")
-	if na.Verdict != VerdictPass {
-		t.Fatalf("non-UX run: design gate must pass as n/a, got %+v", na)
-	}
-	noRun := EvaluateDesign(DesignFacts{HasRun: false, Required: true}, "qa-bot")
-	if noRun.Verdict != VerdictBlocked || codes(noRun)[0] != core.ReasonGateRunRequired {
-		t.Fatalf("no run must block with gate_run_required, got %+v", noRun)
-	}
-	unbound := EvaluateDesign(DesignFacts{HasRun: true, Required: true}, "qa-bot")
-	if unbound.Verdict != VerdictBlocked || codes(unbound)[0] != core.ReasonDesignPrimitiveNotBound {
-		t.Fatalf("unbound must block with design_primitive_not_bound, got %+v", unbound)
-	}
-	mismatch := EvaluateDesign(DesignFacts{
-		HasRun: true, Required: true, Bound: true, BindingSet: "ds", BindingVersion: "v2",
-		HasBoundEvent: true, EventVersion: "v1",
-	}, "qa-bot")
-	if mismatch.Verdict != VerdictBlocked || codes(mismatch)[0] != core.ReasonDesignBindingVersionMism {
-		t.Fatalf("version drift must block with mismatch, got %+v", mismatch)
-	}
-	ok := EvaluateDesign(DesignFacts{
-		HasRun: true, Required: true, Bound: true, BindingSet: "ds", BindingVersion: "v2",
-		HasBoundEvent: true, EventVersion: "v2",
-	}, "qa-bot")
-	if ok.Verdict != VerdictPass {
-		t.Fatalf("bound + matching version must pass, got %+v", ok)
-	}
-}
-
 func TestImplementGateMirrorsAdmission(t *testing.T) {
 	noRun := EvaluateImplement(ImplementFacts{HasRun: false}, "qa-bot")
 	if noRun.Verdict != VerdictBlocked || codes(noRun)[0] != core.ReasonGateRunRequired {
@@ -107,14 +78,14 @@ func TestQAGate(t *testing.T) {
 func TestReleaseGateComposition(t *testing.T) {
 	passFact := GateFact{Present: true, Verdict: "pass"}
 	full := ReleaseFacts{
-		TruthFreeze: passFact, Design: passFact, Implement: passFact, QA: passFact,
-		DesignApplicable: true, HumanConfirmed: true, HumanConfirmedBy: "lai",
+		TruthFreeze: passFact, Implement: passFact, QA: passFact,
+		HumanConfirmed: true, HumanConfirmedBy: "lai",
 	}
 	if ev := EvaluateRelease(full, "qa-bot"); ev.Verdict != VerdictPass {
 		t.Fatalf("all prereqs pass + human must pass, got %+v", ev)
 	}
 	// Missing evaluations are named gate by gate.
-	none := EvaluateRelease(ReleaseFacts{DesignApplicable: false}, "qa-bot")
+	none := EvaluateRelease(ReleaseFacts{}, "qa-bot")
 	if none.Verdict != VerdictBlocked {
 		t.Fatalf("want blocked, got %+v", none)
 	}
@@ -124,8 +95,10 @@ func TestReleaseGateComposition(t *testing.T) {
 	}
 	// A blocked prereq is gate_prerequisite_not_passed, not "unevaluated".
 	withBlocked := ReleaseFacts{
-		TruthFreeze:      GateFact{Present: true, Verdict: "blocked", ReasonCodes: []string{"x"}},
-		DesignApplicable: false, Implement: passFact, QA: passFact, HumanConfirmed: true,
+		TruthFreeze:    GateFact{Present: true, Verdict: "blocked", ReasonCodes: []string{"x"}},
+		Implement:      passFact,
+		QA:             passFact,
+		HumanConfirmed: true,
 	}
 	ev := EvaluateRelease(withBlocked, "qa-bot")
 	if ev.Verdict != VerdictBlocked || codes(ev)[0] != core.ReasonGatePrereqNotPassed {

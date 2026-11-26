@@ -1,4 +1,0 @@
-=== RUN   TestValidateLakeProposalRejectsProseAcceptanceSeed
---- PASS: TestValidateLakeProposalRejectsProseAcceptanceSeed (0.00s)
-PASS
-ok  	beacon-go/internal/orchestrator	0.321s

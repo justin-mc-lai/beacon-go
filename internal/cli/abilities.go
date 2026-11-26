@@ -1,19 +1,16 @@
-// Thin ability faces (P4a): design / implement / qa / release as
-// top-level entries of the six-ability surface.
+// Single-purpose command faces over the shared engine.
 //
-// These groups are ROUTERS, not second implementations. Every
-// subcommand below is either the very constructor the goal/gate
-// groups use (a fresh instance of the same command — same flags,
-// same engine calls, same verdicts) or a three-line wrapper that
-// fixes one argument of the shared gate evaluation. No judgement
-// logic lives in this file.
+// The command groups are the public surface (see harness.Abilities).
+// The faces here (implement / release) are either the same
+// constructors the goal/gate groups use, or thin wrappers that fix one
+// argument of the shared gate evaluation. Gate verdicts are not decided
+// here: facts, verdicts and persistence belong to Engine.EvaluateGate.
+// `verify-harness` is a read-only ledger check that writes no verdict.
 //
-// Relationship to `goal`: goal is the orchestration entry — one
-// utterance in, a run walked stage by stage to the release door.
-// The ability faces are the single-purpose tool entries over the
-// same machinery: check a binding, run one admission, read one
-// gate, complete one run. Both entries always agree because there
-// is only one implementation underneath.
+// Relationship to `goal`: goal is the orchestration entry (one utterance
+// walked stage by stage to the release door). These faces are the
+// single-purpose tool entries over the same machinery. Both entries
+// call the same implementation, so their verdicts always agree.
 package cli
 
 import (
@@ -26,24 +23,6 @@ import (
 	"beacon-go/internal/orchestrator"
 )
 
-// newDesignCmd is the design ability face: binding status + bind,
-// the same commands as `goal design-stage …` (charter 3.4 slim
-// boundary: the face minds bound-or-not, it never draws).
-func newDesignCmd() *cobra.Command {
-	c := &cobra.Command{
-		Use:   "design",
-		Short: "Design ability (thin face): primitive binding status / bind — same implementation as `goal design-stage`",
-		Long: "Design face of the six abilities. It answers only whether the design\n" +
-			"primitives (the frozen visual rules) are bound to a run — the gate that\n" +
-			"keeps unbound UX work out of implement. Prototype generation belongs\n" +
-			"to the host agent via the design bridge; nothing is drawn here.\n" +
-			"These are the same commands as `goal design-stage status|bind`:\n" +
-			"goal orchestrates, this face is the single-purpose tool entry.",
-	}
-	c.AddCommand(newGoalDesignStageStatusCmd(), newGoalDesignStageBindCmd())
-	return c
-}
-
 // newImplementCmd is the implement ability face: lane plan, the
 // shared admission checker, the ralph delegation pair and the
 // worktree group — the same constructors as under `goal`.
@@ -51,8 +30,8 @@ func newImplementCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "implement",
 		Short: "Implementation: admit / worktree / report — no built-in agent executor",
-		Long: "Implementation face: consume frozen truth + a bound design + an\n" +
-			"admitted worktree. The host does the work and records it with\n" +
+		Long: "Implementation face: consume frozen truth and an admitted\n" +
+			"worktree. The host does the work and records it with\n" +
 			"`implement report`; the kernel runs no agent and harvests artifacts\n" +
 			"under one admission rule.",
 	}
@@ -71,14 +50,14 @@ func newImplementCmd() *cobra.Command {
 func newReleaseCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "release",
-		Short: "Release ability (thin face): evaluate release gate / complete a run — same implementation as `gate evaluate release` and `goal complete`",
-		Long: "Release face of the six abilities: the final go/no-go. `release\n" +
+		Short: "Evaluate the release gate / complete a run (same implementation as `gate evaluate release` and `goal complete`)",
+		Long: "Final go/no-go gate, one of the seven command groups. `release\n" +
 			"evaluate` is `gate evaluate release` (the composed verdict over the\n" +
 			"four earlier gates + the human confirmation on record); `release\n" +
 			"complete` is `goal complete` — the run still completes only at\n" +
 			"release_gate, with a human confirmation, an attached verifier and\n" +
-			"a passing qa gate. Human confirmation is an invariant, not a flag\n" +
-			"that can be bypassed from either entry.",
+			"a passing verification gate. Human confirmation is an invariant,\n" +
+			"not a flag that can be bypassed from either entry.",
 	}
 	c.AddCommand(newGateEvaluateFixedCmd("release"), newGoalCompleteCmd(), newReleaseCheckCmd())
 	return c

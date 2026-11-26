@@ -112,6 +112,9 @@ func isTerminalRun(s core.RunStatus) bool {
 
 // stagePhase maps a lifecycle stage to the v1.6 spine phase vocabulary
 // (truth/generate/qa/release/repair, + design/archive extensions).
+// "design" here is a HISTORICAL read-only view label for StagePrototype;
+// the design ability/stage/gate/flag was removed 2026-11-26. Kept for
+// spine JSON compatibility, not a live design surface.
 func stagePhase(s core.WorkflowStage) string {
 	switch s {
 	case core.StageThink, core.StageUserStory, core.StagePrd, core.StageTestCase, core.StageFreeze:

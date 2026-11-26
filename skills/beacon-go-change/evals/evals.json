@@ -1,0 +1,74 @@
+{
+  "schema": "skill-evals.v1",
+  "skill_name": "beacon-go-change",
+  "evals": [
+    {
+      "id": "beacon-go-change-01",
+      "prompt": "需求冻好了，现在要改 AC-003。",
+      "expected_output": "Issues a change request first; Does not edit the frozen body directly",
+      "files": [],
+      "expectations": [
+        "Issues a change request first",
+        "Does not edit the frozen body directly"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "change request"
+        },
+        {
+          "kind": "contains",
+          "text": "Never edit a frozen contract in place"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-change-02",
+      "prompt": "帮我看一下最近有哪些需求变更。",
+      "expected_output": "Uses the single change list entry; Reports change records newest first",
+      "files": [],
+      "expectations": [
+        "Uses the single change list entry",
+        "Reports change records newest first"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "change list"
+        },
+        {
+          "kind": "contains",
+          "text": "change_id"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-change-03",
+      "prompt": "老的需求包要改一下。",
+      "expected_output": "Routes to change legacy, not a separate truth change command; Keeps the tree as authority",
+      "files": [],
+      "expectations": [
+        "Routes to change legacy",
+        "Keeps the tree as authority"
+      ],
+      "checks": [
+        {
+          "kind": "contains",
+          "text": "change legacy"
+        }
+      ]
+    },
+    {
+      "id": "beacon-go-change-04",
+      "prompt": "把这个版本发布上线。",
+      "expected_output": "Does not treat change as release; Routes to the release skill",
+      "files": [],
+      "should_trigger": false,
+      "expectations": [
+        "Does not treat change as release",
+        "Routes to the release skill"
+      ],
+      "checks": []
+    }
+  ]
+}

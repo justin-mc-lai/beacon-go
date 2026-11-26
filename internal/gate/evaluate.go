@@ -72,56 +72,6 @@ func EvaluateTruthFreeze(f TruthFreezeFacts, evaluator string) Evaluation {
 	return finish(GateTruthFreeze, evaluator, checks)
 }
 
-// ---- design ----
-
-// DesignFacts are the design-gate facts for one run (the binding is a
-// per-run record, P2c). Version match means: the version recorded in
-// the run snapshot's binding equals the version in the latest
-// design_primitive_bound event — snapshot and audit trail must agree,
-// and a binding without a version can never be matched.
-type DesignFacts struct {
-	HasRun         bool
-	Required       bool
-	Bound          bool
-	BindingSet     string
-	BindingVersion string
-	EventVersion   string
-	HasBoundEvent  bool
-}
-
-func EvaluateDesign(f DesignFacts, evaluator string) Evaluation {
-	if !f.HasRun {
-		return finish(GateDesign, evaluator, []CheckItem{
-			failItem("run_present", core.ReasonGateRunRequired,
-				"the design binding is a per-run record; no goal run exists for this feature (pass --run or create one)"),
-		})
-	}
-	if !f.Required {
-		return finish(GateDesign, evaluator, []CheckItem{
-			naItem("design_required", "run requires no design (no UX signal); design gate not applicable"),
-		})
-	}
-	checks := []CheckItem{okItem("design_required", "run requires design (UX)")}
-	if f.Bound {
-		checks = append(checks, okItem("binding_present", "design primitives bound: "+f.BindingSet))
-	} else {
-		checks = append(checks, failItem("binding_present", core.ReasonDesignPrimitiveNotBound,
-			"UX run has no design primitive binding; bind before implementing"))
-		return finish(GateDesign, evaluator, checks)
-	}
-	switch {
-	case f.BindingVersion == "":
-		checks = append(checks, failItem("binding_version_match", core.ReasonDesignBindingVersionMiss,
-			"binding carries no version; an unversioned binding cannot be matched"))
-	case f.HasBoundEvent && f.EventVersion != f.BindingVersion:
-		checks = append(checks, failItem("binding_version_match", core.ReasonDesignBindingVersionMism,
-			"snapshot binding version "+f.BindingVersion+" != design_primitive_bound event version "+f.EventVersion))
-	default:
-		checks = append(checks, okItem("binding_version_match", "binding version "+f.BindingVersion+" consistent with the binding event"))
-	}
-	return finish(GateDesign, evaluator, checks)
-}
-
 // ---- implement ----
 
 // CheckImplementWorkRecorded is the implement exit's work-evidence
@@ -358,10 +308,8 @@ type GateFact struct {
 // binds it to freeze/refreeze, not to release.
 type ReleaseFacts struct {
 	TruthFreeze      GateFact
-	Design           GateFact
 	Implement        GateFact
 	QA               GateFact
-	DesignApplicable bool
 	HumanConfirmed   bool
 	HumanConfirmedBy string
 	// MaterialsStale names the package surfaces (truth/tests/
@@ -385,11 +333,6 @@ func releasePrereq(name string, g GateFact) CheckItem {
 
 func EvaluateRelease(f ReleaseFacts, evaluator string) Evaluation {
 	checks := []CheckItem{releasePrereq("truth_freeze", f.TruthFreeze)}
-	if f.DesignApplicable {
-		checks = append(checks, releasePrereq("design", f.Design))
-	} else {
-		checks = append(checks, naItem("gate_design_passed", "no run of this feature requires design"))
-	}
 	checks = append(checks, releasePrereq("implement", f.Implement), releasePrereq("qa", f.QA))
 	if len(f.MaterialsStale) > 0 {
 		checks = append(checks, failItem("truth_materials_fresh", core.ReasonMaterialsStale,

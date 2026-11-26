@@ -6,7 +6,7 @@ import "testing"
 // reason_code=invalid_stage.
 func TestLoopTransitionRejectsInvalidStage(t *testing.T) {
 	st := NewLoopState()
-	err := st.Transition(LoopStage("nope"), false, nil)
+	err := st.Transition(LoopStage("nope"), false)
 	if rc, _ := ReasonCodeOf(err); rc != ReasonInvalidLoopStage {
 		t.Fatalf("reason = %q, err = %v", rc, err)
 	}
@@ -23,14 +23,14 @@ func TestLoopTransitionRejectsInvalidStage(t *testing.T) {
 func TestLoopDoneRequiresReleaseGateAndHuman(t *testing.T) {
 	st := NewLoopState()
 	// Not at release_gate yet.
-	if err := st.Transition(LoopDone, true, nil); err == nil {
+	if err := st.Transition(LoopDone, true); err == nil {
 		t.Fatal("done from idle must be rejected")
 	} else if rc, _ := ReasonCodeOf(err); rc != ReasonNotAtReleaseGate {
 		t.Errorf("reason = %q want %q", rc, ReasonNotAtReleaseGate)
 	}
 	// At release_gate but unconfirmed.
 	st.CurrentStage = LoopReleaseGate
-	if err := st.Transition(LoopDone, false, nil); err == nil {
+	if err := st.Transition(LoopDone, false); err == nil {
 		t.Fatal("done without human confirmation must be rejected")
 	} else if rc, _ := ReasonCodeOf(err); rc != ReasonReleaseRequiresHuman {
 		t.Errorf("reason = %q want %q", rc, ReasonReleaseRequiresHuman)
@@ -39,7 +39,7 @@ func TestLoopDoneRequiresReleaseGateAndHuman(t *testing.T) {
 		t.Fatal("CheckReleaseGate(false) must fail")
 	}
 	// Confirmed: allowed.
-	if err := st.Transition(LoopDone, true, nil); err != nil {
+	if err := st.Transition(LoopDone, true); err != nil {
 		t.Fatalf("confirmed release -> done: %v", err)
 	}
 	if st.CurrentStage != LoopDone || !st.ReleaseConfirmed {
@@ -52,7 +52,7 @@ func TestLoopDoneRequiresReleaseGateAndHuman(t *testing.T) {
 func TestLoopTransitionBlockedByStopWhen(t *testing.T) {
 	st := NewLoopState()
 	st.StopWhen = "qa_failed_twice"
-	err := st.Transition(LoopGovernancePrecheck, false, nil)
+	err := st.Transition(LoopGovernancePrecheck, false)
 	if rc, _ := ReasonCodeOf(err); rc != ReasonStopWhenSatisfied {
 		t.Errorf("reason = %q, err = %v", rc, err)
 	}

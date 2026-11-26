@@ -11,6 +11,6 @@
 4. `beacon goal run "加退款" --project . --feature order-refund --executor-id maker`
 5. `beacon goal driver run-loop --run-id <id>` — 推到 release gate 自己停
 
-**产出**：`docs/beacon/v2.0.0/features/order-refund/` 四件套 + 一个停在 release gate 的 run
+**产出**：`docs/beacon/<version>/tree/` 下冻结的需求树 + 一个停在 release gate 的 run
 
 **不要做**：跳过 ask 直接冻；冻完自己写代码再自己说通过

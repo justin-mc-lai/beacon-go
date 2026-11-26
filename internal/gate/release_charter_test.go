@@ -1,7 +1,7 @@
-// Charter guard (AC-005): the per-feature release gate's four
-// prerequisites are truth_freeze, design (when applicable),
-// implement and qa. The integrity gate stays outside it (AC-101);
-// this test fails if a future change silently adds it.
+// Charter guard (AC-005): the per-feature release gate's three
+// prerequisites are truth_freeze, implement and qa. The integrity
+// gate stays outside it (AC-101); this test fails if a future
+// change silently adds it.
 package gate
 
 import (

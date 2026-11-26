@@ -30,7 +30,7 @@ func newTruthCmd() *cobra.Command {
 	}
 	c.AddCommand(
 		newTruthCreateCmd(), newTruthFreezeCmd(false), newTruthFreezeCmd(true),
-		newTruthChangeCmd(), newTruthBaselineCmd(), newTruthShowCmd(), newTruthListCmd(),
+		newTruthBaselineCmd(), newTruthShowCmd(), newTruthListCmd(),
 		newTruthAskCmd(), newTruthAnswerCmd(), newTruthQuestionsCmd(),
 		newTruthIntentCmd(), newTruthConfirmCmd(), newTruthDriftCmd(), newTruthRebaseCmd(),
 		// R2b (M16): the truth-map standalone face.
@@ -44,7 +44,7 @@ func newTruthCmd() *cobra.Command {
 		newTruthSemanticReviewCmd(),
 		newTruthMigrateCmd(), newTruthTreeCmd(), newTruthNodeCmd(), newTruthSnapshotCmd(),
 	)
-	hideAllBut(c, "create", "intent", "confirm", "freeze", "change", "refreeze", "show", "tree", "node")
+	hideAllBut(c, "create", "intent", "confirm", "freeze", "refreeze", "show", "tree", "node")
 	return c
 }
 
@@ -219,8 +219,8 @@ func newTruthChangeCmd() *cobra.Command {
 	var project, feature, version, summary, by string
 	var asJSON, cancelChange, acceptCurrent bool
 	c := &cobra.Command{
-		Use:   "change",
-		Short: "Register a change against a frozen package (writes changes/<id>.md; the truth body is untouched)",
+		Use:   "legacy",
+		Short: "Legacy: register a change against a frozen feature package (tree-first: prefer `change request`)",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if acceptCurrent && !cancelChange {

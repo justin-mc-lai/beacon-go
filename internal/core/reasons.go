@@ -1,12 +1,11 @@
-// Unified goal reason-code vocabulary (P2b, G-21): the Go port of
-// beacon/utils/goal_reason_codes.py plus the reason constants of the
-// goal guardrail family (goal_agent_driver.py, goal_durable_supervisor.py,
-// goal_queue.py, goal_budget.py, goal_quota.py, goal_todos.py).
+// Unified reason-code vocabulary used by gates, CLI exit codes and events.
 //
-// Rule (charter): every goal-surface reason string lives here as a core
-// constant. Orchestrator / CLI code must reference these constants, never
-// re-spell the strings locally. Values are API-stable contract strings,
-// copied verbatim from the v1 sources.
+// Navigation: codes are grouped by family below (stage_exit_, goal_implement_,
+// freeze_, release_, truth_*, program_, ...). Constant names follow Go
+// semantics while their VALUES are frozen v1 contract strings, so the two
+// are not always spelled alike — look up a value by its constant, never by
+// guessing from the name. Add new codes to both a const here and, where the
+// family is user-facing, ReasonCatalog. Never re-spell a value at a call site.
 package core
 
 import "strings"
@@ -18,7 +17,7 @@ const (
 	ReasonStageExitPlanIncomplete = "stage_exit_plan_incomplete"
 	ReasonStageExitTruthNotFrozen = "stage_exit_truth_not_frozen"
 	ReasonStageExitTruthMissing   = "stage_exit_truth_package_missing"
-	ReasonStageExitDesignIncompl  = "stage_exit_design_incomplete"
+
 	ReasonStageExitImplementBlock = "stage_exit_implement_blocked"
 	ReasonStageExitQAEvidenceMiss = "stage_exit_qa_evidence_missing"
 	ReasonStageExitBlocked        = "stage_exit_blocked"
@@ -51,7 +50,7 @@ var ReasonCatalog = map[string]string{
 	ReasonStageExitTruthNotFrozen:     "Feature truth exists but status is not frozen",
 	ReasonStageExitTruthMissing:       "Feature truth package missing; fill then freeze",
 	ReasonIntentMissing:               "Kernel-driven run needs a confirmed intent recorded in the feature package",
-	ReasonStageExitDesignIncompl:      "Design stage lacks verifiable design evidence",
+
 	ReasonStageExitImplementBlock:     "Implement admission failed",
 	ReasonStageExitQAEvidenceMiss:     "QA lacks scorecard/evidence artifact",
 	ReasonReleaseRequiresHuman:        "Release requires human confirmation",
@@ -186,13 +185,7 @@ const (
 	ReasonSatelliteTruthWrite   = "satellite_truth_write_forbidden"
 )
 
-// ---- Design family (P2c, G-18: design primitive binding) ----
 
-const (
-	ReasonDesignPrimitiveNotBound = "design_primitive_not_bound"
-	ReasonDesignStageNotRequired  = "design_stage_not_required"
-	ReasonDesignPrimitiveSetReq   = "design_primitive_set_required"
-)
 
 // ---- Self-heal family (plan_goal_self_heal steps) ----
 
@@ -297,11 +290,10 @@ const (
 // ---- Gate evaluation family (P3a: formal gate write-back) ----
 //
 // Codes for the beacon-gate evaluation surface: the evaluator identity
-// obligation, prerequisite composition of the release gate, and the
-// design binding's version consistency. Per-item codes of the four
-// gates themselves reuse the families that already own the underlying
-// judgement (stage-exit, admission, design, QA evidence) — one
-// vocabulary, no re-spelling.
+// obligation, prerequisite composition of the release gate, and release
+// gating. Per-item codes of the stage gates themselves reuse the families
+// that already own the underlying judgement (stage-exit, admission, QA
+// evidence) — one vocabulary, no re-spelling.
 
 const (
 	ReasonGateEvaluatorRequired    = "gate_evaluator_required"
@@ -310,8 +302,7 @@ const (
 	ReasonGateRunMismatch          = "gate_run_feature_mismatch"
 	ReasonGateNotEvaluated         = "gate_not_evaluated"
 	ReasonGatePrereqNotPassed      = "gate_prerequisite_not_passed"
-	ReasonDesignBindingVersionMiss = "design_binding_version_missing"
-	ReasonDesignBindingVersionMism = "design_binding_version_mismatch"
+
 	ReasonTruthChangePending       = "truth_change_pending"
 	ReasonQAStageNotExecuted       = "qa_stage_not_executed"
 	ReasonQAArtifactStale          = "qa_artifact_stale"
@@ -376,10 +367,7 @@ const (
 	ReasonIntegrityEvidenceMissing   = "truth_integrity_evidence_artifact_missing"
 	ReasonIntegritySlugMismatch      = "truth_integrity_slug_mismatch"
 	ReasonIntegrityAuditOnly         = "truth_integrity_audit_only"
-	// K5: the truth body carries a UI/design section while the
-	// frontmatter declares ux_required: false (audit by default,
-	// blocking under gate integrity --strict).
-	ReasonIntegrityUxMismatch = "truth_ux_requirement_mismatch"
+
 )
 
 // ---- Conformance traceability family (kernel-truth-traceability
@@ -778,7 +766,7 @@ func IsKnownReasonCode(code string) bool {
 	if _, ok := ReasonCatalog[code]; ok {
 		return true
 	}
-	for _, prefix := range []string{"stage_exit_", "goal_implement_", "implement_", "main_", "freeze_", "release_", "program_", "hotfix_", "multi_version_", "main_axis_", "gate_", "truth_integrity_", "traceability_", "design_binding_", "truth_change_", "truth_canonical_", "truth_", "canonical_", "empty_", "revision_", "stale_", "qa_", "executor_", "ralph_", "worktree_", "planner_", "acp_", "skill_", "standard_flow_", "truth_baseline_", "workspace_admission_", "unscoped_", "git_diff_", "topology_gate_", "topology_scope_", "gitscope_", "satellite_", "multi_git_", "monorepo_", "ac_vague_", "materials_", "feature_package_", "requirement_clarity_", "unapproved_", "scope_mode_", "domain_", "entity_", "illegal_", "orphan_", "placeholder_", "alignment_", "user_intent_", "TRUTH_DETERMINISM_", "health_", "operator_gate_", "evidence_wait", "focus_wait", "gate_unresolved", "already_resolved", "release_", "feature_package_", "machine_json_", "review_", "autotest_", "qa9_", "auto_test_", "tc_declared_", "skill_install_", "state_snapshot_", "archive_", "hook_", "invalid_project_mode", "agent_eval_", "boundary_", "route_probe_", "prompt_fixture_", "catalog_", "live_skill_", "brainstorm_", "decompose_", "code2truth_", "qa_strategy_", "sdd_"} {
+	for _, prefix := range []string{"stage_exit_", "goal_implement_", "implement_", "main_", "freeze_", "release_", "program_", "hotfix_", "multi_version_", "main_axis_", "gate_", "truth_integrity_", "traceability_", "truth_change_", "truth_canonical_", "truth_", "canonical_", "empty_", "revision_", "stale_", "qa_", "executor_", "ralph_", "worktree_", "planner_", "acp_", "skill_", "standard_flow_", "truth_baseline_", "workspace_admission_", "unscoped_", "git_diff_", "topology_gate_", "topology_scope_", "gitscope_", "satellite_", "multi_git_", "monorepo_", "ac_vague_", "materials_", "feature_package_", "requirement_clarity_", "unapproved_", "scope_mode_", "domain_", "entity_", "illegal_", "orphan_", "placeholder_", "alignment_", "user_intent_", "TRUTH_DETERMINISM_", "health_", "operator_gate_", "evidence_wait", "focus_wait", "gate_unresolved", "already_resolved", "release_", "feature_package_", "machine_json_", "review_", "autotest_", "qa9_", "auto_test_", "tc_declared_", "skill_install_", "state_snapshot_", "archive_", "hook_", "invalid_project_mode", "agent_eval_", "boundary_", "route_probe_", "prompt_fixture_", "catalog_", "live_skill_", "brainstorm_", "decompose_", "code2truth_", "qa_strategy_", "sdd_"} {
 		if strings.HasPrefix(code, prefix) {
 			return true
 		}

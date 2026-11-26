@@ -65,7 +65,7 @@ func newGateEvaluateCmd() *cobra.Command {
 	var asJSON, allowEmpty bool
 	c := &cobra.Command{
 		Use:   "evaluate <gate-type>",
-		Short: "Formally evaluate one gate (truth_freeze|design|implement|qa|release) and persist the verdict",
+		Short: "Formally evaluate one gate (truth_freeze|implement|qa|release) and persist the verdict",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			st, err := openWriteStore()

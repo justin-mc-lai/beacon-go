@@ -96,8 +96,8 @@ func TestQAScoreAndHistoryCLI(t *testing.T) {
 	}
 	gdoc := parseDoc(t, out)
 	gates, _ := gdoc["gates"].([]any)
-	if len(gates) != 7 {
-		t.Fatalf("gate status must list exactly the seven gate types, got %d", len(gates))
+	if len(gates) != 6 {
+		t.Fatalf("gate status must list exactly the six gate types, got %d", len(gates))
 	}
 	for _, g := range gates {
 		if gm, _ := g.(map[string]any); gm["gate_type"] == "skill_score" {

@@ -137,7 +137,7 @@ func stallApplies(m *runMeta) bool {
 		return false
 	}
 	switch m.currentStage() {
-	case StagePlan, StageTruth, StageDesign, StageImplement, StageQA:
+	case StagePlan, StageTruth, StageImplement, StageQA:
 		return true
 	}
 	return false
@@ -151,8 +151,6 @@ func workerPlanFor(m *runMeta) string {
 		return "delegate_implement_lane (P2c)"
 	case StageQA:
 		return "run_qa_evaluation"
-	case StageDesign:
-		return "run_design_stage"
 	case StageRelease:
 		return "human_release_gate_only"
 	default:

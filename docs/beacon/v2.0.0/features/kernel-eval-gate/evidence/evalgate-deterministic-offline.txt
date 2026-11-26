@@ -1,6 +1,0 @@
-=== RUN   TestEvalDeterministicOffline
-    suite_test.go:845: determinism: two runs over 16 cases normalized to 6273 identical bytes (volatile run ids: 2)
-    suite_test.go:846: offline: 16 cases passed with HTTP(S)_PROXY/ALL_PROXY at 127.0.0.1:1 (16 report entries)
---- PASS: TestEvalDeterministicOffline (21.08s)
-PASS
-ok  	beacon-go/internal/evalgate	21.464s

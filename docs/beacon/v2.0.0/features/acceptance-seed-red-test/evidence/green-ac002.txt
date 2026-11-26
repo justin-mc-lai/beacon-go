@@ -1,4 +1,0 @@
-=== RUN   TestHarvestRejectsTestOnlyArtifacts
---- PASS: TestHarvestRejectsTestOnlyArtifacts (0.15s)
-PASS
-ok  	beacon-go/internal/orchestrator	0.465s

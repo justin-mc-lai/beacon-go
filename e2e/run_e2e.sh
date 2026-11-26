@@ -20,9 +20,11 @@
 #      this step was added with S3 and is the one declared script
 #      change of that slice)
 #   6. `goal run` (--executor-id maker; subprocess profile executor via
-#      --exec-cmd pointing at a real stage-agent script; no --ux, so the
-#      design stage must NOT be inserted)
+#      --exec-cmd pointing at a real stage-agent script; fixed five-stage
+#      plan: plan/truth/implement/qa/release)
 #   7. `goal admit` (shared implement admission — must fully pass)
+#  7b. `goal worktree status` (worktree is a core ability; real CLI wire,
+#      no mock — verifies the admission-bound worktree surface + AC-140)
 #   8. `goal driver start` + `goal driver run-loop`
 #      (--executor subprocess:codex-style) pushing the run to release_gate;
 #      the agent script does real per-stage work and produces a QA report
@@ -30,7 +32,7 @@
 #  8b. `goal artifacts register` the QA report (P6 fix, v2.0.0-go.5):
 #      the on-disk report becomes a registered qa_report pointer with
 #      its real sha256 — the only kind of evidence the qa gate trusts
-#   9. `gate evaluate` design / implement / qa / release (qa must now
+#   9. `gate evaluate` implement / qa / release (qa must now
 #      pass on the registered evidence; release is evaluated BEFORE
 #      completion and is expected to block)
 #  10. `goal attach-verifier` (checker != maker) + `goal complete
@@ -348,11 +350,11 @@ AGENTEOF
   echo "$OUT"
   RUN_ID="$(printf '%s' "$OUT" | jval run_id)"
   echo "run_id=$RUN_ID"
-  # No --ux was passed: the stage plan must NOT contain a design stage.
+  # The stage plan is the fixed five stages — no design stage exists.
   if printf '%s' "$OUT" | grep -q '"stage": "design"'; then
-    echo "FAIL: design stage inserted without --ux"; return 1
+    echo "FAIL: design stage present in the stage plan"; return 1
   fi
-  echo "stage plan has no design stage (no --ux) verified"
+  echo "stage plan has no design stage verified"
 
   # ==================================================================
   STEP="7 goal admit"
@@ -361,11 +363,26 @@ AGENTEOF
   echo "$OUT"
   [ "$(printf '%s' "$OUT" | jval allow_implement)" = "True" ] || {
     echo "FAIL: implement admission did not fully pass"; return 1; }
-  echo "admit allow_implement=true verified (design_bound not applicable: no --ux)"
+  echo "admit allow_implement=true verified"
   printf '%s' "$OUT" | grep -q '"check": "topology_gate"' || {
     echo "FAIL: admission output lacks the topology_gate item (AC-173)"; return 1; }
   echo "admission topology_gate item present and passing (AC-173, ref $TOPO_REF)"
 
+  # ==================================================================
+  STEP="7b goal worktree status (worktree is a core ability)"
+  echo; echo "===== STEP 7b: $STEP ====="
+  # worktree_binding is an implement-admission hard gate (step 7). The
+  # status face must be reachable through the real CLI and report the
+  # run's binding + AC-140 quarantine surface. Verify the wire, not a mock.
+  OUT="$("$BEACON" goal worktree status --run-id "$RUN_ID" --json)"
+  echo "$OUT"
+  printf '%s' "$OUT" | grep -q '"run_id"' || {
+    echo "FAIL: worktree status output lacks run_id"; return 1; }
+  printf '%s' "$OUT" | grep -q '"records"' || {
+    echo "FAIL: worktree status output lacks records"; return 1; }
+  printf '%s' "$OUT" | grep -q '"quarantines"' || {
+    echo "FAIL: worktree status output lacks quarantines"; return 1; }
+  echo "worktree status core surface reachable and well-formed (AC-140/AC-173)"
   # ==================================================================
   STEP="8 execute plan/truth/implement before independent QA"
   echo; echo "===== STEP 8: $STEP ====="
@@ -458,7 +475,7 @@ REVIEWEOF
   [ "$(jval loop_stage < "$WORK/manual-qa.json")" = "release_gate" ] || { echo "FAIL: manual qa tick did not reach release gate"; return 1; }
 
   # ==================================================================
-  STEP="9 gate evaluate design/implement/qa/release"
+  STEP="9 gate evaluate implement/qa/release"
   echo; echo "===== STEP 9: $STEP ====="
   # eval_gate <type> <expect: pass|blocked|any> — the gate CLI exits 1 on
   # a blocked verdict BY DESIGN; the verdict JSON is the result, recorded
@@ -482,7 +499,7 @@ REVIEWEOF
     esac
     LAST_VERDICT="$verdict"
   }
-  eval_gate design pass      # non-UX run: not applicable -> pass verdict
+  # design gate no longer exists; the five-stage model has no design axis
   eval_gate implement pass   # same shared admission checker as step 7
   eval_gate qa pass          # registered QA evidence (step 8b) must pass
   eval_gate release blocked  # before completion: must block (missing

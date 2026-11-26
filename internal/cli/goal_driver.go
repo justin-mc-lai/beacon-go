@@ -157,7 +157,7 @@ func newGoalDriverRunOnceCmd() *cobra.Command {
 		},
 	}
 	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
-	c.Flags().StringVar(&executor, "executor", "", "stage executor: recording (placeholder) | subprocess | subprocess:<profile> | ralph (real; unconfigured subprocess refuses, never falls back)")
+	c.Flags().StringVar(&executor, "executor", "", "stage executor: recording (placeholder); manual/external record via goal tick --by")
 	addExecFlags(c, &ef, false)
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("run-id")
@@ -198,7 +198,7 @@ func newGoalDriverRunLoopCmd() *cobra.Command {
 	c.Flags().StringVar(&runID, "run-id", "", "goal run id (required)")
 	c.Flags().IntVar(&maxRounds, "max-rounds", 0, "max turns this loop invocation (default: driver max turns)")
 	c.Flags().IntVar(&intervalMS, "interval-ms", 0, "sleep between turns in milliseconds (0 = none)")
-	c.Flags().StringVar(&executor, "executor", "", "stage executor: recording (placeholder) | subprocess | subprocess:<profile> | ralph (real; unconfigured subprocess refuses, never falls back)")
+	c.Flags().StringVar(&executor, "executor", "", "stage executor: recording (placeholder); manual/external record via goal tick --by")
 	addExecFlags(c, &ef, false)
 	c.Flags().BoolVar(&asJSON, "json", false, "emit one JSON document")
 	_ = c.MarkFlagRequired("run-id")

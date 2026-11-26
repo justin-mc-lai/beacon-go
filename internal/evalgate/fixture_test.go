@@ -178,11 +178,11 @@ func (f *fixture) rewritePackage(truthDoc, testsDoc string, files map[string]str
 
 // parkAtTruth creates one run and ticks it until the current stage is
 // truth (the plan stage has been executed and its exit gate passed).
-func (f *fixture) parkAtTruth(uxRequired bool) orchestrator.RunView {
+func (f *fixture) parkAtTruth() orchestrator.RunView {
 	f.t.Helper()
 	run, err := f.eng.CreateRun(orchestrator.CreateRunOptions{
 		ProjectRoot: f.root, FeatureSlug: "feat-a", Utterance: "eval fixture",
-		UXRequired: uxRequired, ExecutorID: "maker", ExecutorMode: orchestrator.ExecutorModeRecording,
+		ExecutorID: "maker", ExecutorMode: orchestrator.ExecutorModeRecording,
 	})
 	if err != nil {
 		f.t.Fatalf("create run: %v", err)

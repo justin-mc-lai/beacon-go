@@ -288,7 +288,7 @@ func (e *Engine) Complete(runID string, opts CompleteOptions) (RunView, error) {
 		}
 		return RunView{}, err
 	}
-	if err := ls.Transition(core.LoopDone, true, e.stopWhen); err != nil {
+	if err := ls.Transition(core.LoopDone, true); err != nil {
 		if rc, ok := core.ReasonCodeOf(err); ok {
 			return reject(rc, err.Error())
 		}

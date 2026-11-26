@@ -142,8 +142,8 @@ func (e *Engine) versionFeatureFacts(ctx store.FeatureContext) (gate.VersionFeat
 		}
 	}
 
-	// Four-gate composition: the latest verdict of each stage gate
-	// must be pass (design only where a run requires it).
+	// Three-gate composition: the latest verdict of each stage gate
+	// must be pass.
 	latest, err := e.store.Gates().LatestByType(ctx.Feature.ID)
 	if err != nil {
 		return ff, err
@@ -157,9 +157,6 @@ func (e *Engine) versionFeatureFacts(ctx store.FeatureContext) (gate.VersionFeat
 		return ff, err
 	}
 	need := []string{string(gate.GateTruthFreeze), string(gate.GateImplement), string(gate.GateQA)}
-	if has && designRequired(m) {
-		need = append(need, string(gate.GateDesign))
-	}
 	ff.GatesPass = true
 	var missing []string
 	for _, t := range need {

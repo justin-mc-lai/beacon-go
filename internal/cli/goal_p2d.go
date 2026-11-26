@@ -6,7 +6,7 @@
 // axis generate|validate) or attaches validation to the build
 // (hotfix-plan). The Go surface uses subcommands for the action —
 // the same shape P2b/P2c already established (driver start|status,
-// design-stage status|bind) — with identical action words. The
+// implement plan|admit) — with identical action words. The
 // hotfix build still refuses what v1 only flagged, per the task's
 // build contract (see orchestrator/hotfix.go).
 package cli

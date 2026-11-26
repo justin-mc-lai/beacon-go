@@ -1,3 +1,0 @@
-$ beacon-go truth intent ... (AC-002 wording fixed; same snapshot)
-{"slug": "intent-contract-bridge", "intent_confirmed": false, "ready": false}
-EXIT=0

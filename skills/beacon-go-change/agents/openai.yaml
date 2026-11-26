@@ -1,0 +1,4 @@
+interface:
+  display_name: "Beacon Change"
+  short_description: "Invalidate frozen truth and drive the bottom-up refreeze"
+  default_prompt: "Use $beacon-go-change to change frozen truth through one canonical entry."

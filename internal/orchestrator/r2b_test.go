@@ -373,14 +373,6 @@ func TestReviewFacesAndWriteBack(t *testing.T) {
 	if !marker {
 		t.Fatalf("spec issues = %+v", spec.Issues)
 	}
-	// Design: no design on record, spec present -> warn only.
-	design, err := env.eng.Review(env.root, "rev-box", ReviewDesign)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if design.Status != "warn" || !design.GateReady {
-		t.Fatalf("design: %+v", design)
-	}
 	// Quality: nothing verified, package open -> fail, and the
 	// write-back blocks the run through the H5 channel.
 	quality, err := env.eng.Review(env.root, "rev-box", ReviewQuality)

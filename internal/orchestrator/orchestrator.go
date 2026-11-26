@@ -6,8 +6,7 @@
 // workflow set — core engine (P2a: create / tick / continue / block
 // / attach-verifier / complete / heartbeat / checkpoint / resume /
 // trace), long-run care (P2b: driver / supervisor / queue /
-// self-heal / guardrails), delegation & parallel (P2c: lanes /
-// delegate-ralph / parallel-plan / design-stage / admission) and
+// delegate-ralph / parallel-plan / admission) and
 // orchestration extensions (P2d: program / hotfix / multi-version
 // / memory / axis). Stage execution stays behind the StageExecutor
 // interface. P3a added formal gate evaluation write-back; P3c added

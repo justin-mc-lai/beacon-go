@@ -199,3 +199,32 @@ for line in sys.stdin:
 		t.Errorf("reason = %q, want %q", res.ReasonCode, core.ReasonACPProbeFailed)
 	}
 }
+
+// TestAbilitiesAreTheSevenGroupTruth locks the single canonical list.
+// Any drift back to the retired six-ability set, a rename, a duplicate,
+// or an order change must fail here before it can leak into the CLI root.
+func TestAbilitiesAreTheSevenGroupTruth(t *testing.T) {
+	want := "plan,truth,change,implement,verify,release,goal"
+	if got := strings.Join(IDs(), ","); got != want {
+		t.Fatalf("Abilities = %q, want canonical %q", got, want)
+	}
+	if len(Abilities) != 7 {
+		t.Fatalf("len(Abilities) = %d, want 7", len(Abilities))
+	}
+	seen := map[string]bool{}
+	for _, a := range Abilities {
+		if a.ID == "" || a.Description == "" {
+			t.Errorf("empty ability id/description: %+v", a)
+		}
+		if seen[a.ID] {
+			t.Errorf("duplicate ability id %q", a.ID)
+		}
+		seen[a.ID] = true
+	}
+	// The retired faces must not creep back into the first-class set.
+	for _, retired := range []string{"design", "loop", "qa", "spine", "projects"} {
+		if seen[retired] {
+			t.Errorf("retired face %q is a first-class ability", retired)
+		}
+	}
+}
