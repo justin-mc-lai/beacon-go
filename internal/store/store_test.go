@@ -528,3 +528,20 @@ func TestDefaultPathIsGoTrackLedger(t *testing.T) {
 		t.Fatalf("DefaultPath = %q want .../beacon-go.db (v1's beacon.db stays untouched)", p)
 	}
 }
+
+func TestTwoProjectsSameVersionName(t *testing.T) {
+	s, _ := openTestStore(t)
+	a, err := s.Projects().Register(Project{RootPath: "/tmp/proj-a2", Name: "a2"})
+	if err != nil { t.Fatal(err) }
+	b, err := s.Projects().Register(Project{RootPath: "/tmp/proj-b2", Name: "b2"})
+	if err != nil { t.Fatal(err) }
+	va, err := s.Projects().AddVersion(ProjectVersion{ProjectID: a.ID, Version: "v0.0.1", DocsRoot: "docs/beacon/v0.0.1", IsCurrent: true})
+	if err != nil { t.Fatal(err) }
+	vb, err := s.Projects().AddVersion(ProjectVersion{ProjectID: b.ID, Version: "v0.0.1", DocsRoot: "docs/beacon/v0.0.1", IsCurrent: true})
+	if err != nil { t.Fatal(err) }
+	if va.ID == vb.ID { t.Fatal("same-named versions in different projects must have different IDs") }
+	la, _ := s.Projects().ListVersions(a.ID)
+	lb, _ := s.Projects().ListVersions(b.ID)
+	if len(la) != 1 || la[0].ID != va.ID { t.Fatalf("project A versions leaked: %+v", la) }
+	if len(lb) != 1 || lb[0].ID != vb.ID { t.Fatalf("project B versions leaked: %+v", lb) }
+}

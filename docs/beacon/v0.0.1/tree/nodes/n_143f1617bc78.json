@@ -37,6 +37,7 @@
       }
     ]
   },
-  "fingerprint": "901fedd3f460b8ad2698507c034005ae87fed73f9b4dbe3d03fbbaaefe941e83",
+  "truth_path": "docs/beacon/v0.0.1/features/docs-version-line/truth.md",
+  "fingerprint": "2c7489b87fc04ceff7d72ccefbf372b6122c1cd4c417bd771dd0d465886999b4",
   "fingerprint_alg": "tree-json-v1"
 }

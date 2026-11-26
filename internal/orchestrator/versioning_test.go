@@ -79,3 +79,27 @@ func TestTruthCreateUsesCurrentVersion(t *testing.T) {
 		t.Fatalf("current version = %q", v.Version)
 	}
 }
+
+func TestBumpDocsVersion(t *testing.T) {
+	cases := []struct {
+		cur, level, want string
+	}{
+		{"v1.2.3", "patch", "v1.2.4"},
+		{"v1.2.3", "", "v1.2.4"},
+		{"v1.2.3", "minor", "v1.3.0"},
+		{"v1.2.3", "major", "v2.0.0"},
+		{"1.0.0", "patch", "v1.0.1"},
+	}
+	for _, c := range cases {
+		got, err := BumpDocsVersion(c.cur, c.level)
+		if err != nil || got != c.want {
+			t.Fatalf("BumpDocsVersion(%q,%q) = %q,%v want %q", c.cur, c.level, got, err, c.want)
+		}
+	}
+	if _, err := BumpDocsVersion("v1.2.3", "banana"); err == nil {
+		t.Fatal("unknown level must fail")
+	}
+	if _, err := BumpDocsVersion("2.0.0-go.12", "patch"); err == nil {
+		t.Fatal("runtime-shaped version must not bump as docs")
+	}
+}

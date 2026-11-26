@@ -1,0 +1,1 @@
+{"fingerprint":"e85d567fa0908a46c10f9a79867188ea58a3610d95cae04ecea328a2b73278bb","reviewer":"SemReviewDocsVer-r3-structure","verdict":"pass","findings":[{"severity":"info","point":"补齐结构门","detail":"增加 ## 用户旅程 与 ## Illegal Transitions section 满足 domain_required/fsm 五元组；TC 命令与 DAG 未变，实跑绿。"}],"summary":"结构补齐后语义不变，指纹匹配当前包。"}

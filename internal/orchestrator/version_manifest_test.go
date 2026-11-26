@@ -239,3 +239,40 @@ func TestReconcileClosesStaleManifestChange(t *testing.T) {
 		t.Fatalf("reconcile = %+v", m.Changes)
 	}
 }
+
+func TestManifestIllegalTransitions(t *testing.T) {
+	env := newTestEnv(t, "frozen")
+	writeVersionFixture(t, env.root)
+	if _, err := env.eng.BaselineVersion(env.root, "v2.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := env.eng.OpenVersion(env.root, "v2.0.0", "patch"); err != nil {
+		t.Fatal(err)
+	}
+	// draft -> released is illegal (must freeze first)
+	if _, err := env.eng.ReleaseVersion(env.root, "v2.0.1"); err == nil {
+		t.Fatal("draft->released must be rejected")
+	}
+	m, err := versionmanifest.LoadVersion(env.root, "v2.0.1")
+	if err != nil { t.Fatal(err) }
+	if m.Status != versionmanifest.StatusDraft {
+		t.Fatalf("status changed after illegal release: %s", m.Status)
+	}
+	// freeze then release to reach terminal state
+	// v2.0.1 has an inherited lake only; FreezeVersion allows inherited lakes.
+	if _, err := env.eng.FreezeVersion(env.root, "v2.0.1"); err != nil {
+		t.Fatalf("freeze draft: %v", err)
+	}
+	if _, err := env.eng.ReleaseVersion(env.root, "v2.0.1"); err != nil {
+		t.Fatalf("release frozen: %v", err)
+	}
+	// released -> draft is illegal (no reopen path; freeze rejects non-draft)
+	if _, err := env.eng.FreezeVersion(env.root, "v2.0.1"); err == nil {
+		t.Fatal("released->draft/freeze must be rejected")
+	}
+	m2, err := versionmanifest.LoadVersion(env.root, "v2.0.1")
+	if err != nil { t.Fatal(err) }
+	if m2.Status != versionmanifest.StatusReleased {
+		t.Fatalf("status changed after illegal freeze: %s", m2.Status)
+	}
+}
