@@ -1,0 +1,3 @@
+$ go test ./internal/intenttree -run TestStageGateFeatureLifecycle$ -count=1
+ok  	beacon-go/internal/intenttree	0.207s
+[exit=0]

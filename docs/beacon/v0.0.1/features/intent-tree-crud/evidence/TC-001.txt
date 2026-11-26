@@ -1,0 +1,3 @@
+$ go test ./internal/intenttree -run TestValidateChildMatrix$ -count=1
+ok  	beacon-go/internal/intenttree	0.190s
+[exit=0]

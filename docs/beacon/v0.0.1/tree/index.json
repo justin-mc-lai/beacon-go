@@ -319,7 +319,8 @@
       "status": "draft",
       "title": "intent tree CRUD",
       "path": "root/truth-binding/intent-tree-crud",
-      "fingerprint": "1dc50d97e30fddb5cc73df8e0480d9c4e37d1ae25e698d952a212737d505e597",
+      "truth_path": "docs/beacon/v0.0.1/features/intent-tree-crud/truth.md",
+      "fingerprint": "d88ebc59d119494a439078635fc00ac2e4450817b61dde415698829cff1576f1",
       "fingerprint_alg": "tree-json-v1"
     },
     {
