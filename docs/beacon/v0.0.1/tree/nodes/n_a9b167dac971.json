@@ -5,7 +5,7 @@
   "intent": "只有 draft 节点可冻结，frozen 节点冻结返回稳定 reason code。",
   "parent_id": "n_1a712a5f8a04",
   "path": "root/truth-binding/intent-tree-crud/freeze-gate",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "beacon plan freeze --node \u003cfrozen-id\u003e 退出非零且 stderr 含 tree_node_not_draft"
   },
-  "fingerprint": "32ab9b94a0f117ef62aef5d11e9b78bfc91d06a32f33f88a9c0b2e1a8ac6691b",
+  "fingerprint": "ceb0eb6dda632be1a52e0ebb01c6469c9784b2fc079574aa257ac29318ff8ec5",
   "fingerprint_alg": "tree-json-v1"
 }

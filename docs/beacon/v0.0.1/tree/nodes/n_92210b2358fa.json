@@ -5,8 +5,8 @@
   "intent": "所有节点类型 id 按 versionID 命名空间并有测试覆盖，跨项目同版本号不撞主键。",
   "parent_id": "n_75ea19c0c144",
   "path": "root/version-evolution/node-id-namespace",
-  "status": "draft",
+  "status": "frozen",
   "truth_path": "docs/beacon/v0.0.1/features/node-id-namespace/truth.md",
-  "fingerprint": "02e5fd2ea2c7d237de7c318fd2d1612b3a203efcd8fb2525764c0045885680d0",
+  "fingerprint": "af8b78bfabeb5ced8cc48fcb60161ab6b1ebd61b303aa344da5f0f577aed221e",
   "fingerprint_alg": "tree-json-v1"
 }

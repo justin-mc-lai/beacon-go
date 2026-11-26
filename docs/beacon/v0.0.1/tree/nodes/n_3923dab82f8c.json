@@ -5,7 +5,7 @@
   "intent": "bump 创建下一 manifest 并置 current",
   "parent_id": "n_143f1617bc78",
   "path": "root/version-evolution/docs-version-line/project-bump-manifest",
-  "status": "draft",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,6 @@
     "type": "test",
     "spec": "beacon projects bump --project . --level patch --json | jq -e '.version'"
   },
-  "fingerprint": "6882ac72eb791540ab5a38dffd628edba38846d72ceecd3c96718f6d451e3929",
+  "fingerprint": "70cd1c8819bbc3a3108bc47be4fdaeb2042b4e560f523daddc906c179bae176d",
   "fingerprint_alg": "tree-json-v1"
 }

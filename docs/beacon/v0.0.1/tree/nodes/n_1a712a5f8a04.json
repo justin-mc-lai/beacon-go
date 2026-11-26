@@ -5,7 +5,7 @@
   "intent": "为意图树节点提供显式增删改入口；删除走 change request 作废链路而非物理删除，保持真相可追溯。",
   "parent_id": "n_56360bc665a3",
   "path": "root/truth-binding/intent-tree-crud",
-  "status": "draft",
+  "status": "frozen",
   "domain_fsm": {
     "states": [
       "draft",
@@ -49,6 +49,6 @@
     ]
   },
   "truth_path": "docs/beacon/v0.0.1/features/intent-tree-crud/truth.md",
-  "fingerprint": "d88ebc59d119494a439078635fc00ac2e4450817b61dde415698829cff1576f1",
+  "fingerprint": "fcfe3d228de10bdcb9ac0a86b78587e4fda68ef3398ac7fa1944818c797e4123",
   "fingerprint_alg": "tree-json-v1"
 }
