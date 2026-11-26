@@ -1,0 +1,10 @@
+{
+  "id": "nroot_6b8991789867",
+  "kind": "intent",
+  "title": "需求树驱动的 SDD 产品",
+  "intent": "以用户一句话为根意图展开需求树；模块互为兄弟、模块内有业务 FSM；增删改都落在父节点下的子节点；复杂度内聚到系统，用户只做点选；实现、验证、交付全链路按这棵树驱动，同模块顺序、跨模块并行 worktree，按用例绑定验收。",
+  "path": "root",
+  "status": "draft",
+  "fingerprint": "7bce0a42a003af9aeab9e6ceba631f9a3a92584459c82b3533b4ca5c4b6904ab",
+  "fingerprint_alg": "tree-json-v1"
+}

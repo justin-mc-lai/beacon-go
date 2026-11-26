@@ -1,0 +1,56 @@
+{
+  "schema": "beacon-intent-tree-v1",
+  "version": "v0.0.1",
+  "root_id": "nroot_6b8991789867",
+  "nodes": [
+    {
+      "id": "nroot_6b8991789867",
+      "kind": "intent",
+      "status": "draft",
+      "title": "需求树驱动的 SDD 产品",
+      "path": "root",
+      "fingerprint": "7bce0a42a003af9aeab9e6ceba631f9a3a92584459c82b3533b4ca5c4b6904ab",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_3c1f1d8ec396",
+      "parent_id": "nroot_6b8991789867",
+      "kind": "module",
+      "status": "draft",
+      "title": "acceptance binding",
+      "path": "root/acceptance-binding",
+      "fingerprint": "d92bfd1fe7d596e3edc38417988c418db24723ad684a07ab4edc2b8fc0eaba8a",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_5f7fcbdf0840",
+      "parent_id": "nroot_6b8991789867",
+      "kind": "module",
+      "status": "draft",
+      "title": "module orchestration",
+      "path": "root/module-orchestration",
+      "fingerprint": "310f34f07a2e7b6beef61251e1ff6b42af844586f3ecc2158073e126a06a2543",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_47544230bf1e",
+      "parent_id": "nroot_6b8991789867",
+      "kind": "module",
+      "status": "draft",
+      "title": "tree visual",
+      "path": "root/tree-visual",
+      "fingerprint": "1ae2c59ef9d7ea913814bf7b029b3fca31078c3428187bb6a50907bf5ec3c9cd",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_56360bc665a3",
+      "parent_id": "nroot_6b8991789867",
+      "kind": "module",
+      "status": "draft",
+      "title": "truth binding",
+      "path": "root/truth-binding",
+      "fingerprint": "631e5779fee5057e89fcd0437a8c33e9159698945ab4b9cf96d7d833be7aa1b3",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ]
+}

@@ -85,8 +85,8 @@ func Import(st *store.Store, in ImportInput) (ImportReport, error) {
 	}
 	rep.SnapshotPath = snapshot
 
-	rootID := shortID("nroot_", in.Version)
-	legacyID := shortID("nmod_", in.Version, "legacy")
+	rootID := shortID("nroot_", in.VersionID)
+	legacyID := shortID("nmod_", in.VersionID, "legacy")
 	root := Node{
 		ID: rootID, Kind: KindIntent, Title: in.ProjectName,
 		Intent: "Imported feature packages under one intent root.",
@@ -100,7 +100,7 @@ func Import(st *store.Store, in ImportInput) (ImportReport, error) {
 	nodes := []Node{root, legacy}
 	for _, f := range in.Features {
 		n := Node{
-			ID: shortID("nfeat_", in.Version, f.Slug), Kind: KindFeature,
+			ID: shortID("nfeat_", in.VersionID, f.Slug), Kind: KindFeature,
 			ParentID: legacyID, Title: f.Slug, Path: "legacy/" + f.Slug,
 			Status: StatusDraft, TruthPath: f.TruthPath, LegacyTestsPath: f.TestsPath,
 		}
@@ -138,7 +138,7 @@ func Import(st *store.Store, in ImportInput) (ImportReport, error) {
 		return rep, err
 	}
 	mig := store.TreeMigration{
-		ID: shortID("tmig_", in.Version), ProjectVersionID: in.VersionID,
+		ID: shortID("tmig_", in.VersionID), ProjectVersionID: in.VersionID,
 		Source: "legacy_feature_packages", SnapshotPath: snapshot,
 		NodeCount: len(stamped), CreatedAt: now.Format(time.RFC3339Nano),
 	}
@@ -166,7 +166,7 @@ func (rep ImportReport) rebuildCache(st *store.Store, in ImportInput, dir string
 		return rep, err
 	}
 	mig := store.TreeMigration{
-		ID: shortID("tmig_", in.Version), ProjectVersionID: in.VersionID,
+		ID: shortID("tmig_", in.VersionID), ProjectVersionID: in.VersionID,
 		Source: "rebuilt_from_repo_json", SnapshotPath: snapshot,
 		NodeCount: len(cache), CreatedAt: now.Format(time.RFC3339Nano),
 	}

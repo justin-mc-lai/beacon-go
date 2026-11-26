@@ -1,0 +1,60 @@
+{
+  "at": "2026-11-26T10:47:53.13232Z",
+  "children": [
+    {
+      "id": "n_56360bc665a3",
+      "kind": "module",
+      "title": "truth binding",
+      "intent": "根意图就是用户的一句话；AGENTS.md 承载 beacon-go 自身的 SDD 规范而非具体业务；需求增删改都落在父节点下的子节点，drift 只报需求级变化。",
+      "parent_id": "nroot_6b8991789867",
+      "path": "root/truth-binding",
+      "status": "draft",
+      "fingerprint": "631e5779fee5057e89fcd0437a8c33e9159698945ab4b9cf96d7d833be7aa1b3",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_47544230bf1e",
+      "kind": "module",
+      "title": "tree visual",
+      "intent": "需求树 HTML：点模块看子节点需求真相、FSM 下的测试用例、按用例绑定验收的交互闭环；复杂度内聚系统，用户只点选。",
+      "parent_id": "nroot_6b8991789867",
+      "path": "root/tree-visual",
+      "status": "draft",
+      "fingerprint": "1ae2c59ef9d7ea913814bf7b029b3fca31078c3428187bb6a50907bf5ec3c9cd",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_5f7fcbdf0840",
+      "kind": "module",
+      "title": "module orchestration",
+      "intent": "按意图树驱动实现：同模块同版本顺序实现，不同模块分配独立 worktree 并行交付；worktree 是核心能力，admission 硬门禁。",
+      "parent_id": "nroot_6b8991789867",
+      "path": "root/module-orchestration",
+      "status": "draft",
+      "fingerprint": "310f34f07a2e7b6beef61251e1ff6b42af844586f3ecc2158073e126a06a2543",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_3c1f1d8ec396",
+      "kind": "module",
+      "title": "acceptance binding",
+      "intent": "FSM 非法转移槽与测试用例覆盖绑定，用例执行产出 evidence，gate 按用例判定验收；一条 TC 从定义到 verdict 可追溯。",
+      "parent_id": "nroot_6b8991789867",
+      "path": "root/acceptance-binding",
+      "status": "draft",
+      "fingerprint": "d92bfd1fe7d596e3edc38417988c418db24723ad684a07ab4edc2b8fc0eaba8a",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "nroot_6b8991789867",
+  "provenance": {
+    "model": "host-agent",
+    "skill": "beacon-go-plan/pln-tree",
+    "by": "main",
+    "sources": [
+      "用户愿景原话",
+      "AGENTS.md 唯一真源",
+      "docs/sdd-kernel-scope.md"
+    ]
+  }
+}

@@ -15,7 +15,7 @@ func InitTree(st *store.Store, projectRoot, docsRoot, version, versionID, title,
 		return Node{}, "", core.NewError(ReasonStateConflict, "intenttree.InitTree", "tree already exists")
 	}
 	root := Node{
-		ID: shortID("nroot_", version), Kind: KindIntent, Title: title,
+		ID: shortID("nroot_", versionID), Kind: KindIntent, Title: title,
 		Intent: intent, Path: "root", Status: StatusDraft,
 	}
 	var err error
@@ -36,7 +36,7 @@ func InitTree(st *store.Store, projectRoot, docsRoot, version, versionID, title,
 	}
 	now := time.Now().UTC().Format(time.RFC3339Nano)
 	mig := store.TreeMigration{
-		ID: shortID("tmig_", version), ProjectVersionID: versionID,
+		ID: shortID("tmig_", versionID), ProjectVersionID: versionID,
 		Source: "plan_init", NodeCount: 1, CreatedAt: now,
 	}
 	if err := st.SaveTree(versionID, []store.TreeNode{{
