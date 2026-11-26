@@ -1,0 +1,12 @@
+{
+  "id": "chg_b806b6ad58c3",
+  "node_id": "n_8fe4e4482eee",
+  "summary": "fix verification spec: cross-module-parallel",
+  "by": "audit-fix",
+  "base_fingerprint": "14667d0a1b7ab55c4fb9748ba2e58848165f45f01a96f2712b59a8273adb87e7",
+  "before_snapshot_id": "v0.0.1-20261126T224749.295922000Z",
+  "affected": [
+    "n_8fe4e4482eee"
+  ],
+  "created_at": "2026-11-26T22:47:49.29482Z"
+}

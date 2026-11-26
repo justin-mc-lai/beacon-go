@@ -1,0 +1,16 @@
+{
+  "id": "n_56360bc665a3",
+  "kind": "module",
+  "title": "truth binding",
+  "intent": "根意图就是用户的一句话；AGENTS.md 承载 beacon-go 自身的 SDD 规范而非具体业务；需求增删改都落在父节点下的子节点，drift 只报需求级变化。",
+  "parent_id": "nroot_6b8991789867",
+  "path": "root/truth-binding",
+  "status": "frozen",
+  "child_fingerprints": [
+    "388edc4c09896b9dd1f6c7f1e4aa458fe36562d11fa0f9f4bf5990046d923807",
+    "f14e1dd86526b31c84fc91eee0043c89b28782c8b9237803dedafe4ac8104774",
+    "153b9639213dd87d7687fa34d13c0920a5bd2f5094e1c2d5b5bb91e47ecd1e00"
+  ],
+  "fingerprint": "7d4e0a8bd2b5ead00481853a7a65547cd7af1b1f6740958f9352f38f883a2655",
+  "fingerprint_alg": "tree-json-v1"
+}

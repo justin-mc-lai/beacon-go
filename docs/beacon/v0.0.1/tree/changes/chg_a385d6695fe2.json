@@ -1,0 +1,12 @@
+{
+  "id": "chg_a385d6695fe2",
+  "node_id": "n_3670106f522e",
+  "summary": "fix verification spec: module-admission-gate",
+  "by": "audit-fix",
+  "base_fingerprint": "c10c85e74046c9f54c4452f7cbaf7e39e6210b8a7d0088529b13efe599f05022",
+  "before_snapshot_id": "v0.0.1-20261126T224748.703549000Z",
+  "affected": [
+    "n_3670106f522e"
+  ],
+  "created_at": "2026-11-26T22:47:48.702419Z"
+}

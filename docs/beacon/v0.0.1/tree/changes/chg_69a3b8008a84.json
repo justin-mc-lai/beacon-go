@@ -1,0 +1,12 @@
+{
+  "id": "chg_69a3b8008a84",
+  "node_id": "n_1ebfb857b26f",
+  "summary": "fix verification spec: tc-to-gate-link",
+  "by": "audit-fix",
+  "base_fingerprint": "7c91e0ea272bd870108dc96292cd29ac2aa3ffadb85c152d18f47b9ab0f2f9ef",
+  "before_snapshot_id": "v0.0.1-20261126T224747.487600000Z",
+  "affected": [
+    "n_1ebfb857b26f"
+  ],
+  "created_at": "2026-11-26T22:47:47.483907Z"
+}

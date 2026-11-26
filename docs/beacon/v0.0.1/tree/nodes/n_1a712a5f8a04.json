@@ -48,7 +48,11 @@
       }
     ]
   },
+  "child_fingerprints": [
+    "7ccee44ba271c91ee5b0d475f818764df4fbf27d828bf6b6053817168574f90b",
+    "918edec60bd8c1064b7d64081c25f3d31fdff00537b58a5d3bf9f99ebb171f85"
+  ],
   "truth_path": "docs/beacon/v0.0.1/features/intent-tree-crud/truth.md",
-  "fingerprint": "fcfe3d228de10bdcb9ac0a86b78587e4fda68ef3398ac7fa1944818c797e4123",
+  "fingerprint": "45c8b06c646052637330aeb45ca1a6ec6eac933cf5d12bae161345c93582b413",
   "fingerprint_alg": "tree-json-v1"
 }

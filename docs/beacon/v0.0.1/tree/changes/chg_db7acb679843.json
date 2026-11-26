@@ -1,0 +1,12 @@
+{
+  "id": "chg_db7acb679843",
+  "node_id": "n_adda25ea8f26",
+  "summary": "fix verification spec: module-run-cmd",
+  "by": "audit-fix",
+  "base_fingerprint": "83dad45a74fa124cf9cf190e78af3aefac69457f6646f9ef4e4f67e2b68b6471",
+  "before_snapshot_id": "v0.0.1-20261126T224749.888516000Z",
+  "affected": [
+    "n_adda25ea8f26"
+  ],
+  "created_at": "2026-11-26T22:47:49.887362Z"
+}

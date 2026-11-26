@@ -1,0 +1,12 @@
+{
+  "id": "chg_e59a5354d8f4",
+  "node_id": "n_dbd725546f3a",
+  "summary": "fix verification spec: version-consistency-full",
+  "by": "audit-fix",
+  "base_fingerprint": "d30ef3446d1ea4a6046d9900a3b3fa91ed308b72e04c6e6ee4a050060b31b5a5",
+  "before_snapshot_id": "v0.0.1-20261126T224755.887237000Z",
+  "affected": [
+    "n_dbd725546f3a"
+  ],
+  "created_at": "2026-11-26T22:47:55.886044Z"
+}

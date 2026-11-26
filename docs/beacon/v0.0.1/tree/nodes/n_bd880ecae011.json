@@ -14,8 +14,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "go test ./internal/intenttree -run TestRenderHTML -count=1 通过且 grep -q data-bind-ac 输出 HTML"
+    "spec": "【目标态，当前不可执行】go test ./internal/intenttree -run TestRenderHTML -count=1 通过，且渲染器含 AC↔TestCase 绑定标记；当前 render_html.go 无交互绑定，grep data-bind-ac 命中 spec 文本属自证，不作通过依据"
   },
-  "fingerprint": "8d58c3f8819286064fd0e84bd124ca471b57ee4bc09782bd2c522daba8491c48",
+  "fingerprint": "dd125de991460bb8b9034a90b2cff193c6ffc726e1fc738ed88dc9cf79a8984c",
   "fingerprint_alg": "tree-json-v1"
 }

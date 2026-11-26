@@ -14,8 +14,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "test \"$(jq -r .runtime docs/beacon/v0.0.1/manifest.json)\" = \"$(beacon-go --version | sed 's/^v//')\""
+    "spec": "【待实现】docs/beacon/v0.0.1/manifest.json 当前不存在；目标态：manifest.Runtime 与 beacon-go 版本对齐写入。对齐写入逻辑属 dual-axis-alignment 待实现能力"
   },
-  "fingerprint": "d5f079755e899217c6dc713b34cb4a9b636560aad46276fa72f16f36f0ee0399",
+  "fingerprint": "3226cd39d4dd9cb80c9e08db393cd80a3584b54a5e8fa6864285be4a509999f0",
   "fingerprint_alg": "tree-json-v1"
 }

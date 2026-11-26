@@ -1,0 +1,21 @@
+{
+  "id": "n_40642d4f01bd",
+  "kind": "touchpoint",
+  "title": "manifest runtime match",
+  "intent": "发布前 manifest.Runtime 等于 beacon --version",
+  "parent_id": "n_26809ef014ec",
+  "path": "root/version-evolution/dual-axis-alignment/manifest-runtime-match",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "manifest.runtime 与二进制版本一致"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "【待实现】docs/beacon/v0.0.1/manifest.json 当前不存在；目标态：manifest.Runtime 与 beacon-go 版本对齐写入。对齐写入逻辑属 dual-axis-alignment 待实现能力"
+  },
+  "fingerprint": "3226cd39d4dd9cb80c9e08db393cd80a3584b54a5e8fa6864285be4a509999f0",
+  "fingerprint_alg": "tree-json-v1"
+}

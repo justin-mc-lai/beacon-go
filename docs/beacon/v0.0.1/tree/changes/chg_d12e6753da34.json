@@ -1,0 +1,13 @@
+{
+  "id": "chg_d12e6753da34",
+  "node_id": "n_143f1617bc78",
+  "summary": "rebind child fingerprint",
+  "by": "audit-fix",
+  "base_fingerprint": "5f9420785018c6d8f2bfe8dba65c733a9e561e4ea41a22ad4e759de3ed63c753",
+  "before_snapshot_id": "v0.0.1-20261126T224830.344831000Z",
+  "affected": [
+    "n_143f1617bc78",
+    "n_3923dab82f8c"
+  ],
+  "created_at": "2026-11-26T22:48:30.341307Z"
+}

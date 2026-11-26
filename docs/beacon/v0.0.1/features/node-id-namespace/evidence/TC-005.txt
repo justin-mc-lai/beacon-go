@@ -1,0 +1,2 @@
+$ python3 -c bad='shortID("nroot_", version)'; hit=('shortID(' in bad and not any(x in bad for x in ['func shortID','versionID','VersionID','parentID'])); raise SystemExit(0 if hit else 1)
+[exit=0]

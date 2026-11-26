@@ -1,0 +1,46 @@
+{
+  "id": "n_143f1617bc78",
+  "kind": "feature",
+  "title": "docs version line",
+  "intent": "项目级 docs 版本创建、bump、manifest 基线/继承，版本按 project_id 隔离。",
+  "parent_id": "n_75ea19c0c144",
+  "path": "root/version-evolution/docs-version-line",
+  "status": "frozen",
+  "domain_fsm": {
+    "states": [
+      "draft",
+      "frozen",
+      "released"
+    ],
+    "transitions": [
+      {
+        "from": "draft",
+        "to": "frozen",
+        "event": "freeze"
+      },
+      {
+        "from": "frozen",
+        "to": "released",
+        "event": "release"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "released",
+        "to": "draft",
+        "event": "reopen"
+      },
+      {
+        "from": "draft",
+        "to": "released",
+        "event": "skip_freeze"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "70cd1c8819bbc3a3108bc47be4fdaeb2042b4e560f523daddc906c179bae176d"
+  ],
+  "truth_path": "docs/beacon/v0.0.1/features/docs-version-line/truth.md",
+  "fingerprint": "25001aed2860ecf0372df36639f0e002901695598335f64109e11740121a275f",
+  "fingerprint_alg": "tree-json-v1"
+}

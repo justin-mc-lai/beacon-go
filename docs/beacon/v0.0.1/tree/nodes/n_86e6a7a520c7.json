@@ -14,8 +14,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "beacon plan drift --agents-md --json 输出仅含需求级 changed 项，治理规则字段不在列表中"
+    "spec": "【待实现】验收命令 beacon plan drift --agents-md 尚未落地（plan 无 drift 子命令）；目标态：只报需求级 changed 项，治理规则字段不出现在列表"
   },
-  "fingerprint": "7bec15bad668350734b11421087627a8455f2f66fc8fe4f37065321ae8679bd0",
+  "fingerprint": "c52323b3b7d01e311fd401b3f88b49b7e8a8f36bf353dcd118095529264e94bc",
   "fingerprint_alg": "tree-json-v1"
 }

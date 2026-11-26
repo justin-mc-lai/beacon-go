@@ -1,0 +1,15 @@
+{
+  "id": "n_5e74132fe68f",
+  "kind": "feature",
+  "title": "defect feedback",
+  "intent": "缺陷自动回流为树节点或 change 记录并进入实现闭环，形成自驱迭代。",
+  "doc": "## 问题\n缺陷目前没有被自动回流为树节点或 change 记录并进入实现闭环；虽然存在冻结 truth 的 change 原语，但缺少「缺陷 → change → refreeze → 实现」的自驱回流定义，缺陷与意图树之间没有可追溯的关联。结果是同一个缺陷可能被反复发现，却在树上留不下 change_id 与闭环轨迹。\n\n## 目标用户\n在 dogfood 场景中记录 beacon-go 自身缺陷并希望其进入实现闭环的规格作者与维护者，以及通过 change 记录追踪缺陷修复进度的 QA / 发布验证者。\n\n## 场景\n在一次自驱迭代中发现一个 gap（例如 self-drive-gap）。系统应把该缺陷回流为对某个树节点的 change 记录，生成可查询的 change_id，随后该 change 进入 refreeze 与实现阶段，形成闭环。\n\n## 范围\n本 feature 冻结「缺陷自动回流为树节点或 change 记录并进入实现闭环」这一需求边界。现有可复用落点是冻结 truth 的 change 记录原语（internal/cli/change.go 的 change request，internal/intenttree/change.go 的 ChangeRecord / RequestChange），它按 --node 与 --summary 生成 change 记录。缺陷到 change 的自动回流触发与闭环串联当前未实现，本包冻结的是需求定义，不是实现状态。\n\n## 非目标\n不负责用 beacon goal 在 beacon-go 自身仓库跑完整交付闭环（由兄弟 feature self-goal-loop 冻结），也不覆盖 CI 对本仓意图树指纹、索引与投影的校验（由兄弟 feature self-tree-ci 冻结）。不定义缺陷的自动发现或采集来源，只冻结「已知缺陷回流为 change 并闭环」这一段。\n\n## 验收标准\n验收命令为 `beacon truth change --project . --node n_5e13a94c202d --summary self-drive-gap --json | jq -e '.change_id'`，该命令当前尚不存在，属待实现能力。就位后，对指定节点提交缺陷摘要应生成一条 change 记录并输出非空 change_id，且该 change 可进入 refreeze 与后续实现阶段。",
+  "parent_id": "n_5e13a94c202d",
+  "path": "root/self-drive/defect-feedback",
+  "status": "frozen",
+  "child_fingerprints": [
+    "d431684c59b101c80e02483126358317d6c12afbaa850e990aaebd07e71f61af"
+  ],
+  "fingerprint": "d374829a95a0e5fd7df910e5741ea3327ba7295023f95c85dc6212181d0807f3",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -8,9 +8,9 @@
   "path": "root/acceptance-binding/tc-acceptance-binding",
   "status": "frozen",
   "child_fingerprints": [
-    "59aaa862bd4a75c3311b038daa599f8ed0d1849fb99ea7a7fe954ea02cbc5c58",
-    "88d806d325ca804fdd56117ebf37f4ab0cf37c1ad4c1385916d73775d4164464"
+    "7b939738ecadbef960129dad82b2c2dc7cd622b21a0a3bd27b997c58f1e5d1ff",
+    "920481c2028eed3b7cbc90b7bd4dbace561e4da0eb9d763358c3fc93ed332082"
   ],
-  "fingerprint": "15aae308ea5fb4110138c839c0ef454c63da5b9893b4e5223ae71fec83b2c3ba",
+  "fingerprint": "3b8383dcd3f1ce37b810e85620a3de94ff788cb02880c41d1f97a69c128bdd72",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -8,8 +8,8 @@
   "path": "root/module-orchestration/module-admission",
   "status": "frozen",
   "child_fingerprints": [
-    "c10c85e74046c9f54c4452f7cbaf7e39e6210b8a7d0088529b13efe599f05022"
+    "e14931ec9e5d0e665011f5819afccfbf8970ae1856f59cee77d2ea6ccf344d43"
   ],
-  "fingerprint": "67164542366794541993834814f1aaad2aa91f5924bbf0b6fe87d678d31816b7",
+  "fingerprint": "871551eb2886e85b765fcbce605147e73b83153528225ef16abdb151430e6e9d",
   "fingerprint_alg": "tree-json-v1"
 }

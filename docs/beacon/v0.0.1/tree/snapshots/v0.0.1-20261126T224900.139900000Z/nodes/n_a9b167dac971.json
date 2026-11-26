@@ -1,0 +1,21 @@
+{
+  "id": "n_a9b167dac971",
+  "kind": "touchpoint",
+  "title": "freeze gate",
+  "intent": "只有 draft 节点可冻结，frozen 节点冻结返回稳定 reason code。",
+  "parent_id": "n_1a712a5f8a04",
+  "path": "root/truth-binding/intent-tree-crud/freeze-gate",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "重复冻结 frozen 节点为幂等成功（already_frozen=true，status 保持 frozen，不报错）；仅 draft/change_pending 节点可冻结"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon truth node freeze --project . --node \u003cfrozen-id\u003e --json 验证：重复 freeze 返回 already_frozen=true 且 status=frozen（内核 freeze.go:37 幂等，不报错）；该 reason 不属 freeze 语义"
+  },
+  "fingerprint": "7ccee44ba271c91ee5b0d475f818764df4fbf27d828bf6b6053817168574f90b",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "n_47544230bf1e",
+  "kind": "module",
+  "title": "tree visual",
+  "intent": "需求树 HTML：点模块看子节点需求真相、FSM 下的测试用例、按用例绑定验收的交互闭环；复杂度内聚系统，用户只点选。",
+  "parent_id": "nroot_6b8991789867",
+  "path": "root/tree-visual",
+  "status": "frozen",
+  "child_fingerprints": [
+    "4b85645a588c7458b30573b7108cc7bd7cd4f5cea1d18f79c6cfe1507cfec9b3",
+    "59ec3b96a45a1aab7c6e253c642ea4c584f97255348f149244e62a5fecb28167"
+  ],
+  "fingerprint": "b406f9e60e45947dbfd1f28f03f8ffe26b6f3018d430234b130f29afa5dfe3d5",
+  "fingerprint_alg": "tree-json-v1"
+}

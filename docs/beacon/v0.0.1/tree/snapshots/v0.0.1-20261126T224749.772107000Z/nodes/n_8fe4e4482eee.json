@@ -1,0 +1,21 @@
+{
+  "id": "n_8fe4e4482eee",
+  "kind": "touchpoint",
+  "title": "cross module parallel",
+  "intent": "不同 module 自动分配 worktree 并行",
+  "parent_id": "n_030e377c5621",
+  "path": "root/module-orchestration/module-scheduler/cross-module-parallel",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "parallel_plan mode=pool 且 satellites 数=module 数"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "【待实现】验收命令 beacon goal worktree status 尚未落地；目标态：parallel_plan mode=pool，satellites 数=module 数"
+  },
+  "fingerprint": "97cf798687359a730f67e19467b7c20e49ba1829bcfe0d3ade24753233a678ae",
+  "fingerprint_alg": "tree-json-v1"
+}

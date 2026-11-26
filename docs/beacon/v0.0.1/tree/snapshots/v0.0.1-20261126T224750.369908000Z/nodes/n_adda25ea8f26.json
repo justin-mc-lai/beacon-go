@@ -1,0 +1,21 @@
+{
+  "id": "n_adda25ea8f26",
+  "kind": "touchpoint",
+  "title": "module run cmd",
+  "intent": "从 module 节点展开子 feature runs",
+  "parent_id": "n_030e377c5621",
+  "path": "root/module-orchestration/module-scheduler/module-run-cmd",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "运行命令输出 N 个 run id 且每个 run 的 FeatureID 属于该 module"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "【待实现】验收命令 beacon goal module run 尚未落地（goal 无 module 子命令）；目标态：输出 N 个 run id 且每个 FeatureID 属于该 module"
+  },
+  "fingerprint": "e47780631709e7b35e39f21fb9ab0de31322b6c5d5cfa8ba503e83cf827d22b9",
+  "fingerprint_alg": "tree-json-v1"
+}

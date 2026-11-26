@@ -1,0 +1,12 @@
+{
+  "id": "chg_24be5e6e5521",
+  "node_id": "n_97cff751330d",
+  "summary": "fix verification spec: node-deprecate",
+  "by": "audit-fix",
+  "base_fingerprint": "09d4527bd783326256ded7665bf684833227e464c989214fd7f349bcb9e1c97f",
+  "before_snapshot_id": "v0.0.1-20261126T224753.490839000Z",
+  "affected": [
+    "n_97cff751330d"
+  ],
+  "created_at": "2026-11-26T22:47:53.489727Z"
+}

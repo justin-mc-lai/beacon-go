@@ -1,0 +1,12 @@
+{
+  "id": "chg_85081c095161",
+  "node_id": "n_1ebfb857b26f",
+  "summary": "fix verification spec: goal autotest -\u003e verify autotest",
+  "by": "audit-fix",
+  "base_fingerprint": "59aaa862bd4a75c3311b038daa599f8ed0d1849fb99ea7a7fe954ea02cbc5c58",
+  "before_snapshot_id": "v0.0.1-20261126T224628.627182000Z",
+  "affected": [
+    "n_1ebfb857b26f"
+  ],
+  "created_at": "2026-11-26T22:46:28.623469Z"
+}

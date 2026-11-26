@@ -14,8 +14,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "beacon goal module run --node \u003cmodule-id\u003e 退出码 != 0"
+    "spec": "【待实现】验收命令 beacon goal module run 尚未落地（goal 无 module 子命令）；目标态：module 入口统一 admission，任一子 feature blocked 则退出非零 reason=freeze_ack_required"
   },
-  "fingerprint": "c10c85e74046c9f54c4452f7cbaf7e39e6210b8a7d0088529b13efe599f05022",
+  "fingerprint": "e14931ec9e5d0e665011f5819afccfbf8970ae1856f59cee77d2ea6ccf344d43",
   "fingerprint_alg": "tree-json-v1"
 }

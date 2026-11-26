@@ -1,0 +1,12 @@
+{
+  "id": "chg_1344acd677d5",
+  "node_id": "n_5a276e5230e8",
+  "summary": "fix verification spec: shortid-prefix-coverage",
+  "by": "audit-fix",
+  "base_fingerprint": "019265689d4652464b397ef4c1394371cb00ddf4a05d4c288817032ea6c7135d",
+  "before_snapshot_id": "v0.0.1-20261126T224755.291757000Z",
+  "affected": [
+    "n_5a276e5230e8"
+  ],
+  "created_at": "2026-11-26T22:47:55.290614Z"
+}

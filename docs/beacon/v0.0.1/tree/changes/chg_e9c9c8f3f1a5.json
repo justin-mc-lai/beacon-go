@@ -1,0 +1,12 @@
+{
+  "id": "chg_e9c9c8f3f1a5",
+  "node_id": "n_a7c847346c2c",
+  "summary": "fix verification spec: tree-drift-cmd",
+  "by": "audit-fix",
+  "base_fingerprint": "3c7cd8a3e4c4c7c31bf9598037205973b4f3764a6db9de26def263c02da3deac",
+  "before_snapshot_id": "v0.0.1-20261126T224754.097364000Z",
+  "affected": [
+    "n_a7c847346c2c"
+  ],
+  "created_at": "2026-11-26T22:47:54.096248Z"
+}

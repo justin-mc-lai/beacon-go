@@ -14,8 +14,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "beacon goal autotest --run-id \u003cid\u003e --by x \u0026\u0026 beacon gate evaluate qa --run-id \u003cid\u003e --evaluator x"
+    "spec": "beacon verify autotest run --run-id \u003cid\u003e --by x \u0026\u0026 beacon gate evaluate qa --run-id \u003cid\u003e --evaluator x"
   },
-  "fingerprint": "59aaa862bd4a75c3311b038daa599f8ed0d1849fb99ea7a7fe954ea02cbc5c58",
+  "fingerprint": "7b939738ecadbef960129dad82b2c2dc7cd622b21a0a3bd27b997c58f1e5d1ff",
   "fingerprint_alg": "tree-json-v1"
 }

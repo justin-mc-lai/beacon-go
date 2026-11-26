@@ -7,11 +7,11 @@
   "path": "root/version-evolution",
   "status": "frozen",
   "child_fingerprints": [
-    "5f9420785018c6d8f2bfe8dba65c733a9e561e4ea41a22ad4e759de3ed63c753",
-    "bea06dd2467e551b5cb4de80cde5716321ce44a1eb0250132fcd2f573f2b89bb",
-    "af8b78bfabeb5ced8cc48fcb60161ab6b1ebd61b303aa344da5f0f577aed221e",
-    "540c75ccdff9926efeacc2b999dba455abe9036b53eacd4944857961aac706aa"
+    "25001aed2860ecf0372df36639f0e002901695598335f64109e11740121a275f",
+    "775832206e7a8c27aceb743742b19e88e1a6d942ef434b41bc33c5ebef50da19",
+    "2f08fe0254aad29e8c4f9538c94ad4e57ca17f749f23547585712c8201efe212",
+    "9d5ea3cfc701ebd6086b5e8c6affaa6ccbabaea4e153d80d83ae10c4295fb044"
   ],
-  "fingerprint": "f6b33120d012fee38768bdc1a2ab8d72f692568882a0338fbe2c99e6b8473ab7",
+  "fingerprint": "bc0a42a06e7b0e9ee66e5d7bc33eff051370eccda6d07bb99b4047c4b9c7c148",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -1,0 +1,21 @@
+{
+  "id": "n_bd880ecae011",
+  "kind": "touchpoint",
+  "title": "testcase bind click",
+  "intent": "点击 TestCase 行完成 AC 绑定并写回树",
+  "parent_id": "n_39e50c0e0da2",
+  "path": "root/tree-visual/interactive-acceptance-binding/tc-bind-click",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "渲染 HTML 存在 data-bind-ac 属性，点击后写回绑定"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "【目标态，当前不可执行】go test ./internal/intenttree -run TestRenderHTML -count=1 通过，且渲染器含 AC↔TestCase 绑定标记；当前 render_html.go 无交互绑定，grep data-bind-ac 命中 spec 文本属自证，不作通过依据"
+  },
+  "fingerprint": "dd125de991460bb8b9034a90b2cff193c6ffc726e1fc738ed88dc9cf79a8984c",
+  "fingerprint_alg": "tree-json-v1"
+}

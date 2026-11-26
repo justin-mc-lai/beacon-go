@@ -8,8 +8,8 @@
   "path": "root/self-drive/defect-feedback",
   "status": "frozen",
   "child_fingerprints": [
-    "7af3595395ae5e9044ccc09430de1954246d1306d2521a23120f958179d5d9b8"
+    "662f8e579f05600239ba1fcad1a805104f08b8dcd06c07b7c4d11cb4269d964c"
   ],
-  "fingerprint": "46970fc516d8efe78e52aefc1ad6d2fe898e1237adc9ee697cc3793fdd7fa014",
+  "fingerprint": "52935cc25db4f54647fb75d1d2dc9c66ada9424277ed2246208edf98163c04a7",
   "fingerprint_alg": "tree-json-v1"
 }

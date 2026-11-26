@@ -9,13 +9,13 @@
   "acs": [
     {
       "id": "AC-001",
-      "text": "重复冻结 frozen 节点返回非零退出码 reason=tree_node_not_draft"
+      "text": "重复冻结 frozen 节点为幂等成功（already_frozen=true，status 保持 frozen，不报错）；仅 draft/change_pending 节点可冻结"
     }
   ],
   "verification": {
     "type": "test",
-    "spec": "beacon plan freeze --node \u003cfrozen-id\u003e 退出非零且 stderr 含 tree_node_not_draft"
+    "spec": "beacon truth node freeze --project . --node \u003cfrozen-id\u003e --json 验证：重复 freeze 返回 already_frozen=true 且 status=frozen（内核 freeze.go:37 幂等，不报错）；该 reason 不属 freeze 语义"
   },
-  "fingerprint": "ceb0eb6dda632be1a52e0ebb01c6469c9784b2fc079574aa257ac29318ff8ec5",
+  "fingerprint": "7ccee44ba271c91ee5b0d475f818764df4fbf27d828bf6b6053817168574f90b",
   "fingerprint_alg": "tree-json-v1"
 }

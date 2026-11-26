@@ -1,0 +1,12 @@
+{
+  "id": "chg_6b1801d80f9e",
+  "node_id": "n_86e6a7a520c7",
+  "summary": "fix verification spec: agents-md-drift-report",
+  "by": "audit-fix",
+  "base_fingerprint": "7bec15bad668350734b11421087627a8455f2f66fc8fe4f37065321ae8679bd0",
+  "before_snapshot_id": "v0.0.1-20261126T224752.287235000Z",
+  "affected": [
+    "n_86e6a7a520c7"
+  ],
+  "created_at": "2026-11-26T22:47:52.286085Z"
+}

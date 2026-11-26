@@ -8,8 +8,8 @@
   "path": "root/tree-visual/gate-verdict-panel",
   "status": "frozen",
   "child_fingerprints": [
-    "878c2f8c3ffd4f7fe6fa5ee52121989828a38627db3287e60a0ea8f814f79ff3"
+    "1112cc831cd9b5acb45832b688b37de3474242718c33f8d35e52dff1e88251c3"
   ],
-  "fingerprint": "c1e5dcfe8c86a2370e3cd0ee753844e9e2611e536fe8b9fbd0bd747a7d29f014",
+  "fingerprint": "4b85645a588c7458b30573b7108cc7bd7cd4f5cea1d18f79c6cfe1507cfec9b3",
   "fingerprint_alg": "tree-json-v1"
 }

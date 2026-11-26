@@ -8,8 +8,8 @@
   "status": "frozen",
   "child_fingerprints": [
     "ac7c6c6225b99c93b4eb8e4d3c03665ae2d8a3e52721fa0bcae374652b76ab1f",
-    "15aae308ea5fb4110138c839c0ef454c63da5b9893b4e5223ae71fec83b2c3ba"
+    "3b8383dcd3f1ce37b810e85620a3de94ff788cb02880c41d1f97a69c128bdd72"
   ],
-  "fingerprint": "600de74a4ecd9a0ee0189e0007b58285881ab3adfbcb14eb6e17ca1e36e0b1b1",
+  "fingerprint": "e2fe72a6fcd40817c83181a70c8f660fa2c093473d5eed7502cd32cc488e3c50",
   "fingerprint_alg": "tree-json-v1"
 }

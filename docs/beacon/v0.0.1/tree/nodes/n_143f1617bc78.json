@@ -37,7 +37,10 @@
       }
     ]
   },
+  "child_fingerprints": [
+    "70cd1c8819bbc3a3108bc47be4fdaeb2042b4e560f523daddc906c179bae176d"
+  ],
   "truth_path": "docs/beacon/v0.0.1/features/docs-version-line/truth.md",
-  "fingerprint": "5f9420785018c6d8f2bfe8dba65c733a9e561e4ea41a22ad4e759de3ed63c753",
+  "fingerprint": "25001aed2860ecf0372df36639f0e002901695598335f64109e11740121a275f",
   "fingerprint_alg": "tree-json-v1"
 }

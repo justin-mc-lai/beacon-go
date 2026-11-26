@@ -1,0 +1,12 @@
+{
+  "id": "chg_d5d5a4d2b20e",
+  "node_id": "n_a9b167dac971",
+  "summary": "fix verification spec: freeze-gate",
+  "by": "audit-fix",
+  "base_fingerprint": "ceb0eb6dda632be1a52e0ebb01c6469c9784b2fc079574aa257ac29318ff8ec5",
+  "before_snapshot_id": "v0.0.1-20261126T224752.895721000Z",
+  "affected": [
+    "n_a9b167dac971"
+  ],
+  "created_at": "2026-11-26T22:47:52.894581Z"
+}

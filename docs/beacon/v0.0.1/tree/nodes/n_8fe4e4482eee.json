@@ -14,8 +14,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "beacon goal worktree status --run-id \u003cid\u003e --json"
+    "spec": "【待实现】验收命令 beacon goal worktree status 尚未落地；目标态：parallel_plan mode=pool，satellites 数=module 数"
   },
-  "fingerprint": "14667d0a1b7ab55c4fb9748ba2e58848165f45f01a96f2712b59a8273adb87e7",
+  "fingerprint": "97cf798687359a730f67e19467b7c20e49ba1829bcfe0d3ade24753233a678ae",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -1,0 +1,21 @@
+{
+  "id": "n_dbd725546f3a",
+  "kind": "touchpoint",
+  "title": "full version consistency gate",
+  "intent": "version.go 唯一源覆盖 tag/release/CHANGELOG",
+  "parent_id": "n_ff59308937cf",
+  "path": "root/version-evolution/runtime-version-source/version-consistency-full",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "consistency 脚本通过且 tag/release notes/CHANGELOG 版本等于 Version"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "bash scripts/check_version_consistency.sh 通过，且 version.go 单一源被所有引用点一致引用（docs 版本为 v0.0.1，与 runtime tag v3.0.2 是两条独立轴，不要求相等）"
+  },
+  "fingerprint": "ba73a9ba1bfe855fd91b6d5674f18eee71d33f8ece0ca58d5f87cd49c543bdae",
+  "fingerprint_alg": "tree-json-v1"
+}

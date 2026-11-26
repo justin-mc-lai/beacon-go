@@ -1,0 +1,12 @@
+{
+  "id": "chg_16ad6c4ab83a",
+  "node_id": "n_17162700446e",
+  "summary": "fix verification spec: gate-panel",
+  "by": "audit-fix",
+  "base_fingerprint": "878c2f8c3ffd4f7fe6fa5ee52121989828a38627db3287e60a0ea8f814f79ff3",
+  "before_snapshot_id": "v0.0.1-20261126T224751.090718000Z",
+  "affected": [
+    "n_17162700446e"
+  ],
+  "created_at": "2026-11-26T22:47:51.089573Z"
+}

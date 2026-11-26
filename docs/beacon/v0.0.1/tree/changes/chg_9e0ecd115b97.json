@@ -1,0 +1,12 @@
+{
+  "id": "chg_9e0ecd115b97",
+  "node_id": "n_1c00934a592b",
+  "summary": "generalize spec node id",
+  "by": "audit-fix",
+  "base_fingerprint": "d431684c59b101c80e02483126358317d6c12afbaa850e990aaebd07e71f61af",
+  "before_snapshot_id": "v0.0.1-20261126T224809.388903000Z",
+  "affected": [
+    "n_1c00934a592b"
+  ],
+  "created_at": "2026-11-26T22:48:09.387741Z"
+}

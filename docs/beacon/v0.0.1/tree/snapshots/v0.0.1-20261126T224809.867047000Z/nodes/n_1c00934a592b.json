@@ -1,0 +1,21 @@
+{
+  "id": "n_1c00934a592b",
+  "kind": "touchpoint",
+  "title": "defect to change",
+  "intent": "缺陷回流为 change 记录并可 refreeze",
+  "parent_id": "n_5e74132fe68f",
+  "path": "root/self-drive/defect-feedback/defect-to-change",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "truth change 生成 change_id"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon change request --node \u003cfeature-id\u003e --summary defect-feedback --by \u003cid\u003e --json | jq -e '.id != \"\"'"
+  },
+  "fingerprint": "ac500af6501a69a1b9b28d7aa61a71e39d74fae4c88799e40b6c4682f3b8e623",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "n_86e6a7a520c7",
+  "kind": "touchpoint",
+  "title": "agents md drift report",
+  "intent": "检测 AGENTS.md 声明的 SDD 规范与树的漂移，只报不改。",
+  "parent_id": "n_ca6fe1322405",
+  "path": "root/truth-binding/agents-md-sync-guard/agents-md-drift-report",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "治理规则变更不进入需求漂移报告；仅规范正文变化被列出"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "【待实现】验收命令 beacon plan drift --agents-md 尚未落地（plan 无 drift 子命令）；目标态：只报需求级 changed 项，治理规则字段不出现在列表"
+  },
+  "fingerprint": "c52323b3b7d01e311fd401b3f88b49b7e8a8f36bf353dcd118095529264e94bc",
+  "fingerprint_alg": "tree-json-v1"
+}

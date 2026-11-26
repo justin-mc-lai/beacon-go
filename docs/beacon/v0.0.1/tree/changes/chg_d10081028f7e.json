@@ -1,0 +1,12 @@
+{
+  "id": "chg_d10081028f7e",
+  "node_id": "n_40642d4f01bd",
+  "summary": "fix verification spec: manifest-runtime-match",
+  "by": "audit-fix",
+  "base_fingerprint": "d5f079755e899217c6dc713b34cb4a9b636560aad46276fa72f16f36f0ee0399",
+  "before_snapshot_id": "v0.0.1-20261126T224754.692864000Z",
+  "affected": [
+    "n_40642d4f01bd"
+  ],
+  "created_at": "2026-11-26T22:47:54.691725Z"
+}

@@ -14,8 +14,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "go test ./internal/intenttree -run TestRenderHTML -count=1 通过且 grep -q 'gate-panel' 输出 HTML"
+    "spec": "【目标态，当前不可执行】go test ./internal/intenttree -run TestRenderHTML -count=1 通过，且渲染源码含 gate 判定区与 reason code 文本标记；当前 render_html.go 无 verdict panel，grep 输出 HTML 中的 gate-panel 属 spec 文本自证，不作为通过依据"
   },
-  "fingerprint": "878c2f8c3ffd4f7fe6fa5ee52121989828a38627db3287e60a0ea8f814f79ff3",
+  "fingerprint": "1112cc831cd9b5acb45832b688b37de3474242718c33f8d35e52dff1e88251c3",
   "fingerprint_alg": "tree-json-v1"
 }

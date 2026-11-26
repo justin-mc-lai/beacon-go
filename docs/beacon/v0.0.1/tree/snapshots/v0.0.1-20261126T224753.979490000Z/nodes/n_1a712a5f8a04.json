@@ -1,0 +1,58 @@
+{
+  "id": "n_1a712a5f8a04",
+  "kind": "feature",
+  "title": "intent tree CRUD",
+  "intent": "为意图树节点提供显式增删改入口；删除走 change request 作废链路而非物理删除，保持真相可追溯。",
+  "parent_id": "n_56360bc665a3",
+  "path": "root/truth-binding/intent-tree-crud",
+  "status": "frozen",
+  "domain_fsm": {
+    "states": [
+      "draft",
+      "frozen",
+      "change_pending",
+      "deprecated"
+    ],
+    "transitions": [
+      {
+        "from": "draft",
+        "to": "frozen",
+        "event": "freeze"
+      },
+      {
+        "from": "frozen",
+        "to": "change_pending",
+        "event": "change_request"
+      },
+      {
+        "from": "change_pending",
+        "to": "frozen",
+        "event": "refreeze"
+      },
+      {
+        "from": "frozen",
+        "to": "deprecated",
+        "event": "deprecate"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "deprecated",
+        "to": "frozen",
+        "event": "revive"
+      },
+      {
+        "from": "draft",
+        "to": "deprecated",
+        "event": "skip_freeze"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "67bc070c458114828fe8d343b3c616e7fbe511e89466682e63b72ff04b97097d",
+    "918edec60bd8c1064b7d64081c25f3d31fdff00537b58a5d3bf9f99ebb171f85"
+  ],
+  "truth_path": "docs/beacon/v0.0.1/features/intent-tree-crud/truth.md",
+  "fingerprint": "12e8693081721ddd7107e807776ae4d28deb61a82875c887339da1d3b59b778e",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -6,7 +6,10 @@
   "parent_id": "n_75ea19c0c144",
   "path": "root/version-evolution/node-id-namespace",
   "status": "frozen",
+  "child_fingerprints": [
+    "0d9c59a163797b525981e0cb0aab9d65a42c32b744f80b2552162913a433ac9c"
+  ],
   "truth_path": "docs/beacon/v0.0.1/features/node-id-namespace/truth.md",
-  "fingerprint": "af8b78bfabeb5ced8cc48fcb60161ab6b1ebd61b303aa344da5f0f577aed221e",
+  "fingerprint": "2f08fe0254aad29e8c4f9538c94ad4e57ca17f749f23547585712c8201efe212",
   "fingerprint_alg": "tree-json-v1"
 }

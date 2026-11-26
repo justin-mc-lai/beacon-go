@@ -1,0 +1,21 @@
+{
+  "id": "n_17162700446e",
+  "kind": "touchpoint",
+  "title": "gate panel",
+  "intent": "节点面板展示 gate 结果与 reason code",
+  "parent_id": "n_5a4abb5210d0",
+  "path": "root/tree-visual/gate-verdict-panel/gate-panel",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "渲染 HTML 含 gate 判定区与 reason code 文本"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "【目标态，当前不可执行】go test ./internal/intenttree -run TestRenderHTML -count=1 通过，且渲染源码含 gate 判定区与 reason code 文本标记；当前 render_html.go 无 verdict panel，grep 输出 HTML 中的 gate-panel 属 spec 文本自证，不作为通过依据"
+  },
+  "fingerprint": "1112cc831cd9b5acb45832b688b37de3474242718c33f8d35e52dff1e88251c3",
+  "fingerprint_alg": "tree-json-v1"
+}

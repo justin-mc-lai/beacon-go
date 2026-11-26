@@ -14,8 +14,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "beacon change request --node \u003cid\u003e --summary deprecate --json 退出 0 且 beacon plan show --node \u003cid\u003e 显示 status=deprecated"
+    "spec": "【待实现】验收命令 beacon change request --node \u003cid\u003e --summary deprecate 存在但不产生 status=deprecated（change 使节点变 draft/change_pending，无 deprecated 转移）；作废终态与 plan show 命令属待实现语义"
   },
-  "fingerprint": "09d4527bd783326256ded7665bf684833227e464c989214fd7f349bcb9e1c97f",
+  "fingerprint": "918edec60bd8c1064b7d64081c25f3d31fdff00537b58a5d3bf9f99ebb171f85",
   "fingerprint_alg": "tree-json-v1"
 }

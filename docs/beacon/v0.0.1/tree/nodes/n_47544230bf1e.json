@@ -7,9 +7,9 @@
   "path": "root/tree-visual",
   "status": "frozen",
   "child_fingerprints": [
-    "c1e5dcfe8c86a2370e3cd0ee753844e9e2611e536fe8b9fbd0bd747a7d29f014",
-    "59ec3b96a45a1aab7c6e253c642ea4c584f97255348f149244e62a5fecb28167"
+    "4b85645a588c7458b30573b7108cc7bd7cd4f5cea1d18f79c6cfe1507cfec9b3",
+    "8874c95930cabea60e87855ccad26b4b6d26656f5c22648c9903b51dc1a0b9f3"
   ],
-  "fingerprint": "1270fd4c86bd55a8664a16cc41568e967322b800154b9df47db1be2157520dfc",
+  "fingerprint": "125d1dd813079994529f6af8eed18206f45036835935d000bfa26b2cda0cf6a7",
   "fingerprint_alg": "tree-json-v1"
 }

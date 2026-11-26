@@ -1,0 +1,12 @@
+{
+  "id": "chg_87a9a7e510ba",
+  "node_id": "n_1c00934a592b",
+  "summary": "fix verification spec: defect-to-change",
+  "by": "audit-fix",
+  "base_fingerprint": "7af3595395ae5e9044ccc09430de1954246d1306d2521a23120f958179d5d9b8",
+  "before_snapshot_id": "v0.0.1-20261126T224750.490031000Z",
+  "affected": [
+    "n_1c00934a592b"
+  ],
+  "created_at": "2026-11-26T22:47:50.488692Z"
+}

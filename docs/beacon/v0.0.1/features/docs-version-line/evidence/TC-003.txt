@@ -1,0 +1,3 @@
+$ go test ./internal/store -run TestProjectVersionFeatureConstraints$ -count=1
+ok  	beacon-go/internal/store	0.475s
+[exit=0]

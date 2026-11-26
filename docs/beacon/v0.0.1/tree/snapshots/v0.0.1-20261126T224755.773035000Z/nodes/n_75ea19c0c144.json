@@ -1,0 +1,17 @@
+{
+  "id": "n_75ea19c0c144",
+  "kind": "module",
+  "title": "version evolution",
+  "intent": "纯 x.y.z 版本演进：严格区分两条轴——beacon-go runtime version（二进制/仓库/tag，唯一源 internal/version/version.go）与需求树文档版本（docs/beacon/\u003cversion\u003e/，用于 beacon-go 驱动其它项目交付时的版本线）；两轴平时独立、发布时对齐；文档版本由 projects bump 按 patch/minor/major 演进，runtime 版本按 V-01..V-11 规则；任何项目不共享彼此的文档版本号。",
+  "parent_id": "nroot_6b8991789867",
+  "path": "root/version-evolution",
+  "status": "frozen",
+  "child_fingerprints": [
+    "5f9420785018c6d8f2bfe8dba65c733a9e561e4ea41a22ad4e759de3ed63c753",
+    "775832206e7a8c27aceb743742b19e88e1a6d942ef434b41bc33c5ebef50da19",
+    "ee7382d7d6f742b4f4cab46905e8d8014ca299370e46b6b5723dccb2ab99fb9c",
+    "540c75ccdff9926efeacc2b999dba455abe9036b53eacd4944857961aac706aa"
+  ],
+  "fingerprint": "bf9d17c772a454490dc145c45ab8a0b4cfa49c83db2eaf0788e052c0d205ff9d",
+  "fingerprint_alg": "tree-json-v1"
+}

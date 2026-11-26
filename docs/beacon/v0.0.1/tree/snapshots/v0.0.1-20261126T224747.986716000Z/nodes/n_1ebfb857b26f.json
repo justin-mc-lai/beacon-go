@@ -1,0 +1,21 @@
+{
+  "id": "n_1ebfb857b26f",
+  "kind": "touchpoint",
+  "title": "tc to gate link",
+  "intent": "一条 TC 从定义到 report 到 gate verdict 可追溯",
+  "parent_id": "n_12c7f50ea594",
+  "path": "root/acceptance-binding/tc-acceptance-binding/tc-to-gate-link",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "AutoTest report 的 TC 顺序与 tests.md 一致且 gate pass 仅当全部 TC passed"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "beacon verify autotest run --run-id \u003cid\u003e --by x \u0026\u0026 beacon gate evaluate qa --run-id \u003cid\u003e --evaluator x"
+  },
+  "fingerprint": "7b939738ecadbef960129dad82b2c2dc7cd622b21a0a3bd27b997c58f1e5d1ff",
+  "fingerprint_alg": "tree-json-v1"
+}

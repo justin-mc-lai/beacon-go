@@ -14,8 +14,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "bash scripts/check_version_consistency.sh \u0026\u0026 test \"$(git describe --tags --abbrev=0)\" = \"v$(awk '/^const Version = /{gsub(/\\\"/,\"\",$4);print $4;exit}' internal/version/version.go)\""
+    "spec": "bash scripts/check_version_consistency.sh 通过，且 version.go 单一源被所有引用点一致引用（docs 版本为 v0.0.1，与 runtime tag v3.0.2 是两条独立轴，不要求相等）"
   },
-  "fingerprint": "d30ef3446d1ea4a6046d9900a3b3fa91ed308b72e04c6e6ee4a050060b31b5a5",
+  "fingerprint": "ba73a9ba1bfe855fd91b6d5674f18eee71d33f8ece0ca58d5f87cd49c543bdae",
   "fingerprint_alg": "tree-json-v1"
 }

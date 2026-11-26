@@ -9,13 +9,13 @@
   "acs": [
     {
       "id": "AC-001",
-      "text": "truth change 生成 change_id"
+      "text": "顶层 beacon change request --node \u003cfeature-id\u003e --summary \u003c缺陷描述\u003e 生成 change_id，缺陷回流为 change 记录进入实现闭环"
     }
   ],
   "verification": {
     "type": "test",
-    "spec": "beacon truth change --project . --node n_5e13a94c202d --summary self-drive-gap --json | jq -e '.change_id'"
+    "spec": "beacon change request --node \u003cfeature-id\u003e --summary defect-feedback --by \u003cid\u003e --json | jq -e '.id != \"\"'"
   },
-  "fingerprint": "7af3595395ae5e9044ccc09430de1954246d1306d2521a23120f958179d5d9b8",
+  "fingerprint": "662f8e579f05600239ba1fcad1a805104f08b8dcd06c07b7c4d11cb4269d964c",
   "fingerprint_alg": "tree-json-v1"
 }

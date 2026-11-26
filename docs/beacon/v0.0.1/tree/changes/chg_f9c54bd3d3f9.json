@@ -1,0 +1,12 @@
+{
+  "id": "chg_f9c54bd3d3f9",
+  "node_id": "n_a7c847346c2c",
+  "summary": "align AC command with spec",
+  "by": "audit-fix",
+  "base_fingerprint": "19fe815d8f445aa0abc0217e1342df656ccd56061fc86c85eb43b71ca6a3aa93",
+  "before_snapshot_id": "v0.0.1-20261126T225006.739305000Z",
+  "affected": [
+    "n_a7c847346c2c"
+  ],
+  "created_at": "2026-11-26T22:50:06.738141Z"
+}

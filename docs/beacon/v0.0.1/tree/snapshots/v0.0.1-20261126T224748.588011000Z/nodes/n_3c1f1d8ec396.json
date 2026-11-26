@@ -1,0 +1,15 @@
+{
+  "id": "n_3c1f1d8ec396",
+  "kind": "module",
+  "title": "acceptance binding",
+  "intent": "FSM 非法转移槽与测试用例覆盖绑定，用例执行产出 evidence，gate 按用例判定验收；一条 TC 从定义到 verdict 可追溯。",
+  "parent_id": "nroot_6b8991789867",
+  "path": "root/acceptance-binding",
+  "status": "frozen",
+  "child_fingerprints": [
+    "ac7c6c6225b99c93b4eb8e4d3c03665ae2d8a3e52721fa0bcae374652b76ab1f",
+    "3b8383dcd3f1ce37b810e85620a3de94ff788cb02880c41d1f97a69c128bdd72"
+  ],
+  "fingerprint": "e2fe72a6fcd40817c83181a70c8f660fa2c093473d5eed7502cd32cc488e3c50",
+  "fingerprint_alg": "tree-json-v1"
+}

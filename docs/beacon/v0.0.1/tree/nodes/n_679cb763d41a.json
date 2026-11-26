@@ -8,8 +8,8 @@
   "path": "root/truth-binding/requirement-level-drift",
   "status": "frozen",
   "child_fingerprints": [
-    "3c7cd8a3e4c4c7c31bf9598037205973b4f3764a6db9de26def263c02da3deac"
+    "e7570e8f8c2f8489f5009c992d21477d0f1cd8520c8229b9236a881a74c964f0"
   ],
-  "fingerprint": "2bad8916bf1f6077434bb3d365ab70054a351dce9146241adc97983e9f9ed7c5",
+  "fingerprint": "f2e27b0682fa589bca86c0118863d1c41da27fa72f006c0d4ae40b60604e9ca6",
   "fingerprint_alg": "tree-json-v1"
 }
