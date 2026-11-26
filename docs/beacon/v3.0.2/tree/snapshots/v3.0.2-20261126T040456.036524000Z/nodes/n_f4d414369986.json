@@ -1,0 +1,55 @@
+{
+  "id": "n_f4d414369986",
+  "kind": "touchpoint",
+  "title": "single version source",
+  "intent": "版本只有一个源",
+  "parent_id": "n_02bbe57308e0",
+  "path": "root/cli-surface/dependency-gate/single-version-source",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_f4d414369986-1",
+      "text": "README/README.zh/AGENTS 与 version.go 一致。"
+    },
+    {
+      "id": "n_f4d414369986-2",
+      "text": "写死版本或第二字面量被门禁拒绝。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_f4d414369986-tc1",
+      "ac_id": "n_f4d414369986-1",
+      "kind": "unit",
+      "ref": "bash scripts/check_version_consistency.sh",
+      "status": "existing"
+    },
+    {
+      "id": "n_f4d414369986-tc2",
+      "ac_id": "n_f4d414369986-2",
+      "kind": "unit",
+      "ref": "bash scripts/check_version_consistency.sh",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 AGENTS 写死当前版本时，版本检查失败"
+  },
+  "constraint": true,
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_f4d414369986.txt",
+    "artifact_hash": "1bc70d42c784e659866562e8256e3230082a2563befd3fa56e95e5a18b3a5902",
+    "at": "2026-11-26T04:03:08.319224Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_14dce074e6fe24ec9d77858e",
+    "content_hash": "1bc70d42c784e659866562e8256e3230082a2563befd3fa56e95e5a18b3a5902",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:08.33435Z"
+  },
+  "fingerprint": "e0b62813b1db7486dcb273f504db6fc7f7d062145404f0fc28a330d971538b2e",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -3,6 +3,7 @@ package cli
 
 import (
 	"crypto/sha256"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"beacon-go/internal/intenttree"
 	"beacon-go/internal/orchestrator"
 	"beacon-go/internal/store"
+	buildversion "beacon-go/internal/version"
 )
 
 func newPlanCmd() *cobra.Command {
@@ -56,10 +58,39 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 				if serr != nil {
 					return serr
 				}
+				if format == "html" {
+					sidx, bodies, berr := snapshotRenderInput(dir, snap)
+					if berr != nil {
+						return berr
+					}
+					data := intenttree.RenderHTMLTreeWithContext(sidx, bodies, nil, intenttree.RenderContext{
+						RuntimeVersion: snap.RuntimeVersion, RuntimeCommit: snap.RuntimeCommit,
+						BinarySHA: snap.BinarySHA, RequirementVersion: snap.RequirementVersion,
+						SnapshotID: snap.ID, SnapshotCreatedAt: snap.CreatedAt,
+						History: treeHistoryLinks(dir, false), Changes: treeChangeLinks(dir),
+						NodeHistory: treeNodeHistory(dir, false), BackURL: "../index.html",
+					})
+					def := filepath.Join(projRoot, ".beacon", "artifacts", "tree", snap.Version, "history", snap.ID+".html")
+					p, werr := writeTreeRender(outPath, "", def, data)
+					if werr != nil {
+						return werr
+					}
+					if outPath == "" {
+						if err := ensureArtifactsIgnored(projRoot); err != nil {
+							return err
+						}
+					}
+					fmt.Fprintf(cmd.OutOrStdout(), "wrote %s (%d bytes, sha256=%s, source=%s)\n", p, len(data), hashHex(data), snap.SourceHash)
+					fmt.Fprintln(cmd.OutOrStdout(), "历史快照只读；权威源见 docs/beacon/"+snap.Version+"/tree/snapshots/"+snap.ID)
+					return nil
+				}
 				return printJSON(cmd, map[string]any{
-					"view": "snapshot", "snapshot_id": snapshot, "schema": snap.Schema,
+					"view": "snapshot", "snapshot_id": snap.ID, "schema": snap.Schema,
 					"version": snap.Version, "root_id": snap.RootID, "created_at": snap.CreatedAt,
-					"source_hash": snap.SourceHash, "node_count": len(snap.Nodes), "nodes": snap.Nodes,
+					"source_hash": snap.SourceHash, "runtime_version": snap.RuntimeVersion,
+					"runtime_commit": snap.RuntimeCommit, "binary_sha256": snap.BinarySHA,
+					"requirement_version": snap.RequirementVersion,
+					"node_count":          len(snap.Nodes), "nodes": snap.Nodes,
 				})
 			}
 			if nodeID != "" {
@@ -122,7 +153,12 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 						Match: st.Match, Error: st.Error,
 					}
 				}
-				data := intenttree.RenderHTMLTreeWithTruth(idx, bodies, truth)
+				rt := buildversion.Runtime()
+				data := intenttree.RenderHTMLTreeWithContext(idx, bodies, truth, intenttree.RenderContext{
+					RuntimeVersion: rt.Version, RuntimeCommit: rt.Commit, BinarySHA: rt.BinarySHA,
+					RequirementVersion: idx.Version, History: treeHistoryLinks(dir, true),
+					Changes: treeChangeLinks(dir), NodeHistory: treeNodeHistory(dir, true),
+				})
 				def := filepath.Join(projRoot, ".beacon", "artifacts", "tree", idx.Version, "index.html")
 				p, werr := writeTreeRender(outPath, "", def, data)
 				if werr != nil {
@@ -136,6 +172,9 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 						if err := ensureDocsIgnored(projRoot); err != nil {
 							return err
 						}
+					}
+					if err := writeHistoryPages(dir, projRoot, idx.Version); err != nil {
+						return err
 					}
 				}
 				fmt.Fprintf(cmd.OutOrStdout(), "wrote %s (%d bytes, sha256=%s, source=%s)\n", p, len(data), hashHex(data), intenttree.SourceHash(idx))
@@ -250,6 +289,126 @@ func statusCounts(idx intenttree.Index) map[string]int {
 		out[string(n.Status)]++
 	}
 	return out
+}
+
+func treeHistoryLinks(dir string, current bool) []intenttree.HistoryLink {
+	ids, err := intenttree.ListSnapshots(dir)
+	if err != nil {
+		return nil
+	}
+	out := make([]intenttree.HistoryLink, 0, len(ids))
+	for _, id := range ids {
+		snap, err := intenttree.ReadSnapshot(dir, id)
+		if err != nil {
+			continue
+		}
+		label := id
+		if snap.CreatedAt != "" {
+			label = id + "  " + snap.CreatedAt
+		}
+		url := id + ".html"
+		if current {
+			url = "history/" + url
+		}
+		out = append(out, intenttree.HistoryLink{ID: id, Label: label, URL: url, CreatedAt: snap.CreatedAt})
+	}
+	return out
+}
+
+func treeNodeHistory(dir string, current bool) map[string][]intenttree.NodeRevision {
+	out := map[string][]intenttree.NodeRevision{}
+	ids, err := intenttree.ListSnapshots(dir)
+	if err != nil {
+		return out
+	}
+	for _, id := range ids {
+		snap, err := intenttree.ReadSnapshot(dir, id)
+		if err != nil {
+			continue
+		}
+		url := id + ".html"
+		if current {
+			url = "history/" + url
+		}
+		for _, e := range snap.Nodes {
+			out[e.ID] = append(out[e.ID], intenttree.NodeRevision{
+				SnapshotID: id, Label: id + " · " + snap.CreatedAt, URL: url + "#" + e.ID,
+				Status: string(e.Status), Fingerprint: e.Fingerprint,
+			})
+		}
+	}
+	return out
+}
+
+func treeChangeLinks(dir string) []intenttree.HistoryLink {
+	changes, err := intenttree.ListChanges(dir)
+	if err != nil {
+		return nil
+	}
+	if len(changes) > 12 {
+		changes = changes[:12]
+	}
+	out := make([]intenttree.HistoryLink, 0, len(changes))
+	for _, c := range changes {
+		label := c.Summary
+		if label == "" {
+			label = c.ID
+		}
+		label = c.ID + " · " + label
+		out = append(out, intenttree.HistoryLink{ID: c.ID, Label: label, CreatedAt: c.CreatedAt})
+	}
+	return out
+}
+
+func writeHistoryPages(dir, projRoot, version string) error {
+	ids, err := intenttree.ListSnapshots(dir)
+	if err != nil {
+		return err
+	}
+	for _, id := range ids {
+		snap, err := intenttree.ReadSnapshot(dir, id)
+		if err != nil {
+			return err
+		}
+		sidx, bodies, err := snapshotRenderInput(dir, snap)
+		if err != nil {
+			return err
+		}
+		links := treeHistoryLinks(dir, false)
+		data := intenttree.RenderHTMLTreeWithContext(sidx, bodies, nil, intenttree.RenderContext{
+			RuntimeVersion: snap.RuntimeVersion, RuntimeCommit: snap.RuntimeCommit, BinarySHA: snap.BinarySHA,
+			RequirementVersion: snap.RequirementVersion, SnapshotID: snap.ID, SnapshotCreatedAt: snap.CreatedAt,
+			History: links, Changes: treeChangeLinks(dir), NodeHistory: treeNodeHistory(dir, false),
+			BackURL: "../index.html",
+		})
+		p := filepath.Join(projRoot, ".beacon", "artifacts", "tree", version, "history", id+".html")
+		if _, err := writeTreeRender("", "", p, data); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func snapshotRenderInput(dir string, snap intenttree.Snapshot) (intenttree.Index, map[string]intenttree.Node, error) {
+	idx := intenttree.Index{Schema: snap.Schema, Version: snap.Version, RootID: snap.RootID}
+	bodies := map[string]intenttree.Node{}
+	for _, e := range snap.Nodes {
+		idx.Nodes = append(idx.Nodes, intenttree.IndexEntry{
+			ID: e.ID, ParentID: e.ParentID, Kind: e.Kind, Status: e.Status,
+			Title: e.Title, Path: e.Path, TruthPath: e.TruthPath,
+			Fingerprint: e.Fingerprint, FingerprintAlg: e.FingerprintAlg,
+		})
+		raw, err := os.ReadFile(filepath.Join(dir, "snapshots", snap.ID, filepath.FromSlash(e.NodeRef)))
+		if err != nil {
+			return intenttree.Index{}, nil, err
+		}
+		var n intenttree.Node
+		if err := json.Unmarshal(raw, &n); err != nil {
+			return intenttree.Index{}, nil, err
+		}
+		bodies[e.ID] = n
+	}
+	return idx, bodies, nil
 }
 
 func unlinkedFeatureSlugs(dir string, idx intenttree.Index) ([]string, error) {
@@ -417,6 +576,8 @@ func printTreeSummary(cmd *cobra.Command, idx intenttree.Index, bodies map[strin
 	if root.Intent != "" {
 		fmt.Fprintf(out, "%s\n\n", root.Intent)
 	}
+	rt := buildversion.Runtime()
+	fmt.Fprintf(out, "版本：runtime %s · requirement %s\n", rt.Version, idx.Version)
 	fmt.Fprintf(out, "%d 模块 · %d 功能 · %d 触达点 · %d 条 AC · %d 个状态机\n", modules, features, leaves, acs, fsm)
 	fmt.Fprintf(out, "状态：草稿 %d · 冻结 %d · 已交付/实现 %d · 已验证 %d · 已交付 %d · 变更中 %d · 废弃 %d\n", draft, frozen, implemented, verified, delivered, changePending, deprecated)
 	fmt.Fprintf(out, "测试：%d 已绑定 · %d 计划中；已验证节点 %d/%d\n", existing, planned, verified, len(idx.Nodes))

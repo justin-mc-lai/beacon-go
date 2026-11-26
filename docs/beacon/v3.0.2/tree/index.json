@@ -9,7 +9,7 @@
       "status": "frozen",
       "title": "beacon-go",
       "path": "root",
-      "fingerprint": "6383fe32a924305c87705fa9e176b21301d4a13d79b9af6f6291b3504f849b4c",
+      "fingerprint": "91a4d499a3f755857b4c3fa19951529be6235591bc9106d8c44b115df378973b",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -19,7 +19,7 @@
       "status": "verified",
       "title": "cli-surface",
       "path": "root/cli-surface",
-      "fingerprint": "01192ce1e574e1838ba11479dd8b310a61814926c7b8786cc5c6a1d11b53a196",
+      "fingerprint": "9a38276053ff34849a3297b04993a010dc5c88ecb8420ec0c97ce423ff633dce",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -29,7 +29,7 @@
       "status": "verified",
       "title": "dependency-gate",
       "path": "root/cli-surface/dependency-gate",
-      "fingerprint": "6d000d1854b45438fe51a21c963118514df722a6918e9c735e07949a27bdf76c",
+      "fingerprint": "190ff8924ba53067682f36d88d9ffbfdd6f08df129e80d9826d204dda3eb9074",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -39,7 +39,7 @@
       "status": "verified",
       "title": "no llm executor",
       "path": "root/cli-surface/dependency-gate/no-llm-executor",
-      "fingerprint": "6b10f72be37a71c922e7ef0635fe467b15b34b2a5f1a38bea2b9410327ef6eb4",
+      "fingerprint": "45efd13ed0ba9e23a043646915000e3d837643a4aba2dc42548af52b4aa4a083",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -49,7 +49,7 @@
       "status": "verified",
       "title": "single version source",
       "path": "root/cli-surface/dependency-gate/single-version-source",
-      "fingerprint": "028e8511d96da0651a5fb4c9821e7d26bcbb54c4c301de4e9fef7675912a9040",
+      "fingerprint": "62bd9eb7cc5f3240dee0a3329a5888300bb9e2002e4319ce93534f1e7d000585",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -59,7 +59,7 @@
       "status": "verified",
       "title": "error-contract",
       "path": "root/cli-surface/error-contract",
-      "fingerprint": "58f0e0a5890416dceb194da9c2b939f673a4a5aa3c1d8fb9fbe9c9ac5d6cd9e3",
+      "fingerprint": "a2198ee166e6b4a9a7502590c05843ffb77f36002e71826442c01392ddc605bb",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -69,7 +69,7 @@
       "status": "verified",
       "title": "reason-exit",
       "path": "root/cli-surface/error-contract/reason-exit",
-      "fingerprint": "00a5dffcbb40f450099226fe8e648e8861343845143fa308e77dd6af33761382",
+      "fingerprint": "f692cc1e885c6267bf7bb91d5a785e44ee241db233cb2761ac5cfbceeba39faf",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -79,7 +79,7 @@
       "status": "delivered",
       "title": "implement surface",
       "path": "root/cli-surface/implement-surface",
-      "fingerprint": "5e953a7611b07b99b0d9430a945283645a0358281fb67979dc310ebfdda98d67",
+      "fingerprint": "918fc7b37189138a6bfcee0a2297ed429c508842fa03d2371f098330cc0972c4",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -89,7 +89,7 @@
       "status": "verified",
       "title": "report artifact",
       "path": "root/cli-surface/implement-surface/report-artifact",
-      "fingerprint": "6b0593bffb3dedeada45d6401735aa3980a24ab80d5819b7efc11e5a881f52a7",
+      "fingerprint": "4ba4b12bf818ad880d42f847431264dbe18f0c4c26b277c869d4cad6c50e8bbf",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -99,7 +99,7 @@
       "status": "verified",
       "title": "shared admission",
       "path": "root/cli-surface/implement-surface/shared-admission",
-      "fingerprint": "61c7e85e0b267761696cf570bd0c0e852079ccf3a2848701004d99ffa7bc73e9",
+      "fingerprint": "32499bd6031e584f1468710ce8abafae7659995509e7500afb37f7d6d72add8d",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -109,7 +109,7 @@
       "status": "delivered",
       "title": "plan surface",
       "path": "root/cli-surface/plan-surface",
-      "fingerprint": "8b636b2d6c3d9dd2f21551bac872e9ed87533caad86c392a0446ad1f2a3beb2d",
+      "fingerprint": "29f976344ff78553eb843b10f97e809df211faf351a89678eadf6582468af057",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -119,7 +119,7 @@
       "status": "verified",
       "title": "proposal guards",
       "path": "root/cli-surface/plan-surface/proposal-guards",
-      "fingerprint": "eb1c9e349a7cec87fc3680b014e5074cc03557292d64e1b77c6e44d0cb6af2ec",
+      "fingerprint": "047eb609087d04266dea4cb5a8ecc191c499fcbe8388b48934a9831035a47afa",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -129,7 +129,7 @@
       "status": "verified",
       "title": "proposal slug",
       "path": "root/cli-surface/plan-surface/proposal-slug",
-      "fingerprint": "a9ac618035a972db266accba5cc98ce91b074d42616225eac44ec41abda4d14c",
+      "fingerprint": "ad7ce464e7be71695d337d592804436c010efc00e66b99a18ddfbc4b75a28b00",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -139,7 +139,7 @@
       "status": "verified",
       "title": "tree render",
       "path": "root/cli-surface/plan-surface/tree-render",
-      "fingerprint": "e108a1cb3768fd4f4cd9e9b96e6b0a4b55c3a75c6af40f9f7c4b7a471e019487",
+      "fingerprint": "92578af28e8e6c845b4df438cad232a6e666030b7a43a4e84a5b4719c55cc12f",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -149,7 +149,7 @@
       "status": "verified",
       "title": "seven-groups",
       "path": "root/cli-surface/seven-groups",
-      "fingerprint": "c8e1f394e2a286a51c978e82c922012e47e819250c6c6687605e044ac1b09120",
+      "fingerprint": "aa2d0278441cd5c2fb29ee6d19c9353cc16a244d759afe6311fad1d8870f5af7",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -159,7 +159,7 @@
       "status": "verified",
       "title": "seven groups",
       "path": "root/cli-surface/seven-groups/seven-groups",
-      "fingerprint": "5f45597090491c635ac462a93a2b48ea240abddc3d5f1a023cb08e8296af5692",
+      "fingerprint": "8e51fb02d128007ad3f8ee992bd171cc8e7875533875eee01059ca0744696249",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -169,7 +169,7 @@
       "status": "verified",
       "title": "verify replaces qa",
       "path": "root/cli-surface/seven-groups/verify-replaces-qa",
-      "fingerprint": "2a4655e41e7f809f918db20f6f2e54b7bfc0ccb062b77c81c61bccce64f46b99",
+      "fingerprint": "8f98062ceb0745c44fd4e466807c107d1d13a77357215bb5bcadaa6c8543b32d",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -179,7 +179,7 @@
       "status": "verified",
       "title": "data-migration",
       "path": "root/data-migration",
-      "fingerprint": "311f973063b0c9a85c1b147e79f6c85ef2298d9a94b05191d425c5e139a13f33",
+      "fingerprint": "31e9056dee7793852f1dfec815684ec3b60fba1f03e879cb5eeeeb5073653d5e",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -189,7 +189,7 @@
       "status": "verified",
       "title": "projects version",
       "path": "root/data-migration/projects-version",
-      "fingerprint": "e186940b2fae80db3c172b83aec40ec3ac27e48af5f3312c5aad9ff6fbe546df",
+      "fingerprint": "04c515eca3469ca7008867ac8ee800210602567661f638763dcad63d23a91bd3",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -199,7 +199,7 @@
       "status": "verified",
       "title": "project registry",
       "path": "root/data-migration/projects-version/project-registry",
-      "fingerprint": "1b7225c0893dd2f49711e2578efb0ab9ffe574c81668b51d68aba0d6391f06bf",
+      "fingerprint": "d685528fecf7067400eb38ec16c672484bfa8d52070e9141805a65dc65421918",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -209,7 +209,7 @@
       "status": "verified",
       "title": "version line",
       "path": "root/data-migration/projects-version/version-line",
-      "fingerprint": "36dfcc980ed9d4d81134be445331b68744bf0424a811b54ded202020a3f4669a",
+      "fingerprint": "1ddf2f0d7c7cf9a0e100581f9b6829e8eaa1bb854c3ed9df5644d5692cd03f9d",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -219,7 +219,7 @@
       "status": "verified",
       "title": "store-cache",
       "path": "root/data-migration/store-cache",
-      "fingerprint": "47b4f74950e36dfb3efe307248d370ede75e920bb2023e20e1a16f11a3fbf07d",
+      "fingerprint": "3b16e08a1f4a098e512972499e4ebf7c08c39b7e85139f6c2ff63353b45b9852",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -229,7 +229,7 @@
       "status": "verified",
       "title": "rebuild-from-json",
       "path": "root/data-migration/store-cache/rebuild-from-json",
-      "fingerprint": "3b8c2da2ed0fae576633703ca0f5fe55ed708dc55099eaee13176759c8f20b0e",
+      "fingerprint": "74721b559b2e5efc48bef811d9452c1e75bedfeb3fed8845dab176344d533caf",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -239,7 +239,7 @@
       "status": "verified",
       "title": "v1-migration",
       "path": "root/data-migration/v1-migration",
-      "fingerprint": "a1095e9c2897bc7444b6244f9cb831e9759bdf987297d57bae6231a7bf124148",
+      "fingerprint": "c444c95e9ba1d87071b43322f1c715d2976df1ec828b4f6655131f8a83e31619",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -249,7 +249,7 @@
       "status": "verified",
       "title": "snapshot-before-write",
       "path": "root/data-migration/v1-migration/snapshot-before-write",
-      "fingerprint": "8ca5452646e56361e0caa4082732487149199486823d7bbf12172e5ee1656707",
+      "fingerprint": "c7a416f72c9c1ca1f4967a15be6349e3a729e269812efb8e8251f0feadaf91c9",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -259,7 +259,7 @@
       "status": "verified",
       "title": "goal-orchestration",
       "path": "root/goal-orchestration",
-      "fingerprint": "ae7ff92c33ba331349179a2e3e898f0dc3a22943e788c52184133a4375f57608",
+      "fingerprint": "80b007fb4cc6961d01fdb5564394bcd79fe95097c66fbbdfd3bec61f709e30d6",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -269,7 +269,7 @@
       "status": "verified",
       "title": "manual-run",
       "path": "root/goal-orchestration/manual-run",
-      "fingerprint": "78a43ac45d32f5db23492904d7826a2035ddb89b8d03506d9da5d26958ed0d61",
+      "fingerprint": "05f5f27db9f9588f9e628e277a3b9434866d8a2b702c285032694f15f22cc59e",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -279,7 +279,7 @@
       "status": "verified",
       "title": "checkpoint resume",
       "path": "root/goal-orchestration/manual-run/checkpoint-resume",
-      "fingerprint": "bebf143eeae249642fb9436e2eb097d591228757758a092c3bbdd42dd6a10f1e",
+      "fingerprint": "2971134b17c0ee656c67e933dba94bd81ec93ea162ce1ef16981ace727412ea9",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -289,7 +289,7 @@
       "status": "verified",
       "title": "driver turn",
       "path": "root/goal-orchestration/manual-run/driver-turn",
-      "fingerprint": "c2ce355f553bed77c6dd2f39dc358eaeab9a58c179520b1dd34a18e7db05a331",
+      "fingerprint": "5ec8442692c7e330b4e22e8678d964339a46f7aa9fddfcbb30a95f4dfb3b2086",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -299,7 +299,7 @@
       "status": "verified",
       "title": "tick identity",
       "path": "root/goal-orchestration/manual-run/tick-identity",
-      "fingerprint": "4416fceb3946eb77b838435fd26ec9c45ffcfc57cb6efa0a9d92ac4d61bc16f2",
+      "fingerprint": "c1a328092774cc0052bca4db383a753d490eb7d9dc8948d3062a9cec11eff46a",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -309,7 +309,7 @@
       "status": "verified",
       "title": "run-lifecycle",
       "path": "root/goal-orchestration/run-lifecycle",
-      "fingerprint": "ee924e0d0938df5381510c6beddd82761ac03e3d70492339f2a8e7a21118d2c3",
+      "fingerprint": "e1e9df19956689855d6281a0000175b4003c3157c7590b131baaed164dc55014",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -319,7 +319,7 @@
       "status": "verified",
       "title": "block recover",
       "path": "root/goal-orchestration/run-lifecycle/block-recover",
-      "fingerprint": "ae228e2e14e08dc54309ce9147d5cfaab264fd6404a650b063b208e2a592d76e",
+      "fingerprint": "bf2c996b18b265f781f9ae4a00a4d3125565c62568a782cc98a56ac90b42cb2d",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -329,7 +329,7 @@
       "status": "verified",
       "title": "run-create-tick",
       "path": "root/goal-orchestration/run-lifecycle/run-create-tick",
-      "fingerprint": "e9411eccba470a6933b5387207e774ec3392ddc8e46bd94b6cd6702afa49dec4",
+      "fingerprint": "2fdfb6ed010d6fc2a0f8607c2178de25084d7a16a4d9e5d260ee8ae6df260eec",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -339,7 +339,7 @@
       "status": "verified",
       "title": "stage plan",
       "path": "root/goal-orchestration/run-lifecycle/stage-plan",
-      "fingerprint": "a52dd750dc372de02bb3b87d5fd191db1e5ede3f8dc4ae1c930f9a6429095b26",
+      "fingerprint": "e37bb80627132b3ea6043225da22595789776a2101603a88945d11cba35a519a",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -349,7 +349,7 @@
       "status": "verified",
       "title": "tree feature adoption",
       "path": "root/goal-orchestration/run-lifecycle/tree-feature-adoption",
-      "fingerprint": "2cc333632ea523c20c64c2bd950e9a8add9e9bcd65422098a3e52a9188375898",
+      "fingerprint": "f3f7c76a5d3cb2d973bf3048523431c7d9d1bd7128b4c9a335f9abe0ed2bf5ea",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -359,7 +359,7 @@
       "status": "verified",
       "title": "stage-gate",
       "path": "root/goal-orchestration/stage-gate",
-      "fingerprint": "55bbc7957727862f076a2b92011f82d4dde1fc6affd462625801958b185a567c",
+      "fingerprint": "5a12aaa73d3db9719ba1988480bf19b8a3edba1f153593ec39aaaa0a9b46848c",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -369,7 +369,7 @@
       "status": "verified",
       "title": "release gate",
       "path": "root/goal-orchestration/stage-gate/release-gate",
-      "fingerprint": "fe443d7adae1d8f4754c6e82c16fe99a712980ce6f07e2c74ac2e833d9f74c00",
+      "fingerprint": "990f50e3f56db35bdb51fdcfc07ada7b09e0cf6d88492e113e9fdf9f0b7393d9",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -379,7 +379,7 @@
       "status": "verified",
       "title": "tree stage readiness",
       "path": "root/goal-orchestration/stage-gate/tree-stage-readiness",
-      "fingerprint": "e52109a1009d18968cf8fd3a7717e82162517ac7ca4156f7fbfaa697b634e803",
+      "fingerprint": "ce01afb2f6a0b5808785aa36c8e8a7a26db741b52f54886af7602e0b51653c0d",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -389,7 +389,7 @@
       "status": "verified",
       "title": "verifier attach",
       "path": "root/goal-orchestration/stage-gate/verifier-attach",
-      "fingerprint": "0378c8264c8f34096a381aaf2b947e13ebfd018d7a40d5510ef9d1d4c6084e51",
+      "fingerprint": "58cbaa267b8610b4a3474a819c9a282056363f193e8d3554dded73287db4855c",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -399,7 +399,7 @@
       "status": "verified",
       "title": "security-boundary",
       "path": "root/security-boundary",
-      "fingerprint": "7b5717780ecb6eb9049e3832cf72ac9efc004a82eb7302a29ed4eee40ab5f734",
+      "fingerprint": "116301b0bb62f721a7418848a62bc0d6c099c98148394a8c415e933d371d2a6e",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -409,7 +409,7 @@
       "status": "verified",
       "title": "protected-paths",
       "path": "root/security-boundary/protected-paths",
-      "fingerprint": "04f1e8aaf1ef39d3628aeb238b46ce379e895447283521d006c7bc550b1d2a05",
+      "fingerprint": "20a8696078b65aecd8b587e9272b01f18734a2fb0b5b14bd8c86f07a789fb6a8",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -419,7 +419,7 @@
       "status": "verified",
       "title": "guard-write",
       "path": "root/security-boundary/protected-paths/guard-write",
-      "fingerprint": "85ab0c4dfb2b6155165861538dc71a537c30b6036dea99062bf1153ccb9ead96",
+      "fingerprint": "e2354f7f7779057d614a70cd98732fbebfc16ce99af21b528e4fa53734e50d84",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -429,7 +429,7 @@
       "status": "verified",
       "title": "write-audit",
       "path": "root/security-boundary/write-audit",
-      "fingerprint": "a7c1abc256e4ff189d516945ccc2820bf7b5daf75cb613459838a8a2498797ea",
+      "fingerprint": "0ef2912e87d9a8eafe2f53f831ba365454c494315e6dd9983635b4d4fdff0c45",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -439,7 +439,7 @@
       "status": "verified",
       "title": "write-receipt",
       "path": "root/security-boundary/write-audit/write-receipt",
-      "fingerprint": "694a2176d91a93b3e4370ea286c19fe5fd27749ea30e1fc4e964461dd160ab82",
+      "fingerprint": "9bd1521f07e4223b7aaa49f262c8bb38f70edceac3743a477e691a4de6efa154",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -449,7 +449,7 @@
       "status": "frozen",
       "title": "self-host",
       "path": "root/self-host",
-      "fingerprint": "b8678b239f8fdecf0371315fda43285a1f6c311b6eb9a0980660b154f749e769",
+      "fingerprint": "2e062347377a618b4587830a2aca9429ef103d835ef2124a9898cde9a0969d8b",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -459,7 +459,7 @@
       "status": "verified",
       "title": "docs-consistency",
       "path": "root/self-host/docs-consistency",
-      "fingerprint": "bedccf8a5e7489787ce2e4991ecd5f9a46e15c51e8eb82e976ac0aa574e33c68",
+      "fingerprint": "3acaad58a2e7377a9389bf66fd3e5985b614d3a53c5a3b9a180bce8d62ce3966",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -469,7 +469,7 @@
       "status": "verified",
       "title": "version-docs",
       "path": "root/self-host/docs-consistency/version-docs",
-      "fingerprint": "c30f14877c468c0e3fe3b22c21c36e48407d7c18ecae0d29d101bd2890551560",
+      "fingerprint": "eb1c5202195811ea39439c78edf4e81e6e7e523bb6cf2bb000857deb8eb0c42e",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -479,7 +479,7 @@
       "status": "verified",
       "title": "dogfood",
       "path": "root/self-host/dogfood",
-      "fingerprint": "6524c65b1feedaa7b8cca8ac928028ddaea1ec001e46fce01029b78be0133251",
+      "fingerprint": "83ddbb9d3f4031c9b8e8df099626d125924773a6d897d6ae67d04d2fa750687b",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -489,7 +489,7 @@
       "status": "verified",
       "title": "badminton chain",
       "path": "root/self-host/dogfood/badminton-chain",
-      "fingerprint": "4de5a04ad4843e7aad7c6f639e3a8d51b572e31ca94817bee824965b0876047a",
+      "fingerprint": "470028a0963bedb754d329e7efc0d6eb5824b848ef6729ce32954ce6b716b2e4",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -499,7 +499,7 @@
       "status": "verified",
       "title": "html history",
       "path": "root/self-host/dogfood/html-history",
-      "fingerprint": "7ff97587327134affbd7f8d5d00b5a8b00b1e3e520e7aa0ebc0fa54667186c79",
+      "fingerprint": "b536dbcb78c5e4a9d2794358d29ccd4e930dbe0a0c284c68877f2c962b1d58b7",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -509,7 +509,7 @@
       "status": "frozen",
       "title": "experience next",
       "path": "root/self-host/experience-next",
-      "fingerprint": "23fd4cbc0cab428d878f4134aa501aaad5d472f0f782f1d5eba0c7ef0980eccd",
+      "fingerprint": "0a77a612926fc522d97b59431e82c4d0bb9a746c237d83e88074036e59ac792e",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -549,7 +549,7 @@
       "status": "delivered",
       "title": "requirement workbench",
       "path": "root/self-host/requirement-workbench",
-      "fingerprint": "c0dee128a41f554baab6e49ac6f8a3448b3eeff41902ef80da10aaac3d1b8920",
+      "fingerprint": "5c3876a023389631012d9eb645a917531ba7f9b1df069164a285b0f1e9ed3b94",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -559,7 +559,7 @@
       "status": "verified",
       "title": "source authority",
       "path": "root/self-host/requirement-workbench/source-authority",
-      "fingerprint": "e9943e2ce66d9a0b40803f6bd3005d8900ac77aec0fea62934c4e52107599252",
+      "fingerprint": "17fc1c79bbde17099dd9caae117edbf1a329aba743724f0374cdfbde726e9333",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -569,7 +569,7 @@
       "status": "verified",
       "title": "status counts",
       "path": "root/self-host/requirement-workbench/status-counts",
-      "fingerprint": "de218ccaa0762c12296418b4a73848a5ff1bc0d32b1ec1b613100ed7ec287d14",
+      "fingerprint": "fe5ecb86526ce7daa8210344ce76dd11a4c519bd0c2e2e548f5d4f1d7d3a8afd",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -579,7 +579,7 @@
       "status": "verified",
       "title": "tree native",
       "path": "root/self-host/requirement-workbench/tree-native",
-      "fingerprint": "6823e262f019bdf6e4dcc61fda0e46d0da7ab71580bf3250e1884fdbe99d8d86",
+      "fingerprint": "8b90c507d65052f47945d3ec5ce75b6d12cac102ba0f0cb2cc5da8cf54fafa0b",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -589,7 +589,7 @@
       "status": "verified",
       "title": "skills",
       "path": "root/self-host/skills",
-      "fingerprint": "b469071a532978b6a9904b20b23c6b5bd548d64e98c749a20abfdfc7fe50878f",
+      "fingerprint": "523dae1d7d5859275416c7dfac5e9933d3021fa43face6ad9e4df221962099f6",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -599,7 +599,7 @@
       "status": "verified",
       "title": "router 3.x",
       "path": "root/self-host/skills/router-3x",
-      "fingerprint": "7171e854ca5ed7ca388b75ae8370759af221a066f4b603b63f314844f8c206f7",
+      "fingerprint": "a4350406453b7b153772b41e324e7065d81a055cfbc891b8941b9dd3c408ce11",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -609,7 +609,7 @@
       "status": "verified",
       "title": "seven skills",
       "path": "root/self-host/skills/seven-skills",
-      "fingerprint": "17887062efdde7c376c37c3b96386f51bac50454a2fec7805a0bc7f2894be812",
+      "fingerprint": "19574700fdc4c23312f18b1af7a2c973b481b07ebc79bdc2d751fa2a4bf5b745",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -619,7 +619,7 @@
       "status": "verified",
       "title": "truth-kernel",
       "path": "root/truth-kernel",
-      "fingerprint": "159ff620b86500e7bdbe6120d2e68ba29e456f24587862af7ad6a37d775e26a3",
+      "fingerprint": "e98adb479d81b4761d9b77a222d5270c70a7bc5891314c5a1937f25624323464",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -629,7 +629,7 @@
       "status": "verified",
       "title": "canonical-json",
       "path": "root/truth-kernel/canonical-json",
-      "fingerprint": "16aa45833a8d4e74913cbcd7eeaf96b8767271de61e78f2d42de89a092158010",
+      "fingerprint": "eb4a5d997f12a1fbb3249e98a66baac4c986f081f7236677b2123606aa85795c",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -639,7 +639,7 @@
       "status": "verified",
       "title": "AC fingerprint",
       "path": "root/truth-kernel/canonical-json/ac-fingerprint",
-      "fingerprint": "96da4e99c47509bb864eaaddd31988264dad28547b53598501630147fb2e732e",
+      "fingerprint": "9238613ac8fa5873afed6d98ddcada9e5beb7c8c4e7691c0f7f3c35d1b271001",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -649,7 +649,7 @@
       "status": "verified",
       "title": "canonical serialization",
       "path": "root/truth-kernel/canonical-json/canonical-serialization",
-      "fingerprint": "e7c5ce76c9193f4bfd4a27ea391c27931171aa1802488d3e2be93d74d6cc2f1a",
+      "fingerprint": "1300c556e752bf708b8f8a5b723708b7bc030373e3a60739bd3979e6e348fdbf",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -659,7 +659,7 @@
       "status": "verified",
       "title": "freeze-change",
       "path": "root/truth-kernel/freeze-change",
-      "fingerprint": "814ae0a52307e4c1fba31d3c7dbbffb45087f1452b192e7a3a0377c75a56859e",
+      "fingerprint": "75077e55d5402ad4b1597213f4b249000ced3994636ef3138db4496bc223d012",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -669,7 +669,7 @@
       "status": "verified",
       "title": "change cascade",
       "path": "root/truth-kernel/freeze-change/change-cascade",
-      "fingerprint": "2a9dadf87008dd109c0be02dc995ea87761b61395725201f95a55f09034e00c8",
+      "fingerprint": "75b47fbdfebf908ca24665d0039e1a32e419ce4914ff261818c59c7a1e4cabe4",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -679,7 +679,7 @@
       "status": "verified",
       "title": "recursive freeze",
       "path": "root/truth-kernel/freeze-change/recursive-freeze",
-      "fingerprint": "24d24accb323bbcd4cfa94a52193b82f0185c2b20bf81306624c9122344c3518",
+      "fingerprint": "7e64f9a0f4e297b71b395d120577e9276c809678dcfa0020af1a192d404a2ed4",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -689,7 +689,7 @@
       "status": "verified",
       "title": "package-lifecycle",
       "path": "root/truth-kernel/package-lifecycle",
-      "fingerprint": "d7e0822cef4668cb820565072e63cb4d5a5762b643cc30c1c1a684d90c04f0fb",
+      "fingerprint": "b946722a0092eef3ca1fdea824800858b22ba04725b3daf176649e317a8a51c6",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -699,7 +699,7 @@
       "status": "verified",
       "title": "ask-confirm",
       "path": "root/truth-kernel/package-lifecycle/ask-confirm",
-      "fingerprint": "78b0c84d55ddf7931ed46659f93ea97702ae398b44bcc2551746ff6944eacf95",
+      "fingerprint": "5b54da5814a7a3f8039f9bd05be4050c1fc1fb97263d54f01c3e4b044abae2b0",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -709,7 +709,7 @@
       "status": "verified",
       "title": "repository-projection",
       "path": "root/truth-kernel/repository-projection",
-      "fingerprint": "10f8032360007ab3b0f411ff6c1350df2ec73610b5b1ff47c7ea8fa269908c47",
+      "fingerprint": "fd5952af61576ebc13ebe80ced4cb2651aa76435a12b126ab08be8fd7533b2b7",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -719,7 +719,7 @@
       "status": "verified",
       "title": "source-hash",
       "path": "root/truth-kernel/repository-projection/source-hash",
-      "fingerprint": "7de34cc8a13596518adb25815ef84e0348f3b4d862fadf681de1407c1c7d6c00",
+      "fingerprint": "75b4e530887dc912796038e551f4a3cd65938d211ea1e4e6027e8f63bbbb9e50",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -729,7 +729,7 @@
       "status": "verified",
       "title": "verification",
       "path": "root/verification",
-      "fingerprint": "881b71cf9bd288271fef176df47d5e8096cec97aaf495a482c339443536d9769",
+      "fingerprint": "d16d5489e2ccbff2e6b85811996a48e920488048b72fe1212446891691996437",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -739,7 +739,7 @@
       "status": "delivered",
       "title": "delivery",
       "path": "root/verification/delivery",
-      "fingerprint": "48ec9a7a79d0160dfdcedb4764c703bacc9dec75da291bb044867f68eb6e632e",
+      "fingerprint": "233f154a7e8ef9f0282de0c73ea9aaa76799839aa3cec4b21916df181a90ff71",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -749,7 +749,7 @@
       "status": "verified",
       "title": "deliver terminal",
       "path": "root/verification/delivery/deliver-terminal",
-      "fingerprint": "3b6d64da27c2d0d1662c142746e2638af4f9bd66b67dd6dabcd31c42a8d14d1d",
+      "fingerprint": "c7d0c4b9521c1147fbb9559a6a58723410699eb95038c955aef29ae7dc71b420",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -759,7 +759,7 @@
       "status": "verified",
       "title": "evidence-scope",
       "path": "root/verification/evidence-scope",
-      "fingerprint": "62d7505d6ce60e643782d3bd73c82e3ff6b354b792ab5d6ad5298df35234c44b",
+      "fingerprint": "58543a472cbeb689d4cae324d460efbffe26122b1af8f352239c895e55495914",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -769,7 +769,7 @@
       "status": "verified",
       "title": "hash recheck",
       "path": "root/verification/evidence-scope/hash-recheck",
-      "fingerprint": "a7e8f9659e37dcef06a4ee7f567369be859f9330ad5e11ea81e14e7534ddf686",
+      "fingerprint": "2ed241116d5593e43499f9074c7400f9b5054df504b2ffa6b45c87ed9280b67d",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -779,7 +779,7 @@
       "status": "verified",
       "title": "node scope registration",
       "path": "root/verification/evidence-scope/node-scope-registration",
-      "fingerprint": "ceee195be8a15df6c231eef28ad011886052207b4407a9c3a010d261b2675485",
+      "fingerprint": "f4077b5a48d8e3a9f42a761da16b25949ab392ed578529849c67554c32fbb99e",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -789,7 +789,7 @@
       "status": "verified",
       "title": "gate-evaluation",
       "path": "root/verification/gate-evaluation",
-      "fingerprint": "d88c8cb4256c45aca7067baccb738ce0cbcd9f1b4e4a174ee267017c1b5047e6",
+      "fingerprint": "cc5d457cceb4d6315fb2b93c33e7327b90436cb15aec5ab769c6bd7ba25af14c",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -799,7 +799,7 @@
       "status": "verified",
       "title": "gate-evaluate",
       "path": "root/verification/gate-evaluation/gate-evaluate",
-      "fingerprint": "505404ed363385aa82e213a486846c599ce0e2806569a7983620bb943b4c314e",
+      "fingerprint": "16bd1626a3824fc0d24278b4b4b4f81c4ebfbda4e516352d640f7990f546f420",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -809,7 +809,7 @@
       "status": "verified",
       "title": "qa surface",
       "path": "root/verification/qa-surface",
-      "fingerprint": "27047ef193d43caf54ed55cb81af672f5d84c3c3f493df437978f18dedb0f052",
+      "fingerprint": "2af7c61dc1d5c20ea33eade16bdc4aa824cd112f3824bdb5ceae890ddaf3c633",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -819,7 +819,7 @@
       "status": "verified",
       "title": "qa surfaces",
       "path": "root/verification/qa-surface/qa-surfaces",
-      "fingerprint": "360af1014e5692316fad29cd36067e9c4d3b4b6398844ccc6e00fb3bf50d8a2f",
+      "fingerprint": "3d3a6424e0c15acc47e4f1fe156ef18f6369e8053f3cb33c2e48a809242013de",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -829,7 +829,7 @@
       "status": "verified",
       "title": "rollup-audit",
       "path": "root/verification/rollup-audit",
-      "fingerprint": "63c9692a6d1b009557d98b07b53a243854ac03505893b2a3b9b5a215147e4cc3",
+      "fingerprint": "a6a8eafe15d546fb4b9d96cf9c4f9f7c7fbedf1aa6617bd1b2c9f687e5781638",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -839,7 +839,7 @@
       "status": "verified",
       "title": "leaf verification",
       "path": "root/verification/rollup-audit/leaf-verification",
-      "fingerprint": "67989b4ed56835ec3adfa5ca541737f5d33e7d33e4dc192207c47c9559011375",
+      "fingerprint": "c97e62a8b4b401d1ef0454fde19a2fc36fe95081cb7508988b4c5bd236932f65",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -849,7 +849,7 @@
       "status": "verified",
       "title": "parent rollup",
       "path": "root/verification/rollup-audit/parent-rollup",
-      "fingerprint": "88c2c1bc9aa94e4f1c975c47cc209dd387805220a369df402200f698eb448800",
+      "fingerprint": "d4e46b35d0738f898130a32bf5538d63c06580e149413c846e0b1b1277528dce",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -859,7 +859,7 @@
       "status": "verified",
       "title": "tree audit",
       "path": "root/verification/rollup-audit/tree-audit",
-      "fingerprint": "c6c8d90bd5a2975f3bddde5d583919b991b4107d9fdd9e3d735f2fe35c86fefa",
+      "fingerprint": "8891b693d31c6e98361b7f7f97d3512c10bae9169c3e313e700df23f824157f5",
       "fingerprint_alg": "tree-json-v1"
     }
   ]

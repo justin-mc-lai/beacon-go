@@ -36,19 +36,20 @@
     "type": "test",
     "spec": "当 AGENTS 写死当前版本时，版本检查失败"
   },
+  "constraint": true,
   "implementation": {
     "by": "self-audit",
     "outcome": "done",
     "artifact_path": "/tmp/beacon-evidence/all/n_f4d414369986.txt",
     "artifact_hash": "1bc70d42c784e659866562e8256e3230082a2563befd3fa56e95e5a18b3a5902",
-    "at": "2026-11-26T03:06:45.092981Z"
+    "at": "2026-11-26T04:05:07.756184Z"
   },
   "verification_evidence": {
     "artifact_id": "art_14dce074e6fe24ec9d77858e",
     "content_hash": "1bc70d42c784e659866562e8256e3230082a2563befd3fa56e95e5a18b3a5902",
     "by": "self-audit",
-    "at": "2026-11-26T03:06:45.108843Z"
+    "at": "2026-11-26T04:05:07.764005Z"
   },
-  "fingerprint": "028e8511d96da0651a5fb4c9821e7d26bcbb54c4c301de4e9fef7675912a9040",
+  "fingerprint": "62bd9eb7cc5f3240dee0a3329a5888300bb9e2002e4319ce93534f1e7d000585",
   "fingerprint_alg": "tree-json-v1"
 }

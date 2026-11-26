@@ -1,0 +1,82 @@
+{
+  "id": "n_542ddf4aff0d",
+  "kind": "feature",
+  "title": "stage-gate",
+  "intent": "阶段门禁",
+  "doc": "## 问题\n“这个阶段可以开始了吗”如果靠自评、时间或散文判断，未冻结的需求会被带进实现，未验证的叶子会被带进发布。团队需要一个统一、可解释、不可跳过的阶段门，而且门的判定只能来自树真相。\n\n## 目标用户\n- 交付负责人和评审者。\n- 宿主 agent（在每次 tick 前需要知道能不能开工）。\n- 审计人员（需要看到拒绝原因码）。\n\n## 场景\n- tick 到 truth / implement / qa 阶段时，检查树是否满足开工条件。\n- 准备 `goal complete` 时，检查 root 是否 verified、verifier 是否独立、人工是否确认。\n- 树里还是 draft feature 或未验证叶子时，得到稳定原因码而不是模糊报错。\n\n## 范围\n- truth 阶段要求 feature 已 frozen。\n- qa 阶段要求全部叶子 verified 或 delivered；release 要求 root verified 或 delivered。\n- implement 要求 feature 已过冻结门（frozen 及更后状态），叶子不得是 draft 或 change_pending。\n- 不满足时返回稳定 reason code：`tree_feature_not_frozen`、`tree_leaf_not_frozen`、`tree_leaf_not_verified`、`tree_root_not_verified` 等。\n- `goal complete` 还要求：已 attach 独立 verifier（maker ≠ checker）、人类确认带身份、最新 QA 门 pass。\n- `attach-verifier` 只记录检查者，不清除未解决阻塞。\n\n## 非目标\n- 不自动冻结节点、不自动验证叶子、不自动补证据。\n- 不执行阶段工作；阶段执行归宿主。\n- 不因技术门全过就跳过人工发布确认。\n- 不重写树状态来“让门通过”。\n\n## 验收标准\n- truth 阶段遇 draft feature 返回 `tree_feature_not_frozen`，不推进。\n- implement 阶段遇未冻结叶子返回 `tree_leaf_not_frozen`。\n- qa 阶段遇未验证叶子返回 `tree_leaf_not_verified`。\n- release/complete 遇 root 未 verified 返回 `tree_root_not_verified`。\n- complete 缺 verifier、缺人工确认或 QA 未 pass 时分别返回对应原因码。\n- maker 与 checker 相同会被拒绝；`attach-verifier` 不能清除人工门或阻塞。\n\n## 用户流程\n1. `goal tick --by ...` 进入某阶段。\n2. 门不通过时读 `reason_code`，回到 truth / implement / verify 补齐。\n3. 叶子验证完成并 `verify rollup` 到 root。\n4. `goal attach-verifier --source \u003cchecker\u003e`，再 `goal complete --human-confirmed --confirmed-by \u003c人\u003e`。\n\n## 指标\n- 各阶段的 blocked 比例与 Top reason codes，数据源为 `tree_stage_blocked` / `stage_exit_blocked` / `complete_rejected` 事件。\n- root verified 后 complete 一次成功率。\n- verifier attach 被拒次数与原因分布。\n- 目标阈值：待产品确认。\n\n## 风险\n- 没有树索引的旧项目会直接放行阶段门（legacy 兼容），这会让“树门”在旧项目上形同虚设，需要显式迁移。\n- release 阶段本身不被 tick 执行；真正的发布门只在 complete 时判定，容易误以为 tick 到 release 就等于可发布。\n- 人工门必须由带身份的确认解除；没有 `--confirmed-by` 的确认会被当作未确认。\n- 门只读树状态与账本事实，不读散文；文档写得再完整也不能替代冻结与验证。",
+  "parent_id": "n_2f9cbcff36f4",
+  "path": "root/goal-orchestration/stage-gate",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "sg-1",
+      "text": "truth 阶段要求 feature frozen；implement 要求叶子 frozen。"
+    },
+    {
+      "id": "sg-2",
+      "text": "qa 阶段要求全部叶子 verified；release 要求 root verified。"
+    },
+    {
+      "id": "sg-3",
+      "text": "不满足时返回稳定 reason code，不自动补全。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "plan",
+      "truth",
+      "design",
+      "implement",
+      "qa",
+      "release"
+    ],
+    "transitions": [
+      {
+        "from": "plan",
+        "to": "truth",
+        "event": "plan_done"
+      },
+      {
+        "from": "truth",
+        "to": "design",
+        "event": "truth_frozen"
+      },
+      {
+        "from": "design",
+        "to": "implement",
+        "event": "design_bound"
+      },
+      {
+        "from": "implement",
+        "to": "qa",
+        "event": "implement_done"
+      },
+      {
+        "from": "qa",
+        "to": "release",
+        "event": "qa_verified"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "release",
+        "to": "plan"
+      },
+      {
+        "from": "qa",
+        "to": "plan"
+      },
+      {
+        "from": "implement",
+        "to": "release"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "990f50e3f56db35bdb51fdcfc07ada7b09e0cf6d88492e113e9fdf9f0b7393d9",
+    "ce01afb2f6a0b5808785aa36c8e8a7a26db741b52f54886af7602e0b51653c0d",
+    "58cbaa267b8610b4a3474a819c9a282056363f193e8d3554dded73287db4855c"
+  ],
+  "fingerprint": "5a12aaa73d3db9719ba1988480bf19b8a3edba1f153593ec39aaaa0a9b46848c",
+  "fingerprint_alg": "tree-json-v1"
+}

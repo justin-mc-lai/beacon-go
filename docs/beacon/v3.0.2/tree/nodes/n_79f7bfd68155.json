@@ -40,15 +40,15 @@
     "by": "self-audit",
     "outcome": "done",
     "artifact_path": "/tmp/beacon-evidence/all/n_79f7bfd68155.txt",
-    "artifact_hash": "b884722189a931f7e2c3bc172e239b2c80cacb11a8e06c2b7b5e415ae41280f5",
-    "at": "2026-11-26T03:07:00.629808Z"
+    "artifact_hash": "a0be96f10afc3f674902b85e2f6aa77c5c3f0f9946c6658ac54ae41dcbdae501",
+    "at": "2026-11-26T04:03:17.874492Z"
   },
   "verification_evidence": {
     "artifact_id": "art_6bbcf361c77d4cba7cd7c3d6",
-    "content_hash": "b884722189a931f7e2c3bc172e239b2c80cacb11a8e06c2b7b5e415ae41280f5",
+    "content_hash": "a0be96f10afc3f674902b85e2f6aa77c5c3f0f9946c6658ac54ae41dcbdae501",
     "by": "self-audit",
-    "at": "2026-11-26T03:07:00.646223Z"
+    "at": "2026-11-26T04:03:17.887704Z"
   },
-  "fingerprint": "4416fceb3946eb77b838435fd26ec9c45ffcfc57cb6efa0a9d92ac4d61bc16f2",
+  "fingerprint": "c1a328092774cc0052bca4db383a753d490eb7d9dc8948d3062a9cec11eff46a",
   "fingerprint_alg": "tree-json-v1"
 }

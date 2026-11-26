@@ -1,0 +1,14 @@
+{
+  "id": "chg_a5ba1ceb1b36",
+  "node_id": "n_4aafa3895e8d",
+  "summary": "Add product PRD doc",
+  "by": "beacon-self-audit",
+  "base_fingerprint": "78a43ac45d32f5db23492904d7826a2035ddb89b8d03506d9da5d26958ed0d61",
+  "affected": [
+    "n_4aafa3895e8d",
+    "n_691cddfe9236",
+    "n_77ece7e1beb1",
+    "n_79f7bfd68155"
+  ],
+  "created_at": "2026-11-26T04:02:58.213228Z"
+}

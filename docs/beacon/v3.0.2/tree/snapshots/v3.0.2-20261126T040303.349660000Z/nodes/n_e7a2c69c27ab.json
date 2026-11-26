@@ -1,0 +1,29 @@
+{
+  "id": "n_e7a2c69c27ab",
+  "kind": "feature",
+  "title": "repository-projection",
+  "intent": "树 JSON 是权威，缓存与渲染均为可重建投影。",
+  "doc": "## 问题\n需求正文如果同时存在树 JSON、SQLite、Markdown、HTML 多个可写副本，迟早会不一致；读者在 HTML 上看到的内容也可能不是当前合同。团队需要明确“哪一份算数”，并且缓存或视图丢了还能从权威源重建。\n\n## 目标用户\n- 评审者/新接手开发者：需要快速读到当前需求，又不会被派生物误导。\n- 宿主 agent：需要从稳定 JSON 读取节点正文，而不是解析渲染页面。\n- 维护者：缓存损坏或迁移后要能重建索引。\n\n## 场景\n- 修改任一节点正文后重新渲染，页面必须显示新的 source hash。\n- SQLite 缓存丢失或 schema 迁移后，从仓库内 canonical JSON 重建。\n- 给非实现者发 HTML/Markdown，读者能看到“派生只读”和来源摘要。\n\n## 范围\n- 仓库内 canonical tree JSON 是唯一权威源；SQLite 只是可重建索引缓存。\n- Markdown/HTML 是带 source hash 的派生视图；渲染不改合同指纹。\n- source hash 随索引中的指纹集合变化，间接绑定全部节点正文。\n- HTML 明确标注权威源与“派生只读”。\n\n## 非目标\n- 不把 SQLite、Markdown 或 HTML 升级为可写权威源。\n- 不支持从 HTML 反向编辑需求。\n- 不提供站点托管、权限控制或在线协作。\n- 不负责页面信息架构与可读性设计（属于 requirement-workbench）。\n\n## 验收标准\n- [ ] rp-1 源哈希覆盖全部节点正文。\n- [ ] rp-2 渲染不改合同指纹。\n- [ ] rp-3 缓存失效可从 JSON 重建。\n- [ ] 细化：正文变化后 source hash 变化；渲染结果携带 source hash。\n\n## 用户流程\n1. 冻结节点，写入 canonical JSON 与指纹。\n2. 生成索引并计算 source hash。\n3. 从索引渲染 Markdown/HTML 或生成快照。\n4. 修改正文后重新渲染，出现新的 source hash；旧页面不再代表当前合同。\n\n## 风险\n- source hash 基于索引条目，正文通过节点指纹间接绑定；若索引字段与正文脱节，需要额外校验（待产品确认校验频率）。\n- 渲染物会过期，读者可能仍把旧 HTML 当权威源；页面必须持续显示来源与派生标识。\n- 缓存重建依赖 canonical JSON 完整；迁移或手工编辑必须走正式入口。",
+  "parent_id": "n_244f402ca9c7",
+  "path": "root/truth-kernel/repository-projection",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "rp-1",
+      "text": "源哈希覆盖全部节点正文。"
+    },
+    {
+      "id": "rp-2",
+      "text": "渲染不改合同指纹。"
+    },
+    {
+      "id": "rp-3",
+      "text": "缓存失效可从 JSON 重建。"
+    }
+  ],
+  "child_fingerprints": [
+    "3e0b7fe66038b9d0ca9119676255714364992c4ef352726964f6302e45b9e796"
+  ],
+  "fingerprint": "76b4934a7c06ea341c2bea430dc5d5ca3f352dccf6ad75163e40007b5d05e54e",
+  "fingerprint_alg": "tree-json-v1"
+}

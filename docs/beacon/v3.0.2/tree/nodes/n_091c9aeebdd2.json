@@ -36,19 +36,20 @@
     "type": "test",
     "spec": "当改写已登记文件后，门禁读取标记 stale"
   },
+  "constraint": true,
   "implementation": {
     "by": "self-audit",
     "outcome": "done",
     "artifact_path": "/tmp/beacon-evidence/all/n_091c9aeebdd2.txt",
-    "artifact_hash": "8884a37b1719e7cfbd74424245d994267d6cc22c43640700fa3a22da2641b38e",
-    "at": "2026-11-26T03:07:20.736367Z"
+    "artifact_hash": "36b506a7bc145d76b020c38cab12f2cfc93537d1b0e0c29baea04fd48ea85efb",
+    "at": "2026-11-26T04:05:28.877959Z"
   },
   "verification_evidence": {
     "artifact_id": "art_e51b9faf4716c306d436ee80",
-    "content_hash": "8884a37b1719e7cfbd74424245d994267d6cc22c43640700fa3a22da2641b38e",
+    "content_hash": "36b506a7bc145d76b020c38cab12f2cfc93537d1b0e0c29baea04fd48ea85efb",
     "by": "self-audit",
-    "at": "2026-11-26T03:07:20.751152Z"
+    "at": "2026-11-26T04:05:28.886181Z"
   },
-  "fingerprint": "a7e8f9659e37dcef06a4ee7f567369be859f9330ad5e11ea81e14e7534ddf686",
+  "fingerprint": "2ed241116d5593e43499f9074c7400f9b5054df504b2ffa6b45c87ed9280b67d",
   "fingerprint_alg": "tree-json-v1"
 }

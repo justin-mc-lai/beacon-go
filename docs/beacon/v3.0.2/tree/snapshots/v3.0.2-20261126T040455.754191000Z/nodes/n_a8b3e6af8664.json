@@ -1,0 +1,31 @@
+{
+  "id": "n_a8b3e6af8664",
+  "kind": "feature",
+  "title": "plan surface",
+  "intent": "plan 组必须把树构建、proposal 校验和渲染收成一个清晰入口",
+  "doc": "## 问题\n\n树构建入口分散在 init/expand/apply 与多个 tree 视图之间，proposal 的自检和落盘各用一套规则。标题没有 ASCII 时，节点路径可能为空或退化成通用段；显式 slug 重复会静默覆盖已有路径。HTML 不标来源时，读者容易把渲染页当成可编辑的需求原文。\n\n## 目标用户\n\n规划者/宿主 agent；需求作者；评审与新人读者。\n\n## 场景\n\n宿主产出 `proposal.json`，先 dry-run 校验，再 apply 写草稿；团队用 summary/json/md/html 阅读同一棵树；需要稳定 URL/路径时显式指定 slug。\n\n## 范围\n\n- proposal 子节点支持可选显式 slug；显式 slug 必须匹配 `^[a-z0-9]+([-_][a-z0-9]+)*$`；非法返回 `tree_node_slug_invalid`。\n- 显式 slug 与已有路径冲突时返回 `tree_node_slug_collision`，不静默加后缀。\n- 纯中文标题且未给 slug 时拒绝，返回 `tree_node_slug_missing` 并提示补 slug。\n- `plan tree` / `truth tree` 支持 summary/json/md/html；HTML 写入权威源 hash 与“派生只读”标识，并指向 `docs/beacon` 权威目录。\n- `plan expand` 只读校验；`plan apply` 才写草稿并记录 expansion provenance。\n\n## 非目标\n\n- 不调用模型生成或改写 proposal；不做自动翻译，也不自动造 slug。\n- 不把 HTML/MD 变成可编辑真相，不做双向同步。\n- 不修改节点数量上限、DAG 规则或树 schema；这些走单独变更。\n\n## 验收标准\n\n- plan-1：proposal 可带可选 slug；显式 slug 生成路径末段，重复或非法 slug fail closed。\n- plan-2：纯中文标题未给 slug 时拒绝，错误码可读。\n- plan-3：plan tree 支持 summary/json/md/html，HTML 标出权威源与派生只读。\n- guard-1：非法显式 slug 返回 `tree_node_slug_invalid`。\n- guard-2：显式 slug 与已有路径冲突时返回 `tree_node_slug_collision`，不静默加后缀。\n- slug-1：带 slug 的 proposal 生成的 feature 路径末段等于该 slug。\n- slug-2：纯中文标题未给 slug 时返回 `tree_node_slug_missing`。\n- render-1：plan tree 支持四种格式，HTML 写入权威源 hash 与 source 标识。\n\n## 用户流程\n\n`plan init` → 宿主写 `proposal.json` → `plan expand` 校验 → `plan apply` 写草稿 → `truth node freeze` → `plan tree --format` 阅读或归档。\n\n## 指标\n\n- 每次 HTML 渲染输出 source hash 与权威源指向。\n- 显式 slug 冲突时静默覆盖次数为 0。\n- expand 与 apply 使用同一个 `ValidateProposal`，判定结果一致。\n\n## 风险\n\n- slug 规则只接受 ASCII；中文团队必须额外提供 slug，否则批量 proposal 会被整体拒绝。\n- 自动 slug 冲突仍会自动加 `-N` 后缀，用户可能误以为新增了不同节点；只有显式 slug 才 fail closed。是否统一为 fail closed 待产品确认。\n- 不合法格式会返回 `tree_format_unknown`，但错误提示未列出全部可用格式的示例。",
+  "parent_id": "n_8b83bfc9403d",
+  "path": "root/cli-surface/plan-surface",
+  "status": "delivered",
+  "acs": [
+    {
+      "id": "plan-1",
+      "text": "proposal 可带可选 slug；显式 slug 生成路径末段，重复或非法 slug fail closed。"
+    },
+    {
+      "id": "plan-2",
+      "text": "纯中文标题未给 slug 时拒绝，错误码可读。"
+    },
+    {
+      "id": "plan-3",
+      "text": "plan tree 支持 summary/json/md/html，HTML 标出权威源与派生只读。"
+    }
+  ],
+  "child_fingerprints": [
+    "047eb609087d04266dea4cb5a8ecc191c499fcbe8388b48934a9831035a47afa",
+    "ad7ce464e7be71695d337d592804436c010efc00e66b99a18ddfbc4b75a28b00",
+    "92578af28e8e6c845b4df438cad232a6e666030b7a43a4e84a5b4719c55cc12f"
+  ],
+  "fingerprint": "29f976344ff78553eb843b10f97e809df211faf351a89678eadf6582468af057",
+  "fingerprint_alg": "tree-json-v1"
+}

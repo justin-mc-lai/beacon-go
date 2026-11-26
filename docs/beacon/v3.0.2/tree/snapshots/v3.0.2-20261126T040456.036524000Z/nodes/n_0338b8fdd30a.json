@@ -1,0 +1,32 @@
+{
+  "id": "n_0338b8fdd30a",
+  "kind": "module",
+  "title": "self-host",
+  "intent": "用自身能力验证自身",
+  "parent_id": "nroot_98a9c77a9519",
+  "path": "root/self-host",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "sh-1",
+      "text": "用羽毛球 dogfood 走通冻结、实现、验证、汇总、变更、快照与 HTML。"
+    },
+    {
+      "id": "sh-2",
+      "text": "七个 skill 可安装到宿主目录，路由文案与当前版本一致。"
+    },
+    {
+      "id": "sh-3",
+      "text": "自驱动产生的证据必须可哈希复查，不用文档冒充运行结果。"
+    }
+  ],
+  "child_fingerprints": [
+    "56c61a3ed385b39c01a567438981a790276dcad79543db51a359cedd932d0613",
+    "83ddbb9d3f4031c9b8e8df099626d125924773a6d897d6ae67d04d2fa750687b",
+    "0a77a612926fc522d97b59431e82c4d0bb9a746c237d83e88074036e59ac792e",
+    "5c3876a023389631012d9eb645a917531ba7f9b1df069164a285b0f1e9ed3b94",
+    "523dae1d7d5859275416c7dfac5e9933d3021fa43face6ad9e4df221962099f6"
+  ],
+  "fingerprint": "2e062347377a618b4587830a2aca9429ef103d835ef2124a9898cde9a0969d8b",
+  "fingerprint_alg": "tree-json-v1"
+}

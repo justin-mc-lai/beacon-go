@@ -18,6 +18,8 @@ type ProposalChild struct {
 	Title        string        `json:"title"`
 	Slug         string        `json:"slug,omitempty"`
 	Intent       string        `json:"intent,omitempty"`
+	Doc          string        `json:"doc,omitempty"`
+	Constraint   bool          `json:"constraint,omitempty"`
 	ACs          []AC          `json:"acs,omitempty"`
 	TestCases    []TestCase    `json:"test_cases,omitempty"`
 	DomainFSM    *DomainFSM    `json:"domain_fsm,omitempty"`
@@ -150,6 +152,8 @@ func ApplyProposal(st *store.Store, dir, versionID, parentID string, p Proposal)
 			Kind:         ch.Kind,
 			Title:        ch.Title,
 			Intent:       ch.Intent,
+			Doc:          ch.Doc,
+			Constraint:   ch.Constraint,
 			ParentID:     parentID,
 			Path:         path,
 			Status:       StatusDraft,

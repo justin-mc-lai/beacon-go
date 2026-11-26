@@ -1,0 +1,64 @@
+{
+  "id": "n_7df782fdb5d7",
+  "kind": "feature",
+  "title": "v1-migration",
+  "intent": "把 Python v1 账本一次性迁入 Go 账本，失败不破坏源数据。",
+  "doc": "## 问题\n\n升级到 Go 内核后，旧项目资料仍留在 v1 目录，新工具看不见。人工复制既可能改动源数据，也可能在失败后留下半套账本；团队不知道能否安全重跑，也不知道哪些历史真的被搬过来了。\n\n## 目标用户\n\n从 Python Beacon 升级的团队；迁移执行者与运维；维护者。\n\n## 场景\n\n首次迁移前 dry-run 核对；真实导入；中断或失败后恢复；重复执行确认幂等。\n\n## 范围\n\n- `migrate v1` 只读 v1 目录（`docs/beacon/\u003cversion\u003e/features` 与 `.machine` 记录），不写回源。\n- 写入前对目标 Go 账本做一致性快照；写入失败保留快照，源数据不变。\n- 导入项目、版本、需求包、派生生命周期、评审 gate 与证据指针；按自然键幂等。\n- `--dry-run` 只扫描报告；`--force` 仅在已有 v2 数据时补缺失，不覆盖、不删除。\n- 报告按类别给出 imported/already_present/skipped，并列出不确定项。\n\n## 非目标\n\n- 不迁移无结构 run/轨迹，不猜测未知 ledger schema（`runtime-ledger.sqlite3`、`loop-runs.db` 只做存在性探测）。\n- 不把需求正文改写成新树；旧包以 legacy 指针保留。\n- 不做自动回滚；回滚按迁移文档恢复快照文件。\n\n## 验收标准\n\n- vm-1：迁移前快照源库。\n- vm-2：重复迁移幂等。\n- vm-3：失败可回滚。\n- sv-1：迁移命令先产生快照。\n- sv-2：写入失败时源库不变。\n\n## 用户流程\n\n`migrate v1 --dry-run` → 核对分类计数与 skipped/uncertain → `migrate v1` 真实导入 → 失败则停止并恢复备份 → 重跑确认 imported=0。\n\n## 指标\n\n- 第二次导入 imported=0，且 already_present 与首次 imported 逐项相等。\n- v1 源目录内容 hash 前后不变。\n- 备份文件可打开，且包含导入前的项目行。\n\n## 风险\n\n- vm-1 写“迁移前快照源库”，实现快照的是目标 Go 账本，v1 源目录仅只读；术语与责任边界需产品确认。\n- vm-3“失败可回滚”目前是手动恢复快照，不是自动事务回滚，停库与文件恢复步骤需要用户自己执行。\n- v1 的 runtime/loop 账本与项目级 gate 报告会 skipped 或仅探测；用户可能误以为历史已全量迁移。",
+  "parent_id": "n_65c89b949e6f",
+  "path": "root/data-migration/v1-migration",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "vm-1",
+      "text": "迁移前快照源库。"
+    },
+    {
+      "id": "vm-2",
+      "text": "重复迁移幂等。"
+    },
+    {
+      "id": "vm-3",
+      "text": "失败可回滚。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "detected",
+      "snapshotted",
+      "migrated",
+      "verified"
+    ],
+    "transitions": [
+      {
+        "from": "detected",
+        "to": "snapshotted",
+        "event": "snapshot"
+      },
+      {
+        "from": "snapshotted",
+        "to": "migrated",
+        "event": "write"
+      },
+      {
+        "from": "migrated",
+        "to": "verified",
+        "event": "verify"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "verified",
+        "to": "migrated"
+      },
+      {
+        "from": "detected",
+        "to": "migrated"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "c7a416f72c9c1ca1f4967a15be6349e3a729e269812efb8e8251f0feadaf91c9"
+  ],
+  "fingerprint": "c444c95e9ba1d87071b43322f1c715d2976df1ec828b4f6655131f8a83e31619",
+  "fingerprint_alg": "tree-json-v1"
+}

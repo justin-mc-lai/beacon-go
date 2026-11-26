@@ -1,0 +1,43 @@
+{
+  "id": "n_fd3492a343ad",
+  "kind": "touchpoint",
+  "title": "version line",
+  "intent": "版本线只能显式打开，不能隐式升级",
+  "parent_id": "n_0fe4a2ab5ffb",
+  "path": "root/data-migration/projects-version/version-line",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "version-1",
+      "text": "projects bump 默认 patch，显式 minor/major；docs root 与 current 标记随新版本变化。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "version-tc1",
+      "ac_id": "version-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestProjectsBumpPatch -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 projects bump patch 时，新版本线被创建且旧版本不被改写"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_fd3492a343ad.txt",
+    "artifact_hash": "9d0c0d3393f5d7e4be23f4b099858e97ada4b69e93b0df3ac07bec7184123561",
+    "at": "2026-11-26T04:03:15.086826Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_66453f5979442ec9d9cd68f6",
+    "content_hash": "9d0c0d3393f5d7e4be23f4b099858e97ada4b69e93b0df3ac07bec7184123561",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:15.097161Z"
+  },
+  "fingerprint": "1ddf2f0d7c7cf9a0e100581f9b6829e8eaa1bb854c3ed9df5644d5692cd03f9d",
+  "fingerprint_alg": "tree-json-v1"
+}

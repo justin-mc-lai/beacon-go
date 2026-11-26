@@ -44,6 +44,11 @@ func FreezeNode(st *store.Store, dir, versionID, nodeID string) (FreezeReport, e
 	if err != nil {
 		return FreezeReport{}, err
 	}
+	if n.Kind == KindFeature && strings.TrimSpace(n.EffectiveTruthPath()) == "" {
+		if err := ValidateFeatureDoc(n.Doc); err != nil {
+			return FreezeReport{}, err
+		}
+	}
 	if n.DomainFSM != nil {
 		if n.Kind != KindFeature {
 			return FreezeReport{}, core.NewError(ReasonFSMScope, "intenttree.FreezeNode",

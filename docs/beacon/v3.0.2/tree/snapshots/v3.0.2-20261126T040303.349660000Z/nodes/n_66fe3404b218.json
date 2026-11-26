@@ -1,0 +1,32 @@
+{
+  "id": "n_66fe3404b218",
+  "kind": "module",
+  "title": "verification",
+  "intent": "证据、叶子验证与父级汇总",
+  "parent_id": "nroot_98a9c77a9519",
+  "path": "root/verification",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "vf-1",
+      "text": "证据登记必须有显式 scope（feature 或 node）与内容哈希。"
+    },
+    {
+      "id": "vf-2",
+      "text": "叶子只有在 implemented 且证据已登记后才能变 verified。"
+    },
+    {
+      "id": "vf-3",
+      "text": "父级只在全部子节点 verified 后才能 verified；审计只读。"
+    }
+  ],
+  "child_fingerprints": [
+    "9f4bafc762ab34169ce134be15d626cf76f3158d03eb106dad1301c6a92845ec",
+    "30f8548c54aadc206ac8313e375a1460571af350a49e4cd2e9e965a63945dcdd",
+    "c00335ad2e859cb6ade2717079b2b9b2ea1b9e246ee9caf419cc3d739c355fc4",
+    "5b94d758d1a937485255010c79da9e9ea0c89994e93483690efb429a0f477c52",
+    "447b0cc3b831b51142ea2f3ffe24bb3502799457a8a74a51f90e0b213e8ac23a"
+  ],
+  "fingerprint": "ceaa7ef1c0dd4739e25996d8cf9a9787d09c1e80c5ce388b6d239e7092fcd791",
+  "fingerprint_alg": "tree-json-v1"
+}

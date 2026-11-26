@@ -36,19 +36,20 @@
     "type": "test",
     "spec": "当依赖图包含 internal/llm 时，check_kernel_deps 失败"
   },
+  "constraint": true,
   "implementation": {
     "by": "self-audit",
     "outcome": "done",
     "artifact_path": "/tmp/beacon-evidence/all/n_4831ea983793.txt",
     "artifact_hash": "de3e9490c5f385bba2ca93f8877c30bbff6698a5dabc0bb7acf5136cea988f9b",
-    "at": "2026-11-26T03:06:45.010462Z"
+    "at": "2026-11-26T04:05:07.712829Z"
   },
   "verification_evidence": {
     "artifact_id": "art_bd2092cb03b197967457fd1c",
     "content_hash": "de3e9490c5f385bba2ca93f8877c30bbff6698a5dabc0bb7acf5136cea988f9b",
     "by": "self-audit",
-    "at": "2026-11-26T03:06:45.028769Z"
+    "at": "2026-11-26T04:05:07.721139Z"
   },
-  "fingerprint": "6b10f72be37a71c922e7ef0635fe467b15b34b2a5f1a38bea2b9410327ef6eb4",
+  "fingerprint": "45efd13ed0ba9e23a043646915000e3d837643a4aba2dc42548af52b4aa4a083",
   "fingerprint_alg": "tree-json-v1"
 }

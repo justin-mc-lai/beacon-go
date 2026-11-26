@@ -1,0 +1,54 @@
+{
+  "id": "n_4fbcca4f8b09",
+  "kind": "touchpoint",
+  "title": "tree stage readiness",
+  "intent": "阶段判定委托给树",
+  "parent_id": "n_542ddf4aff0d",
+  "path": "root/goal-orchestration/stage-gate/tree-stage-readiness",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "n_4fbcca4f8b09-1",
+      "text": "draft feature 阻塞 truth 阶段。"
+    },
+    {
+      "id": "n_4fbcca4f8b09-2",
+      "text": "未验证叶子阻塞 qa 阶段。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_4fbcca4f8b09-tc1",
+      "ac_id": "n_4fbcca4f8b09-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestGoalTruthStageDelegatesToTree",
+      "status": "existing"
+    },
+    {
+      "id": "n_4fbcca4f8b09-tc2",
+      "ac_id": "n_4fbcca4f8b09-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestGoalTruthStageDelegatesToTree",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 truth 阶段遇到 draft feature 时，goal tick 返回 tree_feature_not_frozen"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_4fbcca4f8b09.txt",
+    "artifact_hash": "540d9a4dbbb352fd2e0d7c493355e555dada86ceb82b1931d38a29c1f30eb599",
+    "at": "2026-11-26T04:03:21.41093Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_3e5d6ba14877288f7387eb57",
+    "content_hash": "540d9a4dbbb352fd2e0d7c493355e555dada86ceb82b1931d38a29c1f30eb599",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:21.419567Z"
+  },
+  "fingerprint": "ce01afb2f6a0b5808785aa36c8e8a7a26db741b52f54886af7602e0b51653c0d",
+  "fingerprint_alg": "tree-json-v1"
+}

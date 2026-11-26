@@ -1,0 +1,31 @@
+{
+  "id": "n_712b67ae7445",
+  "kind": "feature",
+  "title": "requirement workbench",
+  "intent": "让需求树 HTML 成为清晰、单源、可筛选的工作台",
+  "doc": "## 问题\n树 JSON 对非作者不友好，普通 HTML 树列表又看不出三件事：哪份是权威源、需求分布如何、哪些功能只是没有 legacy 包而不是失败。评审者容易把“未绑定旧包”误读成“需求未完成”，也无法按状态快速筛选。\n\n## 目标用户\n- 评审者：快速判断当前合同状态与覆盖范围。\n- 产品/需求作者：查看自己写的节点正文与状态分布。\n- 新接手开发者：通过一个页面理解整棵树，不必逐文件读 JSON。\n\n## 场景\n- 打开工作台，第一眼看到权威源路径、source hash 和“HTML 派生只读”。\n- 按草稿/冻结/已实现/已验证筛选节点，数量与列表一致。\n- 选中节点，中间读需求正文，右侧看相关业务 FSM。\n- 某个功能没有 legacy 包，页面显示 `tree-native`，CLI summary 也只给数量。\n\n## 范围\n- 三栏工作台：完整树、选中节点需求正文、相关 FSM。\n- 顶部显示权威源 `tree/index.json`、source hash 与“HTML 派生只读”。\n- 显示草稿/冻结/交付实现/验证的数量，并支持点击筛选；CLI summary 输出同样的状态计数。\n- 无 `truth_path` 的功能标记为 `tree-native`，不列入错误列表。\n\n## 非目标\n- 不支持在 HTML 中编辑需求。\n- 不提供后端、登录、权限或多人协作。\n- 不把 HTML 当权威源或第二账本。\n- 不做通用项目管理仪表盘或品牌视觉设计。\n\n## 验收标准\n- [ ] workbench-1 HTML 顶层明确显示权威源路径与 source hash，并标注 HTML 为派生只读。\n- [ ] workbench-2 HTML 显示草稿/冻结/交付实现/验证的数量与可点击筛选。\n- [ ] workbench-3 未绑定 legacy 包的功能显示为 `tree-native`，而不是失败或未完成。\n- [ ] 细化：HTML 显示 `tree/index.json` 的 source hash；CLI summary 输出同样的状态计数；summary 只给 tree-native 数量，不把全量 slug 当错误列表。\n\n## 用户流程\n1. 生成或打开 HTML 工作台。\n2. 在顶部确认权威源、source hash 与派生只读标识。\n3. 用状态按钮筛选，或在搜索框按节点、AC、状态查找。\n4. 选中节点，阅读需求正文与相关 FSM；未绑定 legacy 包的功能显示 `tree-native`。\n\n## 风险\n- HTML 是派生视图，重新冻结后若未重新渲染会过期；页面必须持续显示来源与生成时间/哈希。\n- 页面当前显示短哈希，精确比对时需要完整值；完整值放在哪里待产品确认。\n- 状态计数包含实现中的更多状态，验收只要求四类，界面需避免让用户误以为只有四类。",
+  "parent_id": "n_0338b8fdd30a",
+  "path": "root/self-host/requirement-workbench",
+  "status": "delivered",
+  "acs": [
+    {
+      "id": "workbench-1",
+      "text": "HTML 顶层明确显示权威源路径与 source hash，并标注 HTML 为派生只读。"
+    },
+    {
+      "id": "workbench-2",
+      "text": "HTML 显示草稿/冻结/交付实现/验证的数量与可点击筛选。"
+    },
+    {
+      "id": "workbench-3",
+      "text": "未绑定 legacy 包的功能显示为 tree-native，而不是失败或未完成。"
+    }
+  ],
+  "child_fingerprints": [
+    "17fc1c79bbde17099dd9caae117edbf1a329aba743724f0374cdfbde726e9333",
+    "fe5ecb86526ce7daa8210344ce76dd11a4c519bd0c2e2e548f5d4f1d7d3a8afd",
+    "8b90c507d65052f47945d3ec5ce75b6d12cac102ba0f0cb2cc5da8cf54fafa0b"
+  ],
+  "fingerprint": "5c3876a023389631012d9eb645a917531ba7f9b1df069164a285b0f1e9ed3b94",
+  "fingerprint_alg": "tree-json-v1"
+}

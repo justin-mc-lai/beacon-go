@@ -3,6 +3,7 @@
   "kind": "feature",
   "title": "gate-evaluation",
   "intent": "正式 gate 评估并写回结果；未通过不自动补全。",
+  "doc": "## 问题\n门禁结论如果散落在聊天记录或报告里，谁在何时、基于什么理由放行就无法追溯；状态面若从散文推断，会把“看起来通过”当成正式通过。发布前也容易漏掉某道门从未被评估。\n\n## 目标用户\n- QA 与发布负责人。\n- 评审者与审计人员。\n- 需要读正式结论的宿主 agent。\n\n## 场景\n- 对 truth_freeze / design / implement / qa / release 做一次正式评估并写回。\n- 查询某 feature 的最新门禁结论。\n- 评估失败后修复证据并重新评估。\n- 发布前确认没有“从未评估”的门。\n\n## 范围\n- 每次评估写一行 `gate_results`，并追加一条 `gate_evaluated` 事件；重评追加新行，不覆盖历史。\n- `verify status` / `gate status` 按 feature 作用域读取每类门的最新结论；未评估显示 `not_evaluated`。\n- 评估者身份必填（`gate_evaluator_required`）；未知门类型拒绝。\n- 失败返回稳定 reason code；缺证据、缺门、缺人工确认分别给出可读原因。\n- 评估只读事实并落结论，不自动补证据、不改需求正文。\n\n## 非目标\n- 不自动修复失败项，不自动生成 QA 证据。\n- 不把评分（skill_score）算作门禁结论。\n- 不因技术门全过而跳过 release 的人工确认。\n- 不从 prose、注释或聊天记录推断 pass。\n\n## 验收标准\n- 评估后写入 `gate_results`，可通过状态查询读回同一结论。\n- 状态查询按 feature 作用域返回各门最新结论，未评估项明确标出。\n- 失败返回稳定 reason code；CLI 对 blocked 返回非零退出码并输出 JSON。\n- release 在缺人工确认时返回 `release_requires_human_confirmation` 或同类原因，不得 pass。\n- 同一事实重复评估结论确定；重评保留历史。\n\n## 用户流程\n1. 产出并登记证据。\n2. `verify evaluate --run-id \u003cid\u003e --evaluator \u003c身份\u003e` 或 `gate evaluate \u003ctype\u003e --feature \u003cslug\u003e --evaluator \u003c身份\u003e`。\n3. `verify status` / `gate status` 读取最新结论与原因码。\n4. 失败项修复后重新评估；发布前确认五门均已有正式结论。\n\n## 指标\n- 各门 pass/blocked 比例与 Top reason codes。\n- 从首次 blocked 到 pass 的评估轮次与耗时。\n- 发布时仍未评估的门数量（目标应为 0）。\n- 目标阈值：待产品确认。\n\n## 风险\n- release 在人工确认前必然 blocked；这是有意设计，不应被当作缺陷重试。\n- 评估绑定 feature（以及可选 run）；run 归属错误会把结论写到错误的需求上。\n- 门禁只信已登记且未 stale 的证据；磁盘上有文件但没登记，评估仍会失败。\n- 历史结论永久保留，修复后的新结论不会抹掉旧 blocked；看状态要认最新一行。",
   "parent_id": "n_66fe3404b218",
   "path": "root/verification/gate-evaluation",
   "status": "verified",
@@ -51,8 +52,8 @@
     ]
   },
   "child_fingerprints": [
-    "505404ed363385aa82e213a486846c599ce0e2806569a7983620bb943b4c314e"
+    "16bd1626a3824fc0d24278b4b4b4f81c4ebfbda4e516352d640f7990f546f420"
   ],
-  "fingerprint": "d88c8cb4256c45aca7067baccb738ce0cbcd9f1b4e4a174ee267017c1b5047e6",
+  "fingerprint": "cc5d457cceb4d6315fb2b93c33e7327b90436cb15aec5ab769c6bd7ba25af14c",
   "fingerprint_alg": "tree-json-v1"
 }

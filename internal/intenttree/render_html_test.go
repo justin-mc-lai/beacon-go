@@ -58,3 +58,16 @@ func TestRenderHTMLTreeCountsDelivered(t *testing.T) {
 		}
 	}
 }
+
+func TestRenderHTMLTreeRendersFeatureDoc(t *testing.T) {
+	idx := Index{Schema: Schema, Version: "v0.1.0", RootID: "f", Nodes: []IndexEntry{
+		{ID: "f", Kind: KindFeature, Status: StatusFrozen, Title: "feature", Path: "root/feature", Fingerprint: "aa"},
+	}}
+	body := Node{ID: "f", Kind: KindFeature, Status: StatusFrozen, Doc: "## 问题\n用户拿不到结果。\n## 目标用户\n维护者。\n## 场景\n打开工作台。\n## 范围\n一个页面。\n## 非目标\n不做服务端。\n## 验收标准\n能看到正文。"}
+	out := string(RenderHTMLTree(idx, map[string]Node{"f": body}))
+	for _, want := range []string{"需求正文", "用户拿不到结果", "目标用户", "验收标准"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("doc render missing %q", want)
+		}
+	}
+}

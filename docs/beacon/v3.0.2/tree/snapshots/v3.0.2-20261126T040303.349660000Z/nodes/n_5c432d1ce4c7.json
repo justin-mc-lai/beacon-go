@@ -1,0 +1,54 @@
+{
+  "id": "n_5c432d1ce4c7",
+  "kind": "touchpoint",
+  "title": "leaf verification",
+  "intent": "叶子 implemented→verified",
+  "parent_id": "n_820af49910f0",
+  "path": "root/verification/rollup-audit/leaf-verification",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_5c432d1ce4c7-1",
+      "text": "implemented 叶子可 verify。"
+    },
+    {
+      "id": "n_5c432d1ce4c7-2",
+      "text": "未 implemented 叶子拒绝。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_5c432d1ce4c7-tc1",
+      "ac_id": "n_5c432d1ce4c7-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestVerifyLeafAndParentRollup",
+      "status": "existing"
+    },
+    {
+      "id": "n_5c432d1ce4c7-tc2",
+      "ac_id": "n_5c432d1ce4c7-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestVerifyLeafAndParentRollup",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当对 implemented 叶子执行 verify leaf 时，状态变 verified"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_5c432d1ce4c7.txt",
+    "artifact_hash": "abdd0d66fc32fd2df16480870292bfcb64fe2e188564df672a8b5e819ff45700",
+    "at": "2026-11-26T03:07:24.379932Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_4da21a678ae367f5ecc3b49f",
+    "content_hash": "abdd0d66fc32fd2df16480870292bfcb64fe2e188564df672a8b5e819ff45700",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:24.396548Z"
+  },
+  "fingerprint": "b21a80f1b451cca5cbf9ae724d5cb6ad126246f17e94e9ca416232645367c66a",
+  "fingerprint_alg": "tree-json-v1"
+}

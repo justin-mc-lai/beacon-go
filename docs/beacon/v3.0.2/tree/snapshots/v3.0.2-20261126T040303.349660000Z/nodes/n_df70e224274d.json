@@ -1,0 +1,31 @@
+{
+  "id": "n_df70e224274d",
+  "kind": "feature",
+  "title": "experience next",
+  "intent": "下一轮用户体验需求：一个入口、一个验证动作、不暴露内部 ID",
+  "doc": "## 问题\n想打开需求工作台或验证一个节点，用户现在往往要记住内部版本号、slug、run id、artifact path 或 hash；任一项写错就失败，而且这些标识对产品和使用者没有意义。验证也被拆成检查、登记证据、rollup 多个动作，容易漏步。\n\n## 目标用户\n- 产品/需求作者：只想打开当前项目的工作台，不想记内部标识。\n- 宿主 agent：用一个验证动作完成检查、证据登记与父级汇总。\n- 偶尔来访的评审者：通过节点标题或路径定位，而不是 id。\n\n## 场景\n- 在项目目录直接运行 `beacon open`，打开当前项目、当前树的工作台。\n- 对某个节点运行 `beacon verify \u003cnode\u003e`，执行该节点声明的测试，登记证据并在通过时 rollup。\n- 输入缺失或无法定位节点时，得到可执行的下一步提示，而不是内部错误。\n\n## 范围\n- `beacon open` 无参数定位当前项目与当前树，打开 HTML 工作台，不需要 `--version`、slug 或 run id。\n- `beacon verify \u003cnode\u003e` 执行节点声明的测试选择器，登记 node-scope evidence，通过时执行 rollup。\n- 正常用户路径不接受 run id、artifact path、slug 或 hash 作为必填参数。\n- 节点可用标题或路径定位；具体解析与冲突提示待产品确认。\n\n## 非目标\n- 不引入新的需求模型或第二套真相源。\n- 不移除高级用户使用的显式参数。\n- 不做 GUI 应用或常驻 Web 服务，只打开静态 HTML。\n- 不自动编造测试或绕过节点声明的验证规格。\n- 不隐藏验证失败；失败必须显式暴露。\n\n## 验收标准\n- [ ] exp-1 用户只运行 `beacon open` 就能打开当前项目需求工作台。\n- [ ] exp-2 用户只运行 `beacon verify \u003cnode\u003e` 就能完成检查、证据登记与 rollup。\n- [ ] exp-3 用户不需要输入 run id、artifact path、slug 或 hash。\n- [ ] 细化：open/verify/next 默认路径不把内部标识作为必填参数；只提供项目与节点标题/路径时系统解析内部 id，缺失时给出可执行提示。\n\n## 用户流程\n1. 进入项目目录，运行 `beacon open`。\n2. 浏览器打开当前树的工作台，无需指定版本或运行标识。\n3. 运行 `beacon verify \u003cnode\u003e`，内核执行该节点声明的测试选择器。\n4. 通过则登记证据并 rollup；失败则显示测试输出与失败原因。\n\n## 风险\n- 节点标题可能重复或随文案变化，标题/路径/id 的解析优先级与歧义提示待产品确认。\n- 当前该功能在树中为 frozen，尚无实现证据；命令形态与“当前项目/当前版本”的判定规则待产品确认。\n- 一个动作完成多步会隐藏中间状态，失败时必须保留足够的测试输出与证据位置。",
+  "parent_id": "n_0338b8fdd30a",
+  "path": "root/self-host/experience-next",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "exp-1",
+      "text": "用户只运行 beacon open 就能打开当前项目需求工作台。"
+    },
+    {
+      "id": "exp-2",
+      "text": "用户只运行 beacon verify \u003cnode\u003e 就能完成检查、证据登记与 rollup。"
+    },
+    {
+      "id": "exp-3",
+      "text": "用户不需要输入 run id、artifact path、slug 或 hash。"
+    }
+  ],
+  "child_fingerprints": [
+    "24d92432f85d7233c9ff684eec3764550027d5952c126f41b577d1e8f0ed05ed",
+    "ff25698c615cfd7be3b922f283630ddf09172d471276ff75d1ff0b7f299d2f8a",
+    "a50da948dafb2e323df211593b840e5797350eccf04002df5866da8414f0dd31"
+  ],
+  "fingerprint": "0a77a612926fc522d97b59431e82c4d0bb9a746c237d83e88074036e59ac792e",
+  "fingerprint_alg": "tree-json-v1"
+}

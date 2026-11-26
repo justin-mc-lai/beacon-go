@@ -1,0 +1,54 @@
+{
+  "id": "n_d3c786a2e734",
+  "kind": "touchpoint",
+  "title": "write-receipt",
+  "intent": "每次写回执可查询、不可覆盖。",
+  "parent_id": "n_9e9c5307a85b",
+  "path": "root/security-boundary/write-audit/write-receipt",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "wr-1",
+      "text": "回执含 by/at/reason。"
+    },
+    {
+      "id": "wr-2",
+      "text": "重复写不覆盖旧回执。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_d3c786a2e734-tc1",
+      "ac_id": "wr-1",
+      "kind": "unit",
+      "ref": "go test ./internal/progressreview -run TestProgressReviewReceiptSchemaAndDefaultMode -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "n_d3c786a2e734-tc2",
+      "ac_id": "wr-2",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestRecoverEventCarriesClearReceipt -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "写入两次后查询回执，至少保留两条并且字段完整。"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_d3c786a2e734.txt",
+    "artifact_hash": "8cf9c8bbc0c6a04727dbf8d5d8637b95c141beff77ddd9e221f42bd39c2a7c07",
+    "at": "2026-11-26T03:07:09.020227Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_5af15239021ed9530471d853",
+    "content_hash": "8cf9c8bbc0c6a04727dbf8d5d8637b95c141beff77ddd9e221f42bd39c2a7c07",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:09.042739Z"
+  },
+  "fingerprint": "f64544fa9de38435f6a9131ff3c29c1bed7515809229503a5456d79c99135607",
+  "fingerprint_alg": "tree-json-v1"
+}

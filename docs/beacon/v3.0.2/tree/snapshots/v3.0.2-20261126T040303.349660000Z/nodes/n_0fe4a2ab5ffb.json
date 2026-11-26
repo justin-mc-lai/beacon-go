@@ -1,0 +1,26 @@
+{
+  "id": "n_0fe4a2ab5ffb",
+  "kind": "feature",
+  "title": "projects version",
+  "intent": "项目注册与版本线是需求真相的稳定作用域",
+  "doc": "## 问题\n\n多项目、多版本并行时，同一个路径可能被重复注册成多个实体，当前版本靠猜测；版本升级如果隐式改动旧 docs 目录，历史与审计线会被悄悄破坏。用户不知道某个仓库的根路径对应哪条需求版本线。\n\n## 目标用户\n\n维护多个仓库的团队；需求负责人与交付负责人；宿主 agent。\n\n## 场景\n\n新机器或新仓库注册；查看当前版本与全部版本；开下一条 patch/minor/major 需求线。\n\n## 范围\n\n- `projects register` 对解析后的绝对根路径幂等；`show`/`list` 返回唯一 `root_path`、`project_key`、`versions` 与 `current_version`。\n- `projects bump` 默认 patch，显式 `--level minor|major`；只新增一条 docs 版本线并设为 current，不改旧版本内容。\n- 未注册项目 bump 返回 `project_not_registered`，提示先注册。\n- 支持 `--json`，字段稳定，便于脚本消费。\n\n## 非目标\n\n- 不删除、合并或重写历史版本。\n- 不自动把需求正文或证据复制到新版本。\n- 不替代 git 分支策略，也不保证注册表跨机器自动同步。\n- `projects export-state`/`import-state` 的跨机恢复是否归本 feature，待产品确认。\n\n## 验收标准\n\n- projects-1：项目注册幂等，show/list 返回唯一根路径与当前版本。\n- projects-2：版本 bump 只开一个新 docs line，不静默改旧版本。\n- registry-1：`projects register` 幂等；show/list 返回 root、versions、current version。\n- version-1：`projects bump` 默认 patch，显式 minor/major；docs root 与 current 标记随新版本变化。\n\n## 用户流程\n\n`projects register --path --version` → `projects show` 核对 → `projects bump --level` → 在新 docs line 上 `plan init`/`plan expand`。\n\n## 指标\n\n- 同一路径二次 register 新增项目行数为 0。\n- 每次 bump 新增版本行数为 1，且 current 唯一。\n- bump 前后旧版本 docs 文件内容不变。\n\n## 风险\n\n- 注册表是机器本地 SQLite；换机器需 export/import-state 或重新 register，用户可能误以为注册信息随仓库走。\n- 存在 version manifest 时 bump 走 `OpenVersion` 分支，无 manifest 时走 `BumpDocsVersion`；两条路径是否完全同语义待产品确认。\n- 命令默认隐藏在 help 外，与 README 快速开始不一致。",
+  "parent_id": "n_65c89b949e6f",
+  "path": "root/data-migration/projects-version",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "projects-1",
+      "text": "项目注册幂等，show/list 返回唯一根路径与当前版本。"
+    },
+    {
+      "id": "projects-2",
+      "text": "版本 bump 只开一个新 docs line，不静默改旧版本。"
+    }
+  ],
+  "child_fingerprints": [
+    "db328ded10b1862be92e9c6060bfe83a11733c55297b711eea248d6696183f97",
+    "a8be0287f2fa062a9e0165ccd5a8362417faf436b45f92aaef8cb6bb0400f331"
+  ],
+  "fingerprint": "61cf80347d09d79126f1efbc827a1675f933d24bb779afffeac8e575d711c26d",
+  "fingerprint_alg": "tree-json-v1"
+}

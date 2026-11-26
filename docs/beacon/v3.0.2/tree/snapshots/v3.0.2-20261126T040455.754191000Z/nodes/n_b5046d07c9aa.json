@@ -1,0 +1,121 @@
+{
+  "id": "n_b5046d07c9aa",
+  "kind": "feature",
+  "title": "freeze-change",
+  "intent": "递归冻结与子树变更",
+  "doc": "## 问题\n需求树分层后，如果允许父节点先冻结、子节点以后再改，“已冻结”就只是标签，不能作为开工依据。下级改动如果不自动让上级失效，就会出现“父节点显示已验证、真正变化的子节点却已改过”的假绿，评审和发布都会基于过期合同。\n\n## 目标用户\n- 产品/需求作者：按叶子到根的顺序冻结，确认每一层都绑定住了下层。\n- 宿主 agent：知道哪些上级因变更失效，必须先重冻才能继续。\n- 评审与发布负责人：需要一眼看出树是否仍是一个完整、自洽的合同。\n\n## 场景\n- 新建需求树，先冻结全部叶子，再逐层冻结 feature、module、root。\n- 上线前修改某个取消规则，只动了一个叶子，需要知道整条祖先链都失效。\n- 重冻后重新绑定子指纹，恢复到可验证、可发布的状态。\n\n## 范围\n- 叶子冻结要求无子节点、至少一条 AC、可执行验证规格。\n- 父节点冻结要求全部子节点已 settled，并记录有序子指纹。\n- 后代 change 后全部祖先进入 `change_pending`；refreeze 自底向上恢复。\n- 状态机覆盖 `draft / frozen / implemented / verified / change_pending / deprecated`；非法迁移直接拒绝。\n\n## 非目标\n- 不替用户判断需求内容对不对，也不自动补 AC 或验证规格。\n- 不解释业务 FSM 的语义，只保证树的冻结与变更关系正确。\n- 不自动跑测试或补证据；验证仍由 verify 面负责。\n- 不处理多人同时改同一节点的合并冲突（待产品确认是否纳入）。\n\n## 验收标准\n- [ ] fc-1 叶子冻结要求无子节点、至少一条 AC、可执行验证规格。\n- [ ] fc-2 父节点冻结要求全部子节点已 settled；父记录绑定有序子指纹。\n- [ ] fc-3 后代 change 后全部祖先为 `change_pending`；refreeze 自底向上。\n- [ ] 细化：子节点仍为 draft 时父冻结返回 `tree_parent_not_frozen`；全部子节点 settled 后父冻结成功。\n\n## 用户流程\n1. 按叶子 → feature → module → root 的顺序冻结。\n2. 对某个叶子发起 change，该叶子回到 draft，全部祖先变为 `change_pending`。\n3. 修改并重新冻结该叶子，再自底向上重冻祖先，父记录绑定新的子指纹。\n4. 重冻完成后再进入实现与验证。\n\n## 风险\n- 根级级联意味着任意叶子变更都会让整条祖先链失效，小改动也要重冻到根，操作成本高，需要批量重冻/清晰提示。\n- 冻结只保证合同结构完整，不保证测试真能证明业务正确；语义质量仍依赖评审与 verify。",
+  "parent_id": "n_244f402ca9c7",
+  "path": "root/truth-kernel/freeze-change",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "fc-1",
+      "text": "叶子冻结要求无子节点、至少一条 AC、可执行验证规格。"
+    },
+    {
+      "id": "fc-2",
+      "text": "父节点冻结要求全部子节点已 settled；父记录绑定有序子指纹。"
+    },
+    {
+      "id": "fc-3",
+      "text": "后代 change 后全部祖先为 change_pending；refreeze 自底向上。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "draft",
+      "frozen",
+      "implemented",
+      "verified",
+      "change_pending",
+      "deprecated"
+    ],
+    "transitions": [
+      {
+        "from": "draft",
+        "to": "frozen",
+        "event": "freeze"
+      },
+      {
+        "from": "frozen",
+        "to": "implemented",
+        "event": "implement"
+      },
+      {
+        "from": "implemented",
+        "to": "verified",
+        "event": "verify"
+      },
+      {
+        "from": "frozen",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "implemented",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "verified",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "frozen",
+        "to": "change_pending",
+        "event": "descendant_change"
+      },
+      {
+        "from": "implemented",
+        "to": "change_pending",
+        "event": "descendant_change"
+      },
+      {
+        "from": "verified",
+        "to": "change_pending",
+        "event": "descendant_change"
+      },
+      {
+        "from": "change_pending",
+        "to": "frozen",
+        "event": "refreeze"
+      },
+      {
+        "from": "change_pending",
+        "to": "draft",
+        "event": "change"
+      },
+      {
+        "from": "frozen",
+        "to": "deprecated",
+        "event": "deprecate"
+      },
+      {
+        "from": "verified",
+        "to": "deprecated",
+        "event": "deprecate"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "draft",
+        "to": "verified"
+      },
+      {
+        "from": "verified",
+        "to": "implemented"
+      },
+      {
+        "from": "deprecated",
+        "to": "frozen"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "75b47fbdfebf908ca24665d0039e1a32e419ce4914ff261818c59c7a1e4cabe4",
+    "7e64f9a0f4e297b71b395d120577e9276c809678dcfa0020af1a192d404a2ed4"
+  ],
+  "fingerprint": "75077e55d5402ad4b1597213f4b249000ced3994636ef3138db4496bc223d012",
+  "fingerprint_alg": "tree-json-v1"
+}

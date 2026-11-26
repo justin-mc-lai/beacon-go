@@ -1,0 +1,54 @@
+{
+  "id": "n_8107d51ca5b8",
+  "kind": "touchpoint",
+  "title": "gate-evaluate",
+  "intent": "评估一次并写回可查询结果。",
+  "parent_id": "n_9689b26b5f17",
+  "path": "root/verification/gate-evaluation/gate-evaluate",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "gv-1",
+      "text": "通过时 gate_result=passed。"
+    },
+    {
+      "id": "gv-2",
+      "text": "缺证据时 blocked 并给 reason。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_8107d51ca5b8-tc1",
+      "ac_id": "gv-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestGateEvaluateWritesAndStatusReadsBack -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "n_8107d51ca5b8-tc2",
+      "ac_id": "gv-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestGateEvaluateBlockedExitsNonZeroWithJSON -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "调用 gate evaluate 后查询状态，结果与退出码一致。"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_8107d51ca5b8.txt",
+    "artifact_hash": "def164c89466c8a9651435b8c0419df05054e97d5bb239ed23c9e2fd6fddac67",
+    "at": "2026-11-26T03:07:22.361101Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_8ef1b06a61692c3d54e1cfa5",
+    "content_hash": "def164c89466c8a9651435b8c0419df05054e97d5bb239ed23c9e2fd6fddac67",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:22.377645Z"
+  },
+  "fingerprint": "fb24368ea60230919323206df79b732504d033e7b95297def75960877c408543",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "n_99a31e588da7",
+  "kind": "feature",
+  "title": "canonical-json",
+  "intent": "canonical JSON 与指纹",
+  "doc": "## 问题\n同一份需求树在不同机器、不同会话重算时，如果没有固定字节序列，团队就无法判断“需求是否被改过”：评审意见、冻结记录和快照会失去可比性。反过来，如果只对标题或渲染文本做哈希，AC 被悄悄改写也发现不了。读者还容易把 Markdown/HTML 当成权威源，改错地方。\n\n## 目标用户\n- 需求作者/产品：需要证明自己冻结的 AC 没被改动。\n- 宿主 agent：需要跨会话、跨机器复用同一需求基线。\n- 评审与发布负责人：需要比对两份树是否属于同一合同。\n\n## 场景\n- 同一棵树两次导出，用于 CI 比对或异地复核。\n- 只改一条 AC 的文字，需要立即看出合同变了。\n- 把树渲染成 MD/HTML 给人读，事后要能追到当时基于哪份源。\n\n## 范围\n- 节点 canonical JSON：字段顺序固定、无缩进、排除指纹字段后序列化。\n- `tree-json-v1`：对 canonical JSON 做 SHA-256，AC 文本参与计算。\n- 渲染物携带 source hash 用于追溯；渲染不改变合同指纹。\n- 历史算法按节点记录的 `fingerprint_alg` 分派校验，不改写旧记录。\n\n## 非目标\n- 不做通用 JSON canonicalization 标准，也不承诺与其他语言实现互操作（是否需要待产品确认）。\n- 不做签名、公证或时间戳服务。\n- 不把证据、运行日志、渲染产物算进合同指纹。\n- 不负责保证人读得懂，只保证字节和指纹可复现。\n\n## 验收标准\n- [ ] cj-1 同一棵树跨运行产生相同 canonical JSON 与 SHA-256。\n- [ ] cj-2 AC 文本变化必须改变 `tree-json-v1` 指纹。\n- [ ] cj-3 渲染 MD/HTML 带 source hash，作为派生视图不入合同指纹。\n- [ ] 细化：同一 AC 重算指纹相同；两次序列化字节一致；键序与字段序固定。\n\n## 用户流程\n1. 规划阶段写入节点正文与 AC。\n2. 冻结节点时计算 `tree-json-v1` 指纹。\n3. 快照或渲染时输出 source hash。\n4. 修改 AC 后重新冻结，指纹变化；渲染页面显示新的 source hash。\n\n## 风险\n- canonical 字节依赖 Go 结构体字段顺序；新增或重排字段会让全部指纹变化，必须走显式迁移而不是静默重算。\n- 旧指纹算法只保留校验分派；跨算法比较需要人工确认，不能当作同一合同。",
+  "parent_id": "n_244f402ca9c7",
+  "path": "root/truth-kernel/canonical-json",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "cj-1",
+      "text": "同一棵树跨运行产生相同 canonical JSON 与 SHA-256。"
+    },
+    {
+      "id": "cj-2",
+      "text": "AC 文本变化必须改变 tree-json-v1 指纹。"
+    },
+    {
+      "id": "cj-3",
+      "text": "渲染 MD/HTML 带 source hash，作为派生视图不入合同指纹。"
+    }
+  ],
+  "child_fingerprints": [
+    "c5a4a1138b1c52eebefbf93dcbb02b60a6fa9e6efa9e1ac66e37f465d6f1b453",
+    "456e8d100fb50146fb97b9c7ee00587e1c43c849ec15a6ef1fd6e7696543ed81"
+  ],
+  "fingerprint": "6c80098a7e3d4733431cac90e573d75b51d6921f7287ac506a901b8c054d6183",
+  "fingerprint_alg": "tree-json-v1"
+}

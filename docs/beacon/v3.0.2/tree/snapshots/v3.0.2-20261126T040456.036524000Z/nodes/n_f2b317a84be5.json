@@ -1,0 +1,30 @@
+{
+  "id": "n_f2b317a84be5",
+  "kind": "feature",
+  "title": "evidence-scope",
+  "intent": "证据作用域",
+  "doc": "## 问题\n证据没有显式作用域时，feature 与 node 的数据会串；文件被改写后如果没人重算哈希，门禁会继续相信过期证据。结果是“证据看起来有，实际证明不了当前版本”。\n\n## 目标用户\n- QA/验证者。\n- 宿主 agent（负责产出并登记证据）。\n- 审计人员（需要按作用域追溯证据）。\n\n## 场景\n- 为某个叶子登记测试输出、截图或 QA 报告。\n- 为 feature 登记没有 run 也能存在的证据。\n- 改写已登记文件后重新跑门禁。\n- 按 node 或 feature 查询证据，确认没有串数据。\n\n## 范围\n- node 与 feature 证据走同一登记入口，按显式 `scope_kind` + `scope_id` 查询。\n- 登记时写入文件 sha256 与大小；账本只存绝对路径。\n- 拒绝空白 scope id 与未知 scope kind（`artifact_scope_invalid`、`artifact_scope_kind_unknown`）。\n- 同一作用域、同一路径、同一哈希重复登记幂等，不新增行、不重复写事件；内容变化时刷新哈希。\n- 门禁每次读取都重算哈希：文件缺失、不可读或哈希不匹配即标 stale，并给出 `file_missing` / `file_unreadable` / `hash_mismatch`。\n\n## 非目标\n- 不判断证据内容质量，不判断测试是否覆盖 AC。\n- 不自动修复、重写或删除证据文件。\n- 不允许匿名登记；`--by` 必填。\n- 不把未登记的文件当证据。\n\n## 验收标准\n- node 与 feature 证据走同一入口，按显式 scope 查询，不串数据。\n- 空白 scope、未知 scope kind 被拒绝；账本不保存相对路径。\n- 同一 scope 同路径重复登记幂等，只刷新哈希。\n- 文件改写后门禁标记 stale；哈希不匹配拒绝通过。\n- 登记后可按 scope 查回该工件及其内容哈希。\n\n## 用户流程\n1. 产出真实文件（测试输出、报告、截图等）。\n2. `goal artifacts register --scope-kind node --scope-id \u003cid\u003e --kind \u003ckind\u003e --path \u003cfile\u003e --by \u003c身份\u003e`，或 `verify leaf --artifact \u003cfile\u003e`。\n3. `goal artifacts list --scope-kind node --scope-id \u003cid\u003e` 复查。\n4. 文件变化后重新登记；门禁评估时自动重算哈希。\n\n## 指标\n- 各作用域登记证据数量与 stale 比例。\n- 幂等重复登记占比、哈希不匹配拒绝次数。\n- 从证据登记到门禁通过的轮次。\n- 目标阈值：待产品确认。\n\n## 风险\n- 账本绑定绝对路径；移动项目或文件会让证据立刻 stale，需要重新登记。\n- 登记是“声明归属”，不是质量背书；恶意或错误的文件也能被登记，防线在下游门禁重算与人工评审。\n- 同一路径内容变更会原地刷新哈希，旧哈希只留在事件轨迹里；追溯历史时要读事件而不是只看当前行。\n- feature scope 不需要 run，可能被用来提前“占位”证据；评审时要确认证据产生的时点。",
+  "parent_id": "n_66fe3404b218",
+  "path": "root/verification/evidence-scope",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "es-1",
+      "text": "node/feature 证据走同一登记入口，按显式 scope 查询。"
+    },
+    {
+      "id": "es-2",
+      "text": "相对路径、空白 scope、未知 scope kind 被拒绝。"
+    },
+    {
+      "id": "es-3",
+      "text": "同 scope 同路径重复登记幂等，只刷新哈希。"
+    }
+  ],
+  "child_fingerprints": [
+    "f740ca918e785deb189151e459e993e6367114f38490c4a5910cefbec9edd1f6",
+    "8dacd56aaa797f9bf4c514939d86a8dc80dcda570da110c9e855dadb0214fd43"
+  ],
+  "fingerprint": "8f552ffa0e5cdf2282ab7093a336563ee662bfcb6dd54fbb2bca624552da8dcc",
+  "fingerprint_alg": "tree-json-v1"
+}

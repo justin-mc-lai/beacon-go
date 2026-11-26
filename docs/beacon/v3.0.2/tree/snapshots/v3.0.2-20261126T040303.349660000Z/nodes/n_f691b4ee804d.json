@@ -1,0 +1,54 @@
+{
+  "id": "n_f691b4ee804d",
+  "kind": "touchpoint",
+  "title": "parent rollup",
+  "intent": "父级只在子全 verified 后 verified",
+  "parent_id": "n_820af49910f0",
+  "path": "root/verification/rollup-audit/parent-rollup",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_f691b4ee804d-1",
+      "text": "子未 verified 时父 rollup 拒绝。"
+    },
+    {
+      "id": "n_f691b4ee804d-2",
+      "text": "全部 verified 后父 verified。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_f691b4ee804d-tc1",
+      "ac_id": "n_f691b4ee804d-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestVerifyLeafAndParentRollup",
+      "status": "existing"
+    },
+    {
+      "id": "n_f691b4ee804d-tc2",
+      "ac_id": "n_f691b4ee804d-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestVerifyLeafAndParentRollup",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当子节点未 verified 时，verify rollup 返回 tree_parent_not_verified"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_f691b4ee804d.txt",
+    "artifact_hash": "96ba7b52107f6ce2ac615ab3956aca785d3fcc6a709a3066bf49c3966ffdee05",
+    "at": "2026-11-26T03:07:24.605477Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_310a371176f462f463fda5ae",
+    "content_hash": "96ba7b52107f6ce2ac615ab3956aca785d3fcc6a709a3066bf49c3966ffdee05",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:24.620308Z"
+  },
+  "fingerprint": "6962de8a721573634944aa8fa166f66342f7ca10166419c9e9f50f55349a5acd",
+  "fingerprint_alg": "tree-json-v1"
+}

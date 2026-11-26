@@ -14,6 +14,7 @@ type NodePatch struct {
 	Title        string        `json:"title"`
 	Intent       string        `json:"intent"`
 	Doc          string        `json:"doc,omitempty"`
+	Constraint   *bool         `json:"constraint,omitempty"`
 	ACs          []AC          `json:"acs"`
 	TestCases    []TestCase    `json:"test_cases,omitempty"`
 	Verification *Verification `json:"verification,omitempty"`
@@ -48,6 +49,9 @@ func UpdateNode(st *store.Store, dir, nodeID string, patch NodePatch) (Node, err
 	}
 	if patch.Doc != "" {
 		n.Doc = patch.Doc
+	}
+	if patch.Constraint != nil {
+		n.Constraint = *patch.Constraint
 	}
 	if patch.ACs != nil {
 		n.ACs = patch.ACs

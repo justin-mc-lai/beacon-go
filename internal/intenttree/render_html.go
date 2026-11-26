@@ -6,6 +6,37 @@ import (
 	"strings"
 )
 
+// RenderContext is the version identity of one rendered tree. Runtime,
+// requirement line, snapshot and source hash are separate axes and must
+// stay visible separately.
+type HistoryLink struct {
+	ID        string
+	Label     string
+	URL       string
+	CreatedAt string
+}
+
+type RenderContext struct {
+	RuntimeVersion     string
+	RuntimeCommit      string
+	BinarySHA          string
+	RequirementVersion string
+	SnapshotID         string
+	SnapshotCreatedAt  string
+	History            []HistoryLink
+	Changes            []HistoryLink
+	NodeHistory        map[string][]NodeRevision
+	BackURL            string
+}
+
+type NodeRevision struct {
+	SnapshotID  string
+	Label       string
+	URL         string
+	Status      string
+	Fingerprint string
+}
+
 // RenderHTMLTree renders a three-pane reader: the full requirement tree
 // on the left, the selected node's requirement text in the middle, and
 // the related business FSM as a real flow diagram on the right.
@@ -16,6 +47,11 @@ func RenderHTMLTree(idx Index, bodies map[string]Node) []byte {
 // RenderHTMLTreeWithTruth adds the read-only package-link comparison to
 // the node detail pane.
 func RenderHTMLTreeWithTruth(idx Index, bodies map[string]Node, truth map[string]TruthLinkStatus) []byte {
+	return RenderHTMLTreeWithContext(idx, bodies, truth, RenderContext{RequirementVersion: idx.Version})
+}
+
+// RenderHTMLTreeWithContext adds the runtime/requirement/snapshot identity.
+func RenderHTMLTreeWithContext(idx Index, bodies map[string]Node, truth map[string]TruthLinkStatus, rc RenderContext) []byte {
 	idx = SortedIndex(idx)
 	children := map[string][]IndexEntry{}
 	for _, n := range idx.Nodes {
@@ -80,10 +116,10 @@ func RenderHTMLTreeWithTruth(idx Index, bodies map[string]Node, truth map[string
 	}
 	assign(idx.RootID, "")
 	var b strings.Builder
-	writeHTMLHead(&b, idx, bodies)
+	writeHTMLHead(&b, idx, bodies, rc)
 	b.WriteString(`<div class="app">`)
-	writeTreePane(&b, idx, children, bodies, related, ownFSM)
-	writeDetailPane(&b, idx, children, bodies, truth)
+	writeTreePane(&b, idx, children, bodies, related, ownFSM, rc)
+	writeDetailPane(&b, idx, children, bodies, truth, rc)
 	writeFSMPane(&b, idx, children, bodies, ownFSM)
 	b.WriteString(`</div>`)
 	writeScript(&b, idx)
@@ -91,7 +127,7 @@ func RenderHTMLTreeWithTruth(idx Index, bodies map[string]Node, truth map[string
 	return []byte(b.String())
 }
 
-func writeHTMLHead(b *strings.Builder, idx Index, bodies map[string]Node) {
+func writeHTMLHead(b *strings.Builder, idx Index, bodies map[string]Node, rc RenderContext) {
 	fmt.Fprintf(b, "<!doctype html><html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n")
 	fmt.Fprintf(b, "<!-- source: %s -->\n", SourceHash(idx))
 	fmt.Fprintf(b, "<title>需求工作台 · %s</title><style>%s</style></head><body>\n", esc(idx.Version), css)
@@ -124,7 +160,7 @@ h2{font-size:15px;margin:26px 0 8px;color:#374151}
 .badge.warn{color:var(--warn);border-color:#efd4ad;background:#fffaf1}
 .intent{font-size:16px;color:#374151;margin:0 0 6px}
 ul.acs{margin:0;padding-left:20px}ul.acs li{margin:5px 0}
-.verify{background:#fafaf8;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:13px}
+.prd{background:#fcfbf8;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:14px 0}.prd h2{margin:2px 0 8px;font-size:16px}.prd h3{font-size:14px;margin:14px 0 4px}.prd p{margin:6px 0}.prd ul{margin:4px 0 8px;padding-left:20px}.prd table{border-collapse:collapse;width:100%;font-size:12px}.prd td,.prd th{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left}.doc-missing{border:1px solid #efd4ad;background:#fffaf1;color:#8a5a12;border-radius:8px;padding:8px 10px;margin:12px 0;font-size:12px}.verify{background:#fafaf8;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:13px}
 details.tech{margin-top:22px;color:var(--muted);font-size:12px}details.tech summary{cursor:pointer}
 .tech dl{display:grid;grid-template-columns:90px 1fr;gap:3px 10px;margin:10px 0}.tech dt{color:#9ca3af}.tech dd{margin:0;word-break:break-all}
 table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:5px 6px;vertical-align:top}th{color:var(--muted);font-weight:500}td.ref{color:#4b5563;word-break:break-word}td:last-child{white-space:nowrap}
@@ -147,7 +183,7 @@ table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px}th,td{text
 @media (max-width:860px){.app{display:block;height:auto}.pane{overflow:visible;max-height:none}.tree-pane,.fsm-pane{border:0;border-bottom:1px solid var(--line)}.detail-pane{padding:22px}}
 `
 
-func writeTreePane(b *strings.Builder, idx Index, children map[string][]IndexEntry, bodies map[string]Node, related, own map[string]string) {
+func writeTreePane(b *strings.Builder, idx Index, children map[string][]IndexEntry, bodies map[string]Node, related, own map[string]string, rc RenderContext) {
 	root := bodies[idx.RootID]
 	counts := map[Status]int{}
 	for _, e := range idx.Nodes {
@@ -155,7 +191,43 @@ func writeTreePane(b *strings.Builder, idx Index, children map[string][]IndexEnt
 	}
 	b.WriteString(`<aside class="pane tree-pane">`)
 	fmt.Fprintf(b, `<div class="brand">%s</div><div class="sub">需求树 · %d 节点</div>`, esc(root.Title), len(idx.Nodes))
-	fmt.Fprintf(b, `<div class="source-note">权威源：tree/index.json · %s<br>HTML 派生只读</div>`, esc(shortHash(SourceHash(idx))))
+	requirement := rc.RequirementVersion
+	if requirement == "" {
+		requirement = idx.Version
+	}
+	snapshot := rc.SnapshotID
+	if snapshot == "" {
+		snapshot = "当前工作树（未绑定快照）"
+	}
+	runtime := rc.RuntimeVersion
+	if runtime == "" {
+		runtime = "unknown"
+	}
+	commit := rc.RuntimeCommit
+	if commit != "" {
+		commit = " · " + shortHash(commit)
+	}
+	fmt.Fprintf(b, `<div class="source-note"><b>权威源</b> tree/index.json · %s<br><b>需求线</b> %s · <b>快照</b> %s<br><b>运行时</b> %s%s<br>HTML 派生只读</div>`, esc(shortHash(SourceHash(idx))), esc(requirement), esc(snapshot), esc(runtime), esc(commit))
+	if rc.BackURL != "" || len(rc.History) > 0 {
+		b.WriteString(`<details class="history"><summary>版本历史`)
+		if len(rc.History) > 0 {
+			fmt.Fprintf(b, `（%d）`, len(rc.History))
+		}
+		b.WriteString(`</summary>`)
+		if rc.BackURL != "" {
+			fmt.Fprintf(b, `<a class="history-link" href="%s">← 当前树</a>`, esc(rc.BackURL))
+		}
+		for _, h := range rc.History {
+			fmt.Fprintf(b, `<a class="history-link" href="%s">%s</a>`, esc(h.URL), esc(h.Label))
+		}
+		if len(rc.Changes) > 0 {
+			b.WriteString(`<div class="history-kicker">变更记录</div>`)
+			for _, h := range rc.Changes {
+				fmt.Fprintf(b, `<span class="history-change">%s · %s</span>`, esc(h.CreatedAt), esc(h.Label))
+			}
+		}
+		b.WriteString(`</details>`)
+	}
 	b.WriteString(`<input id="filter" class="filter" placeholder="搜索节点、AC、状态" autocomplete="off">`)
 	b.WriteString(`<div class="status-legend"><button type="button" class="status-filter active" data-status-filter="">全部 <b>` + fmt.Sprint(len(idx.Nodes)) + `</b></button>`)
 	for _, st := range []Status{StatusDraft, StatusFrozen, StatusImplemented, StatusVerified, StatusDelivered, StatusChangePending} {
@@ -165,11 +237,29 @@ func writeTreePane(b *strings.Builder, idx Index, children map[string][]IndexEnt
 	b.WriteString(`<div class="tree-tools"><button type="button" id="tree-expand">全部展开</button><button type="button" id="tree-collapse">全部收起</button></div>`)
 	b.WriteString(`<ul class="tree">`)
 	writeTreeNode(b, idx.RootID, children, bodies, related, own)
-	b.WriteString(`</ul></aside>`)
+	b.WriteString(`</ul>`)
+	var constraints []Node
+	for _, e := range idx.Nodes {
+		if bodies[e.ID].Constraint {
+			constraints = append(constraints, bodies[e.ID])
+		}
+	}
+	if len(constraints) > 0 {
+		sort.Slice(constraints, func(i, j int) bool { return constraints[i].Path < constraints[j].Path })
+		fmt.Fprintf(b, `<details class="constraints"><summary>质量约束（%d）</summary>`, len(constraints))
+		for _, n := range constraints {
+			fmt.Fprintf(b, `<button type="button" class="constraint-link" data-select="%s">%s</button>`, esc(n.ID), esc(n.Title))
+		}
+		b.WriteString(`</details>`)
+	}
+	b.WriteString(`</aside>`)
 }
 
 func writeTreeNode(b *strings.Builder, id string, children map[string][]IndexEntry, bodies map[string]Node, related, own map[string]string) {
 	n := bodies[id]
+	if n.Constraint {
+		return
+	}
 	owner := related[id]
 	fsm := ""
 	if own[id] != "" {
@@ -203,11 +293,11 @@ func writeTreeNode(b *strings.Builder, id string, children map[string][]IndexEnt
 	b.WriteString(`</li>`)
 }
 
-func writeDetailPane(b *strings.Builder, idx Index, children map[string][]IndexEntry, bodies map[string]Node, truth map[string]TruthLinkStatus) {
+func writeDetailPane(b *strings.Builder, idx Index, children map[string][]IndexEntry, bodies map[string]Node, truth map[string]TruthLinkStatus, rc RenderContext) {
 	b.WriteString(`<main class="pane detail-pane">`)
 	var walk func(id string)
 	walk = func(id string) {
-		writeNodePanel(b, bodies[id], idx.RootID, truth)
+		writeNodePanel(b, bodies[id], idx.RootID, truth, rc)
 		for _, c := range children[id] {
 			walk(c.ID)
 		}
@@ -216,7 +306,50 @@ func writeDetailPane(b *strings.Builder, idx Index, children map[string][]IndexE
 	b.WriteString(`</main>`)
 }
 
-func writeNodePanel(b *strings.Builder, n Node, rootID string, truth map[string]TruthLinkStatus) {
+func renderMarkdown(s string) string {
+	var b strings.Builder
+	inList := false
+	closeList := func() {
+		if inList {
+			b.WriteString("</ul>")
+			inList = false
+		}
+	}
+	for _, raw := range strings.Split(s, "\n") {
+		line := strings.TrimSpace(raw)
+		if line == "" {
+			closeList()
+			continue
+		}
+		switch {
+		case strings.HasPrefix(line, "### "):
+			closeList()
+			fmt.Fprintf(&b, "<h3>%s</h3>", esc(strings.TrimSpace(line[4:])))
+		case strings.HasPrefix(line, "## "):
+			closeList()
+			fmt.Fprintf(&b, "<h3>%s</h3>", esc(strings.TrimSpace(line[3:])))
+		case strings.HasPrefix(line, "# "):
+			closeList()
+			fmt.Fprintf(&b, "<h2>%s</h2>", esc(strings.TrimSpace(line[2:])))
+		case strings.HasPrefix(line, "- "):
+			if !inList {
+				b.WriteString("<ul>")
+				inList = true
+			}
+			fmt.Fprintf(&b, "<li>%s</li>", esc(strings.TrimSpace(line[2:])))
+		case strings.HasPrefix(line, "|"):
+			closeList()
+			fmt.Fprintf(&b, "<p class=\"md-table\">%s</p>", esc(line))
+		default:
+			closeList()
+			fmt.Fprintf(&b, "<p>%s</p>", esc(line))
+		}
+	}
+	closeList()
+	return b.String()
+}
+
+func writeNodePanel(b *strings.Builder, n Node, rootID string, truth map[string]TruthLinkStatus, rc RenderContext) {
 	if n.ID == "" {
 		return
 	}
@@ -226,11 +359,24 @@ func writeNodePanel(b *strings.Builder, n Node, rootID string, truth map[string]
 	}
 	fmt.Fprintf(b, `<section class="node-panel%s" data-panel="%s">`, hidden, esc(n.ID))
 	kind := map[Kind]string{KindIntent: "项目意图", KindModule: "模块", KindFeature: "功能", KindTouchpoint: "触达点"}[n.Kind]
+	if n.Constraint {
+		kind = "质量约束"
+	}
 	fmt.Fprintf(b, `<div class="crumb">%s</div><h1>%s</h1><div class="badges"><span class="badge">%s</span>`, kind, esc(n.Title), esc(kind))
 	if n.DomainFSM != nil {
 		b.WriteString(`<span class="badge fsm">状态机</span>`)
 	}
+	if n.Constraint {
+		b.WriteString(`<span class="badge warn">约束</span>`)
+	}
 	fmt.Fprintf(b, `<span class="badge">%s</span></div>`, esc(statusLabel(n.Status)))
+	if n.Kind == KindFeature {
+		if strings.TrimSpace(n.Doc) == "" {
+			b.WriteString(`<div class="doc-missing"><b>需求正文缺失</b>：这是 legacy/工程节点；PRD 必须有 问题、目标用户、场景、范围、非目标、验收标准。</div>`)
+		} else {
+			b.WriteString(`<section class="prd"><h2>需求正文</h2>` + renderMarkdown(n.Doc) + `</section>`)
+		}
+	}
 	if n.Intent != "" {
 		fmt.Fprintf(b, `<p class="intent">%s</p>`, esc(n.Intent))
 	}
@@ -279,6 +425,13 @@ func writeNodePanel(b *strings.Builder, n Node, rootID string, truth map[string]
 				fmt.Fprintf(b, `<tr><td>%s</td><td class="ref">%s</td><td><span class="badge">%s</span></td></tr>`, esc(text), esc(tc.Ref), esc(testStatusLabel(tc.Status)))
 			}
 			b.WriteString(`</table>`)
+		}
+		b.WriteString(`</details>`)
+	}
+	if revs := rc.NodeHistory[n.ID]; len(revs) > 0 {
+		b.WriteString(`<details class="tech"><summary><b>历史版本</b></summary>`)
+		for _, rev := range revs {
+			fmt.Fprintf(b, `<a class="history-link" href="%s">%s · %s · %s</a>`, esc(rev.URL), esc(rev.Label), esc(rev.Status), esc(shortHash(rev.Fingerprint)))
 		}
 		b.WriteString(`</details>`)
 	}

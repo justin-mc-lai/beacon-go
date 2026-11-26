@@ -40,15 +40,15 @@
     "by": "self-audit",
     "outcome": "done",
     "artifact_path": "/tmp/beacon-evidence/all/n_af25a081f24e.txt",
-    "artifact_hash": "bef083701ac26a2d44c908d30255fa73df0576a2da7334233b8340d7b91f2711",
-    "at": "2026-11-26T03:07:15.619167Z"
+    "artifact_hash": "19be0bb32700531b21557c645a2ca82d5c6285ec8eb35b5df5e9d28ef2f5ca88",
+    "at": "2026-11-26T04:03:27.520573Z"
   },
   "verification_evidence": {
     "artifact_id": "art_5e337a929d5a8992535c0b67",
-    "content_hash": "bef083701ac26a2d44c908d30255fa73df0576a2da7334233b8340d7b91f2711",
+    "content_hash": "19be0bb32700531b21557c645a2ca82d5c6285ec8eb35b5df5e9d28ef2f5ca88",
     "by": "self-audit",
-    "at": "2026-11-26T03:07:15.647254Z"
+    "at": "2026-11-26T04:03:27.530962Z"
   },
-  "fingerprint": "96da4e99c47509bb864eaaddd31988264dad28547b53598501630147fb2e732e",
+  "fingerprint": "9238613ac8fa5873afed6d98ddcada9e5beb7c8c4e7691c0f7f3c35d1b271001",
   "fingerprint_alg": "tree-json-v1"
 }

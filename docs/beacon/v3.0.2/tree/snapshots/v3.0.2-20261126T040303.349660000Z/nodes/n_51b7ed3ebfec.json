@@ -1,0 +1,54 @@
+{
+  "id": "n_51b7ed3ebfec",
+  "kind": "touchpoint",
+  "title": "html history",
+  "intent": "历史树可浏览",
+  "parent_id": "n_036eb6e70d4a",
+  "path": "root/self-host/dogfood/html-history",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_51b7ed3ebfec-1",
+      "text": "快照 index 可读且指纹校验通过。"
+    },
+    {
+      "id": "n_51b7ed3ebfec-2",
+      "text": "HTML 渲染路径可打印。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_51b7ed3ebfec-tc1",
+      "ac_id": "n_51b7ed3ebfec-1",
+      "kind": "unit",
+      "ref": "go test ./internal/intenttree -run TestRenderSourceHashTracksChange",
+      "status": "existing"
+    },
+    {
+      "id": "n_51b7ed3ebfec-tc2",
+      "ac_id": "n_51b7ed3ebfec-2",
+      "kind": "unit",
+      "ref": "go test ./internal/intenttree -run TestRenderSourceHashTracksChange",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 truth tree --format html 后，index.html 存在"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_51b7ed3ebfec.txt",
+    "artifact_hash": "f3f43d20276702048c10703e2993e2c12751267b5055286eb62d8eff68d552b5",
+    "at": "2026-11-26T03:07:11.638056Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_0614dea867e668c0be438e77",
+    "content_hash": "f3f43d20276702048c10703e2993e2c12751267b5055286eb62d8eff68d552b5",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:11.659772Z"
+  },
+  "fingerprint": "9c103f6c793ad6ea43d929e804b56525fe192294d546fc80f87685a86b3d861a",
+  "fingerprint_alg": "tree-json-v1"
+}

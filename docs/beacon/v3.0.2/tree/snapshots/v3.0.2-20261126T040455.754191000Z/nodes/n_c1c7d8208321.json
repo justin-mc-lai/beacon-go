@@ -1,0 +1,43 @@
+{
+  "id": "n_c1c7d8208321",
+  "kind": "touchpoint",
+  "title": "source authority",
+  "intent": "HTML 必须让人一眼看出权威源和派生物",
+  "parent_id": "n_712b67ae7445",
+  "path": "root/self-host/requirement-workbench/source-authority",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "source-1",
+      "text": "HTML 显示 tree/index.json 的 source hash 和“HTML 派生只读”。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "source-tc1",
+      "ac_id": "source-1",
+      "kind": "unit",
+      "ref": "go test ./internal/intenttree -run TestRenderHTMLTreeShowsRequirementBodies -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当生成 HTML 时，页面包含权威源 hash 和派生只读标识"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_c1c7d8208321.txt",
+    "artifact_hash": "b7787d67f82638003d880199e97576a5464dd70a3b345cd0eba98da18dd25311",
+    "at": "2026-11-26T04:03:25.187268Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_51eeb783fbd01629639f04a2",
+    "content_hash": "b7787d67f82638003d880199e97576a5464dd70a3b345cd0eba98da18dd25311",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:25.19769Z"
+  },
+  "fingerprint": "17fc1c79bbde17099dd9caae117edbf1a329aba743724f0374cdfbde726e9333",
+  "fingerprint_alg": "tree-json-v1"
+}

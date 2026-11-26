@@ -34,7 +34,7 @@ func seedFreezeTree(t *testing.T, proj string, withUnverified bool) map[string]s
 	nodes := []intenttree.Node{
 		{ID: "root", Kind: intenttree.KindIntent, Title: "root", Path: "root", Status: intenttree.StatusDraft},
 		{ID: "m", Kind: intenttree.KindModule, ParentID: "root", Title: "module", Path: "m", Status: intenttree.StatusDraft},
-		{ID: "f", Kind: intenttree.KindFeature, ParentID: "m", Title: "feature", Path: "m/f", Status: intenttree.StatusDraft},
+		{ID: "f", Kind: intenttree.KindFeature, ParentID: "m", Title: "feature", Path: "m/f", Status: intenttree.StatusDraft, Doc: "## 问题\n- x\n## 目标用户\n- x\n## 场景\n- x\n## 范围\n- x\n## 非目标\n- x\n## 验收标准\n- x\n"},
 		{ID: "t1", Kind: intenttree.KindTouchpoint, ParentID: "f", Title: "one", Path: "m/f/t1", Status: intenttree.StatusDraft, ACs: ac("t1-1", "可提交"), Verification: verif},
 		{ID: "t2", Kind: intenttree.KindTouchpoint, ParentID: "f", Title: "two", Path: "m/f/t2", Status: intenttree.StatusDraft, ACs: ac("t2-1", "可取消"), Verification: verif},
 	}
@@ -137,7 +137,7 @@ func TestPlanApplyThenFreezeWholeTree(t *testing.T) {
 	}
 	mod := apply(rootID, `{"children":[{"kind":"module","title":"auth"}]}`)
 	modID := mod["nodes"].([]any)[0].(map[string]any)["id"].(string)
-	feat := apply(modID, `{"children":[{"kind":"feature","title":"login"}]}`)
+	feat := apply(modID, `{"children":[{"kind":"feature","title":"login","doc":"## 问题\n- x\n## 目标用户\n- x\n## 场景\n- x\n## 范围\n- x\n## 非目标\n- x\n## 验收标准\n- x\n"}]}`)
 	featID := feat["nodes"].([]any)[0].(map[string]any)["id"].(string)
 	leaf := apply(featID, `{"children":[
 		{"kind":"touchpoint","title":"submit","acs":[{"id":"a1","text":"可提交"}],"verification":{"type":"test","spec":"当提交时返回结果"},"test_cases":[{"id":"t1","ac_id":"a1","kind":"unit","ref":"go test ./internal/cli -run TestPlanApplyThenFreezeWholeTree","status":"existing"}]},
@@ -367,8 +367,8 @@ func TestSnapshotsImmutableAndReferencePrevious(t *testing.T) {
 		}
 	}
 	ids, _ = intenttree.ListSnapshots(dir)
-	if len(ids) != 2 {
-		t.Fatalf("want 2 snapshots, got %v", ids)
+	if len(ids) != 3 {
+		t.Fatalf("want 3 snapshots (freeze + change-before + refreeze), got %v", ids)
 	}
 	second := ids[0]
 	snap, err := intenttree.ReadSnapshot(dir, second)

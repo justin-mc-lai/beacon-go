@@ -1,0 +1,54 @@
+{
+  "id": "n_947f37387606",
+  "kind": "touchpoint",
+  "title": "proposal slug",
+  "intent": "显式 slug 控制节点路径，不能静默变成 node",
+  "parent_id": "n_a8b3e6af8664",
+  "path": "root/cli-surface/plan-surface/proposal-slug",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "slug-1",
+      "text": "带 slug 的 proposal 生成的 feature 路径末段等于该 slug。"
+    },
+    {
+      "id": "slug-2",
+      "text": "纯中文标题未给 slug 时返回 tree_node_slug_missing。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "slug-tc1",
+      "ac_id": "slug-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestProposalSlugControlsFeaturePath -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "slug-tc2",
+      "ac_id": "slug-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestProposalChineseTitleWithoutSlugIsRejected -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 proposal 带/不带合法 slug 时，路径末段与拒绝码符合契约"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_947f37387606.txt",
+    "artifact_hash": "ac5716c94939620c96ae4bd0e6510806c8a037ea977e9494ba788c9473ef6f89",
+    "at": "2026-11-26T04:03:12.306013Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_f02138822590183d2cbda774",
+    "content_hash": "ac5716c94939620c96ae4bd0e6510806c8a037ea977e9494ba788c9473ef6f89",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:12.32824Z"
+  },
+  "fingerprint": "ad7ce464e7be71695d337d592804436c010efc00e66b99a18ddfbc4b75a28b00",
+  "fingerprint_alg": "tree-json-v1"
+}

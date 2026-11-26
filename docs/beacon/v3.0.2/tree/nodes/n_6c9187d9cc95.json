@@ -41,14 +41,14 @@
     "outcome": "done",
     "artifact_path": "/tmp/beacon-evidence/all/n_6c9187d9cc95.txt",
     "artifact_hash": "4c351bca1789fb9c4aa41c9a0a55153d273e225af4db47402c76a0bf231940a3",
-    "at": "2026-11-26T03:07:15.87533Z"
+    "at": "2026-11-26T04:03:27.669711Z"
   },
   "verification_evidence": {
     "artifact_id": "art_42f3a1167f4f886c445118e1",
     "content_hash": "4c351bca1789fb9c4aa41c9a0a55153d273e225af4db47402c76a0bf231940a3",
     "by": "self-audit",
-    "at": "2026-11-26T03:07:15.891992Z"
+    "at": "2026-11-26T04:03:27.678288Z"
   },
-  "fingerprint": "e7c5ce76c9193f4bfd4a27ea391c27931171aa1802488d3e2be93d74d6cc2f1a",
+  "fingerprint": "1300c556e752bf708b8f8a5b723708b7bc030373e3a60739bd3979e6e348fdbf",
   "fingerprint_alg": "tree-json-v1"
 }

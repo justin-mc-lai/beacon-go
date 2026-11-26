@@ -1,0 +1,54 @@
+{
+  "id": "n_17570ee68fcf",
+  "kind": "touchpoint",
+  "title": "verifier attach",
+  "intent": "完成 run 前必须有独立验证者，maker 不能自证",
+  "parent_id": "n_542ddf4aff0d",
+  "path": "root/goal-orchestration/stage-gate/verifier-attach",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "verifier-1",
+      "text": "goal complete 要求已 attach 独立 verifier，且 maker 与 checker 不同。"
+    },
+    {
+      "id": "verifier-2",
+      "text": "attach verifier 不能清除未解决的人工门阻塞。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "verifier-tc1",
+      "ac_id": "verifier-1",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestAttachVerifierMakerChecker -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "verifier-tc2",
+      "ac_id": "verifier-2",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestAttachVerifierDoesNotClearUnresolvedBlock -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当 run 没有独立 verifier 时 complete 被拒绝；attach 后仍不能绕过人工门"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_17570ee68fcf.txt",
+    "artifact_hash": "9fec130bfa854490c5bfc03196e0304e321aea67ee788a744e4d3574435651a7",
+    "at": "2026-11-26T04:03:22.037939Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_76a067d5b94e2abf56f3cce0",
+    "content_hash": "9fec130bfa854490c5bfc03196e0304e321aea67ee788a744e4d3574435651a7",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:22.046661Z"
+  },
+  "fingerprint": "58cbaa267b8610b4a3474a819c9a282056363f193e8d3554dded73287db4855c",
+  "fingerprint_alg": "tree-json-v1"
+}

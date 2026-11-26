@@ -1,0 +1,29 @@
+{
+  "id": "n_e5f3d6ca7d11",
+  "kind": "feature",
+  "title": "docs-consistency",
+  "intent": "README/AGENTS/版本只引用唯一源，CI 阻止漂移。",
+  "doc": "## 问题\n版本号散落在 README、AGENTS 和多份发布说明里时，用户会按旧版本操作、装错包或对不上发布记录。文档漂移通常要等用户踩到才发现；维护者也容易在改版本时漏掉某一处。\n\n## 目标用户\n- 安装/升级的用户：看到的当前版本与二进制一致。\n- 宿主 agent：按文档执行时不会引用已过期的版本或命令。\n- 维护者/CI：版本变化由检查脚本兜底，而不是靠记忆。\n\n## 场景\n- 发布新版本，只改 `internal/version/version.go`。\n- README、中文 README 的当前版本声明不一致时，CI 直接失败。\n- AGENTS.md 写死当前版本号时，检查失败并提示改用 `beacon --version`。\n\n## 范围\n- `internal/version/version.go` 是唯一版本源。\n- README/AGENTS 不写死当前版本；用户和 agent 通过 `beacon --version` 获取版本。\n- 当前检查脚本会校验 README 的 `Current release` 声明与源码一致；这条“允许声明”与 dc-2“不写死”口径的关系待产品确认。\n- CI/本地脚本 `scripts/check_version_consistency.sh` 不一致即非零退出；历史 `go.N` 行允许保留。\n\n## 非目标\n- 不自动改写文档或生成发布说明。\n- 不是通用文档 linter，不检查所有链接、命令与路径是否仍存在。\n- 不校验每一个历史版本字面量。\n- 不做语义级文档评审。\n\n## 验收标准\n- [ ] dc-1 版本只写在 `version.go`。\n- [ ] dc-2 README/AGENTS 不写死当前版本。\n- [ ] dc-3 CI 校验不一致即失败。\n- [ ] 细化：README/AGENTS 与 `version.go` 一致；写死当前版本即失败。\n\n## 用户流程\n1. 维护者修改 `internal/version/version.go`。\n2. 文档不写死版本；若保留当前版本声明，则必须与源码一致。\n3. 本地运行 `scripts/check_version_consistency.sh` 或等 CI。\n4. 通过则发布；失败则先修正漂移。\n\n## 风险\n- 当前脚本实际允许 README 的 `Current release` 字面量与源码对齐，而 dc-2 要求不写死；两条口径需要产品确认后统一。\n- 脚本只检查选定的声明和 AGENTS 的硬编码模式；其他位置的过期版本字面量仍可能漏过。\n- 检查依赖文本模式，文档结构调整后需要同步更新脚本，否则会出现假通过。",
+  "parent_id": "n_0338b8fdd30a",
+  "path": "root/self-host/docs-consistency",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "dc-1",
+      "text": "版本只写在 version.go。"
+    },
+    {
+      "id": "dc-2",
+      "text": "README/AGENTS 不写死当前版本。"
+    },
+    {
+      "id": "dc-3",
+      "text": "CI 校验不一致即失败。"
+    }
+  ],
+  "child_fingerprints": [
+    "6afa3f000b803e88d27bf03c80d94b7b8c7c8c92ff60afb2c6f0c0d6e4cf0531"
+  ],
+  "fingerprint": "4a63f3d6a641e556bbf2c8e7dafc771035459f641cf2321c399787c7887173ff",
+  "fingerprint_alg": "tree-json-v1"
+}

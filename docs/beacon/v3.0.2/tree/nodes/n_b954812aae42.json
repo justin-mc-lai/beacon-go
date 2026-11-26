@@ -40,15 +40,15 @@
     "by": "self-audit",
     "outcome": "done",
     "artifact_path": "/tmp/beacon-evidence/all/n_b954812aae42.txt",
-    "artifact_hash": "f726ea7f7fcc78d2e00b4124b66bcea776484d7ef05fcebbc5a5688ffbbb0073",
-    "at": "2026-11-26T03:07:12.86565Z"
+    "artifact_hash": "01e07cda4fcd5f0d8e82ff1a1874d33bed40e6108726c9acdddc84c0a4d0d4ab",
+    "at": "2026-11-26T04:03:25.607108Z"
   },
   "verification_evidence": {
     "artifact_id": "art_d020d2e2bc7ae7d5f7496f7d",
-    "content_hash": "f726ea7f7fcc78d2e00b4124b66bcea776484d7ef05fcebbc5a5688ffbbb0073",
+    "content_hash": "01e07cda4fcd5f0d8e82ff1a1874d33bed40e6108726c9acdddc84c0a4d0d4ab",
     "by": "self-audit",
-    "at": "2026-11-26T03:07:12.880901Z"
+    "at": "2026-11-26T04:03:25.617358Z"
   },
-  "fingerprint": "de218ccaa0762c12296418b4a73848a5ff1bc0d32b1ec1b613100ed7ec287d14",
+  "fingerprint": "fe5ecb86526ce7daa8210344ce76dd11a4c519bd0c2e2e548f5d4f1d7d3a8afd",
   "fingerprint_alg": "tree-json-v1"
 }

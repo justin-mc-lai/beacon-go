@@ -1,0 +1,54 @@
+{
+  "id": "n_4776fa804b3b",
+  "kind": "touchpoint",
+  "title": "seven groups",
+  "intent": "七个用户入口",
+  "parent_id": "n_068ee154c0a2",
+  "path": "root/cli-surface/seven-groups/seven-groups",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_4776fa804b3b-1",
+      "text": "七个顶层命令存在。"
+    },
+    {
+      "id": "n_4776fa804b3b-2",
+      "text": "内部命令隐藏但可执行。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_4776fa804b3b-tc1",
+      "ac_id": "n_4776fa804b3b-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestSevenCommandSurface -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "n_4776fa804b3b-tc2",
+      "ac_id": "n_4776fa804b3b-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestSevenCommandSurface -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当运行 beacon --help 时，七个组均存在"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_4776fa804b3b.txt",
+    "artifact_hash": "2a6ac769e0d26d509bf832724ca784e991c3a002892231ab29d5bfa090bd5b36",
+    "at": "2026-11-26T03:06:53.907186Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_4dd285548b375b37fadb806b",
+    "content_hash": "2a6ac769e0d26d509bf832724ca784e991c3a002892231ab29d5bfa090bd5b36",
+    "by": "self-audit",
+    "at": "2026-11-26T03:06:53.920743Z"
+  },
+  "fingerprint": "fc5de5ea9a744820c842ded40c6ca69ce753826b07b5623ba8e0726ef8802d71",
+  "fingerprint_alg": "tree-json-v1"
+}

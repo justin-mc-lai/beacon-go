@@ -1,0 +1,10 @@
+{
+  "artifact": "/tmp/beacon-evidence/all/n_5c432d1ce4c7.txt",
+  "artifact_hash": "6724314c08d2bae9cbffacf7b8ac2777bbe463fcfca12be9579df7d99cddb9b2",
+  "at": "2026-11-26T04:03:33.260185Z",
+  "by": "self-audit",
+  "node_id": "n_5c432d1ce4c7",
+  "outcome": "done",
+  "reason_code": "",
+  "type": "implementation_done"
+}

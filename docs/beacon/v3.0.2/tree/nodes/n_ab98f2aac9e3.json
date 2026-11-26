@@ -36,19 +36,20 @@
     "type": "test",
     "spec": "修改 README 中的版本号后，版本一致性检查非零退出。"
   },
+  "constraint": true,
   "implementation": {
     "by": "self-audit",
     "outcome": "done",
     "artifact_path": "/tmp/beacon-evidence/all/n_ab98f2aac9e3.txt",
     "artifact_hash": "1bc70d42c784e659866562e8256e3230082a2563befd3fa56e95e5a18b3a5902",
-    "at": "2026-11-26T03:07:09.217363Z"
+    "at": "2026-11-26T04:05:22.660799Z"
   },
   "verification_evidence": {
     "artifact_id": "art_99b43dc325d58bfa7cf726cc",
     "content_hash": "1bc70d42c784e659866562e8256e3230082a2563befd3fa56e95e5a18b3a5902",
     "by": "self-audit",
-    "at": "2026-11-26T03:07:09.235926Z"
+    "at": "2026-11-26T04:05:22.668862Z"
   },
-  "fingerprint": "c30f14877c468c0e3fe3b22c21c36e48407d7c18ecae0d29d101bd2890551560",
+  "fingerprint": "eb1c5202195811ea39439c78edf4e81e6e7e523bb6cf2bb000857deb8eb0c42e",
   "fingerprint_alg": "tree-json-v1"
 }

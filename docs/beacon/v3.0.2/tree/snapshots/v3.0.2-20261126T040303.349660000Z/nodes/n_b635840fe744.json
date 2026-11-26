@@ -1,0 +1,25 @@
+{
+  "id": "n_b635840fe744",
+  "kind": "module",
+  "title": "security-boundary",
+  "intent": "受保护路径与写入口必须有明确批准与回执。",
+  "parent_id": "nroot_98a9c77a9519",
+  "path": "root/security-boundary",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "sb-1",
+      "text": "密钥、支付、迁移目录写入必须显式批准。"
+    },
+    {
+      "id": "sb-2",
+      "text": "每个写回执记录操作者、时间与原因。"
+    }
+  ],
+  "child_fingerprints": [
+    "30413efe023fb48eed10614df879ddfcae2ce70200d4023a58571732c67beb76",
+    "62a994c21f08055c646f962033c6fd1a287c3bbb3332c357662a1f79b5db9177"
+  ],
+  "fingerprint": "9279be403f888dea4fb12516f6e4c166420fac0cc21539b574398e1316f66bde",
+  "fingerprint_alg": "tree-json-v1"
+}

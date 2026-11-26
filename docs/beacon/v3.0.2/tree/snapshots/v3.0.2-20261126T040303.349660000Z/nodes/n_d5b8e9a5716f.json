@@ -1,0 +1,29 @@
+{
+  "id": "n_d5b8e9a5716f",
+  "kind": "feature",
+  "title": "error-contract",
+  "intent": "用户只看到稳定 reason code 与可操作提示，不看到内部栈。",
+  "doc": "## 问题\n\n命令失败时，用户看到的可能是 Go 原始错误串、框架 usage 或没有上下文的一句话；脚本只能靠猜。个别失败路径没有可判断的退出码，自动化无法区分“参数错”“对象不存在”“被门禁拒绝”。同时 help 把维护命令和产品入口混在一起，用户不知道哪些命令可以依赖。\n\n## 目标用户\n\n宿主 agent 与自动化脚本作者；CI；终端用户与支持人员。\n\n## 场景\n\n参数缺失、对象不存在、被门禁拒绝时查看原因；脚本按退出码与 reason code 分流；用户执行 `beacon --help` 判断可用入口。\n\n## 范围\n\n- 可预期失败返回稳定的 reason code（`core.Error`），stderr 输出可读原因，进程非零退出。\n- JSON 模式 stdout 只输出一份 JSON，不混入进度日志。\n- 默认 help 只展示用户命令；内部维护命令保留可执行但隐藏。\n- 已删除命令以未知命令失败，不提供可用别名。\n\n## 非目标\n\n- 不统一所有历史 reason code 文案，不做本地化/翻译。\n- 不为第三方库错误逐一发明新码；可复用上层码，边界待产品确认。\n- 不保证隐藏维护命令的 help 完整（它们面向维护者）。\n\n## 验收标准\n\n- ec-1：错误返回稳定 reason code。\n- ec-2：退出码可脚本判断。\n- ec-3：帮助只显示用户命令。\n- re-1：失败打印 reason code。\n- re-2：失败退出码非零。\n\n## 用户流程\n\n执行命令 → 失败时 stderr 输出 `Error: \u003cop\u003e: \u003cdetail\u003e (\u003creason_code\u003e)` → 进程退出 1 → 脚本按 reason code 或退出码处理；成功且指定 JSON 时 stdout 可直接解析。\n\n## 指标\n\n- 失败命令退出码非零的比例为 100%。\n- JSON 模式 stdout 始终为单份文档。\n- 默认顶层 help 只出现七组用户入口（`skills` 是否计入待产品确认）。\n\n## 风险\n\n- 未知命令由 CLI 框架产生 `unknown command` 文本，不带内核 reason code；现有 surface 测试也只断言文本。因此“所有失败都有稳定码”存在例外，待产品确认是否把未知命令纳入词表。\n- 新命令若绕过统一的 `fail()`，会退化为裸 error，破坏脚本契约。",
+  "parent_id": "n_8b83bfc9403d",
+  "path": "root/cli-surface/error-contract",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "ec-1",
+      "text": "错误返回稳定 reason code。"
+    },
+    {
+      "id": "ec-2",
+      "text": "退出码可脚本判断。"
+    },
+    {
+      "id": "ec-3",
+      "text": "帮助只显示用户命令。"
+    }
+  ],
+  "child_fingerprints": [
+    "7bdc97a42c23ce725540b0ed6659e8347c5aac8281f40ad83b90db4c731c5b30"
+  ],
+  "fingerprint": "d8490e5f77d1f46f6782ac95724d83b116d7d86ca166a935e79b1172f1ce469b",
+  "fingerprint_alg": "tree-json-v1"
+}

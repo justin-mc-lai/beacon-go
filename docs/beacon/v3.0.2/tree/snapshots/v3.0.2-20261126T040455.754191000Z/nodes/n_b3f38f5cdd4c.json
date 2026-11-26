@@ -1,0 +1,54 @@
+{
+  "id": "n_b3f38f5cdd4c",
+  "kind": "touchpoint",
+  "title": "guard-write",
+  "intent": "未批准的受保护路径写入被拒绝。",
+  "parent_id": "n_509c27c640d2",
+  "path": "root/security-boundary/protected-paths/guard-write",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "gw-1",
+      "text": "写 .env 返回拒绝。"
+    },
+    {
+      "id": "gw-2",
+      "text": "批准后可写入并留下回执。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_b3f38f5cdd4c-tc1",
+      "ac_id": "gw-1",
+      "kind": "unit",
+      "ref": "go test ./internal/core -run TestProtectedPathMatch -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "n_b3f38f5cdd4c-tc2",
+      "ac_id": "gw-2",
+      "kind": "unit",
+      "ref": "go test ./internal/orchestrator -run TestWorktreeMergeProtectedPathBlocked -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当写入受保护路径且未批准时，命令非零退出。"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_b3f38f5cdd4c.txt",
+    "artifact_hash": "5fe348150696e4cb13d88e26716858b96f5afc41f1c3485481add95b40a721b7",
+    "at": "2026-11-26T04:03:22.562559Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_ec3a2abe234643edc738c764",
+    "content_hash": "5fe348150696e4cb13d88e26716858b96f5afc41f1c3485481add95b40a721b7",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:22.576602Z"
+  },
+  "fingerprint": "c147f8d5898b4533961060ae8a0b3af032bc996607c050a6a0da90e317a7e869",
+  "fingerprint_alg": "tree-json-v1"
+}

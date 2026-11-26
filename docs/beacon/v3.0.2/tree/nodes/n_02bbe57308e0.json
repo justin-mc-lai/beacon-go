@@ -3,6 +3,7 @@
   "kind": "feature",
   "title": "dependency-gate",
   "intent": "依赖与版本门禁",
+  "doc": "## 问题\n\n内核一度把执行器、LLM 客户端、HTTP/桌面接口和需求写入口一起打包。删除之后，只要一次 import 或一个旧文件回流，这些面就会重新进入用户拿到的二进制；版本号也散落在 README、AGENTS 和代码里，发布物与文档各说各话。用户无法核验“这版到底包含什么”。\n\n## 目标用户\n\n内核维护者与发布负责人；CI 与发布流水线；安装二进制的宿主和团队（间接受影响）。\n\n## 场景\n\n修改内核依赖、删除或重命名命令、准备发布时，在本地或 CI 执行门禁；发布前核对文档声明的当前版本与代码一致。\n\n## 范围\n\n- 二进制依赖闭包不得包含 `internal/llm`、`internal/httpapi`、`internal/agentapi`、`internal/workspace`（桌面/工作区面）。\n- 已删除的执行器文件与 `goal program`（sea/lake 写入口）不得重新出现。\n- 版本唯一源为 `internal/version/version.go`；README、README.zh、AGENTS 的当前版本声明必须与之一致，不得写死第二份当前版本。\n- 违规时门禁以非零退出，可直接阻断 CI。\n\n## 非目标\n\n- 不检查业务逻辑正确性，不做通用安全扫描。\n- 不自动修复依赖或版本文案。\n- 不阻止测试代码和历史归档提及旧版本；只约束当前版本声明与二进制面。\n- 不负责桌面遗留 `wails.json` 的清理（3.0.0 已知保留）。\n\n## 验收标准\n\n- dg-1：内核依赖图不含 llm/httpapi/agentapi/workspace/desktop。\n- dg-2：执行器文件与 goal program 命令文件不得回归。\n- dg-3：版本只有一个源；AGENTS/README 写死当前版本即失败。\n- n_4831ea983793-1：依赖图不包含 `internal/llm` 与执行器文件。\n- n_4831ea983793-2：`check_kernel_deps` 在违规时非零退出。\n- n_f4d414369986-1：README/README.zh/AGENTS 与 `version.go` 一致。\n- n_f4d414369986-2：写死版本或第二字面量被门禁拒绝。\n\n## 用户流程\n\n开发者提交变更 → CI 执行 `scripts/check_kernel_deps.sh` 与 `scripts/check_version_consistency.sh` → 任一失败即红；发布检查复用同一脚本。\n\n## 指标\n\n- 每次 CI 构建执行一次依赖门禁与版本一致性门禁；违规构建退出码非零。\n- 被禁止模块或文件出现在二进制/仓库中的数量目标为 0。\n- 当前版本字面量只允许 `version.go` 中 1 处，文档只做一致性引用。\n\n## 风险\n\n- 门禁清单是手写列表，新增“应删除面”不会自动纳入，存在漏检。\n- 3.0.0 发布说明承认 `goal program` 内部仍编译在包内、`wails.json` 仍在；若只以文件存在为判据，门禁口径会与用户看到的二进制边界不一致。",
   "parent_id": "n_8b83bfc9403d",
   "path": "root/cli-surface/dependency-gate",
   "status": "verified",
@@ -21,9 +22,9 @@
     }
   ],
   "child_fingerprints": [
-    "6b10f72be37a71c922e7ef0635fe467b15b34b2a5f1a38bea2b9410327ef6eb4",
-    "028e8511d96da0651a5fb4c9821e7d26bcbb54c4c301de4e9fef7675912a9040"
+    "45efd13ed0ba9e23a043646915000e3d837643a4aba2dc42548af52b4aa4a083",
+    "62bd9eb7cc5f3240dee0a3329a5888300bb9e2002e4319ce93534f1e7d000585"
   ],
-  "fingerprint": "6d000d1854b45438fe51a21c963118514df722a6918e9c735e07949a27bdf76c",
+  "fingerprint": "190ff8924ba53067682f36d88d9ffbfdd6f08df129e80d9826d204dda3eb9074",
   "fingerprint_alg": "tree-json-v1"
 }

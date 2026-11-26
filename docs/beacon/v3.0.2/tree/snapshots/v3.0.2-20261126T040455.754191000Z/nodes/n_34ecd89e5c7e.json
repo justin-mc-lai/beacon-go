@@ -1,0 +1,54 @@
+{
+  "id": "n_34ecd89e5c7e",
+  "kind": "touchpoint",
+  "title": "recursive freeze",
+  "intent": "父节点等待子节点",
+  "parent_id": "n_b5046d07c9aa",
+  "path": "root/truth-kernel/freeze-change/recursive-freeze",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "n_34ecd89e5c7e-1",
+      "text": "子节点 draft 时父冻结拒绝。"
+    },
+    {
+      "id": "n_34ecd89e5c7e-2",
+      "text": "全部子 settled 后父冻结成功。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_34ecd89e5c7e-tc1",
+      "ac_id": "n_34ecd89e5c7e-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestFreezeBottomUpBindsChildren",
+      "status": "existing"
+    },
+    {
+      "id": "n_34ecd89e5c7e-tc2",
+      "ac_id": "n_34ecd89e5c7e-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestFreezeBottomUpBindsChildren",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当冻结父节点且子节点为 draft 时，返回 tree_parent_not_frozen"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_34ecd89e5c7e.txt",
+    "artifact_hash": "88f167e69ce437492349b7fb979de59d437b1d00b4ce85ab91bed759a97d7004",
+    "at": "2026-11-26T04:03:29.02224Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_faa87e9d56dfd60657d5e2e6",
+    "content_hash": "88f167e69ce437492349b7fb979de59d437b1d00b4ce85ab91bed759a97d7004",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:29.031546Z"
+  },
+  "fingerprint": "7e64f9a0f4e297b71b395d120577e9276c809678dcfa0020af1a192d404a2ed4",
+  "fingerprint_alg": "tree-json-v1"
+}

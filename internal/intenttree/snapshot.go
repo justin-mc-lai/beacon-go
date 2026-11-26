@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"beacon-go/internal/core"
+	buildversion "beacon-go/internal/version"
 )
 
 // SnapshotSchema is the immutable history format.
@@ -23,6 +24,8 @@ type SnapshotEntry struct {
 	Status         Status `json:"status"`
 	Title          string `json:"title"`
 	Path           string `json:"path"`
+	TruthPath      string `json:"truth_path,omitempty"`
+	Constraint     bool   `json:"constraint,omitempty"`
 	Fingerprint    string `json:"fingerprint"`
 	FingerprintAlg string `json:"fingerprint_alg"`
 	NodeRef        string `json:"node_ref"`
@@ -30,12 +33,17 @@ type SnapshotEntry struct {
 
 // Snapshot is the immutable version-line tree.
 type Snapshot struct {
-	Schema     string          `json:"schema"`
-	Version    string          `json:"version"`
-	RootID     string          `json:"root_id"`
-	CreatedAt  string          `json:"created_at"`
-	SourceHash string          `json:"source_hash"`
-	Nodes      []SnapshotEntry `json:"nodes"`
+	Schema             string          `json:"schema"`
+	ID                 string          `json:"id,omitempty"`
+	Version            string          `json:"version"`
+	RootID             string          `json:"root_id"`
+	CreatedAt          string          `json:"created_at"`
+	SourceHash         string          `json:"source_hash"`
+	RuntimeVersion     string          `json:"runtime_version,omitempty"`
+	RuntimeCommit      string          `json:"runtime_commit,omitempty"`
+	BinarySHA          string          `json:"binary_sha256,omitempty"`
+	RequirementVersion string          `json:"requirement_version,omitempty"`
+	Nodes              []SnapshotEntry `json:"nodes"`
 }
 
 func snapshotsDir(dir string) string { return filepath.Join(dir, "snapshots") }
@@ -51,8 +59,8 @@ func CreateSnapshot(dir, version string) (Snapshot, string, error) {
 		return Snapshot{}, "", core.NewError(ReasonInvalidIndex, "intenttree.CreateSnapshot", strings.Join(findings, "; "))
 	}
 	root, ok := findEntry(idx, idx.RootID)
-	if !ok || root.Status != StatusFrozen {
-		return Snapshot{}, "", core.NewError(ReasonParentNotFrozen, "intenttree.CreateSnapshot", "root must be frozen before a snapshot")
+	if !ok || (root.Status != StatusFrozen && root.Status != StatusImplemented && root.Status != StatusVerified && root.Status != StatusDelivered) {
+		return Snapshot{}, "", core.NewError(ReasonParentNotFrozen, "intenttree.CreateSnapshot", "root must be frozen or terminal before a snapshot")
 	}
 	prevID, prev, _ := latestSnapshot(dir)
 	prevBodies := map[string]SnapshotEntry{}
@@ -67,9 +75,12 @@ func CreateSnapshot(dir, version string) (Snapshot, string, error) {
 	if err := os.MkdirAll(filepath.Join(snapDir, "nodes"), 0o755); err != nil {
 		return Snapshot{}, "", err
 	}
+	rt := buildversion.Runtime()
 	snap := Snapshot{
-		Schema: SnapshotSchema, Version: version, RootID: idx.RootID,
+		Schema: SnapshotSchema, ID: snapID, Version: version, RootID: idx.RootID,
 		CreatedAt: stamp.Format(time.RFC3339Nano), SourceHash: SourceHash(idx),
+		RuntimeVersion: rt.Version, RuntimeCommit: rt.Commit, BinarySHA: rt.BinarySHA,
+		RequirementVersion: version,
 	}
 	for _, e := range idx.Nodes {
 		ref := filepath.ToSlash(filepath.Join("nodes", e.ID+".json"))
@@ -93,7 +104,7 @@ func CreateSnapshot(dir, version string) (Snapshot, string, error) {
 		}
 		snap.Nodes = append(snap.Nodes, SnapshotEntry{
 			ID: e.ID, ParentID: e.ParentID, Kind: e.Kind, Status: e.Status,
-			Title: e.Title, Path: e.Path, Fingerprint: e.Fingerprint,
+			Title: e.Title, Path: e.Path, TruthPath: e.TruthPath, Constraint: e.Constraint, Fingerprint: e.Fingerprint,
 			FingerprintAlg: e.FingerprintAlg, NodeRef: ref,
 		})
 	}
@@ -146,6 +157,9 @@ func ReadSnapshot(dir, id string) (Snapshot, error) {
 	var snap Snapshot
 	if err := json.Unmarshal(raw, &snap); err != nil {
 		return Snapshot{}, err
+	}
+	if snap.ID == "" {
+		snap.ID = id
 	}
 	if snap.Schema != SnapshotSchema {
 		return Snapshot{}, core.NewError(ReasonSchemaUnknown, "intenttree.ReadSnapshot", "unknown snapshot schema "+snap.Schema)

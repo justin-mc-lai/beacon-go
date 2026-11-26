@@ -1,0 +1,54 @@
+{
+  "id": "n_0c8ae82d4829",
+  "kind": "touchpoint",
+  "title": "ask-confirm",
+  "intent": "提问关闭、意图确认后才允许冻结。",
+  "parent_id": "n_2f1bbf51c776",
+  "path": "root/truth-kernel/package-lifecycle/ask-confirm",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "aq-1",
+      "text": "存在未回答问题时不确认。"
+    },
+    {
+      "id": "aq-2",
+      "text": "确认后状态进入 in_review。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_0c8ae82d4829-tc1",
+      "ac_id": "aq-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestTruthAskConfirmDriftCLI -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "n_0c8ae82d4829-tc2",
+      "ac_id": "aq-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestTruthAskConfirmDriftCLI -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当存在 open question 时 confirm 拒绝；关闭后 confirm 成功。"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_0c8ae82d4829.txt",
+    "artifact_hash": "7b891db74b2e4d6529dc849ce5392cf3359b91532a5f3c005de2a74bbc04a77c",
+    "at": "2026-11-26T03:07:18.67106Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_479a45b740c91d108e243883",
+    "content_hash": "7b891db74b2e4d6529dc849ce5392cf3359b91532a5f3c005de2a74bbc04a77c",
+    "by": "self-audit",
+    "at": "2026-11-26T03:07:18.68821Z"
+  },
+  "fingerprint": "5544eafb8d5d886b590a76e38aac0d6a738b6bb07fc4f773e47faf1603434907",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -57,9 +57,14 @@ func GenerateDoc(n Node) string {
 	if n.Intent != "" {
 		fmt.Fprintf(&b, "## 意图\n\n%s\n\n", n.Intent)
 	}
-	b.WriteString("## 前置条件\n\n- [待补充：进入本条需求前必须满足的条件]\n\n")
-	b.WriteString("## 主流程\n\n1. [待补充：用户主动作]\n2. [待补充：系统响应]\n\n")
+	b.WriteString("## 问题\n\n- [待补充：这个需求要解决的用户问题]\n\n")
+	b.WriteString("## 目标用户\n\n- [待补充：谁在什么场景下使用]\n\n")
+	b.WriteString("## 场景\n\n- [待补充：关键用户场景]\n\n")
+	b.WriteString("## 范围\n\n- [待补充：本次做什么]\n\n")
+	b.WriteString("## 非目标\n\n- [待补充：本次明确不做什么]\n\n")
+	b.WriteString("## 用户流程\n\n1. [待补充：用户主动作]\n2. [待补充：系统响应]\n\n")
 	b.WriteString("## 异常与边界\n\n- [待补充：失败、重试、取消或超时]\n")
+	b.WriteString("\n## 验收标准\n\n- [待补充：用户可观察的结果]\n")
 	if n.DomainFSM != nil {
 		b.WriteString("\n## 状态迁移\n\n| From | To | Event |\n|---|---|---|\n")
 		for _, tr := range n.DomainFSM.Transitions {

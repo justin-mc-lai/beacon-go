@@ -1,0 +1,33 @@
+{
+  "id": "nroot_98a9c77a9519",
+  "kind": "intent",
+  "title": "beacon-go",
+  "intent": "让宿主 agent 用一棵可冻结的意图树驱动需求真相、实现、验证与发布",
+  "path": "root",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "root-1",
+      "text": "宿主可用一条命令从意图走到证据：plan→freeze→implement→verify→audit→render。"
+    },
+    {
+      "id": "root-2",
+      "text": "所有门 fail-closed；未满足时返回稳定 reason code，不自动补全。"
+    },
+    {
+      "id": "root-3",
+      "text": "内核边界不含执行器、LLM 客户端、UI 与长跑位；这些归宿主。"
+    }
+  ],
+  "child_fingerprints": [
+    "3460e315bc9db467dc5211c895c1546077473cc62ad434145da0833b061d2fa0",
+    "9ef160e363140e6aff55e71b4b86df632c0b605135d6c3ceab4a171afd3b10cf",
+    "a81833fb8f0477ac8cf06c3401ba2f38efdfa9b486a8ed30f795656422f3bce2",
+    "9279be403f888dea4fb12516f6e4c166420fac0cc21539b574398e1316f66bde",
+    "cb998a245eecb454352576ba99722d3ed74fc15d3c4b6feb652cfe01d4a2b15f",
+    "ad45e85c42b4e262fe19800b16109759f80efb4af2b2e1cbeabdadca962928da",
+    "ceaa7ef1c0dd4739e25996d8cf9a9787d09c1e80c5ce388b6d239e7092fcd791"
+  ],
+  "fingerprint": "6a62bb20a7c540ebc184c2f355b6d83b0a12b5ca5fb14cd990c97fe3fcba68c1",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "n_8bb5a36f0ff5",
+  "kind": "feature",
+  "title": "delivery",
+  "intent": "验证之后必须有显式交付终态，不能把 verified 当交付",
+  "doc": "## 问题\n“验证通过”经常被直接当成交付完成，但验证只证明叶子有证据；父节点、整棵树甚至发布动作都可能还没到位。缺少显式终态时，团队无法区分“做完了”和“交付出去了”。\n\n## 目标用户\n- 交付负责人与发布 owner。\n- 需要向业务方确认“到底交付了什么”的项目管理者。\n- 做发布前审计的评审者。\n\n## 场景\n- 叶子或父节点已验证，准备宣布交付。\n- 父节点要交付，但仍有子节点停在 frozen/implemented/verified 之间的某个状态。\n- 发布前需要一份明确的、不可含糊的交付状态。\n\n## 范围\n- 只有 verified 节点可以执行 `truth node deliver --by \u003c身份\u003e`。\n- 父节点交付要求所有直接子节点为 verified 或 delivered。\n- 交付后节点状态为 `delivered`，作为终态记录在树与账本中。\n- 交付是显式的人类/宿主动作，不从测试通过或实现报告推断。\n\n## 非目标\n- 不把 delivery 等同 release；发布仍有独立的人工门。\n- 不自动交付，不在 verify 后顺带改状态。\n- 不替代验证、汇总或审计。\n- 不提供自动回滚；交付后的撤销要走 change/重新冻结流程。\n\n## 验收标准\n- verified 节点 deliver 后状态为 `delivered`。\n- 未 verified 节点不能 deliver（`tree_node_not_verified`）。\n- 任一子节点未 verified/delivered 时父节点 deliver 被拒绝（`tree_child_not_verified`）。\n- 交付动作必须带 `--by`，无身份拒绝。\n\n## 用户流程\n1. `verify leaf` 验证叶子，`verify rollup` 自底向上汇总。\n2. 确认父节点状态为 verified。\n3. `truth node deliver --project . --node \u003cid\u003e --by \u003c身份\u003e`。\n4. 发布决策另行执行 release gate，不因 delivered 自动放行。\n\n## 指标\n- verified 节点到 delivered 的转化率与平均间隔。\n- deliver 被拒次数及原因（未验证 / 子节点未完成）。\n- 已交付节点中后续发生 change 的比例。\n- 目标阈值：待产品确认。\n\n## 风险\n- `delivered` 是终态；误交付没有自动回滚，只能走变更流程重新打开。\n- 父节点交付只检查直接子节点，深层状态依赖各层已正确 rollup，漏掉一层会留下“看起来交付”的空洞。\n- 团队若把 delivered 当发布完成，会绕过 release 的人工确认；这两个概念必须在流程里分开讲。",
+  "parent_id": "n_66fe3404b218",
+  "path": "root/verification/delivery",
+  "status": "delivered",
+  "acs": [
+    {
+      "id": "delivery-1",
+      "text": "只有 verified 节点可以显式 deliver。"
+    },
+    {
+      "id": "delivery-2",
+      "text": "父节点 delivery 要求所有子节点 verified 或 delivered。"
+    }
+  ],
+  "child_fingerprints": [
+    "c7d0c4b9521c1147fbb9559a6a58723410699eb95038c955aef29ae7dc71b420"
+  ],
+  "fingerprint": "233f154a7e8ef9f0282de0c73ea9aaa76799839aa3cec4b21916df181a90ff71",
+  "fingerprint_alg": "tree-json-v1"
+}

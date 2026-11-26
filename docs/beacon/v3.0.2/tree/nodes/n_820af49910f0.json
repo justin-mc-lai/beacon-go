@@ -3,6 +3,7 @@
   "kind": "feature",
   "title": "rollup-audit",
   "intent": "验证汇总与审计",
+  "doc": "## 问题\n叶子验证通过后，父节点是否可信、整棵树是否健康，需要可重复的汇总与只读审计。缺少这两步时，会出现“子节点没验完父节点却 verified”，或者结构断裂、孤儿节点、空 module 长期无人发现。\n\n## 目标用户\n- 验证负责人与 QA。\n- 发布前做检查的评审者。\n- 维护树结构的架构/需求负责人。\n\n## 场景\n- 叶子 implemented 后登记证据并验证。\n- 自底向上把 feature / module / root 汇总为 verified。\n- 发布前或 change 后跑一次只读审计，看结构和验证缺口。\n\n## 范围\n- `verify leaf` 要求叶子处于 implemented；登记 node scope 证据后写回 artifact id、内容哈希与验证者，状态变 verified。\n- `verify rollup` 递归自底向上；任一子节点未 verified 时拒绝（`tree_parent_not_verified`），全部通过后父节点 verified 并重绑子指纹。\n- `verify audit` 只读，检查 schema/重复 id/孤儿/父子 kind/空 module/叶子验证规格缺失/测试用例/AC 覆盖/指纹漂移；合法树返回 ok，问题以 findings 列表返回。\n- audit 的 `reads_only=true` 是契约，不写树、不写库、不写证据。\n\n## 非目标\n- audit 不修树；修复属于 `change` 流程。\n- rollup 不代替叶子证据，也不替代 release 门。\n- 不自动补验证、不自动冻结。\n- 不把旧树缺 test case 的 advisory 当作硬失败。\n\n## 验收标准\n- implemented 叶子执行 verify 后状态变 verified，并绑定 artifact id/hash/by。\n- 未 implemented 叶子 verify 被拒绝。\n- 子节点未全部 verified 时父级 rollup 拒绝；全部 verified 后父级 verified。\n- audit 对合法树返回 ok；对 kind 违规、孤儿、空 module、叶子缺少验证规格、指纹异常返回 findings。\n- audit 前后树 JSON、SQLite 与证据字节不变。\n- rollup 后父节点绑定最新子指纹。\n\n## 用户流程\n1. `implement report --node \u003cleaf\u003e --artifact \u003cfile\u003e --by \u003cdev\u003e`。\n2. `verify leaf --node \u003cleaf\u003e --artifact \u003cfile\u003e --by \u003cqa\u003e`。\n3. `verify rollup --node \u003cparent\u003e`，逐层到 root。\n4. `verify audit --json` 做只读体检；发现问题走 `change request` 修复。\n\n## 指标\n- verified 叶子数、rollup 成功率与失败层级。\n- audit findings 数量及类型分布（孤儿、空 module、验证规格缺失、测试覆盖缺口）。\n- 从叶子验证完成到 root verified 的耗时。\n- 目标阈值：待产品确认。\n\n## 风险\n- audit 是只读诊断，不会自动修复；发现问题后必须有人走 change，否则树会带病运行。\n- 旧树缺 test case 只会给 advisory，不阻断，容易让覆盖率缺口被忽略。\n- rollup 依赖直接子节点状态；某层漏跑 rollup 时父级会一直停在未验证。\n- 指纹重绑会改变节点记录；审计与评审要同时看内容状态和指纹，不能只看 status。",
   "parent_id": "n_66fe3404b218",
   "path": "root/verification/rollup-audit",
   "status": "verified",
@@ -112,10 +113,10 @@
     ]
   },
   "child_fingerprints": [
-    "67989b4ed56835ec3adfa5ca541737f5d33e7d33e4dc192207c47c9559011375",
-    "88c2c1bc9aa94e4f1c975c47cc209dd387805220a369df402200f698eb448800",
-    "c6c8d90bd5a2975f3bddde5d583919b991b4107d9fdd9e3d735f2fe35c86fefa"
+    "c97e62a8b4b401d1ef0454fde19a2fc36fe95081cb7508988b4c5bd236932f65",
+    "d4e46b35d0738f898130a32bf5538d63c06580e149413c846e0b1b1277528dce",
+    "8891b693d31c6e98361b7f7f97d3512c10bae9169c3e313e700df23f824157f5"
   ],
-  "fingerprint": "63c9692a6d1b009557d98b07b53a243854ac03505893b2a3b9b5a215147e4cc3",
+  "fingerprint": "a6a8eafe15d546fb4b9d96cf9c4f9f7c7fbedf1aa6617bd1b2c9f687e5781638",
   "fingerprint_alg": "tree-json-v1"
 }

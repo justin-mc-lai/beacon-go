@@ -1,0 +1,12 @@
+{
+  "id": "chg_3d05300df506",
+  "node_id": "n_e5f3d6ca7d11",
+  "summary": "Mark engineering guards as constraints",
+  "by": "beacon-self-audit",
+  "base_fingerprint": "4a63f3d6a641e556bbf2c8e7dafc771035459f641cf2321c399787c7887173ff",
+  "affected": [
+    "n_ab98f2aac9e3",
+    "n_e5f3d6ca7d11"
+  ],
+  "created_at": "2026-11-26T04:04:55.951158Z"
+}

@@ -178,7 +178,7 @@ func seedFeatureNode(t *testing.T, proj, title, slug string) (string, string) {
 	mustRun(t, "plan", "init", "--project", proj, "--title", "root", "--intent", "root", "--json")
 	root := parseDoc(t, mustRun(t, "plan", "tree", "--project", proj, "--json"))["root_id"].(string)
 	mod := parseDoc(t, mustRun(t, "plan", "apply", "--project", proj, "--node", root, "--proposal", writeJSON(t, map[string]any{"children": []any{map[string]any{"kind": "module", "title": "m", "intent": "m"}}}), "--json"))["nodes"].([]any)[0].(map[string]any)["id"].(string)
-	child := map[string]any{"kind": "feature", "title": title, "intent": "x"}
+	child := map[string]any{"kind": "feature", "title": title, "intent": "x", "doc": "## 问题\n- x\n## 目标用户\n- x\n## 场景\n- x\n## 范围\n- x\n## 非目标\n- x\n## 验收标准\n- x\n"}
 	if slug != "" {
 		child["slug"] = slug
 	}
@@ -316,5 +316,24 @@ func TestTruthNodeDeliverRequiresVerifiedChildren(t *testing.T) {
 	out := mustRun(t, "truth", "node", "deliver", "--project", proj, "--node", "f", "--by", "qa", "--json")
 	if parseDoc(t, out)["status"] != "delivered" {
 		t.Fatalf("deliver output: %s", out)
+	}
+}
+
+func TestSnapshotHTMLShowsVersionAndHistory(t *testing.T) {
+	proj := treeTestEnv(t)
+	seedFreezeTree(t, proj, false)
+	for _, id := range []string{"t1", "t2", "f", "m", "root"} {
+		mustRun(t, "truth", "node", "freeze", "--project", proj, "--node", id, "--json")
+	}
+	out := filepath.Join(t.TempDir(), "history.html")
+	mustRun(t, "truth", "tree", "--project", proj, "--version", "v0.1.0", "--snapshot", "latest", "--format", "html", "--out", out)
+	raw, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"需求线", "运行时", "快照", "版本历史", "历史版本"} {
+		if !strings.Contains(string(raw), want) {
+			t.Fatalf("snapshot HTML missing %q", want)
+		}
 	}
 }

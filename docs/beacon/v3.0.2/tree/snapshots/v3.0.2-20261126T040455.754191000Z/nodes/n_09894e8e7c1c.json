@@ -1,0 +1,54 @@
+{
+  "id": "n_09894e8e7c1c",
+  "kind": "touchpoint",
+  "title": "verify replaces qa",
+  "intent": "qa 不再存在",
+  "parent_id": "n_068ee154c0a2",
+  "path": "root/cli-surface/seven-groups/verify-replaces-qa",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "n_09894e8e7c1c-1",
+      "text": "beacon qa 返回 unknown command。"
+    },
+    {
+      "id": "n_09894e8e7c1c-2",
+      "text": "verify 子命令覆盖原 qa 能力。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_09894e8e7c1c-tc1",
+      "ac_id": "n_09894e8e7c1c-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestSevenCommandSurface -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "n_09894e8e7c1c-tc2",
+      "ac_id": "n_09894e8e7c1c-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestSevenCommandSurface -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当运行 beacon qa 时，返回 unknown command"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_09894e8e7c1c.txt",
+    "artifact_hash": "92037be75df7a7b06ca388674212beb73ace0e785bf00f1920149ef2cc5f78f4",
+    "at": "2026-11-26T04:03:13.982362Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_cf7cfdf45e47dbebb70b1098",
+    "content_hash": "92037be75df7a7b06ca388674212beb73ace0e785bf00f1920149ef2cc5f78f4",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:13.992429Z"
+  },
+  "fingerprint": "8f98062ceb0745c44fd4e466807c107d1d13a77357215bb5bcadaa6c8543b32d",
+  "fingerprint_alg": "tree-json-v1"
+}

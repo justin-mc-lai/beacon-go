@@ -1,0 +1,55 @@
+{
+  "id": "n_091c9aeebdd2",
+  "kind": "touchpoint",
+  "title": "hash recheck",
+  "intent": "哈希可复查",
+  "parent_id": "n_f2b317a84be5",
+  "path": "root/verification/evidence-scope/hash-recheck",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "n_091c9aeebdd2-1",
+      "text": "文件改写后门禁标记 stale。"
+    },
+    {
+      "id": "n_091c9aeebdd2-2",
+      "text": "哈希不匹配拒绝通过。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "n_091c9aeebdd2-tc1",
+      "ac_id": "n_091c9aeebdd2-1",
+      "kind": "unit",
+      "ref": "go test ./internal/gate -run TestIntegrityEvidenceAndSlugFractures",
+      "status": "existing"
+    },
+    {
+      "id": "n_091c9aeebdd2-tc2",
+      "ac_id": "n_091c9aeebdd2-2",
+      "kind": "unit",
+      "ref": "go test ./internal/gate -run TestIntegrityEvidenceAndSlugFractures",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当改写已登记文件后，门禁读取标记 stale"
+  },
+  "constraint": true,
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_091c9aeebdd2.txt",
+    "artifact_hash": "36b506a7bc145d76b020c38cab12f2cfc93537d1b0e0c29baea04fd48ea85efb",
+    "at": "2026-11-26T04:03:30.705846Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_e51b9faf4716c306d436ee80",
+    "content_hash": "36b506a7bc145d76b020c38cab12f2cfc93537d1b0e0c29baea04fd48ea85efb",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:30.714913Z"
+  },
+  "fingerprint": "f740ca918e785deb189151e459e993e6367114f38490c4a5910cefbec9edd1f6",
+  "fingerprint_alg": "tree-json-v1"
+}

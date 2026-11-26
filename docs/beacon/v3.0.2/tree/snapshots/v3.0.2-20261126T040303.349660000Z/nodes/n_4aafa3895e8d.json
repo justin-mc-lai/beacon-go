@@ -1,0 +1,31 @@
+{
+  "id": "n_4aafa3895e8d",
+  "kind": "feature",
+  "title": "manual-run",
+  "intent": "manual lane 与恢复",
+  "doc": "## 问题\n宿主 agent 在仓库里干活，会话会断、执行者也不止一个；内核本身不跑 agent。过去“这一阶段做完了”只能靠对话或感觉，中断后没人说得清走到哪一步，重复执行又会把同一阶段算两遍。\n\n## 目标用户\n- 用 Claude Code、Codex 等宿主驱动交付的开发者与团队。\n- 没有、也不想让内核内置 agent 执行器的自动化编排者。\n- 接手长任务的后续维护者。\n\n## 场景\n- 一次交付跨多轮会话，宿主每完成一个阶段就回报一次。\n- 同一阶段被同一执行者重复回报，或换了一个执行者接手。\n- 进程被杀、宿主回合中断后，要从断点继续而不是重放已结算阶段。\n- 需要一个后台循环按轮推进，但必须在发布门口停下等人。\n\n## 范围\n- `beacon goal tick --run-id \u003cid\u003e --by \u003c身份\u003e` 把“谁完成了这一阶段”记成阶段完成证据；没有身份时停在原地并返回 `manual_tick_required`。\n- 同一身份重复 tick 幂等（返回 `up_to_date`，不重跑、不重复记 blocker）；新身份重新评估。\n- `goal checkpoint --next-action` 写入下一步与时间；`goal resume-pack` 只读返回恢复所需最小集；`goal resume` 消费中断并给出 `load_next_skill` / `replay_substep` / `await_human_confirmation`。\n- `goal driver run-once` 每轮记录 run 状态、心跳和 checkpoint，不自动完成、不发布，到 release gate 停住。\n\n## 非目标\n- 不内置 LLM 客户端或 agent 执行器，不替宿主判断“代码写得好不好”。\n- 不因时间流逝自动推进阶段；表单填完不等于阶段完成。\n- 不自动清除人工门，不自动发布。\n- `driver` 不做真正的 agent 进程托管与 fencing；它只做轮次记账和停机判断。\n\n## 验收标准\n- manual run 的 tick 身份即阶段完成证据；无身份时不得推进。\n- 同一身份重复 tick 幂等；新身份重新评估，已结算阶段不重放。\n- checkpoint 记录下一步与时间，`resume-pack` 能返回恢复所需最小集。\n- 中断后 `resume` 首次返回 `replay_substep`，消费后不再重放。\n- driver 的每一轮都留下 run 状态、心跳和 checkpoint；到达 release gate 前停下，不越过人工确认。\n- 以上行为有对应的行为测试（`TestManualExecutorRunAdvancesViaTick`、`TestCheckpointResumeAndInterrupt`、`TestDriverRunOnceTurnBookkeeping`、`TestDriverRunLoopStopsAtReleaseGate`）。\n\n## 用户流程\n1. `goal run \"\u003c一句话\u003e\" --project . --feature \u003cslug\u003e --executor manual --executor-id \u003cmaker\u003e` 创建 run。\n2. 宿主完成当前阶段；`goal tick --run-id \u003cid\u003e --by \u003c身份\u003e` 记账并推进一个阶段。\n3. 每轮结束前写 `goal checkpoint --next-action ...`。\n4. 中断后先 `goal resume-pack` 看恢复包，再 `goal resume` 继续。\n5. 可选：`goal driver start` + `goal driver run-once` 循环推进，到发布门停下。\n\n## 指标\n- tick 幂等命中率（`up_to_date` 次数 / tick 总数），数据源为 `lifecycle_events`。\n- checkpoint 到 resume 的恢复成功率，以及重放中断的次数，数据源为 `goal_checkpoint` / `goal_resumed` / `host_interrupt` 事件。\n- driver 轮次、心跳年龄、停机原因分布，数据源为 run 快照与 driver 事件。\n- 目标阈值：待产品确认。\n\n## 风险\n- tick 身份是调用方自述，内核不做身份认证；“谁说的完成”只能作为审计线索，不能当质量证明。\n- 无身份或未注册执行器时 run 会停在原地，这是设计行为；把它误读为系统故障会导致重复启动。\n- driver 租约只约束启动，不是执行期强制隔离；租约过期后的当前轮不会被强行终止。\n- manual lane 高度依赖宿主自觉写 checkpoint，长期任务不写 checkpoint 时恢复成本会显著上升。",
+  "parent_id": "n_2f9cbcff36f4",
+  "path": "root/goal-orchestration/manual-run",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "mr-1",
+      "text": "manual run 的 tick 身份即阶段完成证据。"
+    },
+    {
+      "id": "mr-2",
+      "text": "同一身份重复 tick 幂等；新身份重新评估。"
+    },
+    {
+      "id": "mr-3",
+      "text": "checkpoint 记录下一步，resume-pack 可恢复。"
+    }
+  ],
+  "child_fingerprints": [
+    "51d9d798505ba4ba24bd199ae0ad6b4304e44a898434816a5854f1dac8596df8",
+    "48e6ae28c282d608ce68b6adba12ef86c916e09262c14b2503d837f3d2c0fece",
+    "abc5ac0a557829d51f457e034220a1ef63126ec424e09040fcf73280dc94af7f"
+  ],
+  "fingerprint": "e2032de8a32b7c5ca6231a4e1630cd3cf92e8b52015fce1c15c3060e3c409527",
+  "fingerprint_alg": "tree-json-v1"
+}

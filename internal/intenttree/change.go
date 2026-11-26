@@ -19,6 +19,7 @@ type ChangeRecord struct {
 	Summary         string   `json:"summary"`
 	By              string   `json:"by"`
 	BaseFingerprint string   `json:"base_fingerprint"`
+	BeforeSnapshot  string   `json:"before_snapshot_id,omitempty"`
 	Affected        []string `json:"affected"`
 	CreatedAt       string   `json:"created_at"`
 }
@@ -64,10 +65,14 @@ func RequestChange(st *store.Store, dir, versionID, nodeID, summary, by, base st
 	sort.Strings(affected)
 
 	now := time.Now().UTC()
+	beforeSnapshot := ""
+	if _, sid, serr := CreateSnapshot(dir, idx.Version); serr == nil {
+		beforeSnapshot = sid
+	}
 	rec := ChangeRecord{
 		ID:     shortID("chg_", versionID, nodeID, summary, now.Format(time.RFC3339Nano)),
 		NodeID: nodeID, Summary: strings.TrimSpace(summary), By: strings.TrimSpace(by),
-		BaseFingerprint: target.Fingerprint, Affected: affected,
+		BaseFingerprint: target.Fingerprint, BeforeSnapshot: beforeSnapshot, Affected: affected,
 		CreatedAt: now.Format(time.RFC3339Nano),
 	}
 	raw, err := json.MarshalIndent(rec, "", "  ")

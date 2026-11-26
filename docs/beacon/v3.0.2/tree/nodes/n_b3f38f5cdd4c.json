@@ -36,19 +36,20 @@
     "type": "test",
     "spec": "当写入受保护路径且未批准时，命令非零退出。"
   },
+  "constraint": true,
   "implementation": {
     "by": "self-audit",
     "outcome": "done",
     "artifact_path": "/tmp/beacon-evidence/all/n_b3f38f5cdd4c.txt",
-    "artifact_hash": "6d03ca0908ef443edbeaeb0a4f83de960c74b09ef281a35376098f4f21549270",
-    "at": "2026-11-26T03:07:08.307951Z"
+    "artifact_hash": "c389c0c4a3018bc29aebe536a8bc177b7671f45d18fb1ba8eec20c296977e9b8",
+    "at": "2026-11-26T04:05:22.298295Z"
   },
   "verification_evidence": {
     "artifact_id": "art_ec3a2abe234643edc738c764",
-    "content_hash": "6d03ca0908ef443edbeaeb0a4f83de960c74b09ef281a35376098f4f21549270",
+    "content_hash": "c389c0c4a3018bc29aebe536a8bc177b7671f45d18fb1ba8eec20c296977e9b8",
     "by": "self-audit",
-    "at": "2026-11-26T03:07:08.324323Z"
+    "at": "2026-11-26T04:05:22.308379Z"
   },
-  "fingerprint": "85ab0c4dfb2b6155165861538dc71a537c30b6036dea99062bf1153ccb9ead96",
+  "fingerprint": "e2354f7f7779057d614a70cd98732fbebfc16ce99af21b528e4fa53734e50d84",
   "fingerprint_alg": "tree-json-v1"
 }

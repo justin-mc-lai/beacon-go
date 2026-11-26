@@ -146,6 +146,7 @@ type Node struct {
 	TestCases            []TestCase            `json:"test_cases,omitempty"`
 	DomainFSM            *DomainFSM            `json:"domain_fsm,omitempty"`
 	Verification         *Verification         `json:"verification,omitempty"`
+	Constraint           bool                  `json:"constraint,omitempty"`
 	ChildFingerprints    []string              `json:"child_fingerprints,omitempty"`
 	Implementation       *ImplementationRecord `json:"implementation,omitempty"`
 	VerificationEvidence *EvidenceRef          `json:"verification_evidence,omitempty"`
@@ -177,6 +178,7 @@ type IndexEntry struct {
 	Title          string `json:"title"`
 	Path           string `json:"path"`
 	TruthPath      string `json:"truth_path,omitempty"`
+	Constraint     bool   `json:"constraint,omitempty"`
 	Fingerprint    string `json:"fingerprint"`
 	FingerprintAlg string `json:"fingerprint_alg"`
 }

@@ -1,0 +1,54 @@
+{
+  "id": "n_03cce053c26f",
+  "kind": "touchpoint",
+  "title": "tree feature adoption",
+  "intent": "goal 可以从树 feature 起跑，package 只是派生元数据",
+  "parent_id": "n_eedd1f82a0f6",
+  "path": "root/goal-orchestration/run-lifecycle/tree-feature-adoption",
+  "status": "verified",
+  "acs": [
+    {
+      "id": "adopt-1",
+      "text": "没有 feature_packages 行时，goal run 从 canonical tree 解析 feature 并创建派生包。"
+    },
+    {
+      "id": "adopt-2",
+      "text": "派生 truth.md 标注 source: tree 与 tree_node_id，不冒充独立真相源。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "adopt-tc1",
+      "ac_id": "adopt-1",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestGoalRunAdoptsTreeFeatureWithoutPackage -count=1",
+      "status": "existing"
+    },
+    {
+      "id": "adopt-tc2",
+      "ac_id": "adopt-2",
+      "kind": "unit",
+      "ref": "go test ./internal/cli -run TestGoalRunAdoptsTreeFeatureWithoutPackage -count=1",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "当树存在 frozen feature 且 DB 无包时，goal run 成功并写出带 tree 来源的派生包"
+  },
+  "implementation": {
+    "by": "self-audit",
+    "outcome": "done",
+    "artifact_path": "/tmp/beacon-evidence/all/n_03cce053c26f.txt",
+    "artifact_hash": "a8aa605b6f01a63ae6a19d335b813187eab40fcfa88f4950d62a167ec7975780",
+    "at": "2026-11-26T04:03:20.016196Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_6694c9445a900259a333dcc0",
+    "content_hash": "a8aa605b6f01a63ae6a19d335b813187eab40fcfa88f4950d62a167ec7975780",
+    "by": "self-audit",
+    "at": "2026-11-26T04:03:20.025204Z"
+  },
+  "fingerprint": "f3f7c76a5d3cb2d973bf3048523431c7d9d1bd7128b4c9a335f9abe0ed2bf5ea",
+  "fingerprint_alg": "tree-json-v1"
+}
