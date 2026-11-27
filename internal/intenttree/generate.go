@@ -48,24 +48,42 @@ func PlannedTestCases(n Node) []TestCase {
 	return out
 }
 
-// GenerateDoc renders a deterministic requirement-document skeleton from
-// the node's intent, ACs and FSM. Semantic prose is the host agent's job;
-// this function only fills the stable sections and evidence links.
+// scaffoldMarker is the one placeholder token a generated skeleton may
+// carry. truth_freeze refuses a package that still contains it.
+const scaffoldMarker = "[待补充"
+
+// DocReady reports whether a node carries real prose instead of the
+// generated skeleton. A doc that still contains the scaffold marker is
+// not ready: filling half the sections is not the requirement truth.
+func DocReady(n Node) bool {
+	doc := strings.TrimSpace(n.Doc)
+	return doc != "" && !strings.Contains(doc, scaffoldMarker)
+}
+
+// GenerateDoc starts from the node's own document when the host agent
+// has written one and appends the structured sections the node owns
+// (FSM, ACs, verification). Only a node with no prose at all gets the
+// deterministic skeleton, and that skeleton must stay draft/scaffold —
+// it is never a frozen requirement.
 func GenerateDoc(n Node) string {
 	var b strings.Builder
-	fmt.Fprintf(&b, "# %s\n\n", n.Title)
-	if n.Intent != "" {
-		fmt.Fprintf(&b, "## 意图\n\n%s\n\n", n.Intent)
+	doc := strings.TrimSpace(n.Doc)
+	if doc != "" {
+		b.WriteString(strings.TrimRight(doc, "\n") + "\n")
+	} else {
+		fmt.Fprintf(&b, "# %s\n\n", n.Title)
+		if n.Intent != "" {
+			fmt.Fprintf(&b, "## 意图\n\n%s\n\n", n.Intent)
+		}
+		b.WriteString("## 问题\n\n- " + scaffoldMarker + "：这个需求要解决的用户问题]\n\n")
+		b.WriteString("## 目标用户\n\n- " + scaffoldMarker + "：谁在什么场景下使用]\n\n")
+		b.WriteString("## 场景\n\n- " + scaffoldMarker + "：关键用户场景]\n\n")
+		b.WriteString("## 范围\n\n- " + scaffoldMarker + "：本次做什么]\n\n")
+		b.WriteString("## 非目标\n\n- " + scaffoldMarker + "：本次明确不做什么]\n\n")
+		b.WriteString("## 用户流程\n\n1. " + scaffoldMarker + "：用户主动作]\n2. " + scaffoldMarker + "：系统响应]\n\n")
+		b.WriteString("## 异常与边界\n\n- " + scaffoldMarker + "：失败、重试、取消或超时]\n")
 	}
-	b.WriteString("## 问题\n\n- [待补充：这个需求要解决的用户问题]\n\n")
-	b.WriteString("## 目标用户\n\n- [待补充：谁在什么场景下使用]\n\n")
-	b.WriteString("## 场景\n\n- [待补充：关键用户场景]\n\n")
-	b.WriteString("## 范围\n\n- [待补充：本次做什么]\n\n")
-	b.WriteString("## 非目标\n\n- [待补充：本次明确不做什么]\n\n")
-	b.WriteString("## 用户流程\n\n1. [待补充：用户主动作]\n2. [待补充：系统响应]\n\n")
-	b.WriteString("## 异常与边界\n\n- [待补充：失败、重试、取消或超时]\n")
-	b.WriteString("\n## 验收标准\n\n- [待补充：用户可观察的结果]\n")
-	if n.DomainFSM != nil {
+	if n.DomainFSM != nil && !strings.Contains(doc, "## 状态迁移") {
 		b.WriteString("\n## 状态迁移\n\n| From | To | Event |\n|---|---|---|\n")
 		for _, tr := range n.DomainFSM.Transitions {
 			fmt.Fprintf(&b, "| %s | %s | %s |\n", tr.From, tr.To, tr.Event)
@@ -77,16 +95,20 @@ func GenerateDoc(n Node) string {
 			}
 		}
 	}
-	if len(n.ACs) > 0 {
+	if len(n.ACs) > 0 && !strings.Contains(doc, "## 验收标准") {
 		b.WriteString("\n## 验收标准\n\n")
 		for _, ac := range n.ACs {
 			fmt.Fprintf(&b, "- **%s**：%s\n", ac.ID, ac.Text)
 		}
+	} else if doc == "" {
+		b.WriteString("\n## 验收标准\n\n- " + scaffoldMarker + "：用户可观察的结果]\n")
 	}
-	if n.Verification != nil {
+	if n.Verification != nil && n.Verification.Spec != "" && !strings.Contains(doc, "## 验证方式") {
 		fmt.Fprintf(&b, "\n## 验证方式\n\n%s\n", n.Verification.Spec)
 	}
-	b.WriteString("\n> 生成骨架：语义正文与真实测试由宿主 agent 补全；不得把占位符当作已验证结果。\n")
+	if doc == "" {
+		b.WriteString("\n> 生成骨架：语义正文与真实测试由宿主 agent 补全；不得把占位符当作已验证结果。\n")
+	}
 	return b.String()
 }
 

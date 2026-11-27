@@ -1,0 +1,9 @@
+{
+  "at": "2026-11-27T08:21:07.514738Z",
+  "by": "remediation",
+  "from": "verified",
+  "node_id": "n_17162700446e",
+  "reason": "evidence not committed / code changed",
+  "to": "implemented",
+  "type": "node_reopened"
+}

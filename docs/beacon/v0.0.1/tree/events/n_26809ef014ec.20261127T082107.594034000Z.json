@@ -1,0 +1,9 @@
+{
+  "at": "2026-11-27T08:21:07.594034Z",
+  "by": "remediation",
+  "from": "verified",
+  "node_id": "n_26809ef014ec",
+  "reason": "manifest evidence withdrawn",
+  "to": "implemented",
+  "type": "node_reopened"
+}

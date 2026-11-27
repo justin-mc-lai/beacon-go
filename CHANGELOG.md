@@ -18,6 +18,11 @@ frozen artifacts were removed.
 - `goal module run` now admits every direct feature child before creating runs; a blocked child returns `freeze_ack_required` and creates zero runs.
 - Tree HTML TestCase rows carry `data-bind-ac` and expose a click-to-bind writeback seam for AC↔TestCase binding.
 - Version manifests written by baseline/open now carry the build/runtime version while the docs version line stays independent.
+- `truth node reopen --to frozen|implemented` is the one lifecycle demotion entry; it clears verification evidence and implementation claims instead of hand-editing tree JSON.
+- Tree-derived packages copy the node's real document. A node without prose gets `status: draft` + `package_maturity: scaffold`, and `truth_freeze` blocks any `truth.md` that still contains the `[待补充` placeholder.
+- Module admission reads the tree node status as the requirement authority; a legacy package can no longer upgrade a draft tree, and a tree-derived scaffold bound to the node blocks it.
+- `verify leaf` refuses evidence outside the repository or under `.beacon/`, and requires `source_commit`, `binary_sha256` and `requirement_fingerprint`; `verify audit` re-checks the registered artifact hash, path and requirement fingerprint for every verified leaf.
+- Feature packages resolve one canonical slug: an explicit `truth_path` no longer gets a module prefix, so `intent-tree-crud`, `docs-version-line` and `node-id-namespace` keep a single package. `truth feature sync` materializes/repairs derived packages from the tree.
 
 ## [0.0.1] — redesigned kernel baseline
 

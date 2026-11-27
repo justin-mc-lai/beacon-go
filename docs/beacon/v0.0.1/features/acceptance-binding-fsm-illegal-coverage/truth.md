@@ -2,48 +2,26 @@
 slug: acceptance-binding-fsm-illegal-coverage
 version: v0.0.1
 status: frozen
+package_maturity: complete
 source: tree
 tree_node_id: n_dbab29f9640e
 parser_contract: beacon-feature-package-v2
 truth_source_model: tree_derived
 ---
-# FSM illegal slot coverage
-
-## 意图
-
-每个 FSM illegal slot 必须有对应 negative TC，缺失时 integrity fail-closed。
-
 ## 问题
-
-- [待补充：这个需求要解决的用户问题]
+领域 FSM 的每条 illegal（非法）转移在 tests.md / TC 集合里没有对应 negative TC 时，现有检查只在 tests.md 出现「illegal」字样时给出提示，无法逐 slot 判定覆盖是否完整；证据被篡改时 qa 门也缺少按 TC 证据哈希逐条 fail-closed 的判定。结果是「看起来有非法用例」但实际覆盖缺口可能被放行。
 
 ## 目标用户
-
-- [待补充：谁在什么场景下使用]
+维护某 feature 需求真相与验收用例的规格作者，以及执行 gate evaluate / gate integrity 的 QA 验证者；他们需要在提交冻结前看到哪个 illegal slot 缺 negative TC、哪份 evidence 与注册哈希不符。
 
 ## 场景
-
-- [待补充：关键用户场景]
+一个含领域聚合根的 feature 声明了若干 illegal transition slot，作者只为其中部分 slot 写了 negative TC。运行 integrity 时，未被 negative TC 覆盖的 slot 触发 uncovered / illegal_transition_slot_missing 类 reason；若之后有人篡改某 TC 的 evidence 文件，再次运行 qa 评估应被 blocked 并带 stale reason。
 
 ## 范围
-
-- [待补充：本次做什么]
+本 feature 冻结「每个 FSM illegal slot 必须有对应 negative TC，缺失即 integrity fail-closed」这一需求边界。现有落点为 internal/gate/domainfsm.go（约 681-724 行）中 EvaluateDomainFSM / validateDomainFSM 在 tests.md 缺少 illegal 引用时产出 illegal_transition_slot_missing（fail-closed 原语），以及 internal/gate/evaluate.go 的 EvaluateQA 中 qa_artifact_refs_valid 证据哈希核对。逐 slot 的 negative TC 覆盖判定、AC 所用的 qa_execution_stale 与 uncovered 这两个 reason code 及其精确语义，当前未实现，本包冻结的是需求定义，不是实现状态。
 
 ## 非目标
-
-- [待补充：本次明确不做什么]
-
-## 用户流程
-
-1. [待补充：用户主动作]
-2. [待补充：系统响应]
-
-## 异常与边界
-
-- [待补充：失败、重试、取消或超时]
+不输出每条 TC 的 pass/fail verdict，也不定义 TC 与 FSM 转移的显式绑定——那是兄弟 feature tc-acceptance-binding 的边界；本 feature 只关心 illegal slot 的覆盖是否缺失。不负责 module 级准入或调度，也不改变 worktree 与证据存储机制。
 
 ## 验收标准
-
-- [待补充：用户可观察的结果]
-
-> 生成骨架：语义正文与真实测试由宿主 agent 补全；不得把占位符当作已验证结果。
+篡改任一 TC 的 evidence 后，执行 `beacon gate evaluate qa --run-id <id> --evaluator x` 应退出非零，判定 blocked 并带 evidence 过期 reason（AC 期望 reason=qa_execution_stale）。缺失某个 illegal slot 的 negative TC 时，`beacon gate integrity --feature <slug> --json | jq -e '.reason_code'` 应输出非空 reason_code，明确指向该 slot 的覆盖缺失（AC 期望 uncovered）。当每个 illegal slot 都有对应 negative TC 且 evidence 哈希与注册一致时，上述两条命令都不报这两类 reason。

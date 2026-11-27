@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"beacon-go/internal/intenttree"
 	"beacon-go/internal/store"
 )
 
@@ -31,6 +32,33 @@ func mustRun(t *testing.T, args ...string) string {
 		t.Fatalf("%v: %v\n%s", args, err, out)
 	}
 	return out
+}
+
+// writeEvidence creates a committed-evidence-shaped artifact inside the
+// project tree. Fixtures use fixed hex for source/binary because a temp
+// project has no git history; the requirement fingerprint is real.
+func writeEvidence(t *testing.T, proj, nodeID string) string {
+	t.Helper()
+	dir := filepath.Join(proj, "docs", "beacon", "v0.1.0", "tree")
+	n, err := intenttree.ReadNode(dir, nodeID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp, err := intenttree.ContractFingerprint(n)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p := filepath.Join(proj, "docs", "beacon", "v0.1.0", "evidence", nodeID+".txt")
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	body := "source_commit: " + strings.Repeat("a", 40) + "\n" +
+		"binary_sha256: " + strings.Repeat("b", 64) + "\n" +
+		"requirement_fingerprint: " + fp + "\n\nproof\n"
+	if err := os.WriteFile(p, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return p
 }
 
 func TestTreeMigrateReadAuditAndIdempotency(t *testing.T) {

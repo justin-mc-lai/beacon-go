@@ -5,7 +5,7 @@
   "intent": "对意图树节点指纹输出 added/changed/removed 级漂移报告。",
   "parent_id": "n_679cb763d41a",
   "path": "root/truth-binding/requirement-level-drift/tree-drift-cmd",
-  "status": "verified",
+  "status": "implemented",
   "acs": [
     {
       "id": "AC-001",
@@ -23,12 +23,6 @@
     "artifact_hash": "9ebec059fd20a137dda310a1434c43fab05a5c223fb62cebef1a43543201343b",
     "at": "2026-11-27T04:50:25.841635Z"
   },
-  "verification_evidence": {
-    "artifact_id": "art_8be97b0a3ca5aa90ee6ec717",
-    "content_hash": "9b9f0f2369d8b98ab32cf5e3a6c115fa2611981062dedfb1a050bee2a7668d28",
-    "by": "parallel-qa",
-    "at": "2026-11-27T07:43:10.971007Z"
-  },
-  "fingerprint": "f0b7ce4d86947c2322901602e0622634df80c44da2c21f438de8d9cc031bf0c2",
+  "fingerprint": "f18b6b225b7ec8dfe1469f9a8e885034663568fea85de425d5c07fb7758e0b47",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -1,0 +1,9 @@
+{
+  "at": "2026-11-27T08:21:07.57448Z",
+  "by": "remediation",
+  "from": "verified",
+  "node_id": "n_47544230bf1e",
+  "reason": "module rollup withdrawn",
+  "to": "frozen",
+  "type": "node_reopened"
+}

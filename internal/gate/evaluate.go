@@ -21,13 +21,16 @@ import (
 // legitimately moves on to Implement/QA, so it can never be the
 // authority for "is it frozen".
 type TruthFreezeFacts struct {
-	TruthPresent    bool
-	TruthNonEmpty   bool
-	TestsPresent    bool
-	TestsNonEmpty   bool
-	FrozenMarker    bool // truth.md frontmatter status == frozen
-	LifecycleFrozen bool // corroboration only: lifecycle at Freeze/Completed
-	PendingChange   bool // a change was requested and never refrozen
+	TruthPresent  bool
+	TruthNonEmpty bool
+	// TruthPlaceholder is true when truth.md still carries the generated
+	// scaffold token ([待补充). A scaffold is a draft, never frozen truth.
+	TruthPlaceholder bool
+	TestsPresent     bool
+	TestsNonEmpty    bool
+	FrozenMarker     bool // truth.md frontmatter status == frozen
+	LifecycleFrozen  bool // corroboration only: lifecycle at Freeze/Completed
+	PendingChange    bool // a change was requested and never refrozen
 }
 
 func EvaluateTruthFreeze(f TruthFreezeFacts, evaluator string) Evaluation {
@@ -41,6 +44,12 @@ func EvaluateTruthFreeze(f TruthFreezeFacts, evaluator string) Evaluation {
 		checks = append(checks, okItem("truth_file_nonempty", "truth.md is non-empty"))
 	} else {
 		checks = append(checks, failItem("truth_file_nonempty", core.ReasonStageExitTruthMissing, "truth.md is empty (scaffold not filled)"))
+	}
+	if f.TruthPlaceholder {
+		checks = append(checks, failItem("truth_no_placeholders", core.ReasonTruthPlaceholder,
+			"truth.md still contains the generated scaffold marker [待补充; fill the requirement before freezing"))
+	} else {
+		checks = append(checks, okItem("truth_no_placeholders", "truth.md has no scaffold placeholders"))
 	}
 	if f.TestsPresent {
 		checks = append(checks, okItem("tests_file_present", "tests.md exists"))

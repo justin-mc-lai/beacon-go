@@ -5,7 +5,7 @@
   "intent": "点击 TestCase 行完成 AC 绑定并写回树",
   "parent_id": "n_39e50c0e0da2",
   "path": "root/tree-visual/interactive-acceptance-binding/tc-bind-click",
-  "status": "verified",
+  "status": "implemented",
   "acs": [
     {
       "id": "AC-001",
@@ -23,12 +23,6 @@
     "artifact_hash": "bd4e9ff4e6b077aff3b176613c612fb8b545c7a9646ddf618b2abca983211e1d",
     "at": "2026-11-27T07:43:10.904606Z"
   },
-  "verification_evidence": {
-    "artifact_id": "art_668a6609ad8a72b2834838b9",
-    "content_hash": "bd4e9ff4e6b077aff3b176613c612fb8b545c7a9646ddf618b2abca983211e1d",
-    "by": "parallel-qa",
-    "at": "2026-11-27T07:43:10.947961Z"
-  },
-  "fingerprint": "f6bbf29a3f94b1afc99b20cea98ea3ebcc895b5aaaa5c49a0aaee51c2b2a4af2",
+  "fingerprint": "4bc39c4db152186e3d7f5c733ea3c1898bfa789657fc353bb2152de1b3fb981b",
   "fingerprint_alg": "tree-json-v1"
 }

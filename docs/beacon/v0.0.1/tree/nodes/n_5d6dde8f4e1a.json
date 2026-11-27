@@ -5,7 +5,7 @@
   "intent": "同模块 feature 按声明顺序串行",
   "parent_id": "n_030e377c5621",
   "path": "root/module-orchestration/module-scheduler/intra-module-order",
-  "status": "verified",
+  "status": "implemented",
   "acs": [
     {
       "id": "AC-001",
@@ -23,12 +23,6 @@
     "artifact_hash": "5ea33fb8007909d57926bb381a473233b3853d34064918e52f21467ed02630dd",
     "at": "2026-11-27T07:10:23.92081Z"
   },
-  "verification_evidence": {
-    "artifact_id": "art_58ce82a8bebc9e36fce82665",
-    "content_hash": "5ea33fb8007909d57926bb381a473233b3853d34064918e52f21467ed02630dd",
-    "by": "qa-independent",
-    "at": "2026-11-27T07:10:23.984562Z"
-  },
-  "fingerprint": "fa923f41c8870fc223243b74b78582b5d8cf608d0e8e335ff91f7b8bc7181dac",
+  "fingerprint": "e74b77f89f9c28bfdb7b2404ed10dc5fe83a10f707a9d6f54ec13895cbca1c61",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -17,6 +17,7 @@ const (
 	ReasonStageExitPlanIncomplete = "stage_exit_plan_incomplete"
 	ReasonStageExitTruthNotFrozen = "stage_exit_truth_not_frozen"
 	ReasonStageExitTruthMissing   = "stage_exit_truth_package_missing"
+	ReasonTruthPlaceholder        = "truth_placeholder_present"
 
 	ReasonStageExitImplementBlock = "stage_exit_implement_blocked"
 	ReasonStageExitQAEvidenceMiss = "stage_exit_qa_evidence_missing"
@@ -56,6 +57,7 @@ var ReasonCatalog = map[string]string{
 	ReasonStageExitPlanIncomplete: "Plan/journey incomplete; cannot leave plan",
 	ReasonStageExitTruthNotFrozen: "Feature truth exists but status is not frozen",
 	ReasonStageExitTruthMissing:   "Feature truth package missing; fill then freeze",
+	ReasonTruthPlaceholder:        "Truth still contains a generated scaffold placeholder; fill it before freezing",
 	ReasonIntentMissing:           "Kernel-driven run needs a confirmed intent recorded in the feature package",
 
 	ReasonStageExitImplementBlock:     "Implement admission failed",

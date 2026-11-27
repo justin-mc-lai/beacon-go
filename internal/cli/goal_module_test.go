@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -277,6 +278,74 @@ func TestGoalModuleRunBlocksWhenChildAdmissionFails(t *testing.T) {
 		if len(runs) != 0 {
 			t.Fatalf("feature %s created %d runs, want 0", ctx.Feature.ID, len(runs))
 		}
+	}
+}
+
+// writeModulePackage materializes one feature package directly, so a
+// test can put a legacy/derived claim in front of the tree.
+func writeModulePackage(t *testing.T, proj, slug, truth string) {
+	t.Helper()
+	st, err := store.Open(storePathFromEnv(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer st.Close()
+	pr, err := st.Projects().GetByRootPath(store.ResolveRootPath(proj))
+	if err != nil {
+		t.Fatal(err)
+	}
+	vers, err := st.Projects().ListVersions(pr.ID)
+	if err != nil || len(vers) == 0 {
+		t.Fatalf("versions: %v", err)
+	}
+	ver := vers[0]
+	truthRel := filepath.ToSlash(filepath.Join(ver.DocsRoot, "features", slug, "truth.md"))
+	testsRel := filepath.ToSlash(filepath.Join(ver.DocsRoot, "features", slug, "tests.md"))
+	truthAbs := filepath.Join(pr.RootPath, filepath.FromSlash(truthRel))
+	if err := os.MkdirAll(filepath.Dir(truthAbs), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(truthAbs, []byte(truth), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(pr.RootPath, filepath.FromSlash(testsRel)), []byte("# tests\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := st.Features().CreatePackage(store.FeaturePackage{
+		ProjectVersionID: ver.ID, Slug: slug, TruthPath: truthRel, TestsPath: testsRel, Status: "frozen",
+	}); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestGoalModuleRunTreeStatusOverridesLegacyPackage(t *testing.T) {
+	proj := treeTestEnv(t)
+	ids := seedModuleTree(t, proj, intenttree.StatusDraft)
+	writeModulePackage(t, proj, "alpha-one",
+		"---\nslug: alpha-one\nversion: v0.1.0\nstatus: frozen\n---\n# one\n\n## 验收标准\n- x\n")
+
+	out, err := runCLI(t, "goal", "module", "run", "--project", proj, "--node", ids["alpha"], "--json")
+	if err == nil {
+		t.Fatalf("legacy frozen package must not override a draft tree: %s", out)
+	}
+	if rc, ok := core.ReasonCodeOf(err); !ok || rc != core.ReasonFreezeAckRequired {
+		t.Fatalf("headline reason = %q (typed=%v), want %q: %v", rc, ok, core.ReasonFreezeAckRequired, err)
+	}
+}
+
+func TestGoalModuleRunBlocksDerivedScaffold(t *testing.T) {
+	proj := treeTestEnv(t)
+	ids := seedModuleTree(t, proj)
+	writeModulePackage(t, proj, "alpha-one",
+		"---\nslug: alpha-one\nversion: v0.1.0\nstatus: draft\npackage_maturity: scaffold\n"+
+			"tree_node_id: alpha-one\ntruth_source_model: tree_derived\n---\n# one\n\n- [待补充：x]\n")
+
+	out, err := runCLI(t, "goal", "module", "run", "--project", proj, "--node", ids["alpha"], "--json")
+	if err == nil {
+		t.Fatalf("scaffold package must not stand in for frozen truth: %s", out)
+	}
+	if rc, ok := core.ReasonCodeOf(err); !ok || rc != core.ReasonFreezeAckRequired {
+		t.Fatalf("headline reason = %q (typed=%v), want %q: %v", rc, ok, core.ReasonFreezeAckRequired, err)
 	}
 }
 

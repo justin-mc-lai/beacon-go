@@ -34,10 +34,11 @@ func (e *Engine) evalTruthFreeze(ctx store.FeatureContext, evaluator string) (ga
 	}
 	tests := readPkgFile(root, testsPath)
 	f := gate.TruthFreezeFacts{
-		TruthPresent:  truth.Present,
-		TruthNonEmpty: truth.Present && strings.TrimSpace(truth.Text) != "",
-		TestsPresent:  tests.Present,
-		TestsNonEmpty: tests.Present && strings.TrimSpace(tests.Text) != "",
+		TruthPresent:     truth.Present,
+		TruthNonEmpty:    truth.Present && strings.TrimSpace(truth.Text) != "",
+		TruthPlaceholder: truth.Present && strings.Contains(truth.Text, "[待补充"),
+		TestsPresent:     tests.Present,
+		TestsNonEmpty:    tests.Present && strings.TrimSpace(tests.Text) != "",
 	}
 	if status, parsed := frontmatterStatusOf(truth); parsed {
 		f.FrozenMarker = status == "frozen"

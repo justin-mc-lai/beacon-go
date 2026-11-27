@@ -36,6 +36,19 @@ func TestTruthFreezePassAndBlock(t *testing.T) {
 	}
 }
 
+func TestTruthFreezeRejectsScaffoldPlaceholder(t *testing.T) {
+	ev := EvaluateTruthFreeze(TruthFreezeFacts{
+		TruthPresent: true, TruthNonEmpty: true, TruthPlaceholder: true,
+		TestsPresent: true, TestsNonEmpty: true, FrozenMarker: true,
+	}, "qa-bot")
+	if ev.Verdict != VerdictBlocked {
+		t.Fatalf("a scaffold marked frozen must block, got %+v", ev)
+	}
+	if !strings.Contains(strings.Join(codes(ev), ","), core.ReasonTruthPlaceholder) {
+		t.Fatalf("placeholder block must name %s, got %v", core.ReasonTruthPlaceholder, codes(ev))
+	}
+}
+
 func TestImplementGateMirrorsAdmission(t *testing.T) {
 	noRun := EvaluateImplement(ImplementFacts{HasRun: false}, "qa-bot")
 	if noRun.Verdict != VerdictBlocked || codes(noRun)[0] != core.ReasonGateRunRequired {

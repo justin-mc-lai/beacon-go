@@ -2,48 +2,26 @@
 slug: tree-visual-interactive-acceptance-binding
 version: v0.0.1
 status: frozen
+package_maturity: complete
 source: tree
 tree_node_id: n_39e50c0e0da2
 parser_contract: beacon-feature-package-v2
 truth_source_model: tree_derived
 ---
-# interactive acceptance binding
-
-## 意图
-
-在需求树 HTML 中点击 AC↔TestCase 完成绑定并回写树；复杂度留系统，用户只点选。
-
 ## 问题
-
-- [待补充：这个需求要解决的用户问题]
+需求树 HTML 中 AC 与 TestCase 无交互绑定入口，无法通过点选完成绑定并回写树，绑定复杂度暴露给用户。
 
 ## 目标用户
-
-- [待补充：谁在什么场景下使用]
+审阅需求树的开发者，需在 HTML 中点选完成 AC↔TestCase 绑定。
 
 ## 场景
-
-- [待补充：关键用户场景]
+生成树 HTML 后，页面存在 data-bind-ac 属性标记的 TestCase 行，用户点击后绑定写回树。
 
 ## 范围
-
-- [待补充：本次做什么]
+定义渲染产物必须包含 data-bind-ac 属性以支持点击绑定与回写。现有落点 internal/intenttree/render_html.go 为静态渲染，无交互绑定/回写，当前未实现，本包冻结的是需求定义，不是实现状态。
 
 ## 非目标
-
-- [待补充：本次明确不做什么]
-
-## 用户流程
-
-1. [待补充：用户主动作]
-2. [待补充：系统响应]
-
-## 异常与边界
-
-- [待补充：失败、重试、取消或超时]
+不实现 gate verdict 展示（属 gate-verdict-panel）；不实现 FSM illegal slot 覆盖（属 fsm-illegal-coverage）；不改变树指纹/索引投影（属 self-tree-ci）。
 
 ## 验收标准
-
-- [待补充：用户可观察的结果]
-
-> 生成骨架：语义正文与真实测试由宿主 agent 补全；不得把占位符当作已验证结果。
+`go test ./internal/intenttree -run TestRenderHTML -count=1` 通过，且输出 HTML 中 `grep -q data-bind-ac` 命中。当前尚无交互绑定，属待实现能力。

@@ -63,7 +63,12 @@ func FeaturePackageSlug(idx Index, nodeID, truthPath string) string {
 	if strings.TrimSpace(truthPath) == "" {
 		truthPath = n.TruthPath
 	}
-	base := NodeSlug(truthPath, n.Path, n.Title)
+	// An explicit truth link is the canonical package identity. Prefixing
+	// it with the module slug creates a second package for one node.
+	if slug := TruthPathSlug(truthPath); slug != "" {
+		return slug
+	}
+	base := NodeSlug("", n.Path, n.Title)
 	moduleSlugs := ModuleWorktreeSlugs(idx)
 	if parent, ok := findEntry(idx, n.ParentID); ok && parent.Kind == KindModule {
 		if moduleSlug := moduleSlugs[parent.ID]; moduleSlug != "" && moduleSlug != base {
@@ -103,6 +108,16 @@ func FeaturePackageSlugs(idx Index, nodeID, truthPath string) []string {
 	add(TruthPathSlug(n.TruthPath))
 	add(TruthPathSlug(truthPath))
 	add(filepath.Base(n.Path))
+	// Backward-compatible alias: derived packages written before the
+	// canonical-slug fix used "<module>-<truth-slug>". Gate lookup keeps
+	// resolving them, but persistence never creates them again.
+	if base := TruthPathSlug(truthPath); base != "" {
+		if parent, ok := findEntry(idx, n.ParentID); ok && parent.Kind == KindModule {
+			if moduleSlug := ModuleWorktreeSlugs(idx)[parent.ID]; moduleSlug != "" && moduleSlug != base {
+				add(moduleSlug + "-" + base)
+			}
+		}
+	}
 	add(strings.TrimSpace(n.Title))
 	return slugs
 }

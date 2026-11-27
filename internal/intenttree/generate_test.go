@@ -32,6 +32,40 @@ func TestPlannedTestCasesCoverACAndFSM(t *testing.T) {
 	}
 }
 
+func TestGenerateDocCopiesNodeProseInsteadOfScaffold(t *testing.T) {
+	n := Node{
+		ID: "f", Kind: KindFeature, Title: "feature", Status: StatusFrozen,
+		Doc: "## 问题\n\n真实的用户问题。\n",
+		ACs: []AC{{ID: "AC-001", Text: "可提交"}},
+		DomainFSM: &DomainFSM{States: []string{"draft", "frozen"},
+			Transitions: []FSMTransition{{From: "draft", To: "frozen", Event: "freeze"}}},
+	}
+	doc := GenerateDoc(n)
+	if !strings.Contains(doc, "真实的用户问题") {
+		t.Fatalf("node prose must be the base of the document:\n%s", doc)
+	}
+	if strings.Contains(doc, scaffoldMarker) {
+		t.Fatalf("a node with real prose must not get scaffold placeholders:\n%s", doc)
+	}
+	if !strings.Contains(doc, "## 状态迁移") {
+		t.Fatalf("structured FSM section must be appended:\n%s", doc)
+	}
+	if again := GenerateDoc(Node{ID: n.ID, Kind: n.Kind, Title: n.Title, Status: n.Status,
+		Doc: doc, ACs: n.ACs, DomainFSM: n.DomainFSM}); strings.Count(again, "## 状态迁移") != 1 {
+		t.Fatalf("regeneration must not duplicate sections:\n%s", again)
+	}
+}
+
+func TestGenerateDocScaffoldOnlyForMissingProse(t *testing.T) {
+	doc := GenerateDoc(Node{ID: "t", Kind: KindTouchpoint, Title: "leaf", Status: StatusFrozen})
+	if !strings.Contains(doc, scaffoldMarker) {
+		t.Fatalf("a node without prose must get a scaffold:\n%s", doc)
+	}
+	if DocReady(Node{ID: "t", Doc: doc}) {
+		t.Fatal("a generated scaffold must never report DocReady")
+	}
+}
+
 func contains(s, sub string) bool {
 	return len(sub) == 0 || (len(s) >= len(sub) && indexOf(s, sub) >= 0)
 }

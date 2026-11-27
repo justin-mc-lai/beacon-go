@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -183,28 +185,48 @@ func (e *Engine) admitModuleChild(proj store.Project, ver store.ProjectVersion, 
 }
 
 // moduleChildExitInput feeds one child into the shared admission item.
-// A materialized feature package is judged by the shared FrozenFact
-// through buildExitInput; a tree-only child is judged by its frozen tree
-// body, which is exactly what ensureDerivedFeature would write as
-// truth.md frontmatter.
+// The TREE NODE is the requirement authority: a child is admissible
+// only when its tree status is frozen-or-later. A materialized package
+// may only corroborate downward — a tree-derived package bound to this
+// exact node that is still a draft/scaffold blocks the child. A legacy
+// package (no tree_node_id, or a different node id) never upgrades or
+// overrides the tree.
 func (e *Engine) moduleChildExitInput(proj store.Project, ver store.ProjectVersion, child intenttree.IndexEntry, body intenttree.Node, slug string) (ExitInput, error) {
-	ctx, err := e.store.ResolveFeature(proj.RootPath, slug, ver.Version)
-	if err == nil {
-		run := store.Run{ID: "module-admission:" + child.ID, FeatureID: ctx.Feature.ID}
-		m := &runMeta{CurrentStageIdx: 0, StagePlan: []StagePlanEntry{{Stage: StageImplement}}}
-		return e.buildExitInput(run, m)
-	}
-	if !errors.Is(err, sql.ErrNoRows) {
-		return ExitInput{}, err
-	}
-	return ExitInput{
+	in := ExitInput{
 		HasFeature:          true,
 		TruthPackagePresent: true,
 		TruthFrozen:         moduleTreeStatusFrozen(body.Status),
 		TruthDraftPresent:   body.Status == intenttree.StatusDraft,
 		TruthChangePending:  body.Status == intenttree.StatusChangePending,
 		FrozenSource:        FrozenSourceFrontmatter,
-	}, nil
+	}
+	if strings.TrimSpace(slug) == "" {
+		return in, nil
+	}
+	ctx, err := e.store.ResolveFeature(proj.RootPath, slug, ver.Version)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return in, nil
+		}
+		return ExitInput{}, err
+	}
+	if ctx.Feature.TruthPath == "" {
+		return in, nil
+	}
+	raw, rerr := os.ReadFile(filepath.Join(proj.RootPath, filepath.FromSlash(ctx.Feature.TruthPath)))
+	if rerr != nil {
+		return in, nil
+	}
+	meta := simpleFrontmatter(string(raw))
+	// Only a package explicitly bound to this node can contradict it.
+	if meta["tree_node_id"] != child.ID {
+		return in, nil
+	}
+	if meta["status"] != "frozen" || meta["package_maturity"] == "scaffold" {
+		in.TruthFrozen = false
+		in.FrozenSource = "derived_package_not_frozen"
+	}
+	return in, nil
 }
 
 func moduleTreeStatusFrozen(status intenttree.Status) bool {

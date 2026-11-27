@@ -110,7 +110,7 @@ func TestOtherGatesUnchanged(t *testing.T) {
 	truthFreeze := EvaluateTruthFreeze(TruthFreezeFacts{
 		TruthPresent: true, TruthNonEmpty: true, TestsPresent: true, TestsNonEmpty: true, FrozenMarker: true,
 	}, "qa-bot")
-	if got := strings.Join(checkNames(truthFreeze), ","); got != "truth_file_present,truth_file_nonempty,tests_file_present,tests_file_nonempty,frozen_marker,lifecycle_corroboration,no_pending_change" {
+	if got := strings.Join(checkNames(truthFreeze), ","); got != "truth_file_present,truth_file_nonempty,truth_no_placeholders,tests_file_present,tests_file_nonempty,frozen_marker,lifecycle_corroboration,no_pending_change" {
 		t.Fatalf("truth_freeze check set changed: %s", got)
 	}
 	qa := EvaluateQA(QAFacts{QAArtifactCount: 1, QAStageExecuted: true}, "qa-bot")

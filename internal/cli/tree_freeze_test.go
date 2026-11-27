@@ -442,14 +442,12 @@ func TestVerifyLeafAndParentRollup(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	artifact := filepath.Join(t.TempDir(), "proof.txt")
-	if err := os.WriteFile(artifact, []byte("proof"), 0o644); err != nil {
-		t.Fatal(err)
-	}
 	for _, id := range []string{"t1", "t2"} {
-		mustRun(t, "implement", "report", "--project", proj, "--node", id, "--by", "dev", "--artifact", artifact, "--json")
+		mustRun(t, "implement", "report", "--project", proj, "--node", id, "--by", "dev",
+			"--artifact", writeEvidence(t, proj, id), "--json")
 	}
-	out := mustRun(t, "verify", "leaf", "--project", proj, "--node", "t1", "--artifact", artifact, "--by", "qa", "--json")
+	out := mustRun(t, "verify", "leaf", "--project", proj, "--node", "t1",
+		"--artifact", writeEvidence(t, proj, "t1"), "--by", "qa", "--json")
 	doc := parseDoc(t, out)
 	if doc["verify"].(map[string]any)["status"] != "verified" {
 		t.Fatalf("verify leaf: %v", doc)
@@ -457,7 +455,8 @@ func TestVerifyLeafAndParentRollup(t *testing.T) {
 	if _, err := runCLI(t, "verify", "rollup", "--project", proj, "--node", "f", "--json"); err == nil || !strings.Contains(err.Error(), "tree_parent_not_verified") {
 		t.Fatalf("rollup before all leaves: %v", err)
 	}
-	mustRun(t, "verify", "leaf", "--project", proj, "--node", "t2", "--artifact", artifact, "--by", "qa", "--json")
+	mustRun(t, "verify", "leaf", "--project", proj, "--node", "t2",
+		"--artifact", writeEvidence(t, proj, "t2"), "--by", "qa", "--json")
 	for _, id := range []string{"f", "m", "root"} {
 		out := mustRun(t, "verify", "rollup", "--project", proj, "--node", id, "--json")
 		if parseDoc(t, out)["status"] != "verified" {

@@ -5,7 +5,7 @@
   "intent": "节点面板展示 gate 结果与 reason code",
   "parent_id": "n_5a4abb5210d0",
   "path": "root/tree-visual/gate-verdict-panel/gate-panel",
-  "status": "verified",
+  "status": "implemented",
   "acs": [
     {
       "id": "AC-001",
@@ -23,12 +23,6 @@
     "artifact_hash": "ec593f18e34c3e194f7eee6e8b7c07514ab6ce240d572e95251da378e20ee32e",
     "at": "2026-11-27T07:10:23.88683Z"
   },
-  "verification_evidence": {
-    "artifact_id": "art_6bf29224b4e87f3544577f61",
-    "content_hash": "ec593f18e34c3e194f7eee6e8b7c07514ab6ce240d572e95251da378e20ee32e",
-    "by": "qa-independent",
-    "at": "2026-11-27T07:10:23.931561Z"
-  },
-  "fingerprint": "0e544600c630a7714e0b128c91b804c4be69ab8a3cefc9ab5d073614d2d80fdc",
+  "fingerprint": "325be05747a6843a925df7fa412e1caa79feda232b1cc05a5a224df65cd0e197",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -304,13 +304,11 @@ func TestTruthNodeDeliverRequiresVerifiedChildren(t *testing.T) {
 	if _, err := runCLI(t, "truth", "node", "deliver", "--project", proj, "--node", "f", "--by", "qa"); err == nil {
 		t.Fatal("delivery before verification must fail")
 	}
-	artifact := filepath.Join(t.TempDir(), "proof.txt")
-	if err := os.WriteFile(artifact, []byte("verified\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
 	for _, id := range []string{"t1", "t2"} {
-		mustRun(t, "implement", "report", "--project", proj, "--node", id, "--by", "dev", "--artifact", artifact, "--json")
-		mustRun(t, "verify", "leaf", "--project", proj, "--node", id, "--by", "qa", "--artifact", artifact, "--json")
+		mustRun(t, "implement", "report", "--project", proj, "--node", id, "--by", "dev",
+			"--artifact", writeEvidence(t, proj, id), "--json")
+		mustRun(t, "verify", "leaf", "--project", proj, "--node", id, "--by", "qa",
+			"--artifact", writeEvidence(t, proj, id), "--json")
 	}
 	mustRun(t, "verify", "rollup", "--project", proj, "--node", "f", "--json")
 	out := mustRun(t, "truth", "node", "deliver", "--project", proj, "--node", "f", "--by", "qa", "--json")

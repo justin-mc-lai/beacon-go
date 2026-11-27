@@ -5,7 +5,7 @@
   "intent": "发布前 manifest.Runtime 等于 beacon --version",
   "parent_id": "n_26809ef014ec",
   "path": "root/version-evolution/dual-axis-alignment/manifest-runtime-match",
-  "status": "verified",
+  "status": "implemented",
   "acs": [
     {
       "id": "AC-001",
@@ -23,12 +23,6 @@
     "artifact_hash": "fcb02276001d57e504e9b11f62de175f648761e6ce97658a38e685cca4bdee6b",
     "at": "2026-11-27T07:43:10.918181Z"
   },
-  "verification_evidence": {
-    "artifact_id": "art_28a7c6829b7696613dba7045",
-    "content_hash": "fcb02276001d57e504e9b11f62de175f648761e6ce97658a38e685cca4bdee6b",
-    "by": "parallel-qa",
-    "at": "2026-11-27T07:43:10.960858Z"
-  },
-  "fingerprint": "c6388ce08037cd54d1e1ac3f2be06530ea5436168a023f6968175c3e044085f0",
+  "fingerprint": "a07961c526b5ce6ca47cb576d78a65373eac4f1026abccbca733899959b8d2dd",
   "fingerprint_alg": "tree-json-v1"
 }

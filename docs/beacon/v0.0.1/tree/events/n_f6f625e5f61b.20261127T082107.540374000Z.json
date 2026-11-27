@@ -1,0 +1,9 @@
+{
+  "at": "2026-11-27T08:21:07.540374Z",
+  "by": "remediation",
+  "from": "verified",
+  "node_id": "n_f6f625e5f61b",
+  "reason": "child claims withdrawn",
+  "to": "frozen",
+  "type": "node_reopened"
+}
