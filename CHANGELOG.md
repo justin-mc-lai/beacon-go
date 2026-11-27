@@ -12,6 +12,7 @@ frozen artifacts were removed.
 - `plan tree` and `truth tree` can read repository intent trees without a local
   SQLite ledger. Without a registered current version, a sole tree is selected
   automatically and multiple trees require an explicit `--version`.
+- `plan drift --node <id> --json` reports added/changed/removed requirement-level drift against one immutable snapshot. Status, grouping, fingerprints and evidence changes alone are not reported as requirement drift; `--snapshot <id>` selects the explicit baseline (`latest` is an accepted key).
 
 ## [0.0.1] — redesigned kernel baseline
 

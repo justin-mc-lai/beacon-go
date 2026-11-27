@@ -137,51 +137,78 @@ func ListSnapshots(dir string) ([]string, error) {
 	return ids, nil
 }
 
-// ReadSnapshot loads a snapshot and verifies every referenced body.
-func ReadSnapshot(dir, id string) (Snapshot, error) {
+// readSnapshotEnvelope resolves the snapshot key and validates its envelope.
+func readSnapshotEnvelope(dir, id string) (Snapshot, string, error) {
 	if id == "latest" {
 		ids, err := ListSnapshots(dir)
 		if err != nil {
-			return Snapshot{}, err
+			return Snapshot{}, "", err
 		}
 		if len(ids) == 0 {
-			return Snapshot{}, core.NewError(ReasonNodeNotFound, "intenttree.ReadSnapshot", "no snapshots")
+			return Snapshot{}, "", core.NewError(ReasonNodeNotFound, "intenttree.ReadSnapshot", "no snapshots")
 		}
 		id = ids[0]
 	}
 	snapDir := filepath.Join(snapshotsDir(dir), id)
 	raw, err := os.ReadFile(filepath.Join(snapDir, "snapshot.json"))
 	if err != nil {
-		return Snapshot{}, err
+		return Snapshot{}, "", err
 	}
 	var snap Snapshot
 	if err := json.Unmarshal(raw, &snap); err != nil {
-		return Snapshot{}, err
+		return Snapshot{}, "", err
 	}
 	if snap.ID == "" {
 		snap.ID = id
 	}
 	if snap.Schema != SnapshotSchema {
-		return Snapshot{}, core.NewError(ReasonSchemaUnknown, "intenttree.ReadSnapshot", "unknown snapshot schema "+snap.Schema)
+		return Snapshot{}, "", core.NewError(ReasonSchemaUnknown, "intenttree.ReadSnapshot", "unknown snapshot schema "+snap.Schema)
 	}
+	return snap, snapDir, nil
+}
+
+func readSnapshotBodies(snapDir string, snap Snapshot) (map[string]Node, error) {
+	bodies := make(map[string]Node, len(snap.Nodes))
 	for _, e := range snap.Nodes {
-		body, err := os.ReadFile(filepath.Join(snapDir, e.NodeRef))
+		raw, err := os.ReadFile(filepath.Join(snapDir, filepath.FromSlash(e.NodeRef)))
 		if err != nil {
-			return Snapshot{}, core.NewError(ReasonInvalidIndex, "intenttree.ReadSnapshot", "missing body for "+e.ID)
+			return nil, core.NewError(ReasonInvalidIndex, "intenttree.ReadSnapshot", "missing body for "+e.ID)
 		}
 		var n Node
-		if err := json.Unmarshal(body, &n); err != nil {
-			return Snapshot{}, err
+		if err := json.Unmarshal(raw, &n); err != nil {
+			return nil, err
 		}
 		ok, err := VerifyFingerprint(n)
 		if err != nil {
-			return Snapshot{}, err
+			return nil, err
 		}
 		if !ok || n.Fingerprint != e.Fingerprint {
-			return Snapshot{}, core.NewError(ReasonInvalidIndex, "intenttree.ReadSnapshot", "fingerprint drift in snapshot for "+e.ID)
+			return nil, core.NewError(ReasonInvalidIndex, "intenttree.ReadSnapshot", "fingerprint drift in snapshot for "+e.ID)
 		}
+		bodies[e.ID] = n
 	}
-	return snap, nil
+	return bodies, nil
+}
+
+// ReadSnapshot loads a snapshot and verifies every referenced body.
+func ReadSnapshot(dir, id string) (Snapshot, error) {
+	snap, snapDir, err := readSnapshotEnvelope(dir, id)
+	if err != nil {
+		return Snapshot{}, err
+	}
+	_, err = readSnapshotBodies(snapDir, snap)
+	return snap, err
+}
+
+// ReadSnapshotWithBodies is the single verified read path for callers that
+// need both the snapshot envelope and its bodies.
+func ReadSnapshotWithBodies(dir, id string) (Snapshot, map[string]Node, error) {
+	snap, snapDir, err := readSnapshotEnvelope(dir, id)
+	if err != nil {
+		return Snapshot{}, nil, err
+	}
+	bodies, err := readSnapshotBodies(snapDir, snap)
+	return snap, bodies, err
 }
 
 func latestSnapshot(dir string) (string, *Snapshot, error) {

@@ -357,10 +357,10 @@
       "id": "n_a7c847346c2c",
       "parent_id": "n_679cb763d41a",
       "kind": "touchpoint",
-      "status": "frozen",
+      "status": "implemented",
       "title": "tree drift command",
       "path": "root/truth-binding/requirement-level-drift/tree-drift-cmd",
-      "fingerprint": "e7570e8f8c2f8489f5009c992d21477d0f1cd8520c8229b9236a881a74c964f0",
+      "fingerprint": "f18b6b225b7ec8dfe1469f9a8e885034663568fea85de425d5c07fb7758e0b47",
       "fingerprint_alg": "tree-json-v1"
     },
     {

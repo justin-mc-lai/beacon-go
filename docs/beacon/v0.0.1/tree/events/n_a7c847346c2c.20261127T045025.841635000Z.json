@@ -1,0 +1,10 @@
+{
+  "artifact": "/Users/hainagou-laikunqi/Developer/personal/beacon-go/.beacon/artifacts/requirement-level-drift/plan-drift.md",
+  "artifact_hash": "9ebec059fd20a137dda310a1434c43fab05a5c223fb62cebef1a43543201343b",
+  "at": "2026-11-27T04:50:25.841635Z",
+  "by": "release-builder",
+  "node_id": "n_a7c847346c2c",
+  "outcome": "done",
+  "reason_code": "",
+  "type": "implementation_done"
+}
