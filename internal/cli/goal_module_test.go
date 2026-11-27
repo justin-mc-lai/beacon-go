@@ -12,7 +12,7 @@ import (
 	"beacon-go/internal/store"
 )
 
-func seedModuleTree(t *testing.T, proj string) map[string]string {
+func seedModuleTree(t *testing.T, proj string, childStatus ...intenttree.Status) map[string]string {
 	t.Helper()
 	st, err := store.Open(storePathFromEnv(t))
 	if err != nil {
@@ -30,6 +30,10 @@ func seedModuleTree(t *testing.T, proj string) map[string]string {
 	ver := vers[0]
 	dir := intenttree.TreeDir(pr.RootPath, ver.DocsRoot)
 	doc := "## 问题\n- x\n## 目标用户\n- x\n## 场景\n- x\n## 范围\n- x\n## 非目标\n- x\n## 验收标准\n- x\n"
+	childTruthStatus := intenttree.StatusFrozen
+	if len(childStatus) > 0 && childStatus[0] != "" {
+		childTruthStatus = childStatus[0]
+	}
 	stamp := func(n intenttree.Node) intenttree.Node {
 		n, err := intenttree.Stamp(n)
 		if err != nil {
@@ -37,7 +41,7 @@ func seedModuleTree(t *testing.T, proj string) map[string]string {
 		}
 		return n
 	}
-	one := stamp(intenttree.Node{ID: "alpha-one", Kind: intenttree.KindFeature, ParentID: "alpha", Title: "one", Path: "root/alpha/one", Status: intenttree.StatusFrozen, Doc: doc})
+	one := stamp(intenttree.Node{ID: "alpha-one", Kind: intenttree.KindFeature, ParentID: "alpha", Title: "one", Path: "root/alpha/one", Status: childTruthStatus, Doc: doc})
 	two := stamp(intenttree.Node{ID: "alpha-two", Kind: intenttree.KindFeature, ParentID: "alpha", Title: "two", Path: "root/alpha/two", Status: intenttree.StatusFrozen, Doc: doc})
 	betaOne := stamp(intenttree.Node{ID: "beta-one", Kind: intenttree.KindFeature, ParentID: "beta", Title: "beta one", Path: "root/beta/beta-one", Status: intenttree.StatusFrozen, Doc: doc})
 	nodes := []intenttree.Node{
@@ -235,6 +239,44 @@ func TestGoalModuleRunRejectsInvalidRequests(t *testing.T) {
 				t.Fatalf("refusal missing %q: %s %v", tc.want, out, err)
 			}
 		})
+	}
+}
+
+// A draft child feature blocks the whole module expansion: no feature
+// package and no run may be materialized before every child is admitted.
+func TestGoalModuleRunBlocksWhenChildAdmissionFails(t *testing.T) {
+	proj := treeTestEnv(t)
+	ids := seedModuleTree(t, proj, intenttree.StatusDraft)
+
+	out, err := runCLI(t, "goal", "module", "run", "--project", proj, "--node", ids["alpha"], "--json")
+	if err == nil {
+		t.Fatalf("draft child must block module run: %s", out)
+	}
+	if rc, ok := core.ReasonCodeOf(err); !ok || rc != core.ReasonFreezeAckRequired {
+		t.Fatalf("headline reason = %q (typed=%v), want %q: %v", rc, ok, core.ReasonFreezeAckRequired, err)
+	}
+	doc := parseDoc(t, out)
+	if got := strField(t, doc, "reason_code"); got != core.ReasonFreezeAckRequired {
+		t.Fatalf("JSON reason_code = %q, want %q: %v", got, core.ReasonFreezeAckRequired, doc)
+	}
+
+	st, err := store.Open(storePathFromEnv(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer st.Close()
+	contexts := mustFeatureContexts(t, st, proj)
+	if len(contexts) != 0 {
+		t.Fatalf("blocked module created %d feature packages, want 0", len(contexts))
+	}
+	for _, ctx := range contexts {
+		runs, err := st.Runs().ListByFeature(ctx.Feature.ID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(runs) != 0 {
+			t.Fatalf("feature %s created %d runs, want 0", ctx.Feature.ID, len(runs))
+		}
 	}
 }
 

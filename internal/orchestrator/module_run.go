@@ -1,7 +1,9 @@
 package orchestrator
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"sort"
 	"strconv"
 	"strings"
@@ -90,15 +92,24 @@ func (e *Engine) ModuleRun(opts ModuleRunOptions) ([]ModuleRunView, error) {
 	plan.Mode = ModulePoolMode
 	plan.IntentSource = "module_tree"
 
-	var out []ModuleRunView
-	predecessor := ""
+	bodies := make([]intenttree.Node, len(children))
+	slugs := make([]string, len(children))
 	for i, child := range children {
 		body, err := intenttree.ReadNode(dir, child.ID)
 		if err != nil {
 			return nil, err
 		}
 		slug := moduleFeatureSlug(idx, child, body)
-		ctx, err := e.ensureDerivedFeature(proj, ver, slug, child.ID, body)
+		if err := e.admitModuleChild(proj, ver, child, body, slug); err != nil {
+			return nil, err
+		}
+		bodies[i], slugs[i] = body, slug
+	}
+
+	var out []ModuleRunView
+	predecessor := ""
+	for i, child := range children {
+		ctx, err := e.ensureDerivedFeature(proj, ver, slugs[i], child.ID, bodies[i])
 		if err != nil {
 			return nil, err
 		}
@@ -152,6 +163,57 @@ func (e *Engine) ModuleRun(opts ModuleRunOptions) ([]ModuleRunView, error) {
 		predecessor = v.RunID
 	}
 	return out, nil
+}
+
+// admitModuleChild runs the shared truth admission judgement for one
+// direct feature child before any write happens. Module-level refusals
+// always report the AC's freeze_ack_required reason; the child's own
+// reason stays in the detail for diagnosis.
+func (e *Engine) admitModuleChild(proj store.Project, ver store.ProjectVersion, child intenttree.IndexEntry, body intenttree.Node, slug string) error {
+	in, err := e.moduleChildExitInput(proj, ver, child, body, slug)
+	if err != nil {
+		return err
+	}
+	item := truthFrozenAdmissionItem(in)
+	if item.OK {
+		return nil
+	}
+	return core.NewError(core.ReasonFreezeAckRequired, "goal.ModuleRun",
+		"child feature admission blocked: "+child.ID+" ("+item.ReasonCode+": "+item.Detail+")")
+}
+
+// moduleChildExitInput feeds one child into the shared admission item.
+// A materialized feature package is judged by the shared FrozenFact
+// through buildExitInput; a tree-only child is judged by its frozen tree
+// body, which is exactly what ensureDerivedFeature would write as
+// truth.md frontmatter.
+func (e *Engine) moduleChildExitInput(proj store.Project, ver store.ProjectVersion, child intenttree.IndexEntry, body intenttree.Node, slug string) (ExitInput, error) {
+	ctx, err := e.store.ResolveFeature(proj.RootPath, slug, ver.Version)
+	if err == nil {
+		run := store.Run{ID: "module-admission:" + child.ID, FeatureID: ctx.Feature.ID}
+		m := &runMeta{CurrentStageIdx: 0, StagePlan: []StagePlanEntry{{Stage: StageImplement}}}
+		return e.buildExitInput(run, m)
+	}
+	if !errors.Is(err, sql.ErrNoRows) {
+		return ExitInput{}, err
+	}
+	return ExitInput{
+		HasFeature:          true,
+		TruthPackagePresent: true,
+		TruthFrozen:         moduleTreeStatusFrozen(body.Status),
+		TruthDraftPresent:   body.Status == intenttree.StatusDraft,
+		TruthChangePending:  body.Status == intenttree.StatusChangePending,
+		FrozenSource:        FrozenSourceFrontmatter,
+	}, nil
+}
+
+func moduleTreeStatusFrozen(status intenttree.Status) bool {
+	switch status {
+	case intenttree.StatusFrozen, intenttree.StatusImplemented, intenttree.StatusVerified, intenttree.StatusDelivered:
+		return true
+	default:
+		return false
+	}
 }
 
 // moduleChildrenInDeclarationOrder reads direct feature children and orders

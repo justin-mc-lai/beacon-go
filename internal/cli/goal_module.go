@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"beacon-go/internal/core"
 	"beacon-go/internal/orchestrator"
 )
 
@@ -37,6 +38,16 @@ func newGoalModuleRunCmd() *cobra.Command {
 				ProjectRoot: project, Version: version, NodeID: nodeID, By: by,
 			})
 			if err != nil {
+				if asJSON {
+					if rc, ok := core.ReasonCodeOf(err); ok {
+						if perr := printJSON(cmd, map[string]any{
+							"reason_code": rc,
+							"detail":      err.Error(),
+						}); perr != nil {
+							return perr
+						}
+					}
+				}
 				return err
 			}
 			if asJSON {

@@ -95,31 +95,17 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 	ok := func(item AdmissionItem) { res.Items = append(res.Items, item) }
 
 	// 1. truth frozen (the shared FrozenFact determination, via
-	// buildExitInput — no second derivation lives here).
+	// buildExitInput — no second derivation lives here). Module-run
+	// admission consumes the same item before any run is created.
 	in, err := e.buildExitInput(run, m)
 	if err != nil {
 		return AdmissionResult{}, err
 	}
-	switch {
-	case !in.TruthPackagePresent && in.HasFeature:
-		fail(AdmissionItem{Check: "truth_frozen", Applicable: true,
-			ReasonCode: core.ReasonStageExitTruthMissing,
-			Detail:     "feature truth package missing; fill then freeze"})
-	case in.TruthChangePending:
-		fail(AdmissionItem{Check: "truth_frozen", Applicable: true,
-			ReasonCode: core.ReasonTruthChangePending,
-			Detail:     "a truth change is pending (unrefrozen); refreeze before implementing"})
-	case in.TruthFrozen && in.TruthBaselineUncommitted:
-		fail(AdmissionItem{Check: "truth_frozen", Applicable: true,
-			ReasonCode: core.ReasonCanonicalRefreezeNotCommitted,
-			Detail:     "truth is frozen but not committed on the canonical branch; commit it and run `beacon truth baseline` before implementing (AC-139)"})
-	case !in.TruthFrozen:
-		fail(AdmissionItem{Check: "truth_frozen", Applicable: true,
-			ReasonCode: core.ReasonFreezeAckRequired,
-			Detail:     "truth exists but is not frozen (fill != self-sign)"})
-	default:
-		ok(AdmissionItem{Check: "truth_frozen", OK: true, Applicable: true,
-			Detail: "truth frozen (source: " + in.FrozenSource + ")"})
+	truth := truthFrozenAdmissionItem(in)
+	if truth.OK {
+		ok(truth)
+	} else {
+		fail(truth)
 	}
 	if fc, fcErr := e.featureContext(run.FeatureID); fcErr != nil {
 		return AdmissionResult{}, fcErr
@@ -240,4 +226,31 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 		res.ReasonCode = core.ReasonGoalImplementAdmissOK
 	}
 	return res, nil
+}
+
+// truthFrozenAdmissionItem is the single truth_frozen judgement shared by
+// feature implement admission and module-run admission. Both paths feed it
+// the one FrozenFact-derived ExitInput; neither derives frozenness twice.
+func truthFrozenAdmissionItem(in ExitInput) AdmissionItem {
+	switch {
+	case !in.TruthPackagePresent && in.HasFeature:
+		return AdmissionItem{Check: "truth_frozen", Applicable: true,
+			ReasonCode: core.ReasonStageExitTruthMissing,
+			Detail:     "feature truth package missing; fill then freeze"}
+	case in.TruthChangePending:
+		return AdmissionItem{Check: "truth_frozen", Applicable: true,
+			ReasonCode: core.ReasonTruthChangePending,
+			Detail:     "a truth change is pending (unrefrozen); refreeze before implementing"}
+	case in.TruthFrozen && in.TruthBaselineUncommitted:
+		return AdmissionItem{Check: "truth_frozen", Applicable: true,
+			ReasonCode: core.ReasonCanonicalRefreezeNotCommitted,
+			Detail:     "truth is frozen but not committed on the canonical branch; commit it and run `beacon truth baseline` before implementing (AC-139)"}
+	case !in.TruthFrozen:
+		return AdmissionItem{Check: "truth_frozen", Applicable: true,
+			ReasonCode: core.ReasonFreezeAckRequired,
+			Detail:     "truth exists but is not frozen (fill != self-sign)"}
+	default:
+		return AdmissionItem{Check: "truth_frozen", OK: true, Applicable: true,
+			Detail: "truth frozen (source: " + in.FrozenSource + ")"}
+	}
 }
