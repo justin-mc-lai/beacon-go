@@ -12,6 +12,15 @@
       "text": "运行命令输出 N 个 run id 且每个 run 的 FeatureID 属于该 module"
     }
   ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
   "verification": {
     "type": "test",
     "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableModuleRun$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableModuleRun\"]}"
@@ -29,6 +38,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:37.092193Z"
   },
-  "fingerprint": "c9db9677c80b9578701e95c23961c9cd02fbe659cfcf2468acb41ba64cde04ce",
+  "fingerprint": "4d7d5346bddeb9ca7bf1e871569f2a9e58e093fbd7ab360a6e14c500a85782c8",
   "fingerprint_alg": "tree-json-v1"
 }

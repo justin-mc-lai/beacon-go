@@ -12,6 +12,15 @@
       "text": "渲染 HTML 含 gate 判定区与 reason code 文本"
     }
   ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
   "verification": {
     "type": "test",
     "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableTreeHTMLPanels$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableTreeHTMLPanels\"]}"
@@ -29,6 +38,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:37.257204Z"
   },
-  "fingerprint": "caef1403fccd7bc4ec17d7843e4b24f673b107f92678c1a4c9d5c7dae1320aa0",
+  "fingerprint": "c50adf1d9bb198e4f43bdc36ee242e1de98510c9c807a161aff713f4c02551bd",
   "fingerprint_alg": "tree-json-v1"
 }

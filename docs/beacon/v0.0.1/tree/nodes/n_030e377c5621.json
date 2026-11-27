@@ -56,10 +56,10 @@
     ]
   },
   "child_fingerprints": [
-    "94b289465ff10264562b2bff7ff282d0ea16bb3224c324f2f8b651d1d88962db",
-    "2aebba2b4f5aff0ec43907295182432ac41fd08c92441af2312bb6cc5bff2efa",
-    "c9db9677c80b9578701e95c23961c9cd02fbe659cfcf2468acb41ba64cde04ce"
+    "d7e1b5b83087da88d5446155366c050d3d0bb2eed8d96d3a45777576db1255ef",
+    "50b24fc70010e313921326b8659ecb2feecdc9d6418087b197ea2af42dd1c2be",
+    "4d7d5346bddeb9ca7bf1e871569f2a9e58e093fbd7ab360a6e14c500a85782c8"
   ],
-  "fingerprint": "b59407103f754ad7ae361479d94241a911e8b50fafceccd9a5a0ccac128243d7",
+  "fingerprint": "0a906d59a8525ffd0ce6569a1085140784980dce07afbea2be4315eccd87bc17",
   "fingerprint_alg": "tree-json-v1"
 }

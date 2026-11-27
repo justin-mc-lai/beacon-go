@@ -12,6 +12,15 @@
       "text": "第二个 run 在第一个 stage done 前为 pending"
     }
   ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
   "verification": {
     "type": "test",
     "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableModuleRun$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableModuleRun\"]}"
@@ -29,6 +38,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:36.939085Z"
   },
-  "fingerprint": "2aebba2b4f5aff0ec43907295182432ac41fd08c92441af2312bb6cc5bff2efa",
+  "fingerprint": "50b24fc70010e313921326b8659ecb2feecdc9d6418087b197ea2af42dd1c2be",
   "fingerprint_alg": "tree-json-v1"
 }

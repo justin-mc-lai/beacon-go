@@ -8,8 +8,8 @@
   "path": "root/tree-visual/interactive-acceptance-binding",
   "status": "frozen",
   "child_fingerprints": [
-    "37fba3df4fdf7180c789c4696f97d94af54531b5ad26c64a16e0a48ef4a585b4"
+    "2f12c75c5e1fe26a432260a0669e72ec8f5642a9fc619220a4a3d309f39b0c84"
   ],
-  "fingerprint": "3e9a324effa7cfd5549c38d08d68025535cda1dfaa40361854902beddb7d15b8",
+  "fingerprint": "b2c660c321186cc4f30a32b7548175076c2bbea95866418ee075f8e20e97e187",
   "fingerprint_alg": "tree-json-v1"
 }

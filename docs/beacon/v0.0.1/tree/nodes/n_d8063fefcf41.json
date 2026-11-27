@@ -78,8 +78,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableCaptureLifecycle$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableCaptureLifecycle\"]}"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryGuard$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryGuard\"]}"
   },
-  "fingerprint": "7c1c9409c1123035ce73277619cbd1c6ef525b4efd874449c3de7eaed64c0c5c",
+  "fingerprint": "a9885859f49f7751e324d09b631ecd5f23bedeb9a6cb5c2489ef929af2ff32d2",
   "fingerprint_alg": "tree-json-v1"
 }

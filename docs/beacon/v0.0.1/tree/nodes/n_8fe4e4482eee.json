@@ -12,6 +12,15 @@
       "text": "parallel_plan mode=pool 且 satellites 数=module 数"
     }
   ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
   "verification": {
     "type": "test",
     "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableParallelPlan$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableParallelPlan\"]}"
@@ -29,6 +38,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:36.716856Z"
   },
-  "fingerprint": "94b289465ff10264562b2bff7ff282d0ea16bb3224c324f2f8b651d1d88962db",
+  "fingerprint": "d7e1b5b83087da88d5446155366c050d3d0bb2eed8d96d3a45777576db1255ef",
   "fingerprint_alg": "tree-json-v1"
 }

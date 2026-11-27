@@ -12,6 +12,15 @@
       "text": "manifest.runtime 与二进制版本一致"
     }
   ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
   "verification": {
     "type": "test",
     "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableVersionManifestAlignment$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableVersionManifestAlignment\"]}"
@@ -23,6 +32,6 @@
     "artifact_hash": "fcb02276001d57e504e9b11f62de175f648761e6ce97658a38e685cca4bdee6b",
     "at": "2026-11-27T07:43:10.918181Z"
   },
-  "fingerprint": "dbcab3b4650f5114ee59241bbee3409b571467ddbdf1991546214ef03039b50a",
+  "fingerprint": "bd5af8f3a96b9764506e130b438e74ae93a7c59405b25006d7d809b96c328a8f",
   "fingerprint_alg": "tree-json-v1"
 }

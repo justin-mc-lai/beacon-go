@@ -12,6 +12,15 @@
       "text": "truth 未 freeze 时命令退出非零且 reason=freeze_ack_required"
     }
   ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
   "verification": {
     "type": "test",
     "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableModuleAdmission$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableModuleAdmission\"]}"
@@ -29,6 +38,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:36.54872Z"
   },
-  "fingerprint": "0ced5418874f35980ddeeea7f4165da553866d8ddb4d9a4768f346fd4cd8d29e",
+  "fingerprint": "73a8deeda66a454691333713b7863734bddf91453eca360b420f16f90a698ac2",
   "fingerprint_alg": "tree-json-v1"
 }

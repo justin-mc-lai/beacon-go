@@ -1,0 +1,15 @@
+{
+  "id": "n_5f7fcbdf0840",
+  "kind": "module",
+  "title": "module orchestration",
+  "intent": "按意图树驱动实现：同模块同版本顺序实现，不同模块分配独立 worktree 并行交付；worktree 是核心能力，admission 硬门禁。",
+  "parent_id": "nroot_6b8991789867",
+  "path": "root/module-orchestration",
+  "status": "frozen",
+  "child_fingerprints": [
+    "b645c70673ec7cffa3fcbcd70ea4df65d062f453c655111362828b4f2900e845",
+    "0a906d59a8525ffd0ce6569a1085140784980dce07afbea2be4315eccd87bc17"
+  ],
+  "fingerprint": "0bc681ae9d778b9a93be99583414be46625b65d8718b863b1294d2e34f73aea9",
+  "fingerprint_alg": "tree-json-v1"
+}

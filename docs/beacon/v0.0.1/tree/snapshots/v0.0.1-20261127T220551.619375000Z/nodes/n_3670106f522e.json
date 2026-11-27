@@ -1,0 +1,43 @@
+{
+  "id": "n_3670106f522e",
+  "kind": "touchpoint",
+  "title": "module admission gate",
+  "intent": "任一子 feature admission blocked 则 module 不启动",
+  "parent_id": "n_f6f625e5f61b",
+  "path": "root/module-orchestration/module-admission/module-admission-gate",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "truth 未 freeze 时命令退出非零且 reason=freeze_ack_required"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableModuleAdmission$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableModuleAdmission\"]}"
+  },
+  "implementation": {
+    "by": "ImplModuleAdmission",
+    "outcome": "done",
+    "artifact_path": ".beacon/artifacts/parallel/module-admission-evidence.txt",
+    "artifact_hash": "d57a679e2cc8dbf64e8a4d2fd22fccf104f9d4e424f58ef8ceceea43256bac9e",
+    "at": "2026-11-27T07:43:10.884125Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_d629937aadac1c32464be521",
+    "content_hash": "56020fef600751fc9b7a9c14b0a2c0fa7789f89226b0d9f07ffb228b6dac6083",
+    "by": "qa-independent",
+    "at": "2026-11-27T08:42:36.54872Z"
+  },
+  "fingerprint": "73a8deeda66a454691333713b7863734bddf91453eca360b420f16f90a698ac2",
+  "fingerprint_alg": "tree-json-v1"
+}

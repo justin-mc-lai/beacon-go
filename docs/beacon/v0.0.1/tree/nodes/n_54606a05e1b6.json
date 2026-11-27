@@ -67,8 +67,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableCaptureLifecycle$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableCaptureLifecycle\"]}"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryGuard$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryGuard\"]}"
   },
-  "fingerprint": "7eb7f4624393dab79e5f7b7f670f7133f69feaf7aa130625c4c149f47630d640",
+  "fingerprint": "d16a5f250f890c22a2a6030a3fa369bfc0dac92091511822cabe4cc00c266294",
   "fingerprint_alg": "tree-json-v1"
 }

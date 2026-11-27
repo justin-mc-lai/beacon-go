@@ -12,6 +12,15 @@
       "text": "【目标态，当前未实现】改动节点正文后需求级漂移报告列出该节点为 changed，未改动节点不出现；验收命令 beacon plan drift --node \u003cid\u003e 尚未落地"
     }
   ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
   "verification": {
     "type": "test",
     "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableTreeDrift$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableTreeDrift\"]}"
@@ -29,6 +38,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:37.454391Z"
   },
-  "fingerprint": "54cb64822bf3116d326d536b2758437bcdba96bb4ee69f0f57cdbba1e8c0b7dd",
+  "fingerprint": "7ccc1b34dce9b1948be9bc26a2ffba0c86efd389f803271fa922fa8dbb8e0600",
   "fingerprint_alg": "tree-json-v1"
 }

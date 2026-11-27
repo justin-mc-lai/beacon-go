@@ -8,8 +8,8 @@
   "path": "root/version-evolution/dual-axis-alignment",
   "status": "frozen",
   "child_fingerprints": [
-    "dbcab3b4650f5114ee59241bbee3409b571467ddbdf1991546214ef03039b50a"
+    "bd5af8f3a96b9764506e130b438e74ae93a7c59405b25006d7d809b96c328a8f"
   ],
-  "fingerprint": "be9700a1f0f3755a815a22de218b23a12022b6fd0eb2186f33e88051113966bc",
+  "fingerprint": "cbbcf771ff190bb38a8aef4faac67ae27869635df6e9e83ab64ded9998c39ad2",
   "fingerprint_alg": "tree-json-v1"
 }

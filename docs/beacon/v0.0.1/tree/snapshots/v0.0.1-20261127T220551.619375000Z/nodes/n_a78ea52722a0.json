@@ -1,0 +1,52 @@
+{
+  "id": "n_a78ea52722a0",
+  "kind": "touchpoint",
+  "title": "red green",
+  "intent": "先红后绿并保护已确认测试断言，禁止伪造 Red。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/red-green",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "同一规范测试集合、命令与合同先产生预期缺失行为 Red 再 Green；环境/编译错误、零测试和全部 skip 不算 Red。"
+    },
+    {
+      "id": "AC-002",
+      "text": "实现阶段保持断言不变；测试修订需记录差异与原因、重新审查并重建配对。"
+    },
+    {
+      "id": "AC-003",
+      "text": "缺 Red/Green、反序、测试 hash 变化、失败 Green、超时或取消拒绝核销；不适用 TDD 需明确合同，不口头豁免。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "TestDeliveryReceiptCLIRefusals/missing_red and planned capture machine-result rejection tests",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "TestDeliveryReceiptCLIRefusals/changed_assertions",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "TestDeliveryReceiptCLIRefusals/green_first and planned timeout/cancel tests",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryGuard$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryGuard\"]}"
+  },
+  "fingerprint": "fa34929cb61fc0793445f3b7816c79573c494e7f54564cd7da9d95d948d4922a",
+  "fingerprint_alg": "tree-json-v1"
+}

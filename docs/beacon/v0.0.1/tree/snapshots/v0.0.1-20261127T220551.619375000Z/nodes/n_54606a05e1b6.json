@@ -1,0 +1,74 @@
+{
+  "id": "n_54606a05e1b6",
+  "kind": "touchpoint",
+  "title": "transition integration",
+  "intent": "所有相关迁移共享采集证据校验，拒绝不产生成功状态。",
+  "parent_id": "n_4bdf0311e438",
+  "path": "root/acceptance-binding/red-green-capture/transition-integration",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "verified、rollup、delivered、verify/release evaluate、goal tick/complete 通过共享校验消费有效 capture 配对，直接 CLI 与服务结论一致。"
+    },
+    {
+      "id": "AC-002",
+      "text": "独立回执绑定最终 Green 候选与 capture refs；任何任务未核销、缺独立回执、候选过期或日志失效阻止成功迁移。"
+    },
+    {
+      "id": "AC-003",
+      "text": "验证前拒绝非法迁移，失败不推进节点也不产生成功登记，允许保留失败尝试证据。"
+    },
+    {
+      "id": "AC-004",
+      "text": "CLI 合同变更同批更新真实 fixture/E2E，实跑完整新链成功与拒绝；既有 legacy E2E 不充作新链验收。"
+    },
+    {
+      "id": "AC-005",
+      "text": "旧 v1 外部回执适用范围与迁移显式说明，不静默降级；无树 legacy 不宣称严格覆盖。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "planned TestCaptureTransitionEntrypoints",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "planned TestCaptureReviewAndLedgerRefusals",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "planned TestCaptureRejectedTransitionHasNoSuccessWrites",
+      "status": "planned"
+    },
+    {
+      "id": "TC-004",
+      "ac_id": "AC-004",
+      "kind": "e2e",
+      "ref": "planned strict capture CLI E2E success and refusal chain",
+      "status": "planned"
+    },
+    {
+      "id": "TC-005",
+      "ac_id": "AC-005",
+      "kind": "unit",
+      "ref": "planned TestCaptureLegacyBoundary",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryGuard$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryGuard\"]}"
+  },
+  "fingerprint": "d16a5f250f890c22a2a6030a3fa369bfc0dac92091511822cabe4cc00c266294",
+  "fingerprint_alg": "tree-json-v1"
+}
