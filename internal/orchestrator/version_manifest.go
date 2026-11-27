@@ -16,6 +16,7 @@ import (
 
 	"beacon-go/internal/core"
 	"beacon-go/internal/store"
+	buildversion "beacon-go/internal/version"
 	"beacon-go/internal/versionmanifest"
 )
 
@@ -30,6 +31,7 @@ func (e *Engine) BaselineVersion(root, version string) (versionmanifest.Manifest
 	m := versionmanifest.Manifest{
 		Schema:    versionmanifest.Schema,
 		Version:   version,
+		Runtime:   buildversion.Version,
 		Status:    versionmanifest.StatusBaseline,
 		CreatedAt: time.Now().UTC().Format(time.RFC3339),
 	}
@@ -86,6 +88,9 @@ func (e *Engine) OpenVersion(root, from, level string) (versionmanifest.Manifest
 			"manifest for "+next+" already exists")
 	}
 	child := versionmanifest.Inherit(parent, next)
+	// Realign Runtime with the current binary: a parent line may carry a
+	// stale value, and the docs version axis evolves independently.
+	child.Runtime = buildversion.Version
 	if err := e.ensureStoreVersion(root, next); err != nil {
 		return versionmanifest.Manifest{}, err
 	}

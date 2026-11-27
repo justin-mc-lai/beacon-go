@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"beacon-go/internal/store"
+	buildversion "beacon-go/internal/version"
 	"beacon-go/internal/versionmanifest"
 )
 
@@ -274,5 +275,44 @@ func TestManifestIllegalTransitions(t *testing.T) {
 	if err != nil { t.Fatal(err) }
 	if m2.Status != versionmanifest.StatusReleased {
 		t.Fatalf("status changed after illegal freeze: %s", m2.Status)
+	}
+}
+
+func TestVersionManifestRuntimeMatchesBuildVersion(t *testing.T) {
+	env := newTestEnv(t, "frozen")
+	writeVersionFixture(t, env.root)
+
+	m, err := env.eng.BaselineVersion(env.root, "v2.0.0")
+	if err != nil {
+		t.Fatalf("baseline: %v", err)
+	}
+	if m.Runtime != buildversion.Version || m.Version != "v2.0.0" {
+		t.Fatalf("baseline manifest = %+v, want runtime=%q docs version=v2.0.0", m, buildversion.Version)
+	}
+
+	child, err := env.eng.OpenVersion(env.root, "v2.0.0", "patch")
+	if err != nil {
+		t.Fatalf("open: %v", err)
+	}
+	if child.Runtime != buildversion.Version || child.Version != "v2.0.1" {
+		t.Fatalf("open manifest = %+v, want runtime=%q docs version=v2.0.1", child, buildversion.Version)
+	}
+
+	// Open realigns Runtime from the binary even when the parent line
+	// carries a stale value; the docs version axis stays independent.
+	parent, err := versionmanifest.LoadVersion(env.root, "v2.0.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	parent.Runtime = "9.9.9"
+	if err := versionmanifest.Save(versionmanifest.Path(env.root, "v2.0.0"), parent); err != nil {
+		t.Fatal(err)
+	}
+	child2, err := env.eng.OpenVersion(env.root, "v2.0.0", "minor")
+	if err != nil {
+		t.Fatalf("open with stale parent: %v", err)
+	}
+	if child2.Runtime != buildversion.Version || child2.Version != "v2.1.0" {
+		t.Fatalf("open manifest = %+v, want runtime=%q docs version=v2.1.0", child2, buildversion.Version)
 	}
 }
