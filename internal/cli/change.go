@@ -61,7 +61,7 @@ func newChangeRequestCmd() *cobra.Command {
 	c.Flags().StringVar(&nodeID, "node", "", "subtree root node id (required)")
 	c.Flags().StringVar(&summary, "summary", "", "what is changing (required)")
 	c.Flags().StringVar(&by, "by", "", "who requests the change")
-	c.Flags().StringVar(&base, "base-fingerprint", "", "optional optimistic-concurrency base")
+	c.Flags().StringVar(&base, "base-fingerprint", "", "required optimistic-concurrency base fingerprint")
 	c.Flags().BoolVar(&asJSON, "json", false, "print JSON")
 	return c
 }

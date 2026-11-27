@@ -55,7 +55,7 @@ func newGenerateCmd(use, short string) *cobra.Command {
 				if by == "" {
 					by = "cli"
 				}
-				if _, err := intenttree.RequestChange(st, dir, idx.Version, nodeID, summary, by, ""); err != nil {
+				if _, err := intenttree.RequestChange(st, dir, idx.Version, nodeID, summary, by, n.Fingerprint); err != nil {
 					return err
 				}
 				n, err = intenttree.ReadNode(dir, nodeID)

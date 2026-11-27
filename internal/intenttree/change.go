@@ -1,7 +1,9 @@
 package intenttree
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"sort"
@@ -24,12 +26,96 @@ type ChangeRecord struct {
 	CreatedAt       string   `json:"created_at"`
 }
 
+type changeJournal struct {
+	TreeDir string           `json:"tree_dir"`
+	Files   []changeFileCopy `json:"files"`
+}
+
+type changeFileCopy struct {
+	Path string `json:"path"`
+	Old  string `json:"old_base64"`
+}
+
+// recoverTreeChange restores a tree left half-written by an interrupted
+// change. Callers hold the tree lock. The journal lives outside the tree so
+// the canonical artifact never gains runtime files.
+func recoverTreeChange(dir string) error {
+	path := changeJournalPath(dir)
+	raw, err := os.ReadFile(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	var j changeJournal
+	if err := json.Unmarshal(raw, &j); err != nil {
+		return err
+	}
+	if j.TreeDir != dir {
+		want, err1 := filepath.EvalSymlinks(dir)
+		got, err2 := filepath.EvalSymlinks(j.TreeDir)
+		if err1 != nil || err2 != nil || want != got {
+			return core.NewError(ReasonStateConflict, "intenttree.recoverTreeChange", "journal belongs to another tree")
+		}
+	}
+	for _, f := range j.Files {
+		if f.Old == "" {
+			if err := os.Remove(f.Path); err != nil && !errors.Is(err, os.ErrNotExist) {
+				return err
+			}
+			continue
+		}
+		old, err := base64.StdEncoding.DecodeString(f.Old)
+		if err != nil {
+			return err
+		}
+		if err := atomicWrite(f.Path, old); err != nil {
+			return err
+		}
+	}
+	return os.Remove(path)
+}
+
+func changeJournalPath(dir string) string {
+	return filepath.Join(lockDirForTree(dir), "tree-change-journal.json")
+}
+
+func writeChangeJournal(dir string, paths []string) error {
+	j := changeJournal{TreeDir: dir}
+	for _, p := range paths {
+		old, err := os.ReadFile(p)
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+		item := changeFileCopy{Path: p}
+		if err == nil {
+			item.Old = base64.StdEncoding.EncodeToString(old)
+		}
+		j.Files = append(j.Files, item)
+	}
+	raw, err := json.MarshalIndent(j, "", "  ")
+	if err != nil {
+		return err
+	}
+	return atomicWrite(changeJournalPath(dir), append(raw, '\n'))
+}
+
 // RequestChange invalidates one frozen subtree: the target and every
 // descendant become draft, every ancestor becomes change_pending, and
-// one immutable change record is written.
+// one immutable change record is written. The caller must pass the target's
+// current fingerprint; a stale base is refused before anything is written.
 func RequestChange(st *store.Store, dir, versionID, nodeID, summary, by, base string) (ChangeRecord, error) {
 	if strings.TrimSpace(summary) == "" {
 		return ChangeRecord{}, core.NewError(ReasonChangeSummaryMissing, "intenttree.RequestChange", "summary is required")
+	}
+	unlock, err := lockTreeChange(dir)
+	if err != nil {
+		return ChangeRecord{}, err
+	}
+	defer unlock()
+	if err := recoverTreeChange(dir); err != nil {
+		return ChangeRecord{}, err
 	}
 	idx, err := ReadIndex(dir)
 	if err != nil {
@@ -39,16 +125,29 @@ func RequestChange(st *store.Store, dir, versionID, nodeID, summary, by, base st
 	if !ok {
 		return ChangeRecord{}, core.NewError(ReasonNodeNotFound, "intenttree.RequestChange", "node not found: "+nodeID)
 	}
-	switch target.Status {
-	case StatusFrozen, StatusImplemented, StatusVerified, StatusDelivered:
-	default:
-		return ChangeRecord{}, core.NewError(ReasonChangeNotAllowed, "intenttree.RequestChange",
-			"change requires frozen truth; "+nodeID+" is "+string(target.Status))
+	// Re-read the node body after taking the lock. The index is a cache;
+	// the canonical fingerprint is the one stamped into the node on disk.
+	fresh, err := ReadNode(dir, nodeID)
+	if err != nil {
+		return ChangeRecord{}, err
 	}
-	if base != "" && base != target.Fingerprint {
+	// A stale base wins over the state check: after the first writer commits,
+	// the second must see base mismatch, not a bare draft-state error.
+	if strings.TrimSpace(base) != "" && base != fresh.Fingerprint {
 		return ChangeRecord{}, core.NewError(ReasonChangeBaseMismatch, "intenttree.RequestChange",
 			"base fingerprint does not match current node; rebase first")
 	}
+	switch fresh.Status {
+	case StatusFrozen, StatusImplemented, StatusVerified, StatusDelivered:
+	default:
+		return ChangeRecord{}, core.NewError(ReasonChangeNotAllowed, "intenttree.RequestChange",
+			"change requires frozen truth; "+nodeID+" is "+string(fresh.Status))
+	}
+	if strings.TrimSpace(base) == "" {
+		return ChangeRecord{}, core.NewError(ReasonChangeBaseMismatch, "intenttree.RequestChange",
+			"base fingerprint is required")
+	}
+	target.Fingerprint = fresh.Fingerprint
 	children := map[string][]IndexEntry{}
 	for _, n := range idx.Nodes {
 		children[n.ParentID] = append(children[n.ParentID], n)
@@ -64,22 +163,48 @@ func RequestChange(st *store.Store, dir, versionID, nodeID, summary, by, base st
 	walk(nodeID)
 	sort.Strings(affected)
 
+	var ancestors []string
+	for parent := target.ParentID; parent != ""; {
+		ancestors = append(ancestors, parent)
+		p, ok := findEntry(idx, parent)
+		if !ok {
+			break
+		}
+		parent = p.ParentID
+	}
+
 	now := time.Now().UTC()
 	beforeSnapshot := ""
 	if _, sid, serr := CreateSnapshot(dir, idx.Version); serr == nil {
 		beforeSnapshot = sid
 	}
+	id := shortID("chg_", versionID, nodeID, summary, now.Format(time.RFC3339Nano))
 	rec := ChangeRecord{
-		ID:     shortID("chg_", versionID, nodeID, summary, now.Format(time.RFC3339Nano)),
+		ID:     id,
 		NodeID: nodeID, Summary: strings.TrimSpace(summary), By: strings.TrimSpace(by),
-		BaseFingerprint: target.Fingerprint, BeforeSnapshot: beforeSnapshot, Affected: affected,
+		BaseFingerprint: fresh.Fingerprint, BeforeSnapshot: beforeSnapshot, Affected: affected,
 		CreatedAt: now.Format(time.RFC3339Nano),
 	}
 	raw, err := json.MarshalIndent(rec, "", "  ")
 	if err != nil {
 		return ChangeRecord{}, err
 	}
-	if err := atomicWrite(filepath.Join(dir, "changes", rec.ID+".json"), append(raw, '\n')); err != nil {
+
+	paths := []string{IndexPath(dir), filepath.Join(dir, "changes", id+".json")}
+	for _, node := range append(append([]string{}, affected...), ancestors...) {
+		paths = append(paths, NodePath(dir, node))
+	}
+	if err := writeChangeJournal(dir, paths); err != nil {
+		return ChangeRecord{}, err
+	}
+	committed := false
+	defer func() {
+		if !committed {
+			_ = recoverTreeChange(dir)
+		}
+	}()
+
+	if err := atomicWrite(filepath.Join(dir, "changes", id+".json"), append(raw, '\n')); err != nil {
 		return ChangeRecord{}, err
 	}
 	// Target subtree becomes editable draft.
@@ -89,19 +214,18 @@ func RequestChange(st *store.Store, dir, versionID, nodeID, summary, by, base st
 		}
 	}
 	// Ancestors stop claiming frozen truth.
-	for parent := target.ParentID; parent != ""; {
+	for _, parent := range ancestors {
 		if err := setNodeStatus(st, dir, &idx, parent, StatusChangePending); err != nil {
 			return ChangeRecord{}, err
 		}
-		p, ok := findEntry(idx, parent)
-		if !ok {
-			break
-		}
-		parent = p.ParentID
 	}
 	if err := WriteIndex(dir, idx); err != nil {
 		return ChangeRecord{}, err
 	}
+	if err := os.Remove(changeJournalPath(dir)); err != nil {
+		return ChangeRecord{}, err
+	}
+	committed = true
 	return rec, nil
 }
 
