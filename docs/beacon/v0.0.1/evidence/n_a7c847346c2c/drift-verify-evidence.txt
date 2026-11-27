@@ -1,0 +1,37 @@
+# Verification evidence — tree drift command
+
+- node: `n_a7c847346c2c`
+- feature_node_id: `n_679cb763d41a`
+- source_commit: `247f5db5cfb8898688b2eaa7511d5ee018339ae6`
+- binary_sha256: `9dd0668989a446d6419a10797222ae815256d70329db54fffabfdc2b8b66598b`
+- requirement_fingerprint: `81b7b0c2b422d32ceb20ab73758c3c8a99dcdaec8b00608912f41e268116af4a`
+- source_state: committed
+- registered_by: qa-independent
+- registered_at: 2026-11-27T08:42:37Z
+
+---
+
+# Verification evidence — tree drift command
+
+- node: `n_a7c847346c2c`
+- feature: `n_679cb763d41a`
+- implementation artifact: `.beacon/artifacts/requirement-level-drift/plan-drift.md`
+- implementation artifact sha256: `9ebec059fd20a137dda310a1434c43fab05a5c223fb62cebef1a43543201343b`
+
+## Commands and observed results
+
+```text
+$ go test ./internal/cli -run '^(TestPlanDriftSeparatesRequirementBodyFromRecomputedFields|TestPlanDriftClassifiesAddedAndRemoved)$' -count=1
+ok  	beacon-go/internal/cli	0.336s
+$ go test ./internal/intenttree -run '^(TestDrift|TestDriftWithoutSnapshotFailsClosed)$' -count=1
+ok  	beacon-go/internal/intenttree	0.207s
+$ go build ./...                         exit 0
+$ go vet ./...                           exit 0
+$ go test ./... -count=1                 exit 0
+$ bash scripts/check_version_consistency.sh
+version-consistency: ok (0.0.1)
+$ bash scripts/check_kernel_deps.sh
+kernel-deps: ok (no removed surfaces in the binary)
+```
+
+These tests exercise `plan drift` through the CLI and the intent-tree drift seam: body changes are `changed`, added/removed nodes are classified, recomputed fields do not masquerade as requirement drift, and a missing snapshot fails closed.

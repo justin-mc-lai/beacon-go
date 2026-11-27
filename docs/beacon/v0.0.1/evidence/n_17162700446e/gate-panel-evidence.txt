@@ -1,0 +1,42 @@
+# Verification evidence — gate panel
+
+- node: `n_17162700446e`
+- feature_node_id: `n_5a4abb5210d0`
+- source_commit: `247f5db5cfb8898688b2eaa7511d5ee018339ae6`
+- binary_sha256: `9dd0668989a446d6419a10797222ae815256d70329db54fffabfdc2b8b66598b`
+- requirement_fingerprint: `3e17208a2aa6bf939639167eda1be4c042493aa06b1cda08f40e9f08d6322373`
+- source_state: committed
+- registered_by: qa-independent
+- registered_at: 2026-11-27T08:42:37Z
+
+---
+
+gate verdict panel — focused acceptance evidence
+
+Command:
+  go test ./internal/intenttree -run 'TestRenderHTMLTreeShowsGateVerdictPanel|TestRenderHTMLTreeShowsEmptyGatePanel' -count=1 -v
+
+Output:
+=== RUN   TestRenderHTMLTreeShowsGateVerdictPanel
+--- PASS: TestRenderHTMLTreeShowsGateVerdictPanel (0.00s)
+=== RUN   TestRenderHTMLTreeShowsEmptyGatePanel
+--- PASS: TestRenderHTMLTreeShowsEmptyGatePanel (0.00s)
+PASS
+ok  	beacon-go/internal/intenttree	0.437s
+
+Command:
+  go test ./internal/cli -run 'TestTreeHTMLRendersGateVerdicts' -count=1 -v
+
+Output:
+=== RUN   TestTreeHTMLRendersGateVerdicts
+--- PASS: TestTreeHTMLRendersGateVerdicts (0.05s)
+PASS
+ok  	beacon-go/internal/cli	0.485s
+
+Full suite (same worktree):
+  go build ./...                       exit 0
+  go vet ./...                         exit 0
+  go test ./... -count=1               exit 0
+  bash scripts/check_version_consistency.sh  exit 0
+  bash scripts/check_kernel_deps.sh    exit 0
+  bash e2e/run_e2e.sh                  exit 0

@@ -5,11 +5,11 @@
   "intent": "按意图树驱动实现：同模块同版本顺序实现，不同模块分配独立 worktree 并行交付；worktree 是核心能力，admission 硬门禁。",
   "parent_id": "nroot_6b8991789867",
   "path": "root/module-orchestration",
-  "status": "frozen",
+  "status": "verified",
   "child_fingerprints": [
-    "e4b4ae57c584ce3179f0a3e644c07b0caba9c2263b3630ef8c2d15cfd969906d",
-    "2bff1ec7099538ff178cf06ebdc4f4b7df583100f01223d2278605177da1fbb5"
+    "d17995f953848207275d2047dc530c42f4e916e33a16f3903103025ee0559b52",
+    "8a5a3670138670e469c54dc583662005e7dbf7a1247fa16edf51944ca9fa31b8"
   ],
-  "fingerprint": "8c06a711ccc866d71b092a4d693fc90f76d8cb9dfbc3926aee98b3704ace3929",
+  "fingerprint": "599bdd3002d57bc5f44e7099b02c494ffa780665675d9b4252fc3cf5c78ced04",
   "fingerprint_alg": "tree-json-v1"
 }

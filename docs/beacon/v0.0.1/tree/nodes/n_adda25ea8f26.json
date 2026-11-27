@@ -5,7 +5,7 @@
   "intent": "从 module 节点展开子 feature runs",
   "parent_id": "n_030e377c5621",
   "path": "root/module-orchestration/module-scheduler/module-run-cmd",
-  "status": "implemented",
+  "status": "verified",
   "acs": [
     {
       "id": "AC-001",
@@ -23,6 +23,12 @@
     "artifact_hash": "1c90d8610a85b1a2107ab06773dca51f5d56d920549f2e5cf2289b0e23c89609",
     "at": "2026-11-27T07:10:23.899621Z"
   },
-  "fingerprint": "8c6d15f1ef43047b5d2fcd634564a93724ad497eb11b5e7f58efcfa4f88d36c1",
+  "verification_evidence": {
+    "artifact_id": "art_e74afa35b378327a3d746468",
+    "content_hash": "004e7214807d6e38701b9fcb6762c60fc1f1369ce96ff4884aad8b9e1ac01571",
+    "by": "qa-independent",
+    "at": "2026-11-27T08:42:37.092193Z"
+  },
+  "fingerprint": "9ce0e288782ef3d19180203ac696254258b51fc33cd9135f35a75a46c795f286",
   "fingerprint_alg": "tree-json-v1"
 }

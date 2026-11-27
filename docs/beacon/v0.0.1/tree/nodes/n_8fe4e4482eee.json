@@ -5,7 +5,7 @@
   "intent": "不同 module 自动分配 worktree 并行",
   "parent_id": "n_030e377c5621",
   "path": "root/module-orchestration/module-scheduler/cross-module-parallel",
-  "status": "implemented",
+  "status": "verified",
   "acs": [
     {
       "id": "AC-001",
@@ -23,6 +23,12 @@
     "artifact_hash": "5ea33fb8007909d57926bb381a473233b3853d34064918e52f21467ed02630dd",
     "at": "2026-11-27T07:10:23.910343Z"
   },
-  "fingerprint": "c8bfb0e2560f58ade5639d7297f78a74997102217a8f62269b58d4841b0fec77",
+  "verification_evidence": {
+    "artifact_id": "art_9ed115f10c764190ea30d52b",
+    "content_hash": "716f5fb68185fad71b639bd20a411dd24d9bc92f89565fd399099d1df412e4c4",
+    "by": "qa-independent",
+    "at": "2026-11-27T08:42:36.716856Z"
+  },
+  "fingerprint": "9a4adb1a6f9a49389f04f6b5f6d1df3847385a73377fa66312648579ef59b37f",
   "fingerprint_alg": "tree-json-v1"
 }

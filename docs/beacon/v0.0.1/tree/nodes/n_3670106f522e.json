@@ -5,7 +5,7 @@
   "intent": "任一子 feature admission blocked 则 module 不启动",
   "parent_id": "n_f6f625e5f61b",
   "path": "root/module-orchestration/module-admission/module-admission-gate",
-  "status": "implemented",
+  "status": "verified",
   "acs": [
     {
       "id": "AC-001",
@@ -23,6 +23,12 @@
     "artifact_hash": "d57a679e2cc8dbf64e8a4d2fd22fccf104f9d4e424f58ef8ceceea43256bac9e",
     "at": "2026-11-27T07:43:10.884125Z"
   },
-  "fingerprint": "4967b9ee1ea69ca0ab216e1f933c3e32d1b4d748fbfcbdce2881ffe7bca8014f",
+  "verification_evidence": {
+    "artifact_id": "art_d629937aadac1c32464be521",
+    "content_hash": "56020fef600751fc9b7a9c14b0a2c0fa7789f89226b0d9f07ffb228b6dac6083",
+    "by": "qa-independent",
+    "at": "2026-11-27T08:42:36.54872Z"
+  },
+  "fingerprint": "177dc8c090b592bd9ce222c3cc754b26f80a12bfbaa9ee45495a807eb11d937a",
   "fingerprint_alg": "tree-json-v1"
 }

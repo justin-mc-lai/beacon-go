@@ -1,0 +1,39 @@
+# Verification evidence — module run cmd
+
+- node: `n_adda25ea8f26`
+- feature_node_id: `n_030e377c5621`
+- source_commit: `247f5db5cfb8898688b2eaa7511d5ee018339ae6`
+- binary_sha256: `9dd0668989a446d6419a10797222ae815256d70329db54fffabfdc2b8b66598b`
+- requirement_fingerprint: `77be2bad071ee445225d8af3f8b5a64971d8e8c701c017fd019f13a78f6f07de`
+- source_state: committed
+- registered_by: qa-independent
+- registered_at: 2026-11-27T08:42:37Z
+
+---
+
+module run cmd — focused acceptance evidence
+
+Command:
+  go test ./internal/cli -run 'TestGoalModuleRunExpandsFeatureRuns|TestGoalModuleRunRejectsInvalidRequests' -count=1 -v
+
+Output:
+=== RUN   TestGoalModuleRunExpandsFeatureRuns
+--- PASS: TestGoalModuleRunExpandsFeatureRuns (0.08s)
+=== RUN   TestGoalModuleRunRejectsInvalidRequests
+=== RUN   TestGoalModuleRunRejectsInvalidRequests/empty_module
+=== RUN   TestGoalModuleRunRejectsInvalidRequests/wrong_kind
+=== RUN   TestGoalModuleRunRejectsInvalidRequests/missing_node
+--- PASS: TestGoalModuleRunRejectsInvalidRequests (0.01s)
+    --- PASS: TestGoalModuleRunRejectsInvalidRequests/empty_module (0.00s)
+    --- PASS: TestGoalModuleRunRejectsInvalidRequests/wrong_kind (0.00s)
+    --- PASS: TestGoalModuleRunRejectsInvalidRequests/missing_node (0.00s)
+PASS
+ok  	beacon-go/internal/cli	0.324s
+
+Full suite (same worktree):
+  go build ./...                       exit 0
+  go vet ./...                         exit 0
+  go test ./... -count=1               exit 0
+  bash scripts/check_version_consistency.sh  exit 0
+  bash scripts/check_kernel_deps.sh    exit 0
+  bash e2e/run_e2e.sh                  exit 0

@@ -1,0 +1,41 @@
+# Verification evidence — module admission gate
+
+- node: `n_3670106f522e`
+- feature_node_id: `n_f6f625e5f61b`
+- source_commit: `247f5db5cfb8898688b2eaa7511d5ee018339ae6`
+- binary_sha256: `9dd0668989a446d6419a10797222ae815256d70329db54fffabfdc2b8b66598b`
+- requirement_fingerprint: `369246961f1f074ad27ecbc92d1ddca7bb3bcec3da10f6e8fa0e0c592257a456`
+- source_state: committed
+- registered_by: qa-independent
+- registered_at: 2026-11-27T08:42:36Z
+
+---
+
+# Verification evidence — module admission gate
+
+- node: `n_3670106f522e`
+- feature: `n_f6f625e5f61b`
+- run: `run_265b51496f11f8f00e40add5`
+- lane: `module-orchestration`
+- commits: `58537ef4ae`, `25266e99d7`
+
+## Commands and observed results
+
+```text
+$ go test ./internal/cli -run '^TestGoalModuleRun' -count=1
+ok  	beacon-go/internal/cli	0.352s
+```
+
+The added test `TestGoalModuleRunBlocksWhenChildAdmissionFails` exercises the public CLI seam: when any direct child is blocked, `goal module run` exits nonzero with `reason_code=freeze_ack_required` and creates no runs.
+
+```text
+$ go build ./...                         exit 0
+$ go vet ./...                           exit 0
+$ go test ./... -count=1                 exit 0
+$ bash scripts/check_version_consistency.sh
+version-consistency: ok (0.0.1)
+$ bash scripts/check_kernel_deps.sh
+kernel-deps: ok (no removed surfaces in the binary)
+$ bash e2e/run_e2e.sh
+E2E RESULT: PASS — full chain completed
+```

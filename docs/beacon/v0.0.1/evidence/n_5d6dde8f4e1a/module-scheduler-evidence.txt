@@ -1,0 +1,40 @@
+# Verification evidence — intra module order
+
+- node: `n_5d6dde8f4e1a`
+- feature_node_id: `n_030e377c5621`
+- source_commit: `247f5db5cfb8898688b2eaa7511d5ee018339ae6`
+- binary_sha256: `9dd0668989a446d6419a10797222ae815256d70329db54fffabfdc2b8b66598b`
+- requirement_fingerprint: `fee8d5210ae8984db63c3618a5e029bfefdcee82bca3fe384c01ed567251b38b`
+- source_state: committed
+- registered_by: qa-independent
+- registered_at: 2026-11-27T08:42:36Z
+
+---
+
+module scheduler — focused acceptance evidence
+
+Command:
+  go test ./internal/orchestrator -run 'TestModuleWorktreeSlugsStayUniqueForDuplicatePaths|TestCompleteReleasesModuleSuccessor|TestExpectedWorktreeUsesModuleSlug' -count=1 -v
+
+Output:
+=== RUN   TestModuleWorktreeSlugsStayUniqueForDuplicatePaths
+--- PASS: TestModuleWorktreeSlugsStayUniqueForDuplicatePaths (0.00s)
+=== RUN   TestCompleteReleasesModuleSuccessor
+--- PASS: TestCompleteReleasesModuleSuccessor (0.37s)
+=== RUN   TestExpectedWorktreeUsesModuleSlug
+--- PASS: TestExpectedWorktreeUsesModuleSlug (0.00s)
+PASS
+ok  	beacon-go/internal/orchestrator	0.875s
+
+Command:
+  go test ./internal/cli -run 'TestGoalModuleRunExpandsFeatureRuns' -count=1 -v
+
+Output:
+=== RUN   TestGoalModuleRunExpandsFeatureRuns
+--- PASS: TestGoalModuleRunExpandsFeatureRuns (0.08s)
+PASS
+ok  	beacon-go/internal/cli	0.324s
+
+Cross-module AC: parallel_plan mode=pool and three satellites for three modules.
+Intra-module AC: second run stays pending at plan until predecessor leaves that stage; complete releases it.
+Full suite (same worktree) exit 0 for build, vet, test, version consistency, kernel deps and e2e.
