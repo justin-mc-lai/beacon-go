@@ -1,11 +1,11 @@
 ---
 slug: portable-intent-tree-read
 intent_confirmation_by: justin-mc-lai
-intent_confirmation_fingerprint: 9b39100b47fa1e9335d4b546484cc453576178b4ee32c71984eec44f4ab1a852
-sdd_review_fingerprint: 9b39100b47fa1e9335d4b546484cc453576178b4ee32c71984eec44f4ab1a852
-sdd_review_at: 2026-11-27T02:42:51.976419Z
+intent_confirmation_fingerprint: 9fe1638cfdd5e8ba1428a98adb8d7ef93a9cc5bc8893f6662209484e4903ae12
+sdd_review_fingerprint: 9fe1638cfdd5e8ba1428a98adb8d7ef93a9cc5bc8893f6662209484e4903ae12
+sdd_review_at: 2026-11-27T03:11:03.384413Z
 sdd_review_verdict: pass
-sdd_review_by: omp-independent-sdd-review
+sdd_review_by: omp-independent-qa-spec
 version: v0.0.1
 status: frozen
 language: zh
@@ -81,12 +81,12 @@ scope_mode: focused
 
 | AC ID | TC ID | Layer | Command | Assertion | Evidence | Required Tests |
 |---|---|---|---|---|---|---|
-| AC-001 | TC-001 | behavior | `go test ./internal/cli -run '^TestPortableIntentTreeRead$/^local_without_store$' -count=1` | 两入口分别显式选版和单版隐式选版；比较同一仓库既有读法的完整 JSON；无账本且权威树不变 | evidence/TC-001.txt | TC-001 |
-| AC-001 | TC-002 | negative | `go test ./internal/cli -run '^TestPortableIntentTreeRead$/^local_no_tree$' -count=1` | 无意图树时两个入口均拒绝；缺失账本不创建；已有其他项目账本及权威文件保持不变 | evidence/TC-002.txt | TC-002 |
-| AC-001 | TC-005 | behavior | `go test ./internal/cli -run '^TestPortableIntentTreeRead$/^local_legacy_store$' -count=1` | 使用写入口会迁移的旧账本；两个读入口显式选版均成功，账本 schema、内容和权威树不变 | evidence/TC-005.txt | TC-005 |
-| AC-002 | TC-003 | behavior | `go test ./internal/cli -run '^TestPortableIntentTreeRead$/^version_registered_current$' -count=1` | 两个可读版本中默认读取登记当前版；显式指定另一版优先；权威树与账本不变 | evidence/TC-003.txt | TC-003 |
-| AC-002 | TC-006 | behavior | `go test ./internal/cli -run '^TestPortableIntentTreeRead$/^version_unregistered$' -count=1` | 账本只登记其他项目；两个入口不指定版本均读到目标项目唯一树，未注册目标且权威树和账本不变 | evidence/TC-006.txt | TC-006 |
-| AC-002 | TC-004 | negative | `go test ./internal/cli -run '^TestPortableIntentTreeRead$/^version_reject_' -count=1` | 两个入口均列出歧义版本。分别使用登记当前版和唯一磁盘候选作为可读备选，验证指定版缺失与损坏均拒绝且不输出备选树；权威树与账本不变 | evidence/TC-004.txt | TC-004 |
+| AC-001 | TC-001 | behavior | `go test -json ./internal/cli -run '^TestPortableIntentTreeRead$/^local_without_store$' -count=1` | 两入口分别显式选版和单版隐式选版；比较同一仓库既有读法的完整 JSON；无账本且权威树不变 | evidence/TC-001.txt | TestPortableIntentTreeRead/local_without_store |
+| AC-001 | TC-002 | negative | `go test -json ./internal/cli -run '^TestPortableIntentTreeRead$/^local_no_tree$' -count=1` | 无意图树时两个入口均拒绝；缺失账本不创建；已有其他项目账本及权威文件保持不变 | evidence/TC-002.txt | TestPortableIntentTreeRead/local_no_tree |
+| AC-001 | TC-005 | behavior | `go test -json ./internal/cli -run '^TestPortableIntentTreeRead$/^local_legacy_store$' -count=1` | 使用写入口会迁移的旧账本；两个读入口显式选版均成功，账本 schema、内容和权威树不变 | evidence/TC-005.txt | TestPortableIntentTreeRead/local_legacy_store |
+| AC-002 | TC-003 | behavior | `go test -json ./internal/cli -run '^TestPortableIntentTreeRead$/^version_registered_current$' -count=1` | 两个可读版本中默认读取登记当前版；显式指定另一版优先；权威树与账本不变 | evidence/TC-003.txt | TestPortableIntentTreeRead/version_registered_current |
+| AC-002 | TC-006 | behavior | `go test -json ./internal/cli -run '^TestPortableIntentTreeRead$/^version_unregistered$' -count=1` | 账本只登记其他项目；两个入口不指定版本均读到目标项目唯一树，未注册目标且权威树和账本不变 | evidence/TC-006.txt | TestPortableIntentTreeRead/version_unregistered |
+| AC-002 | TC-004 | negative | `go test -json ./internal/cli -run '^TestPortableIntentTreeRead$/^version_reject_' -count=1` | 两个入口均列出歧义版本。分别使用登记当前版和唯一磁盘候选作为可读备选，验证指定版缺失与损坏均拒绝且不输出备选树；权威树与账本不变 | evidence/TC-004.txt | TestPortableIntentTreeRead/version_reject_ambiguous,TestPortableIntentTreeRead/version_reject_explicit |
 
 ## FSM
 
