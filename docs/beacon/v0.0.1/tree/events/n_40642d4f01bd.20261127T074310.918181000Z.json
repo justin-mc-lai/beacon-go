@@ -1,0 +1,10 @@
+{
+  "artifact": ".beacon/artifacts/parallel/manifest-runtime-evidence.txt",
+  "artifact_hash": "fcb02276001d57e504e9b11f62de175f648761e6ce97658a38e685cca4bdee6b",
+  "at": "2026-11-27T07:43:10.918181Z",
+  "by": "ImplVersionManifest",
+  "node_id": "n_40642d4f01bd",
+  "outcome": "done",
+  "reason_code": "",
+  "type": "implementation_done"
+}

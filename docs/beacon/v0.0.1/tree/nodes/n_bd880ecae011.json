@@ -5,7 +5,7 @@
   "intent": "点击 TestCase 行完成 AC 绑定并写回树",
   "parent_id": "n_39e50c0e0da2",
   "path": "root/tree-visual/interactive-acceptance-binding/tc-bind-click",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,19 @@
     "type": "test",
     "spec": "【目标态，当前不可执行】go test ./internal/intenttree -run TestRenderHTML -count=1 通过，且渲染器含 AC↔TestCase 绑定标记；当前 render_html.go 无交互绑定，grep data-bind-ac 命中 spec 文本属自证，不作通过依据"
   },
-  "fingerprint": "dd125de991460bb8b9034a90b2cff193c6ffc726e1fc738ed88dc9cf79a8984c",
+  "implementation": {
+    "by": "ImplInteractiveBinding",
+    "outcome": "done",
+    "artifact_path": ".beacon/artifacts/parallel/interactive-binding-evidence.txt",
+    "artifact_hash": "bd4e9ff4e6b077aff3b176613c612fb8b545c7a9646ddf618b2abca983211e1d",
+    "at": "2026-11-27T07:43:10.904606Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_668a6609ad8a72b2834838b9",
+    "content_hash": "bd4e9ff4e6b077aff3b176613c612fb8b545c7a9646ddf618b2abca983211e1d",
+    "by": "parallel-qa",
+    "at": "2026-11-27T07:43:10.947961Z"
+  },
+  "fingerprint": "f6bbf29a3f94b1afc99b20cea98ea3ebcc895b5aaaa5c49a0aaee51c2b2a4af2",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -1,0 +1,10 @@
+{
+  "artifact": ".beacon/artifacts/parallel/interactive-binding-evidence.txt",
+  "artifact_hash": "bd4e9ff4e6b077aff3b176613c612fb8b545c7a9646ddf618b2abca983211e1d",
+  "at": "2026-11-27T07:43:10.904606Z",
+  "by": "ImplInteractiveBinding",
+  "node_id": "n_bd880ecae011",
+  "outcome": "done",
+  "reason_code": "",
+  "type": "implementation_done"
+}

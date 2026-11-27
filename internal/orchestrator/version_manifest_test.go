@@ -255,7 +255,9 @@ func TestManifestIllegalTransitions(t *testing.T) {
 		t.Fatal("draft->released must be rejected")
 	}
 	m, err := versionmanifest.LoadVersion(env.root, "v2.0.1")
-	if err != nil { t.Fatal(err) }
+	if err != nil {
+		t.Fatal(err)
+	}
 	if m.Status != versionmanifest.StatusDraft {
 		t.Fatalf("status changed after illegal release: %s", m.Status)
 	}
@@ -272,7 +274,9 @@ func TestManifestIllegalTransitions(t *testing.T) {
 		t.Fatal("released->draft/freeze must be rejected")
 	}
 	m2, err := versionmanifest.LoadVersion(env.root, "v2.0.1")
-	if err != nil { t.Fatal(err) }
+	if err != nil {
+		t.Fatal(err)
+	}
 	if m2.Status != versionmanifest.StatusReleased {
 		t.Fatalf("status changed after illegal freeze: %s", m2.Status)
 	}

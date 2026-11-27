@@ -5,11 +5,11 @@
   "intent": "需求树 HTML：点模块看子节点需求真相、FSM 下的测试用例、按用例绑定验收的交互闭环；复杂度内聚系统，用户只点选。本模块只展示 verdict 并提供 AC↔TestCase 点选绑定入口；verdict 生成和 TC↔FSM 绑定规则归 acceptance-binding 模块。",
   "parent_id": "nroot_6b8991789867",
   "path": "root/tree-visual",
-  "status": "frozen",
+  "status": "verified",
   "child_fingerprints": [
-    "4b85645a588c7458b30573b7108cc7bd7cd4f5cea1d18f79c6cfe1507cfec9b3",
-    "8874c95930cabea60e87855ccad26b4b6d26656f5c22648c9903b51dc1a0b9f3"
+    "1329fceea614dda3f3fc4f13074ce9c2e8bf228f5120cf217bbff0a84895e88b",
+    "b9714d4b23974ac1fe9f30d0f06271c499cb03f999f16cee1041ac7f494a0f7d"
   ],
-  "fingerprint": "3f3844e8e96296c76272a0f03293e6705754d7345fc2b7a0f58a3675a219883c",
+  "fingerprint": "07581d97893a9ed2ed86a8200119d8aeaae49baa3f77b4d022fc5b1708c578c3",
   "fingerprint_alg": "tree-json-v1"
 }
