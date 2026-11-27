@@ -2,6 +2,7 @@ package intenttree
 
 import (
 	"beacon-go/internal/core"
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -188,6 +189,14 @@ table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px}th,td{text
 .fsm-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
 .fsm-link{text-align:left;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;cursor:pointer;font:12px/1.4 inherit;color:var(--ink)}
 .fsm-link:hover{border-color:#b7d7c5;background:var(--accent-soft)}
+.bind-ac-row{cursor:pointer}
+.bind-ac-row:hover td{background:#f1f8f4}
+.bind-ac-row.selected td{background:#e8f0eb;color:#17412c;font-weight:600}
+.bind-ac-form{margin:10px 0 4px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fcfbf8;font-size:12px}
+.bind-ac-form .bind-ac-state{display:inline-block;margin-right:12px;color:#374151}
+.bind-ac-form code{color:#17412c}
+.bind-ac-hint{margin:4px 0;color:var(--muted)}
+pre.bind-ac-command,pre.bind-ac-patch{white-space:pre-wrap;word-break:break-word;margin:6px 0;background:#fff;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
 .hidden{display:none!important}
 .empty{color:var(--muted);font-size:12px}
 @media (max-width:1100px){.app{grid-template-columns:240px 1fr 360px}}
@@ -436,15 +445,29 @@ func writeNodePanel(b *strings.Builder, n Node, rootID string, truth map[string]
 			for _, ac := range n.ACs {
 				acText[ac.ID] = ac.Text
 			}
-			b.WriteString(`<table><tr><th>验收标准</th><th>用例</th><th>状态</th></tr>`)
+			b.WriteString(`<table class="bind-ac-table"><tr><th>验收标准</th><th>用例</th><th>状态</th></tr>`)
 			for _, tc := range n.TestCases {
 				text := acText[tc.ACID]
 				if text == "" {
 					text = tc.ACID
 				}
-				fmt.Fprintf(b, `<tr><td>%s</td><td class="ref">%s</td><td><span class="badge">%s</span></td></tr>`, esc(text), esc(tc.Ref), esc(testStatusLabel(tc.Status)))
+				fmt.Fprintf(b, `<tr class="bind-ac-row" data-bind-ac="%s" data-bind-node="%s" data-bind-testcase="%s" data-bind-ref="%s" data-bind-kind="%s" data-bind-status="%s" tabindex="0" role="button" title="点击确认该用例绑定到 AC"><td>%s</td><td class="ref">%s</td><td><span class="badge">%s</span></td></tr>`,
+					esc(tc.ACID), esc(n.ID), esc(tc.ID), esc(tc.Ref), esc(tc.Kind), esc(tc.Status), esc(text), esc(tc.Ref), esc(testStatusLabel(tc.Status)))
 			}
 			b.WriteString(`</table>`)
+			patchJSON, _ := json.MarshalIndent(struct {
+				TestCases []TestCase `json:"test_cases"`
+			}{TestCases: n.TestCases}, "", "  ")
+			patchFile := "/tmp/beacon-bind-" + n.ID + ".json"
+			b.WriteString(`<form class="bind-ac-form" data-bind-form="` + esc(n.ID) + `">`)
+			fmt.Fprintf(b, `<div class="bind-ac-state" data-bind-ac-value>未选择 AC</div><div class="bind-ac-state" data-bind-testcase-value>未选择用例</div><div class="bind-ac-state" data-bind-ref-value>未选择引用</div><input type="hidden" name="binding" data-bind-state value="">`)
+			fmt.Fprintf(b, `<div class="bind-ac-hint">点击用例行确认 AC 绑定；先把下方 JSON 保存为 <code>%s</code>，再执行写回命令。</div>`, esc(patchFile))
+			if n.Status == StatusFrozen {
+				fmt.Fprintf(b, `<pre class="bind-ac-command">beacon change request --project . --node %s --summary "bind test case to AC" --by html --base-fingerprint %s</pre>`, esc(n.ID), esc(n.Fingerprint))
+			}
+			fmt.Fprintf(b, `<pre class="bind-ac-command">beacon truth node update --project . --node %s --file %s</pre>`, esc(n.ID), esc(patchFile))
+			fmt.Fprintf(b, `<pre class="bind-ac-patch">%s</pre>`, esc(string(patchJSON)))
+			b.WriteString(`</form>`)
 		}
 		b.WriteString(`</details>`)
 	}
@@ -512,6 +535,20 @@ function select(id){
 buttons.forEach(b=>b.addEventListener('click',()=>select(b.dataset.node)));
 document.querySelectorAll('[data-select]').forEach(b=>b.addEventListener('click',()=>select(b.dataset.select)));
 document.querySelectorAll('.fsm-toggle').forEach(b=>b.addEventListener('click',()=>{const slot=b.closest('.fsm-slot');slot.classList.toggle('show-exceptions');b.textContent=slot.classList.contains('show-exceptions')?'隐藏异常转移':'显示异常转移';}));
+const bindRows=[...document.querySelectorAll('.bind-ac-row')];
+const bindForms=[...document.querySelectorAll('[data-bind-form]')];
+bindForms.forEach(f=>f.addEventListener('submit',e=>e.preventDefault()));
+function showBinding(row){
+ const form=row.closest('[data-panel]')?.querySelector('[data-bind-form]');
+ if(!form)return;
+ const state={node:form.dataset.bindForm,ac_id:row.dataset.bindAc,test_case_id:row.dataset.bindTestcase,ref:row.dataset.bindRef};
+ const hidden=form.querySelector('[data-bind-state]'); if(hidden)hidden.value=JSON.stringify(state);
+ const ac=form.querySelector('[data-bind-ac-value]'); if(ac)ac.textContent=row.dataset.bindAc||'未选择 AC';
+ const tc=form.querySelector('[data-bind-testcase-value]'); if(tc)tc.textContent=row.dataset.bindTestcase||'未选择用例';
+ const ref=form.querySelector('[data-bind-ref-value]'); if(ref)ref.textContent=row.dataset.bindRef||'未选择引用';
+ const rows=row.closest('.bind-ac-table')?.querySelectorAll('.bind-ac-row')||[]; rows.forEach(r=>r.classList.toggle('selected',r===row));
+}
+bindRows.forEach(row=>{row.addEventListener('click',()=>showBinding(row));row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showBinding(row);}});});
 const filter=document.getElementById('filter');
 let activeStatus='';
 const statusButtons=[...document.querySelectorAll('[data-status-filter]')];
