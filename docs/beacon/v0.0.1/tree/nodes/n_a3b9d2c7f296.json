@@ -22,31 +22,31 @@
   ],
   "test_cases": [
     {
-      "id": "TC-001",
+      "id": "TC-PORTABLE-001",
       "ac_id": "AC-001",
-      "kind": "unit",
-      "ref": "TestStrictDeliverySixControls",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-002",
+      "id": "TC-PORTABLE-002",
       "ac_id": "AC-002",
-      "kind": "unit",
-      "ref": "TestDeliveryReceiptCLIRefusals/open_task and empty_ledger and duplicate_ac",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-003",
+      "id": "TC-PORTABLE-003",
       "ac_id": "AC-003",
-      "kind": "unit",
-      "ref": "TaskStatus freshness regression tests",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     }
   ],
   "verification": {
     "type": "test",
     "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryGuard$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryGuard\"]}"
   },
-  "fingerprint": "2bf9d4cda498829e041ba1003ce1c801708d7bc2578dd2ffdf3305acf7b1195a",
+  "fingerprint": "96c42b50a32133d81cdf2355a4eab6c35b3728a17d6bae2aa236233518e2ea06",
   "fingerprint_alg": "tree-json-v1"
 }

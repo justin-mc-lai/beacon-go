@@ -17,7 +17,7 @@
       "id": "TC-PORTABLE-001",
       "ac_id": "AC-001",
       "kind": "e2e",
-      "ref": "e2e/portableacceptance/portable_acceptance_test.go",
+      "ref": "TestPortableModuleRun → e2e/portableacceptance/portable_acceptance_test.go",
       "status": "existing"
     }
   ],
@@ -38,6 +38,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:36.939085Z"
   },
-  "fingerprint": "50b24fc70010e313921326b8659ecb2feecdc9d6418087b197ea2af42dd1c2be",
+  "fingerprint": "be12a5f2b53e23875b07b68cfb1c4a633a2655dae1f85a9eb89231e4ea08e2f2",
   "fingerprint_alg": "tree-json-v1"
 }

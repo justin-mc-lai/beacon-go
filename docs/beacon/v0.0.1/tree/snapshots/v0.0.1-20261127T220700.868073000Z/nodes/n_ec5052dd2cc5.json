@@ -1,0 +1,52 @@
+{
+  "id": "n_ec5052dd2cc5",
+  "kind": "touchpoint",
+  "title": "blind review",
+  "intent": "宿主以全新只读上下文组织独立审查，系统校验绑定回执。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/blind-review",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "内核合同校验捕获 reviewer 身份、原始需求/候选/日志引用与 Green 后时序；真实上下文隔离由宿主流程另行提供证据，不由 Go 测试证明。"
+    },
+    {
+      "id": "AC-002",
+      "text": "回执绑定节点、需求指纹、最终候选与 capture refs，review 在 Green 后、无未关闭问题；缺回执、自审或错误绑定拒绝。"
+    },
+    {
+      "id": "AC-003",
+      "text": "宿主不支持独立 reviewer 时记录阻塞；身份字符串检查不宣称真实身份认证或上下文隔离已证明。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    },
+    {
+      "id": "TC-PORTABLE-002",
+      "ac_id": "AC-002",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    },
+    {
+      "id": "TC-PORTABLE-003",
+      "ac_id": "AC-003",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryGuard$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryGuard\"]}"
+  },
+  "fingerprint": "3754c2a8b7334d58f8bba4e3c66e2225c708357efdd686d41632eaac8170075d",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -1,0 +1,85 @@
+{
+  "id": "n_d8063fefcf41",
+  "kind": "touchpoint",
+  "title": "pair and register",
+  "intent": "显式 Red ID 配对 Green，唯一采集结果登记复用既有 artifact 权威。",
+  "parent_id": "n_4bdf0311e438",
+  "path": "root/acceptance-binding/red-green-capture/pair-and-register",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "Green 显式引用 Red capture ID，不查隐式 latest；节点、AC、合同、命令、测试集合、maker 一致才配对。"
+    },
+    {
+      "id": "AC-002",
+      "text": "Red 必须预期行为失败且 Green 通过才能核销；Green 绑定实现后源码 commit/input hash，不借用 Red 旧候选。"
+    },
+    {
+      "id": "AC-003",
+      "text": "每次采集唯一目录与不可覆盖结果日志，通过既有 scoped artifact 入口登记；重试追加历史，不覆盖前次。"
+    },
+    {
+      "id": "AC-004",
+      "text": "校验器读取已登记 capture 并重算引用 hash 与测试/候选；手填 v1 JSON、借用节点、缺登记、篡改、重复 ID 和路径别名绕过拒绝。"
+    },
+    {
+      "id": "AC-005",
+      "text": "一个采集事实只有一个写入口，派生 envelope 引用 capture ID/hash，不另维护第二任务状态。"
+    },
+    {
+      "id": "AC-006",
+      "text": "历史重放仅限 Red 的显式完整祖先 commit；系统解包真实 Git 快照，仅覆盖当前合同绑定的相同测试文件，在隔离目录运行，不修改活动实现。记录基线 commit、覆盖后输入 hash、目标 Green commit/input hash、测试 hash、实际执行目录与日志；Green 和 verified 复核目标绑定。当前 HEAD、非祖先、无效 commit、自定义程序、无法运行测试、编译/环境失败均不能冒充有效历史 Red；不补造旧日志。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    },
+    {
+      "id": "TC-PORTABLE-002",
+      "ac_id": "AC-002",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    },
+    {
+      "id": "TC-PORTABLE-003",
+      "ac_id": "AC-003",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    },
+    {
+      "id": "TC-PORTABLE-004",
+      "ac_id": "AC-004",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    },
+    {
+      "id": "TC-PORTABLE-005",
+      "ac_id": "AC-005",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    },
+    {
+      "id": "TC-PORTABLE-006",
+      "ac_id": "AC-006",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryGuard$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryGuard\"]}"
+  },
+  "fingerprint": "68ff219ac23dec269c25917a3a2b4e23720f104ba9b29471b9c313863d59493a",
+  "fingerprint_alg": "tree-json-v1"
+}

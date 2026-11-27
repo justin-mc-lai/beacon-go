@@ -17,7 +17,7 @@
       "id": "TC-PORTABLE-001",
       "ac_id": "AC-001",
       "kind": "e2e",
-      "ref": "e2e/portableacceptance/portable_acceptance_test.go",
+      "ref": "TestPortableVersionManifestAlignment → e2e/portableacceptance/portable_acceptance_test.go",
       "status": "existing"
     }
   ],
@@ -32,6 +32,6 @@
     "artifact_hash": "fcb02276001d57e504e9b11f62de175f648761e6ce97658a38e685cca4bdee6b",
     "at": "2026-11-27T07:43:10.918181Z"
   },
-  "fingerprint": "bd5af8f3a96b9764506e130b438e74ae93a7c59405b25006d7d809b96c328a8f",
+  "fingerprint": "0b1470b419b7a9aa753190a6d8c79099d4742cb83efcd6ac2e1d805c5a7a12dd",
   "fingerprint_alg": "tree-json-v1"
 }

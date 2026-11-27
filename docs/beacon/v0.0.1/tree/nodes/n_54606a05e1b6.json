@@ -30,45 +30,45 @@
   ],
   "test_cases": [
     {
-      "id": "TC-001",
+      "id": "TC-PORTABLE-001",
       "ac_id": "AC-001",
-      "kind": "unit",
-      "ref": "planned TestCaptureTransitionEntrypoints",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-002",
+      "id": "TC-PORTABLE-002",
       "ac_id": "AC-002",
-      "kind": "unit",
-      "ref": "planned TestCaptureReviewAndLedgerRefusals",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-003",
+      "id": "TC-PORTABLE-003",
       "ac_id": "AC-003",
-      "kind": "unit",
-      "ref": "planned TestCaptureRejectedTransitionHasNoSuccessWrites",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-004",
+      "id": "TC-PORTABLE-004",
       "ac_id": "AC-004",
       "kind": "e2e",
-      "ref": "planned strict capture CLI E2E success and refusal chain",
-      "status": "planned"
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-005",
+      "id": "TC-PORTABLE-005",
       "ac_id": "AC-005",
-      "kind": "unit",
-      "ref": "planned TestCaptureLegacyBoundary",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     }
   ],
   "verification": {
     "type": "test",
     "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryGuard$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryGuard\"]}"
   },
-  "fingerprint": "d16a5f250f890c22a2a6030a3fa369bfc0dac92091511822cabe4cc00c266294",
+  "fingerprint": "a720d666a7f0db818b1e1aa9700077929ca15ceaa2c3133ecabe4b12fc20fc03",
   "fingerprint_alg": "tree-json-v1"
 }

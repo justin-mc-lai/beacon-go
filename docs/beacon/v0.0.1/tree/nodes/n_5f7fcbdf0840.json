@@ -7,9 +7,9 @@
   "path": "root/module-orchestration",
   "status": "frozen",
   "child_fingerprints": [
-    "b645c70673ec7cffa3fcbcd70ea4df65d062f453c655111362828b4f2900e845",
-    "0a906d59a8525ffd0ce6569a1085140784980dce07afbea2be4315eccd87bc17"
+    "540dabe677e2802e65412ecee357f32c7a9252e2329177ba6a49d81cb6222a02",
+    "800ecbb9a190497df2e36e404fd24c5620cf8a33805373e3a0d46ef3c4ac7f49"
   ],
-  "fingerprint": "0bc681ae9d778b9a93be99583414be46625b65d8718b863b1294d2e34f73aea9",
+  "fingerprint": "8c356e9b78ee208c4c13c64074e94fc02c659a8b5a3a43554bba2e85732a70b4",
   "fingerprint_alg": "tree-json-v1"
 }

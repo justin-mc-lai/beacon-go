@@ -34,52 +34,52 @@
   ],
   "test_cases": [
     {
-      "id": "TC-001",
+      "id": "TC-PORTABLE-001",
       "ac_id": "AC-001",
-      "kind": "unit",
-      "ref": "TestCaptureExplicitRedPair",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-002",
+      "id": "TC-PORTABLE-002",
       "ac_id": "AC-002",
-      "kind": "unit",
-      "ref": "TestCaptureRealProcessAndTestHash",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-003",
+      "id": "TC-PORTABLE-003",
       "ac_id": "AC-003",
-      "kind": "unit",
-      "ref": "TestCaptureConcurrentProcessesUseBarrier",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-004",
+      "id": "TC-PORTABLE-004",
       "ac_id": "AC-004",
-      "kind": "unit",
-      "ref": "TestCaptureRejectsPublicRefreshOfReservedResult",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-005",
+      "id": "TC-PORTABLE-005",
       "ac_id": "AC-005",
-      "kind": "unit",
-      "ref": "TestCaptureMakerVerifyHasNoRegistrationSideEffect",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     },
     {
-      "id": "TC-006",
+      "id": "TC-PORTABLE-006",
       "ac_id": "AC-006",
-      "kind": "unit",
-      "ref": "TestCaptureHistoricalReplayRedGreen",
-      "status": "planned"
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
     }
   ],
   "verification": {
     "type": "test",
     "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryGuard$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryGuard\"]}"
   },
-  "fingerprint": "a9885859f49f7751e324d09b631ecd5f23bedeb9a6cb5c2489ef929af2ff32d2",
+  "fingerprint": "68ff219ac23dec269c25917a3a2b4e23720f104ba9b29471b9c313863d59493a",
   "fingerprint_alg": "tree-json-v1"
 }

@@ -1,0 +1,52 @@
+{
+  "id": "n_a3b9d2c7f296",
+  "kind": "touchpoint",
+  "title": "external ledger",
+  "intent": "任务定义和执行事实外部化，逐项核销且不产生双账本。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/external-ledger",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "tasks.md/DAG 是任务定义，已有运行回执是执行事实；展示清单声明派生来源，不创建独立权威 progress 账本。"
+    },
+    {
+      "id": "AC-002",
+      "text": "当前合同的必需集合决定核销范围；空集合、漏项、重复/未知 key、pending/failed、缺证据或候选过期均阻塞。"
+    },
+    {
+      "id": "AC-003",
+      "text": "恢复先读取显式作用域账本与候选；通过运行入口记录任务结果，手动勾选不等于通过；未核销可报告进度但不可宣称全部完成。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    },
+    {
+      "id": "TC-PORTABLE-002",
+      "ac_id": "AC-002",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    },
+    {
+      "id": "TC-PORTABLE-003",
+      "ac_id": "AC-003",
+      "kind": "e2e",
+      "ref": "TestPortableStrictDeliveryGuard → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryGuard$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryGuard\"]}"
+  },
+  "fingerprint": "96c42b50a32133d81cdf2355a4eab6c35b3728a17d6bae2aa236233518e2ea06",
+  "fingerprint_alg": "tree-json-v1"
+}

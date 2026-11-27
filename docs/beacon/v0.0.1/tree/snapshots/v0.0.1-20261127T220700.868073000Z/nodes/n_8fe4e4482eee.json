@@ -1,0 +1,43 @@
+{
+  "id": "n_8fe4e4482eee",
+  "kind": "touchpoint",
+  "title": "cross module parallel",
+  "intent": "不同 module 自动分配 worktree 并行",
+  "parent_id": "n_030e377c5621",
+  "path": "root/module-orchestration/module-scheduler/cross-module-parallel",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "parallel_plan mode=pool 且 satellites 数=module 数"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-PORTABLE-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "TestPortableParallelPlan → e2e/portableacceptance/portable_acceptance_test.go",
+      "status": "existing"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableParallelPlan$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableParallelPlan\"]}"
+  },
+  "implementation": {
+    "by": "implement-host",
+    "outcome": "done",
+    "artifact_path": ".beacon/artifacts/priority3/module-scheduler-evidence.txt",
+    "artifact_hash": "5ea33fb8007909d57926bb381a473233b3853d34064918e52f21467ed02630dd",
+    "at": "2026-11-27T07:10:23.910343Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_9ed115f10c764190ea30d52b",
+    "content_hash": "716f5fb68185fad71b639bd20a411dd24d9bc92f89565fd399099d1df412e4c4",
+    "by": "qa-independent",
+    "at": "2026-11-27T08:42:36.716856Z"
+  },
+  "fingerprint": "6c18e5beec28585de360c9cd64112a96942f31c21436e227f18d584f6f27d3c2",
+  "fingerprint_alg": "tree-json-v1"
+}
