@@ -1,6 +1,7 @@
 package orchestrator
 
 import (
+	"database/sql"
 	"errors"
 	"os"
 	"path/filepath"
@@ -60,9 +61,23 @@ func (e *Engine) ensureTreeFeature(projectRoot, version, slug string) (store.Fea
 	if slug == "" {
 		return store.FeatureContext{}, false, nil
 	}
+	ctx, err := e.ensureDerivedFeature(proj, ver, slug, chosen.ID, body)
+	if err != nil {
+		return store.FeatureContext{}, false, err
+	}
+	return ctx, true, nil
+}
+
+// ensureDerivedFeature is the single materialization entry for a
+// tree-derived feature package. Callers decide which tree node owns the
+// slug; this helper owns the file and store writes, so a re-run never
+// overwrites an existing derived truth/tests body.
+func (e *Engine) ensureDerivedFeature(proj store.Project, ver store.ProjectVersion, slug, nodeID string, body intenttree.Node) (store.FeatureContext, error) {
 	// A package row may already exist; re-resolve it first.
-	if ctx, rerr := e.store.ResolveFeature(proj.RootPath, slug, ver.Version); rerr == nil {
-		return ctx, true, nil
+	if ctx, err := e.store.ResolveFeature(proj.RootPath, slug, ver.Version); err == nil {
+		return ctx, nil
+	} else if !errors.Is(err, sql.ErrNoRows) {
+		return store.FeatureContext{}, err
 	}
 	pkgDir := filepath.Join(ver.DocsRoot, "features", slug)
 	truthRel := filepath.ToSlash(filepath.Join(pkgDir, "truth.md"))
@@ -71,18 +86,22 @@ func (e *Engine) ensureTreeFeature(projectRoot, version, slug string) (store.Fea
 	testsAbs := filepath.Join(proj.RootPath, filepath.FromSlash(testsRel))
 	if _, statErr := os.Stat(truthAbs); errors.Is(statErr, os.ErrNotExist) {
 		if err := os.MkdirAll(filepath.Dir(truthAbs), 0o755); err != nil {
-			return store.FeatureContext{}, false, err
+			return store.FeatureContext{}, err
 		}
 		front := "---\nslug: " + slug + "\nversion: " + ver.Version +
-			"\nstatus: frozen\nsource: tree\ntree_node_id: " + chosen.ID +
+			"\nstatus: frozen\nsource: tree\ntree_node_id: " + nodeID +
 			"\nparser_contract: beacon-feature-package-v2\ntruth_source_model: tree_derived\n---\n"
 		if err := os.WriteFile(truthAbs, []byte(front+intenttree.GenerateDoc(body)), 0o644); err != nil {
-			return store.FeatureContext{}, false, err
+			return store.FeatureContext{}, err
 		}
 	}
 	if _, statErr := os.Stat(testsAbs); errors.Is(statErr, os.ErrNotExist) {
-		_ = os.MkdirAll(filepath.Dir(testsAbs), 0o755)
-		_ = os.WriteFile(testsAbs, []byte("# Tests (tree-derived)\n\n| AC | TC | Kind | Selector | Assertion |\n|---|---|---|---|---|\n"), 0o644)
+		if err := os.MkdirAll(filepath.Dir(testsAbs), 0o755); err != nil {
+			return store.FeatureContext{}, err
+		}
+		if err := os.WriteFile(testsAbs, []byte("# Tests (tree-derived)\n\n| AC | TC | Kind | Selector | Assertion |\n|---|---|---|---|---|\n"), 0o644); err != nil {
+			return store.FeatureContext{}, err
+		}
 	}
 	pkg, err := e.store.Features().CreatePackage(store.FeaturePackage{
 		ProjectVersionID: ver.ID, Slug: slug, TruthPath: truthRel, TestsPath: testsRel, Status: "derived",
@@ -90,11 +109,11 @@ func (e *Engine) ensureTreeFeature(projectRoot, version, slug string) (store.Fea
 	if err != nil {
 		// A concurrent creator may have won; resolve it.
 		if ctx, rerr := e.store.ResolveFeature(proj.RootPath, slug, ver.Version); rerr == nil {
-			return ctx, true, nil
+			return ctx, nil
 		}
-		return store.FeatureContext{}, false, err
+		return store.FeatureContext{}, err
 	}
-	return store.FeatureContext{Project: proj, Version: ver, Feature: pkg}, true, nil
+	return store.FeatureContext{Project: proj, Version: ver, Feature: pkg}, nil
 }
 
 func pickVersion(vers []store.ProjectVersion, want string) (store.ProjectVersion, bool) {

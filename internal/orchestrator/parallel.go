@@ -125,16 +125,24 @@ func appendUniqueStr(list []string, s string) []string {
 	return append(list, s)
 }
 
+// isSatellitePoolMode is the one predicate for the two pool modes:
+// main-star/satellite and the module scheduler's per-module pool.
+func isSatellitePoolMode(mode string) bool {
+	return mode == ParallelPool || mode == ModulePoolMode
+}
+
 // expectedWorktree is the worktree ref admission expects this run to
-// be bound to, derived from the run's parallel plan: the satellite
-// worktree of the run's own lake in pool mode, the main star (".")
-// otherwise — including when no plan exists (single_worktree default,
-// the project root itself).
+// be bound to. It is the satellite worktree of the run's own module
+// in pool mode, or the main star (".") otherwise — including when no
+// plan exists (single_worktree default, the project root itself).
 func expectedWorktree(m *runMeta, featureSlug string) string {
-	if m.ParallelPlan == nil || m.ParallelPlan.Mode != ParallelPool {
+	if m.ParallelPlan == nil || !isSatellitePoolMode(m.ParallelPlan.Mode) {
 		return "."
 	}
 	for _, s := range m.ParallelPlan.Satellites {
+		if m.ModuleRun != nil && s.Lake == m.ModuleRun.ModuleSlug {
+			return s.Worktree
+		}
 		if s.Lake == featureSlug {
 			return s.Worktree
 		}

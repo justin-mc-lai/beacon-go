@@ -149,6 +149,9 @@ func (e *Engine) ProgramComplete(hostRunID, confirmedBy string) (ProgramDriveVie
 	}); err != nil {
 		return ProgramDriveView{}, err
 	}
+	if err := e.releaseModuleSuccessor(run.ID); err != nil {
+		return ProgramDriveView{}, err
+	}
 	fresh, ferr := e.ProgramRoute(hostRunID)
 	if ferr != nil {
 		return ProgramDriveView{}, ferr

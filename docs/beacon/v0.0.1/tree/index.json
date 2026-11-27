@@ -116,40 +116,40 @@
       "id": "n_030e377c5621",
       "parent_id": "n_5f7fcbdf0840",
       "kind": "feature",
-      "status": "frozen",
+      "status": "verified",
       "title": "module scheduler",
       "path": "root/module-orchestration/module-scheduler",
-      "fingerprint": "025a531de36454a010ef2d5be2db86eabd4895c23f3841b83712afa50aeef642",
+      "fingerprint": "2bff1ec7099538ff178cf06ebdc4f4b7df583100f01223d2278605177da1fbb5",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_8fe4e4482eee",
       "parent_id": "n_030e377c5621",
       "kind": "touchpoint",
-      "status": "frozen",
+      "status": "verified",
       "title": "cross module parallel",
       "path": "root/module-orchestration/module-scheduler/cross-module-parallel",
-      "fingerprint": "97cf798687359a730f67e19467b7c20e49ba1829bcfe0d3ade24753233a678ae",
+      "fingerprint": "4fae4d7900d4519db3e1960a8bb41a33abc6b40f321f6e241d14e1964c6ab05a",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_5d6dde8f4e1a",
       "parent_id": "n_030e377c5621",
       "kind": "touchpoint",
-      "status": "frozen",
+      "status": "verified",
       "title": "intra module order",
       "path": "root/module-orchestration/module-scheduler/intra-module-order",
-      "fingerprint": "8d56c49bbe8e19e920d416e709d3e3cbc2123562a7e468c03eebbf99829280e5",
+      "fingerprint": "fa923f41c8870fc223243b74b78582b5d8cf608d0e8e335ff91f7b8bc7181dac",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_adda25ea8f26",
       "parent_id": "n_030e377c5621",
       "kind": "touchpoint",
-      "status": "frozen",
+      "status": "verified",
       "title": "module run cmd",
       "path": "root/module-orchestration/module-scheduler/module-run-cmd",
-      "fingerprint": "e47780631709e7b35e39f21fb9ab0de31322b6c5d5cfa8ba503e83cf827d22b9",
+      "fingerprint": "022f4ba223d0fffd61c87f4fd98bc50d8c94048ef1a4097ad2dfcaffd2c4c315",
       "fingerprint_alg": "tree-json-v1"
     },
     {

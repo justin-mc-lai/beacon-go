@@ -164,8 +164,9 @@ type RunView struct {
 	FromQueueItem   string           `json:"from_queue_item,omitempty"`
 	// P2c delegation-and-parallel surfaces (present only when the
 	// corresponding state exists on the run).
-	Implement     *ImplementView `json:"implement,omitempty"`
-	ParallelPlan  *ParallelPlan  `json:"parallel_plan,omitempty"`
+	Implement    *ImplementView `json:"implement,omitempty"`
+	ParallelPlan *ParallelPlan  `json:"parallel_plan,omitempty"`
+	ModuleRun    *ModuleRunInfo `json:"module_run,omitempty"`
 	// P2d orchestration-extension surfaces (present only when the
 	// corresponding state exists on the run).
 	Program      *ProgramState     `json:"program,omitempty"`
@@ -289,7 +290,8 @@ func viewOf(run store.Run, m *runMeta, slug string) RunView {
 		Todos: m.todoSummary(), PendingSteering: m.pendingSteering(),
 		FromQueueItem: m.FromQueueItem,
 		ParallelPlan:  m.ParallelPlan,
-		Program: m.Program, Hotfix: m.Hotfix,
+		ModuleRun:     m.ModuleRun,
+		Program:       m.Program, Hotfix: m.Hotfix,
 		MultiVersion: m.MultiVersion, MainAxis: m.MainAxis,
 		Topology: m.Topology,
 		Review:   m.ReviewDecision, HumanStops: m.HumanStops,
@@ -423,7 +425,7 @@ type CreateRunOptions struct {
 	FeatureSlug string
 	Utterance   string
 
-	ExecutorID  string
+	ExecutorID string
 	// ExecutorMode is the explicit executor selector (manual |
 	// external | recording | subprocess | subprocess:<profile> |
 	// ralph). Validated at creation; an unknown value is refused
@@ -493,7 +495,7 @@ func (e *Engine) CreateRun(opts CreateRunOptions) (RunView, error) {
 	}
 	stages := BuildStageOrder()
 	m := &runMeta{
-		Utterance:         opts.Utterance,
+		Utterance: opts.Utterance,
 
 		CurrentStageIdx:   0,
 		ExecutorID:        opts.ExecutorID,

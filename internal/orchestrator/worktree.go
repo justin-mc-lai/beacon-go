@@ -61,8 +61,9 @@ type WorktreeView struct {
 	Records     []WorktreeRecord `json:"records"`
 	// Quarantines: S1 (AC-140) stale-truth isolations recorded
 	// against this run's worktrees.
-	Quarantines []TruthQuarantine `json:"quarantines"`
-	Note        string            `json:"note,omitempty"`
+	Quarantines  []TruthQuarantine `json:"quarantines"`
+	ParallelPlan *ParallelPlan     `json:"parallel_plan,omitempty"`
+	Note         string            `json:"note,omitempty"`
 }
 
 // worktreeBook returns the run's worktree state (creating the shell).
@@ -92,7 +93,8 @@ func (e *Engine) worktreeView(run store.Run, m *runMeta, root, note string) Work
 	}
 	return WorktreeView{
 		RunID: run.ID, ProjectRoot: root, PlanMode: planMode,
-		MainBranch: book.MainBranch, Records: records, Quarantines: quarantines, Note: note,
+		MainBranch: book.MainBranch, Records: records, Quarantines: quarantines,
+		ParallelPlan: m.ParallelPlan, Note: note,
 	}
 }
 
@@ -176,7 +178,7 @@ func (e *Engine) WorktreeCreate(ctx context.Context, runID string, opts Worktree
 	}
 
 	// Pool mode: a main-star/satellite plan is required.
-	if m.ParallelPlan == nil || m.ParallelPlan.Mode != ParallelPool {
+	if m.ParallelPlan == nil || !isSatellitePoolMode(m.ParallelPlan.Mode) {
 		return WorktreeView{}, core.NewError(core.ReasonWorktreePlanRequired, "goal.WorktreeCreate",
 			"satellite worktrees need a parallel plan in "+ParallelPool+" mode; run goal parallel-plan first")
 	}

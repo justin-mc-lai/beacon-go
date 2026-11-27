@@ -319,5 +319,8 @@ func (e *Engine) Complete(runID string, opts CompleteOptions) (RunView, error) {
 	}); err != nil {
 		return RunView{}, err
 	}
+	if err := e.releaseModuleSuccessor(run.ID); err != nil {
+		return RunView{}, err
+	}
 	return viewOf(run, m, slug), nil
 }

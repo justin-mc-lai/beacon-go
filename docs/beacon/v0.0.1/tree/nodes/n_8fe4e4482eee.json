@@ -5,7 +5,7 @@
   "intent": "不同 module 自动分配 worktree 并行",
   "parent_id": "n_030e377c5621",
   "path": "root/module-orchestration/module-scheduler/cross-module-parallel",
-  "status": "frozen",
+  "status": "verified",
   "acs": [
     {
       "id": "AC-001",
@@ -16,6 +16,19 @@
     "type": "test",
     "spec": "【待实现】验收命令 beacon goal worktree status 尚未落地；目标态：parallel_plan mode=pool，satellites 数=module 数"
   },
-  "fingerprint": "97cf798687359a730f67e19467b7c20e49ba1829bcfe0d3ade24753233a678ae",
+  "implementation": {
+    "by": "implement-host",
+    "outcome": "done",
+    "artifact_path": ".beacon/artifacts/priority3/module-scheduler-evidence.txt",
+    "artifact_hash": "5ea33fb8007909d57926bb381a473233b3853d34064918e52f21467ed02630dd",
+    "at": "2026-11-27T07:10:23.910343Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_ad0fe158ded0ce9bba1dc85b",
+    "content_hash": "5ea33fb8007909d57926bb381a473233b3853d34064918e52f21467ed02630dd",
+    "by": "qa-independent",
+    "at": "2026-11-27T07:10:23.964474Z"
+  },
+  "fingerprint": "4fae4d7900d4519db3e1960a8bb41a33abc6b40f321f6e241d14e1964c6ab05a",
   "fingerprint_alg": "tree-json-v1"
 }

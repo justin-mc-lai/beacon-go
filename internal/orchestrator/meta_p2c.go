@@ -261,6 +261,7 @@ type ParallelPlan struct {
 const (
 	ParallelSingle = "single_worktree"
 	ParallelPool   = "main_star_satellite_pool"
+	ModulePoolMode = "pool"
 )
 
 // ---- Implement admission (G-04) ----

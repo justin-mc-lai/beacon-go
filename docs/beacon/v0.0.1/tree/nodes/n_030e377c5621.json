@@ -6,7 +6,7 @@
   "doc": "## 问题\n意图树 module 节点目前不能展开为多个 feature run，也没有「同 module 内按声明顺序串行、跨 module 分配 worktree 并行」的调度逻辑；现有 internal/orchestrator/worktree.go 只提供 satellite pool 原语（ParallelPlan.Mode / Satellites、worktree create/status 等），不决定 run 的展开与顺序。结果是多 feature module 只能人工逐个启动，跨 module 并行靠手工分配 worktree。\n\n## 目标用户\n从一个 module 节点批量派生多个 feature run 的工作流作者，以及需要通过 worktree 状态视图确认跨 module 并行与同 module 串行顺序的调试者。\n\n## 场景\n意图树里有两个 module，每个 module 下各有若干 feature。操作者运行 module run 得到 N 个 run id，每个 run 的 FeatureID 都归属对应 module；跨 module 的 run 由 pool 模式自动分配各自 worktree 并行，同 module 内第二个 feature 的 run 在第一个 run 的 stage done 之前保持 pending。\n\n## 范围\n本 feature 冻结「从 module 节点展开多个 feature run，同 module 内按序、跨 module 分配 worktree 并行」这一需求边界。现有落点是 internal/orchestrator/worktree.go 的 satellite pool 原语（ParallelPlan.Mode=pool、Satellites、worktree 创建与 status 视图）。module run 展开命令、同 module 串行顺序控制、parallel_plan 的 mode/satellites 与 module 数自动对应，当前未实现，本包冻结的是需求定义，不是实现状态。\n\n## 非目标\n不定义 module 启动前的统一准入检查与 blocked 判定（由兄弟 feature module-admission 冻结），也不改动 git worktree 与分支合并本身的实现细节。\n\n## 验收标准\n`beacon goal worktree status --run-id \u003cid\u003e --json` 应显示 parallel_plan mode=pool 且 satellites 数等于 module 数；`beacon goal status --run-id \u003cid2\u003e` 在第一个 run 的 stage done 之前应显示该 run blocked=false 且 current_stage=plan，即尚未越序执行。module 展开的验收命令为 `beacon goal module run --node \u003cmodule-id\u003e --json | jq -e 'length \u003e 0'`，该命令当前尚不存在，属待实现能力；就位后应输出 N 个 run id 且每个 run 的 FeatureID 属于该 module。",
   "parent_id": "n_5f7fcbdf0840",
   "path": "root/module-orchestration/module-scheduler",
-  "status": "frozen",
+  "status": "verified",
   "domain_fsm": {
     "states": [
       "draft",
@@ -56,10 +56,10 @@
     ]
   },
   "child_fingerprints": [
-    "97cf798687359a730f67e19467b7c20e49ba1829bcfe0d3ade24753233a678ae",
-    "8d56c49bbe8e19e920d416e709d3e3cbc2123562a7e468c03eebbf99829280e5",
-    "e47780631709e7b35e39f21fb9ab0de31322b6c5d5cfa8ba503e83cf827d22b9"
+    "4fae4d7900d4519db3e1960a8bb41a33abc6b40f321f6e241d14e1964c6ab05a",
+    "fa923f41c8870fc223243b74b78582b5d8cf608d0e8e335ff91f7b8bc7181dac",
+    "022f4ba223d0fffd61c87f4fd98bc50d8c94048ef1a4097ad2dfcaffd2c4c315"
   ],
-  "fingerprint": "025a531de36454a010ef2d5be2db86eabd4895c23f3841b83712afa50aeef642",
+  "fingerprint": "2bff1ec7099538ff178cf06ebdc4f4b7df583100f01223d2278605177da1fbb5",
   "fingerprint_alg": "tree-json-v1"
 }

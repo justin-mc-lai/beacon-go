@@ -98,7 +98,7 @@ type VerifierInfo struct {
 
 // runMeta is the goal snapshot persisted in runs.metadata_json.
 type runMeta struct {
-	Utterance       string           `json:"utterance,omitempty"`
+	Utterance string `json:"utterance,omitempty"`
 
 	LoopStage       string           `json:"loop_stage"`
 	StageHistory    []string         `json:"stage_history,omitempty"`
@@ -170,6 +170,7 @@ type runMeta struct {
 	TaskScale    string          `json:"task_scale,omitempty"`
 	Implement    *ImplementState `json:"implement,omitempty"`
 	ParallelPlan *ParallelPlan   `json:"parallel_plan,omitempty"`
+	ModuleRun    *ModuleRunInfo  `json:"module_run,omitempty"`
 	// P2d orchestration-extension fields (program / hotfix /
 	// multi-version / memory / axis). Same rule: runs.metadata_json
 	// is the only snapshot; no side files, no extra tables.
@@ -207,6 +208,18 @@ type runMeta struct {
 	Spend              *core.SpendLedger      `json:"spend_ledger,omitempty"`
 	AutoDecide         *bool                  `json:"auto_decide,omitempty"`
 	HumanGateOverrides []string               `json:"human_gate_overrides,omitempty"`
+}
+
+// ModuleRunInfo records one run's place in a module expansion. `pending`
+// runs stay at the plan stage until their predecessor leaves it; this is
+// scheduling state, not a goal blocker.
+type ModuleRunInfo struct {
+	ModuleNodeID     string `json:"module_node_id"`
+	ModuleSlug       string `json:"module_slug,omitempty"`
+	FeatureNodeID    string `json:"feature_node_id"`
+	Position         int    `json:"position"`
+	State            string `json:"state"`
+	PredecessorRunID string `json:"predecessor_run_id,omitempty"`
 }
 
 // pendingSteering returns the newest unacknowledged steering record,

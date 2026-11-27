@@ -1,0 +1,10 @@
+{
+  "artifact": ".beacon/artifacts/priority3/module-run-cmd-evidence.txt",
+  "artifact_hash": "1c90d8610a85b1a2107ab06773dca51f5d56d920549f2e5cf2289b0e23c89609",
+  "at": "2026-11-27T07:10:23.899621Z",
+  "by": "implement-host",
+  "node_id": "n_adda25ea8f26",
+  "outcome": "done",
+  "reason_code": "",
+  "type": "implementation_done"
+}

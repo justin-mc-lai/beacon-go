@@ -129,6 +129,9 @@ func (e *Engine) LegacyClose(runID string, opts LegacyCloseOptions) (RunView, er
 	}); err != nil {
 		return RunView{}, err
 	}
+	if err := e.releaseModuleSuccessor(run.ID); err != nil {
+		return RunView{}, err
+	}
 	return viewOf(run, m, slug), nil
 }
 

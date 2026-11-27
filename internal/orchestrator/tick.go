@@ -91,6 +91,12 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 	if err != nil {
 		return RunView{}, err
 	}
+	if m.ModuleRun != nil && m.ModuleRun.State == ModuleRunStatePending {
+		v := viewOf(run, m, slug)
+		v.UpToDate = true
+		v.ReasonCode = core.ReasonModuleRunPending
+		return v, nil
+	}
 	if m.LoopStage == string(core.LoopDone) {
 		v := viewOf(run, m, slug)
 		v.UpToDate = true
@@ -306,6 +312,9 @@ func (e *Engine) TickBy(ctx context.Context, runID, by string) (RunView, error) 
 		}
 		return e.saveRunOn(tx, run, m)
 	}); err != nil {
+		return RunView{}, err
+	}
+	if err := e.releaseModuleSuccessor(run.ID); err != nil {
 		return RunView{}, err
 	}
 	return viewOf(run, m, slug), nil

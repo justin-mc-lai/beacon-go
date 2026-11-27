@@ -49,6 +49,8 @@ func newGoalCmd() *cobra.Command {
 		// (G-04), delegate-ralph + receive-result (G-10),
 		// parallel-plan (G-11).
 		newGoalImplementCmd(), newGoalAdmitCmd(),
+		// module-scheduler: one module node to ordered feature runs.
+		newGoalModuleCmd(),
 		newGoalReceiveResultCmd(),
 		// P2d orchestration extensions: program (G-12), hotfix-plan
 		// (G-13), multi-version-plan (G-14), memory (G-15),
@@ -81,7 +83,7 @@ func newGoalCmd() *cobra.Command {
 		// command.
 		newGoalReleaseShadowCmd(),
 	)
-	hideAllBut(c, "run", "status", "tick", "block", "recover", "attach-verifier", "complete", "resume")
+	hideAllBut(c, "run", "status", "tick", "block", "recover", "attach-verifier", "complete", "resume", "module")
 	return c
 }
 
