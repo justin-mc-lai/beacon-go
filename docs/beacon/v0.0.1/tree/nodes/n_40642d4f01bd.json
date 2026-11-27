@@ -5,7 +5,7 @@
   "intent": "发布前 manifest.Runtime 等于 beacon --version",
   "parent_id": "n_26809ef014ec",
   "path": "root/version-evolution/dual-axis-alignment/manifest-runtime-match",
-  "status": "implemented",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -14,7 +14,7 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "【待实现】docs/beacon/v0.0.1/manifest.json 当前不存在；目标态：manifest.Runtime 与 beacon-go 版本对齐写入。对齐写入逻辑属 dual-axis-alignment 待实现能力"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableVersionManifestAlignment$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableVersionManifestAlignment\"]}"
   },
   "implementation": {
     "by": "ImplVersionManifest",
@@ -23,6 +23,6 @@
     "artifact_hash": "fcb02276001d57e504e9b11f62de175f648761e6ce97658a38e685cca4bdee6b",
     "at": "2026-11-27T07:43:10.918181Z"
   },
-  "fingerprint": "a07961c526b5ce6ca47cb576d78a65373eac4f1026abccbca733899959b8d2dd",
+  "fingerprint": "dbcab3b4650f5114ee59241bbee3409b571467ddbdf1991546214ef03039b50a",
   "fingerprint_alg": "tree-json-v1"
 }

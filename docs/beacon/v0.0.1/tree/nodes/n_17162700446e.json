@@ -5,7 +5,7 @@
   "intent": "节点面板展示 gate 结果与 reason code",
   "parent_id": "n_5a4abb5210d0",
   "path": "root/tree-visual/gate-verdict-panel/gate-panel",
-  "status": "verified",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -14,7 +14,7 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "【目标态，当前不可执行】go test ./internal/intenttree -run TestRenderHTML -count=1 通过，且渲染源码含 gate 判定区与 reason code 文本标记；当前 render_html.go 无 verdict panel，grep 输出 HTML 中的 gate-panel 属 spec 文本自证，不作为通过依据"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableTreeHTMLPanels$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableTreeHTMLPanels\"]}"
   },
   "implementation": {
     "by": "implement-host",
@@ -29,6 +29,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:37.257204Z"
   },
-  "fingerprint": "487aaeaf1effb675969567c3897f91b064543b5142690dc53c6a37391e5ef88b",
+  "fingerprint": "caef1403fccd7bc4ec17d7843e4b24f673b107f92678c1a4c9d5c7dae1320aa0",
   "fingerprint_alg": "tree-json-v1"
 }

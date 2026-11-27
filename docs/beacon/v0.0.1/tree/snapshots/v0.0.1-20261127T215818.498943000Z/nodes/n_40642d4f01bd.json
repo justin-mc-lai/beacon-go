@@ -1,0 +1,28 @@
+{
+  "id": "n_40642d4f01bd",
+  "kind": "touchpoint",
+  "title": "manifest runtime match",
+  "intent": "发布前 manifest.Runtime 等于 beacon --version",
+  "parent_id": "n_26809ef014ec",
+  "path": "root/version-evolution/dual-axis-alignment/manifest-runtime-match",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "manifest.runtime 与二进制版本一致"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableVersionManifestAlignment$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableVersionManifestAlignment\"]}"
+  },
+  "implementation": {
+    "by": "ImplVersionManifest",
+    "outcome": "done",
+    "artifact_path": ".beacon/artifacts/parallel/manifest-runtime-evidence.txt",
+    "artifact_hash": "fcb02276001d57e504e9b11f62de175f648761e6ce97658a38e685cca4bdee6b",
+    "at": "2026-11-27T07:43:10.918181Z"
+  },
+  "fingerprint": "dbcab3b4650f5114ee59241bbee3409b571467ddbdf1991546214ef03039b50a",
+  "fingerprint_alg": "tree-json-v1"
+}

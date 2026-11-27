@@ -5,7 +5,7 @@
   "intent": "任一子 feature admission blocked 则 module 不启动",
   "parent_id": "n_f6f625e5f61b",
   "path": "root/module-orchestration/module-admission/module-admission-gate",
-  "status": "verified",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -14,7 +14,7 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "【待实现】验收命令 beacon goal module run 尚未落地（goal 无 module 子命令）；目标态：module 入口统一 admission，任一子 feature blocked 则退出非零 reason=freeze_ack_required"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableModuleAdmission$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableModuleAdmission\"]}"
   },
   "implementation": {
     "by": "ImplModuleAdmission",
@@ -29,6 +29,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:36.54872Z"
   },
-  "fingerprint": "177dc8c090b592bd9ce222c3cc754b26f80a12bfbaa9ee45495a807eb11d937a",
+  "fingerprint": "0ced5418874f35980ddeeea7f4165da553866d8ddb4d9a4768f346fd4cd8d29e",
   "fingerprint_alg": "tree-json-v1"
 }

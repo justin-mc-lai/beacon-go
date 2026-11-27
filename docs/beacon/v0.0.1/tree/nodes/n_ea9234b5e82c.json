@@ -45,8 +45,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./skills\",\"-run\",\"^TestStrictDelivery\"],\"test_files\":[\"skills/contract_test.go\",\"skills/hosts_test.go\",\"skills/router_test.go\",\"skills/skills_test.go\",\"skills/strict_delivery_test.go\",\"skills/verify_test.go\",\"skills/version_flow_test.go\"],\"required_tests\":[\"TestStrictDeliveryReferencesSurviveInstall\",\"TestStrictDeliverySixControls\"]}"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryContract$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryContract\"]}"
   },
-  "fingerprint": "0496aa2272bf7c03926b8aa62cf195b862d769045e9b6874249cf483a31f82d8",
+  "fingerprint": "71e9495dbcff6408d8a444d47e813f9c9b87df9fcf547d611d3f4585eae35143",
   "fingerprint_alg": "tree-json-v1"
 }

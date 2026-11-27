@@ -5,16 +5,16 @@
   "intent": "点击 TestCase 行完成 AC 绑定并写回树",
   "parent_id": "n_39e50c0e0da2",
   "path": "root/tree-visual/interactive-acceptance-binding/tc-bind-click",
-  "status": "implemented",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
-      "text": "渲染 HTML 存在 data-bind-ac 属性，点击后写回绑定"
+      "text": "渲染 HTML 含 data-bind-ac/data-bind-testcase 绑定属性和写回表单字段；HTTP 绑定入口能够将 TestCase 写回指定 AC 并更新 canonical 指纹。"
     }
   ],
   "verification": {
     "type": "test",
-    "spec": "【目标态，当前不可执行】go test ./internal/intenttree -run TestRenderHTML -count=1 通过，且渲染器含 AC↔TestCase 绑定标记；当前 render_html.go 无交互绑定，grep data-bind-ac 命中 spec 文本属自证，不作通过依据"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableTreeHTMLPanels$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableTreeHTMLPanels\"]}"
   },
   "implementation": {
     "by": "ImplInteractiveBinding",
@@ -23,6 +23,6 @@
     "artifact_hash": "bd4e9ff4e6b077aff3b176613c612fb8b545c7a9646ddf618b2abca983211e1d",
     "at": "2026-11-27T07:43:10.904606Z"
   },
-  "fingerprint": "4bc39c4db152186e3d7f5c733ea3c1898bfa789657fc353bb2152de1b3fb981b",
+  "fingerprint": "37fba3df4fdf7180c789c4696f97d94af54531b5ad26c64a16e0a48ef4a585b4",
   "fingerprint_alg": "tree-json-v1"
 }

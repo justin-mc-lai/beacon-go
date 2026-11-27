@@ -1,0 +1,34 @@
+{
+  "id": "n_adda25ea8f26",
+  "kind": "touchpoint",
+  "title": "module run cmd",
+  "intent": "从 module 节点展开子 feature runs",
+  "parent_id": "n_030e377c5621",
+  "path": "root/module-orchestration/module-scheduler/module-run-cmd",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "运行命令输出 N 个 run id 且每个 run 的 FeatureID 属于该 module"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableModuleRun$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableModuleRun\"]}"
+  },
+  "implementation": {
+    "by": "implement-host",
+    "outcome": "done",
+    "artifact_path": ".beacon/artifacts/priority3/module-run-cmd-evidence.txt",
+    "artifact_hash": "1c90d8610a85b1a2107ab06773dca51f5d56d920549f2e5cf2289b0e23c89609",
+    "at": "2026-11-27T07:10:23.899621Z"
+  },
+  "verification_evidence": {
+    "artifact_id": "art_e74afa35b378327a3d746468",
+    "content_hash": "004e7214807d6e38701b9fcb6762c60fc1f1369ce96ff4884aad8b9e1ac01571",
+    "by": "qa-independent",
+    "at": "2026-11-27T08:42:37.092193Z"
+  },
+  "fingerprint": "c9db9677c80b9578701e95c23961c9cd02fbe659cfcf2468acb41ba64cde04ce",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -9,11 +9,11 @@
   "acs": [
     {
       "id": "AC-001",
-      "text": "计划包含完成定义、输入输出、边界、AC、任务依赖及适用检查；确认前只读调查与计划材料允许，产品写入不允许。"
+      "text": "七项 skill 文本合同声明完成定义、输入输出、边界、AC、任务依赖及适用检查，并声明确认前产品写入边界。"
     },
     {
       "id": "AC-002",
-      "text": "每次推进一个原子任务，通常一两个函数；扩大范围先拆解或说明必要跨文件原因；原子任务不授权自动提交。"
+      "text": "七项 skill 文本合同声明一次推进一个原子任务，不自动提交；宿主实际执行纪律不由结构文本测试证明。"
     },
     {
       "id": "AC-003",
@@ -45,8 +45,8 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./skills\",\"-run\",\"^TestStrictDelivery\"],\"test_files\":[\"skills/contract_test.go\",\"skills/hosts_test.go\",\"skills/router_test.go\",\"skills/skills_test.go\",\"skills/strict_delivery_test.go\",\"skills/verify_test.go\",\"skills/version_flow_test.go\"],\"required_tests\":[\"TestStrictDeliveryReferencesSurviveInstall\",\"TestStrictDeliverySixControls\"]}"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryContract$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryContract\"]}"
   },
-  "fingerprint": "5c3607ae9c0b084f5ae7dce14c3d57e8c30ede048361e422ffedf49cf2adee12",
+  "fingerprint": "58c2284116072ef315b80c72304926accfb0c2b71f5fe98f6114889b00172953",
   "fingerprint_alg": "tree-json-v1"
 }

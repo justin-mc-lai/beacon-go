@@ -5,7 +5,7 @@
   "intent": "不同 module 自动分配 worktree 并行",
   "parent_id": "n_030e377c5621",
   "path": "root/module-orchestration/module-scheduler/cross-module-parallel",
-  "status": "verified",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -14,7 +14,7 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "【待实现】验收命令 beacon goal worktree status 尚未落地；目标态：parallel_plan mode=pool，satellites 数=module 数"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableParallelPlan$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableParallelPlan\"]}"
   },
   "implementation": {
     "by": "implement-host",
@@ -29,6 +29,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:36.716856Z"
   },
-  "fingerprint": "9a4adb1a6f9a49389f04f6b5f6d1df3847385a73377fa66312648579ef59b37f",
+  "fingerprint": "94b289465ff10264562b2bff7ff282d0ea16bb3224c324f2f8b651d1d88962db",
   "fingerprint_alg": "tree-json-v1"
 }

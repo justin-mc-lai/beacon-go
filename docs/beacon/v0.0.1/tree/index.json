@@ -9,7 +9,7 @@
       "status": "frozen",
       "title": "需求树驱动的 SDD 产品",
       "path": "root",
-      "fingerprint": "c31817f770cade26ac49e9c71ebeb3dadbd146fad2a1aec2978e776339027b3d",
+      "fingerprint": "02a6200e45a93ec5bf7cce0922a687038c62363d44b0a5bd43e8ed71e9aa10dd",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -19,7 +19,7 @@
       "status": "frozen",
       "title": "acceptance binding",
       "path": "root/acceptance-binding",
-      "fingerprint": "36eecac8c0f6e22c3ddd93420e54dbb25d3216b7e2ec5d0c424efeb9c9486f98",
+      "fingerprint": "6cb0778120fb69c4582bdb4cd48818505a815cdbad96ac0efbafb0b275537415",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -59,7 +59,7 @@
       "status": "frozen",
       "title": "red green capture",
       "path": "root/acceptance-binding/red-green-capture",
-      "fingerprint": "51e527eb20aadb144054100b33b77f902d2884245f4f6cb817066f50dbd3192c",
+      "fingerprint": "a910788243270f9ffc5a802c0d5310397a523ddc68b727bb5fd18b8f17c84f26",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -69,7 +69,7 @@
       "status": "frozen",
       "title": "capture process",
       "path": "root/acceptance-binding/red-green-capture/capture-process",
-      "fingerprint": "acba1b4a0fe6512dce03effad1d8799b0576c567443d64c6bee5ccb177ec35d8",
+      "fingerprint": "5fafa213989fb3359a285b1a5756b5fcaf7209991448b712fe42594202db8ee8",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -79,7 +79,7 @@
       "status": "frozen",
       "title": "pair and register",
       "path": "root/acceptance-binding/red-green-capture/pair-and-register",
-      "fingerprint": "1d15411b3b1e681ec4b03980c15c02ca01ce70c064f2f96387d42f05054c7eb9",
+      "fingerprint": "7c1c9409c1123035ce73277619cbd1c6ef525b4efd874449c3de7eaed64c0c5c",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -89,7 +89,7 @@
       "status": "frozen",
       "title": "transition integration",
       "path": "root/acceptance-binding/red-green-capture/transition-integration",
-      "fingerprint": "e390840651e6840f342dda281e94b2cc27421cadd0070de61faa745788a75ec8",
+      "fingerprint": "7eb7f4624393dab79e5f7b7f670f7133f69feaf7aa130625c4c149f47630d640",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -99,7 +99,7 @@
       "status": "frozen",
       "title": "strict delivery contract",
       "path": "root/acceptance-binding/strict-delivery-contract",
-      "fingerprint": "4096f1097cc407140c98a2557cad5dc8c93d3e9f9d75b4e15b34d5f3f2e8c320",
+      "fingerprint": "5791a384c5512a64d198c105050a3b02e847784a6064658ca0d44db462a77f5a",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -109,7 +109,7 @@
       "status": "frozen",
       "title": "blind review",
       "path": "root/acceptance-binding/strict-delivery-contract/blind-review",
-      "fingerprint": "14d002db76b99e6f32fdd30c78f5d71573d9058ae4db2db67fd95191784d9ca7",
+      "fingerprint": "5ae1844d90eb5431660945f2e7009ce61d6ee80fbf03a1afd857d005abdf756d",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -119,7 +119,7 @@
       "status": "frozen",
       "title": "deterministic tools",
       "path": "root/acceptance-binding/strict-delivery-contract/deterministic-tools",
-      "fingerprint": "0496aa2272bf7c03926b8aa62cf195b862d769045e9b6874249cf483a31f82d8",
+      "fingerprint": "71e9495dbcff6408d8a444d47e813f9c9b87df9fcf547d611d3f4585eae35143",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -129,7 +129,7 @@
       "status": "frozen",
       "title": "evidence gate",
       "path": "root/acceptance-binding/strict-delivery-contract/evidence-gate",
-      "fingerprint": "63a6a3e4843a6ab0d6a03f2c7080a92b43051f0688a5ee0fab7d70ebc1c70213",
+      "fingerprint": "35a5831ef431c3528aceb6d31d9a362d35b3431a9595c3e25e29bca5e3e5bd23",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -139,7 +139,7 @@
       "status": "frozen",
       "title": "external ledger",
       "path": "root/acceptance-binding/strict-delivery-contract/external-ledger",
-      "fingerprint": "eee43ad903e64569a4b6faaad297a5bbffb9b7abdeb8481f57dbcba4ce66c931",
+      "fingerprint": "2bf9d4cda498829e041ba1003ce1c801708d7bc2578dd2ffdf3305acf7b1195a",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -149,7 +149,7 @@
       "status": "frozen",
       "title": "plan first",
       "path": "root/acceptance-binding/strict-delivery-contract/plan-first",
-      "fingerprint": "5c3607ae9c0b084f5ae7dce14c3d57e8c30ede048361e422ffedf49cf2adee12",
+      "fingerprint": "58c2284116072ef315b80c72304926accfb0c2b71f5fe98f6114889b00172953",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -159,7 +159,7 @@
       "status": "frozen",
       "title": "red green",
       "path": "root/acceptance-binding/strict-delivery-contract/red-green",
-      "fingerprint": "96295e585d32f03c44a14c6c820d62e5b57a7a3b871d7085b0caaea4702c3c30",
+      "fingerprint": "85cdf1afa24ed3a179cf93aee0db119dcdbb9ecd2d123bca0a3da2340e96be30",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -196,70 +196,70 @@
       "id": "n_5f7fcbdf0840",
       "parent_id": "nroot_6b8991789867",
       "kind": "module",
-      "status": "verified",
+      "status": "frozen",
       "title": "module orchestration",
       "path": "root/module-orchestration",
-      "fingerprint": "599bdd3002d57bc5f44e7099b02c494ffa780665675d9b4252fc3cf5c78ced04",
+      "fingerprint": "6c1a3c5843e80e63e7668545defa360e31733dd853ece4cb9f0e000d3b842d99",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_f6f625e5f61b",
       "parent_id": "n_5f7fcbdf0840",
       "kind": "feature",
-      "status": "verified",
+      "status": "frozen",
       "title": "module admission",
       "path": "root/module-orchestration/module-admission",
-      "fingerprint": "d17995f953848207275d2047dc530c42f4e916e33a16f3903103025ee0559b52",
+      "fingerprint": "063053965e47f3568b171eea365f8b123b5169561addb3567a612c3e31056784",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_3670106f522e",
       "parent_id": "n_f6f625e5f61b",
       "kind": "touchpoint",
-      "status": "verified",
+      "status": "frozen",
       "title": "module admission gate",
       "path": "root/module-orchestration/module-admission/module-admission-gate",
-      "fingerprint": "177dc8c090b592bd9ce222c3cc754b26f80a12bfbaa9ee45495a807eb11d937a",
+      "fingerprint": "0ced5418874f35980ddeeea7f4165da553866d8ddb4d9a4768f346fd4cd8d29e",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_030e377c5621",
       "parent_id": "n_5f7fcbdf0840",
       "kind": "feature",
-      "status": "verified",
+      "status": "frozen",
       "title": "module scheduler",
       "path": "root/module-orchestration/module-scheduler",
-      "fingerprint": "8a5a3670138670e469c54dc583662005e7dbf7a1247fa16edf51944ca9fa31b8",
+      "fingerprint": "b59407103f754ad7ae361479d94241a911e8b50fafceccd9a5a0ccac128243d7",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_8fe4e4482eee",
       "parent_id": "n_030e377c5621",
       "kind": "touchpoint",
-      "status": "verified",
+      "status": "frozen",
       "title": "cross module parallel",
       "path": "root/module-orchestration/module-scheduler/cross-module-parallel",
-      "fingerprint": "9a4adb1a6f9a49389f04f6b5f6d1df3847385a73377fa66312648579ef59b37f",
+      "fingerprint": "94b289465ff10264562b2bff7ff282d0ea16bb3224c324f2f8b651d1d88962db",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_5d6dde8f4e1a",
       "parent_id": "n_030e377c5621",
       "kind": "touchpoint",
-      "status": "verified",
+      "status": "frozen",
       "title": "intra module order",
       "path": "root/module-orchestration/module-scheduler/intra-module-order",
-      "fingerprint": "ebc8142d5d4b156a3ea922fc5518167618a830eff19003a04ffc38e5d901516e",
+      "fingerprint": "2aebba2b4f5aff0ec43907295182432ac41fd08c92441af2312bb6cc5bff2efa",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_adda25ea8f26",
       "parent_id": "n_030e377c5621",
       "kind": "touchpoint",
-      "status": "verified",
+      "status": "frozen",
       "title": "module run cmd",
       "path": "root/module-orchestration/module-scheduler/module-run-cmd",
-      "fingerprint": "9ce0e288782ef3d19180203ac696254258b51fc33cd9135f35a75a46c795f286",
+      "fingerprint": "c9db9677c80b9578701e95c23961c9cd02fbe659cfcf2468acb41ba64cde04ce",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -349,27 +349,27 @@
       "status": "frozen",
       "title": "tree visual",
       "path": "root/tree-visual",
-      "fingerprint": "96c263ed02d640d26c59ba1f30ed0dcf641eb7d6dd0f3297e1d06f2c4a2dcdab",
+      "fingerprint": "2694d02b0d44dfcec9195ad6dcc091e744bb8132b90b2561f5f41a224e8ebf97",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_5a4abb5210d0",
       "parent_id": "n_47544230bf1e",
       "kind": "feature",
-      "status": "verified",
+      "status": "frozen",
       "title": "gate verdict panel",
       "path": "root/tree-visual/gate-verdict-panel",
-      "fingerprint": "f5a648b9c4d70ef85bfb8d4601c2ecb83cfe685682bd2627824ba5302f5ec9ac",
+      "fingerprint": "c2729434a9bc1fee64ce20ffd44ab0c93ea697d3aba347dcfb5fbf6dfa56d747",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_17162700446e",
       "parent_id": "n_5a4abb5210d0",
       "kind": "touchpoint",
-      "status": "verified",
+      "status": "frozen",
       "title": "gate panel",
       "path": "root/tree-visual/gate-verdict-panel/gate-panel",
-      "fingerprint": "487aaeaf1effb675969567c3897f91b064543b5142690dc53c6a37391e5ef88b",
+      "fingerprint": "caef1403fccd7bc4ec17d7843e4b24f673b107f92678c1a4c9d5c7dae1320aa0",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -379,17 +379,17 @@
       "status": "frozen",
       "title": "interactive acceptance binding",
       "path": "root/tree-visual/interactive-acceptance-binding",
-      "fingerprint": "eac22a1eaa100ab487d3f9dc11be699a3ae775c28af9a995d3c12ef647d8efaf",
+      "fingerprint": "3e9a324effa7cfd5549c38d08d68025535cda1dfaa40361854902beddb7d15b8",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_bd880ecae011",
       "parent_id": "n_39e50c0e0da2",
       "kind": "touchpoint",
-      "status": "implemented",
+      "status": "frozen",
       "title": "testcase bind click",
       "path": "root/tree-visual/interactive-acceptance-binding/tc-bind-click",
-      "fingerprint": "4bc39c4db152186e3d7f5c733ea3c1898bfa789657fc353bb2152de1b3fb981b",
+      "fingerprint": "37fba3df4fdf7180c789c4696f97d94af54531b5ad26c64a16e0a48ef4a585b4",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -399,7 +399,7 @@
       "status": "frozen",
       "title": "truth binding",
       "path": "root/truth-binding",
-      "fingerprint": "2e1af20dce64a7235d15d2caf85ca8eb410532fbea0cfc880eef0d66198dee6f",
+      "fingerprint": "fb8c976b18be0d03017f43c2e17760379d716bdd4c682291f78fef2f2703634d",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -457,20 +457,20 @@
       "id": "n_679cb763d41a",
       "parent_id": "n_56360bc665a3",
       "kind": "feature",
-      "status": "verified",
+      "status": "frozen",
       "title": "requirement level drift",
       "path": "root/truth-binding/requirement-level-drift",
-      "fingerprint": "c52c8e4c2e45e336aafe14c1542f75d96e67149d30a75346a394fe6160f8a1d4",
+      "fingerprint": "8a157558c4409a2540ee7073330f514c57631ec7033df8020fbcfaec1ad9ccf3",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_a7c847346c2c",
       "parent_id": "n_679cb763d41a",
       "kind": "touchpoint",
-      "status": "verified",
+      "status": "frozen",
       "title": "tree drift command",
       "path": "root/truth-binding/requirement-level-drift/tree-drift-cmd",
-      "fingerprint": "1fec2f77747e18be67c38e639bdae9587341139136c9de3decb04baff58f5ece",
+      "fingerprint": "54cb64822bf3116d326d536b2758437bcdba96bb4ee69f0f57cdbba1e8c0b7dd",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -480,7 +480,7 @@
       "status": "frozen",
       "title": "version evolution",
       "path": "root/version-evolution",
-      "fingerprint": "bc0a42a06e7b0e9ee66e5d7bc33eff051370eccda6d07bb99b4047c4b9c7c148",
+      "fingerprint": "1ea517c7399582b60efca8d530792287e501517aeb4808cd3269572a3e2e3152",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -508,20 +508,20 @@
       "id": "n_26809ef014ec",
       "parent_id": "n_75ea19c0c144",
       "kind": "feature",
-      "status": "implemented",
+      "status": "frozen",
       "title": "dual axis alignment",
       "path": "root/version-evolution/dual-axis-alignment",
-      "fingerprint": "1a26ec13649aa006bfa2257d759debad38684772c198e1bc7ee7890bea318b30",
+      "fingerprint": "be9700a1f0f3755a815a22de218b23a12022b6fd0eb2186f33e88051113966bc",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_40642d4f01bd",
       "parent_id": "n_26809ef014ec",
       "kind": "touchpoint",
-      "status": "implemented",
+      "status": "frozen",
       "title": "manifest runtime match",
       "path": "root/version-evolution/dual-axis-alignment/manifest-runtime-match",
-      "fingerprint": "a07961c526b5ce6ca47cb576d78a65373eac4f1026abccbca733899959b8d2dd",
+      "fingerprint": "dbcab3b4650f5114ee59241bbee3409b571467ddbdf1991546214ef03039b50a",
       "fingerprint_alg": "tree-json-v1"
     },
     {

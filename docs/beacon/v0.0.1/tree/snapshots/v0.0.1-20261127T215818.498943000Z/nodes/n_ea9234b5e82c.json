@@ -1,0 +1,52 @@
+{
+  "id": "n_ea9234b5e82c",
+  "kind": "touchpoint",
+  "title": "deterministic tools",
+  "intent": "通过真实脚本与 CLI 执行而非生成文本模拟复杂操作。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/deterministic-tools",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "调用前读取真实 help/API 签名，复杂解析、Git 与环境操作优先复用确定性程序，不编造 flag。"
+    },
+    {
+      "id": "AC-002",
+      "text": "脚本维护版本、输入指纹、stdout/stderr、真实退出码；执行范围与人工批准边界明确。"
+    },
+    {
+      "id": "AC-003",
+      "text": "六点合同随七 skill 分发且引用可达；合同完整性脚本只声明结构检查通过，不声明真实行为已验收。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "TestTaskRunnerStopsDownstreamAndRetainsFailure",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "TestStrictDeliveryReferencesSurviveInstall",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryContract$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryContract\"]}"
+  },
+  "fingerprint": "71e9495dbcff6408d8a444d47e813f9c9b87df9fcf547d611d3f4585eae35143",
+  "fingerprint_alg": "tree-json-v1"
+}

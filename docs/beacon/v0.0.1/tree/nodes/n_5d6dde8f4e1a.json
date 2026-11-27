@@ -5,7 +5,7 @@
   "intent": "同模块 feature 按声明顺序串行",
   "parent_id": "n_030e377c5621",
   "path": "root/module-orchestration/module-scheduler/intra-module-order",
-  "status": "verified",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -14,7 +14,7 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "beacon goal status --run-id \u003cid2\u003e 显示 blocked=false 且 current_stage=plan"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableModuleRun$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableModuleRun\"]}"
   },
   "implementation": {
     "by": "implement-host",
@@ -29,6 +29,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:36.939085Z"
   },
-  "fingerprint": "ebc8142d5d4b156a3ea922fc5518167618a830eff19003a04ffc38e5d901516e",
+  "fingerprint": "2aebba2b4f5aff0ec43907295182432ac41fd08c92441af2312bb6cc5bff2efa",
   "fingerprint_alg": "tree-json-v1"
 }

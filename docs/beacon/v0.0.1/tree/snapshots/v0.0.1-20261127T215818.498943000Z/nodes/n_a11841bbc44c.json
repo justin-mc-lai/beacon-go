@@ -1,0 +1,52 @@
+{
+  "id": "n_a11841bbc44c",
+  "kind": "touchpoint",
+  "title": "plan first",
+  "intent": "先确认计划与微步任务再实施产品代码；工具权限覆盖如实声明。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/plan-first",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "七项 skill 文本合同声明完成定义、输入输出、边界、AC、任务依赖及适用检查，并声明确认前产品写入边界。"
+    },
+    {
+      "id": "AC-002",
+      "text": "七项 skill 文本合同声明一次推进一个原子任务，不自动提交；宿主实际执行纪律不由结构文本测试证明。"
+    },
+    {
+      "id": "AC-003",
+      "text": "宿主文本合同与工具权限拦截分别声明；未实现工具拦截不得声称已硬阻断写入。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "TestStrictDeliveryReferencesSurviveInstall",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableStrictDeliveryContract$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableStrictDeliveryContract\"]}"
+  },
+  "fingerprint": "58c2284116072ef315b80c72304926accfb0c2b71f5fe98f6114889b00172953",
+  "fingerprint_alg": "tree-json-v1"
+}

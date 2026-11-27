@@ -5,7 +5,7 @@
   "intent": "从 module 节点展开子 feature runs",
   "parent_id": "n_030e377c5621",
   "path": "root/module-orchestration/module-scheduler/module-run-cmd",
-  "status": "verified",
+  "status": "frozen",
   "acs": [
     {
       "id": "AC-001",
@@ -14,7 +14,7 @@
   ],
   "verification": {
     "type": "test",
-    "spec": "【待实现】验收命令 beacon goal module run 尚未落地（goal 无 module 子命令）；目标态：输出 N 个 run id 且每个 FeatureID 属于该 module"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/portableacceptance\",\"-run\",\"^TestPortableModuleRun$\"],\"test_files\":[\"e2e/portableacceptance/portable_acceptance_test.go\"],\"required_tests\":[\"TestPortableModuleRun\"]}"
   },
   "implementation": {
     "by": "implement-host",
@@ -29,6 +29,6 @@
     "by": "qa-independent",
     "at": "2026-11-27T08:42:37.092193Z"
   },
-  "fingerprint": "9ce0e288782ef3d19180203ac696254258b51fc33cd9135f35a75a46c795f286",
+  "fingerprint": "c9db9677c80b9578701e95c23961c9cd02fbe659cfcf2468acb41ba64cde04ce",
   "fingerprint_alg": "tree-json-v1"
 }

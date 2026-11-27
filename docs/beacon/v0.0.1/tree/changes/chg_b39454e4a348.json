@@ -1,0 +1,11 @@
+{
+  "id": "chg_b39454e4a348",
+  "node_id": "n_3670106f522e",
+  "summary": "用户授权：将冻结验证合同绑定到便携公开CLI行为测试并收窄不可内核证明AC",
+  "by": "user-authorized-host",
+  "base_fingerprint": "177dc8c090b592bd9ce222c3cc754b26f80a12bfbaa9ee45495a807eb11d937a",
+  "affected": [
+    "n_3670106f522e"
+  ],
+  "created_at": "2026-11-27T21:58:02.615446Z"
+}
