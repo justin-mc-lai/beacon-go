@@ -91,6 +91,29 @@ Build the tree from the root; the kernel blocks a parent freeze until every
 child is settled. `proposal.json` is produced by the host agent (see the
 `beacon-go-plan` skill).
 
+### Bind acceptance criteria to test cases
+
+Ask the host agent to open the local tree workspace, or start it with:
+
+```sh
+beacon plan tree serve --project /path/to/project --version v0.1.0
+# Equivalent entry: beacon truth tree serve
+```
+
+Open the printed `http://127.0.0.1:<port>/` URL. Select a node, expand
+“测试与验证”, choose a test case and an acceptance criterion (AC), then click
+“保存绑定”. The workspace writes through the node update API and reads the
+canonical JSON back before confirming the save. No JSON file or write command
+is needed from the product user. Each AC must retain test coverage.
+
+`tree --format html` exports and historical snapshots are read-only; persistent
+binding needs the running `tree serve` workspace. Only draft/change_pending
+nodes are editable. Frozen contracts require a separately authorized change
+request; the workspace never unfreezes them. Refresh after a stale-fingerprint
+conflict. Stop the workspace with Ctrl+C. Workspaces share a tree write lock;
+if two saves use the same fingerprint, one succeeds and the stale save is
+rejected. Freeze and authorized change operations use the same lock.
+
 ### Ask before sign (legacy feature packages)
 
 Feature packages still work for `goal` runs. A package cannot freeze just

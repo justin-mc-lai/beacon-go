@@ -27,8 +27,10 @@ type ChangeRecord struct {
 }
 
 type changeJournal struct {
-	TreeDir string           `json:"tree_dir"`
-	Files   []changeFileCopy `json:"files"`
+	TreeDir    string           `json:"tree_dir"`
+	Files      []changeFileCopy `json:"files"`
+	Cache      []store.TreeNode `json:"cache,omitempty"`
+	RemoveDirs []string         `json:"remove_dirs,omitempty"`
 }
 
 type changeFileCopy struct {
@@ -39,7 +41,7 @@ type changeFileCopy struct {
 // recoverTreeChange restores a tree left half-written by an interrupted
 // change. Callers hold the tree lock. The journal lives outside the tree so
 // the canonical artifact never gains runtime files.
-func recoverTreeChange(dir string) error {
+func recoverTreeChange(dir string, stores ...*store.Store) error {
 	path := changeJournalPath(dir)
 	raw, err := os.ReadFile(path)
 	if errors.Is(err, os.ErrNotExist) {
@@ -74,6 +76,25 @@ func recoverTreeChange(dir string) error {
 			return err
 		}
 	}
+	for _, path := range j.RemoveDirs {
+		if err := os.RemoveAll(path); err != nil {
+			return err
+		}
+	}
+	for _, cached := range j.Cache {
+		if len(stores) != 1 || stores[0] == nil {
+			return core.NewError(ReasonStateConflict, "intenttree.recoverTreeChange", "cache recovery requires the scoped store")
+		}
+		current, err := stores[0].Tree().GetTreeNode(cached.ID)
+		if err != nil {
+			return err
+		}
+		if current != cached {
+			if err := stores[0].UpdateTreeNodeProjection(cached); err != nil {
+				return err
+			}
+		}
+	}
 	return os.Remove(path)
 }
 
@@ -82,7 +103,11 @@ func changeJournalPath(dir string) string {
 }
 
 func writeChangeJournal(dir string, paths []string) error {
-	j := changeJournal{TreeDir: dir}
+	return writeMutationJournal(dir, paths, nil, nil)
+}
+
+func writeMutationJournal(dir string, paths []string, cache []store.TreeNode, removeDirs []string) error {
+	j := changeJournal{TreeDir: dir, Cache: cache, RemoveDirs: removeDirs}
 	for _, p := range paths {
 		old, err := os.ReadFile(p)
 		if err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -114,7 +139,7 @@ func RequestChange(st *store.Store, dir, versionID, nodeID, summary, by, base st
 		return ChangeRecord{}, err
 	}
 	defer unlock()
-	if err := recoverTreeChange(dir); err != nil {
+	if err := recoverTreeChange(dir, st); err != nil {
 		return ChangeRecord{}, err
 	}
 	idx, err := ReadIndex(dir)
@@ -200,7 +225,7 @@ func RequestChange(st *store.Store, dir, versionID, nodeID, summary, by, base st
 	committed := false
 	defer func() {
 		if !committed {
-			_ = recoverTreeChange(dir)
+			_ = recoverTreeChange(dir, st)
 		}
 	}()
 

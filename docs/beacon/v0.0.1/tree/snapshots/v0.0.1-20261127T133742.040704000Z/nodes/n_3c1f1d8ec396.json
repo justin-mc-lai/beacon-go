@@ -1,0 +1,17 @@
+{
+  "id": "n_3c1f1d8ec396",
+  "kind": "module",
+  "title": "acceptance binding",
+  "intent": "FSM 非法转移槽与测试用例覆盖绑定，用例执行产出 evidence，gate 按用例判定验收；一条 TC 从定义到 verdict 可追溯。本模块负责 TC 与 FSM 的绑定规则和 per-TC verdict 的生成；tree-visual 模块只负责 verdict 展示和 AC↔TestCase 点选绑定，不生成 verdict。",
+  "parent_id": "nroot_6b8991789867",
+  "path": "root/acceptance-binding",
+  "status": "frozen",
+  "child_fingerprints": [
+    "ac7c6c6225b99c93b4eb8e4d3c03665ae2d8a3e52721fa0bcae374652b76ab1f",
+    "51e527eb20aadb144054100b33b77f902d2884245f4f6cb817066f50dbd3192c",
+    "4096f1097cc407140c98a2557cad5dc8c93d3e9f9d75b4e15b34d5f3f2e8c320",
+    "3b8383dcd3f1ce37b810e85620a3de94ff788cb02880c41d1f97a69c128bdd72"
+  ],
+  "fingerprint": "36eecac8c0f6e22c3ddd93420e54dbb25d3216b7e2ec5d0c424efeb9c9486f98",
+  "fingerprint_alg": "tree-json-v1"
+}

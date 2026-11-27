@@ -25,7 +25,15 @@ type FreezeReport struct {
 // need every child frozen. The parent's frozen fingerprint binds the
 // ordered child fingerprints, so a later child change is detectable.
 func FreezeNode(st *store.Store, dir, versionID, nodeID string) (FreezeReport, error) {
-	idx, err := ReadIndex(dir)
+	unlock, err := lockTreeChange(dir)
+	if err != nil {
+		return FreezeReport{}, err
+	}
+	defer unlock()
+	if err := recoverTreeChange(dir, st); err != nil {
+		return FreezeReport{}, err
+	}
+	idx, n, err := readMutationNode(dir, nodeID)
 	if err != nil {
 		return FreezeReport{}, err
 	}
@@ -33,16 +41,10 @@ func FreezeNode(st *store.Store, dir, versionID, nodeID string) (FreezeReport, e
 	if !ok {
 		return FreezeReport{}, core.NewError(ReasonNodeNotFound, "intenttree.FreezeNode", "node not found: "+nodeID)
 	}
-	if entry.Status == StatusFrozen {
-		return FreezeReport{NodeID: nodeID, Status: string(entry.Status), Fingerprint: entry.Fingerprint, Already: true}, nil
-	}
-	if entry.Status != StatusDraft && entry.Status != StatusChangePending {
+	already := entry.Status == StatusFrozen
+	if !already && entry.Status != StatusDraft && entry.Status != StatusChangePending {
 		return FreezeReport{}, core.NewError(ReasonNodeNotDraft, "intenttree.FreezeNode",
 			"only draft or change_pending nodes can freeze: "+nodeID+" is "+string(entry.Status))
-	}
-	n, err := ReadNode(dir, nodeID)
-	if err != nil {
-		return FreezeReport{}, err
 	}
 	if n.Kind == KindFeature && strings.TrimSpace(n.EffectiveTruthPath()) == "" {
 		if err := ValidateFeatureDoc(n.Doc); err != nil {
@@ -100,36 +102,46 @@ func FreezeNode(st *store.Store, dir, versionID, nodeID string) (FreezeReport, e
 		}
 		bound = append(bound, ch.Fingerprint)
 	}
+	previousFingerprint := n.Fingerprint
 	n.Status = StatusFrozen
 	n.ChildFingerprints = bound
 	n, err = Stamp(n)
 	if err != nil {
 		return FreezeReport{}, err
 	}
-	if err := WriteNode(dir, n); err != nil {
-		return FreezeReport{}, err
+	if already && n.Fingerprint != previousFingerprint {
+		return FreezeReport{}, core.NewError(ReasonStateConflict, "intenttree.FreezeNode", "frozen child bindings differ from canonical children")
 	}
-	entry.Status = StatusFrozen
-	entry.Fingerprint = n.Fingerprint
-	entry.FingerprintAlg = n.FingerprintAlg
-	for i := range idx.Nodes {
-		if idx.Nodes[i].ID == nodeID {
-			idx.Nodes[i] = entry
-		}
-	}
-	if err := WriteIndex(dir, idx); err != nil {
-		return FreezeReport{}, err
-	}
-	if err := st.UpdateTreeNodeStatus(n.ID, string(n.Status), n.Fingerprint, time.Now().UTC().Format(time.RFC3339Nano)); err != nil {
-		return FreezeReport{}, err
-	}
-	rep := FreezeReport{NodeID: nodeID, Status: string(n.Status), Fingerprint: n.Fingerprint, Children: len(bound)}
+	rep := FreezeReport{NodeID: nodeID, Status: string(n.Status), Fingerprint: n.Fingerprint, Children: len(bound), Already: already}
 	if n.ParentID == "" {
-		_, id, err := CreateSnapshot(dir, idx.Version)
-		if err != nil {
-			return rep, err
+		if already {
+			ids, err := ListSnapshots(dir)
+			if err != nil {
+				return FreezeReport{}, err
+			}
+			for _, id := range ids {
+				snap, err := ReadSnapshot(dir, id)
+				if err != nil {
+					return FreezeReport{}, err
+				}
+				if snap.SourceHash == SourceHash(idx) {
+					rep.SnapshotID = id
+					break
+				}
+			}
 		}
-		rep.SnapshotID = id
+		if rep.SnapshotID == "" {
+			rep.SnapshotID = fmt.Sprintf("%s-%s", idx.Version, time.Now().UTC().Format("20060102T150405.000000000Z"))
+		}
+	}
+	snapshotID := rep.SnapshotID
+	if already && snapshotID != "" {
+		if _, err := ReadSnapshot(dir, snapshotID); err == nil {
+			snapshotID = ""
+		}
+	}
+	if err := persistMutation(st, dir, idx, n, nil, snapshotID); err != nil {
+		return FreezeReport{}, err
 	}
 	return rep, nil
 }

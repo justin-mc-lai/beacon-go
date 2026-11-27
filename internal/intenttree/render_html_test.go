@@ -40,19 +40,14 @@ func TestRenderHTMLTreeBindsTestCaseRowsToAC(t *testing.T) {
 			{ID: "tc-1", ACID: "AC-001", Kind: "unit", Ref: "go test ./internal/intenttree -run TestOne", Status: "planned"},
 			{ID: "tc-2", ACID: "AC-002", Kind: "manual", Ref: "manual bind check", Status: "existing"},
 		},
-		Verification: &Verification{Type: "test", Spec: "点击行生成写回命令"}}
+		Verification: &Verification{Type: "test", Spec: "绑定写回并回读"}}
 	out := string(RenderHTMLTree(idx, map[string]Node{"r": {ID: "r", Kind: KindIntent, Title: "root"}, "n_bind": body}))
 	for _, want := range []string{
 		`data-bind-ac="AC-001"`,
 		`data-bind-ac="AC-002"`,
 		`data-bind-testcase="tc-1"`,
 		`data-bind-ref="go test ./internal/intenttree -run TestOne"`,
-		`data-bind-form="n_bind"`,
-		`data-bind-state`,
-		`beacon change request --project . --node n_bind`,
-		`beacon truth node update --project . --node n_bind --file /tmp/beacon-bind-n_bind.json`,
-		`test_cases`,
-		`addEventListener('click'`,
+		`冻结合同只读`,
 		`data-panel="n_bind"`,
 	} {
 		if !strings.Contains(out, want) {
@@ -61,6 +56,22 @@ func TestRenderHTMLTreeBindsTestCaseRowsToAC(t *testing.T) {
 	}
 	if got := strings.Count(out, `class="bind-ac-row"`); got != 2 {
 		t.Fatalf("bindable test case rows = %d, want 2", got)
+	}
+	if strings.Contains(out, `data-bind-form="n_bind"`) || strings.Contains(out, "beacon truth node update") || strings.Contains(out, "保存为") {
+		t.Fatal("frozen/static view must not offer manual patch or writable binding")
+	}
+	body.Status = StatusDraft
+	bodies := map[string]Node{"r": {ID: "r", Kind: KindIntent, Title: "root"}, "n_bind": body}
+	live := string(RenderHTMLTreeWithContext(idx, bodies, nil, RenderContext{BindingURL: "/binding", BindingToken: "secret"}))
+	for _, want := range []string{`data-bind-form="n_bind"`, `action="/binding" method="post"`, `name="base_fingerprint" value="bb"`, `name="csrf_token" value="secret"`, `name="test_case_id" required`, `name="ac_id" required`, `value="AC-002"`, `type="submit">保存绑定`, `role="status" aria-live="polite"`, `await fetch(form.action`, `node.test_cases.forEach`} {
+		if !strings.Contains(live, want) {
+			t.Fatalf("live binding missing %q", want)
+		}
+	}
+	for name, rc := range map[string]RenderContext{"static": {}, "snapshot": {SnapshotID: "old", BindingURL: "/binding", BindingToken: "secret"}} {
+		if html := string(RenderHTMLTreeWithContext(idx, bodies, nil, rc)); strings.Contains(html, `data-bind-form="n_bind"`) {
+			t.Fatalf("%s unexpectedly writable", name)
+		}
 	}
 }
 

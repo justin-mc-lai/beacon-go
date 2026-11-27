@@ -1,11 +1,92 @@
 package cli
 
 import (
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"beacon-go/internal/intenttree"
+	"beacon-go/internal/store"
 )
+
+func TestPlanDriftAgentsMDRealRepositoryAligned(t *testing.T) {
+	t.Setenv(store.EnvStorePath, filepath.Join(t.TempDir(), "absent.db"))
+	project, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := runCLI(t, "plan", "drift", "--project", project, "--agents-md", "--json")
+	if err != nil {
+		t.Fatalf("real entry must compare nine canonical contracts: %s %v", out, err)
+	}
+	doc := parseDoc(t, out)
+	if doc["blocked"] != float64(0) || doc["evaluated"] != float64(9) || len(doc["changed"].([]any)) != 0 || len(doc["items"].([]any)) != 9 {
+		t.Fatalf("nine-rule canonical alignment: %v", doc)
+	}
+}
+
+func TestPlanDriftAgentsMDNumberedCLI(t *testing.T) {
+	proj := treeTestEnv(t)
+	seedFreezeTree(t, proj, false)
+	if err := os.MkdirAll(filepath.Join(proj, "docs"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	// Read the canonical field used by this fixture; the mapping stores no text.
+	n, err := intenttree.ReadNode(filepath.Join(proj, "docs", "beacon", "v0.1.0", "tree"), "t1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	agents := "## 唯一真源（最高口径）\n1. " + n.Title + "\n## Process\nold process\n"
+	mapPath := filepath.Join(proj, "docs", "agents-md-drift-map.json")
+	mapping := `{"schema":"beacon-agents-md-map-v2","section":"唯一真源（最高口径）","requirements":[{"item":1,"targets":[{"node_id":"t1","field":"/title"}]}],"governance":["Process"]}`
+	write := func(path, text string) {
+		t.Helper()
+		if err := os.WriteFile(path, []byte(text), 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write(filepath.Join(proj, "AGENTS.md"), agents)
+	write(mapPath, mapping)
+	before, err := os.ReadFile(filepath.Join(proj, "docs", "beacon", "v0.1.0", "tree", "nodes", "t1.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc := parseDoc(t, mustRun(t, "plan", "drift", "--project", proj, "--agents-md", "--json"))
+	if doc["evaluated"] != float64(1) || doc["blocked"] != float64(0) || len(doc["changed"].([]any)) != 0 {
+		t.Fatalf("bare fixture: %v", doc)
+	}
+	write(filepath.Join(proj, "AGENTS.md"), strings.Replace(agents, "old process", "new process", 1))
+	doc = parseDoc(t, mustRun(t, "plan", "drift", "--project", proj, "--agents-md", "--agents-map", mapPath, "--json"))
+	if len(doc["changed"].([]any)) != 0 {
+		t.Fatalf("governance: %v", doc)
+	}
+	write(filepath.Join(proj, "AGENTS.md"), strings.Replace(agents, "1. "+n.Title, "1. reverse "+n.Title, 1))
+	doc = parseDoc(t, mustRun(t, "plan", "drift", "--project", proj, "--agents-md", "--agents-map", "docs/agents-md-drift-map.json", "--json"))
+	if len(doc["changed"].([]any)) != 1 {
+		t.Fatalf("reverse product: %v", doc)
+	}
+	after, err := os.ReadFile(filepath.Join(proj, "docs", "beacon", "v0.1.0", "tree", "nodes", "t1.json"))
+	if err != nil || string(before) != string(after) {
+		t.Fatalf("comparison mutated truth: %v", err)
+	}
+	for _, args := range [][]string{
+		{"--agents-md", "--snapshot", "latest"},
+		{"--agents-map", mapPath},
+		{"--agents-md", "--agents-map", ""},
+		{"--agents-md", "--agents-map", " "},
+		{"--agents-md", "--node", "t2"},
+	} {
+		if _, err := runCLI(t, append([]string{"plan", "drift", "--project", proj}, args...)...); err == nil {
+			t.Fatalf("must reject: %v", args)
+		}
+	}
+	write(mapPath, strings.Replace(mapping, `"targets":`, `"gap":"missing contract","targets":`, 1))
+	out, err := runCLI(t, "plan", "drift", "--project", proj, "--agents-md", "--json")
+	if err == nil || !strings.Contains(err.Error(), "agents_md_drift_blocked") || parseDoc(t, out)["blocked"] != float64(1) {
+		t.Fatalf("gap must return diagnostic and error: %s %v", out, err)
+	}
+}
 
 func TestPlanDriftSeparatesRequirementBodyFromRecomputedFields(t *testing.T) {
 	proj := treeTestEnv(t)
@@ -70,7 +151,7 @@ func TestPlanDriftClassifiesAddedAndRemoved(t *testing.T) {
 		"--base-fingerprint", f["fingerprint"].(string), "--json")
 	proposal := writeJSON(t, map[string]any{"children": []any{map[string]any{
 		"kind": "touchpoint", "title": "Three", "slug": "three", "intent": "third",
-		"acs": []any{map[string]any{"id": "t3-1", "text": "可追踪"}},
+		"acs":          []any{map[string]any{"id": "t3-1", "text": "可追踪"}},
 		"verification": map[string]any{"type": "test", "spec": "go test ./..."},
 	}}})
 	mustRun(t, "plan", "apply", "--project", proj, "--node", "f", "--proposal", proposal, "--json")

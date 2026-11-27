@@ -1,0 +1,72 @@
+{
+  "id": "n_4bdf0311e438",
+  "kind": "feature",
+  "title": "red green capture",
+  "intent": "由确定性执行器启动真实测试、读取测试输入、登记不可覆盖的采集结果，并在共享状态迁移入口消费显式 Red/Green 配对。",
+  "doc": "# Red/Green 确定性采集\n\n## 问题\n现有 v1 交付回执与 test_sha256 可由调用者手填；hash 一致不证明测试运行。需要系统直接采集，防止把自洽 JSON 当作真实执行。\n\n## 目标用户\n宿主 implementer、独立 reviewer 和 Beacon 验收服务。\n\n## 场景\n宿主在 implement 组显式选择项目、版本、叶子、AC 和测试定义；先采集 Red，修改实现后显式引用 Red ID 采集 Green，再取得最终候选的独立审查，最后核销与验证。\n\n## 范围\n三个叶子定义进程采集、配对登记和状态迁移集成。命令来自当前确认的测试定义或合同绑定配置；服务直接启动进程、不调 LLM/agent、不隐式拼 shell。采集系统时钟、真实退出码、stdout/stderr，读取实际测试文件集合计算 hash，前后核对合同输入。每次尝试唯一目录，失败历史追加保留，复用现有 scoped artifact 登记。Green 引用明确 Red capture ID，不用 latest。最终候选需真实源码 commit/input hash，独立回执绑定 Green 与 capture refs。\n\n## 非目标\n不认证外部 reviewer 的真实身份，不防御可任意改写源码/二进制/账本的恶意本机用户。无树 legacy 范围显式标记，不宣称全覆盖。非 TDD 自动豁免未定义前保持阻塞。\n\n## 验收标准\n有效行为 Red→Green→独立审查→核销可进入 verified；缺采集、零测试、全部 skip、环境/编译失败、取消、超时、输入改变、自审、篡改或账本未核销必须非零退出且不推进状态。所有直接 CLI 与共享服务使用同一校验。fixture/E2E 同批更新；legacy E2E 不代替新增采集链验收。",
+  "parent_id": "n_3c1f1d8ec396",
+  "path": "root/acceptance-binding/red-green-capture",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "采集、配对登记与状态迁移集成均由子叶子定义，可追溯到真实运行证据。"
+    },
+    {
+      "id": "AC-002",
+      "text": "未采集→Red→Green→独立审查→可核销按序推进，跳步、过期与失败阻塞且保留历史。"
+    }
+  ],
+  "domain_fsm": {
+    "states": [
+      "not_captured",
+      "red_captured",
+      "green_captured",
+      "reviewed",
+      "settled"
+    ],
+    "transitions": [
+      {
+        "from": "not_captured",
+        "to": "red_captured",
+        "event": "capture_expected_failure"
+      },
+      {
+        "from": "red_captured",
+        "to": "green_captured",
+        "event": "capture_passing_same_tests"
+      },
+      {
+        "from": "green_captured",
+        "to": "reviewed",
+        "event": "independent_review_pass"
+      },
+      {
+        "from": "reviewed",
+        "to": "settled",
+        "event": "all_tasks_closed"
+      }
+    ],
+    "illegal": [
+      {
+        "from": "not_captured",
+        "to": "green_captured"
+      },
+      {
+        "from": "red_captured",
+        "to": "settled"
+      },
+      {
+        "from": "green_captured",
+        "to": "settled"
+      }
+    ]
+  },
+  "child_fingerprints": [
+    "acba1b4a0fe6512dce03effad1d8799b0576c567443d64c6bee5ccb177ec35d8",
+    "1d15411b3b1e681ec4b03980c15c02ca01ce70c064f2f96387d42f05054c7eb9",
+    "e390840651e6840f342dda281e94b2cc27421cadd0070de61faa745788a75ec8"
+  ],
+  "fingerprint": "51e527eb20aadb144054100b33b77f902d2884245f4f6cb817066f50dbd3192c",
+  "fingerprint_alg": "tree-json-v1"
+}

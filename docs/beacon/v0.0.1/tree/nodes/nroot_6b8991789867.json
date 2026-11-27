@@ -6,13 +6,13 @@
   "path": "root",
   "status": "frozen",
   "child_fingerprints": [
-    "f2e552bbf4a40b3534e05893434d5641dc7cf397b6c628af835d0d8eab3e1abd",
+    "36eecac8c0f6e22c3ddd93420e54dbb25d3216b7e2ec5d0c424efeb9c9486f98",
     "599bdd3002d57bc5f44e7099b02c494ffa780665675d9b4252fc3cf5c78ced04",
     "89ab8c2da8060bc5fc27fd433470bb3ca53d743328f94053b331c13cc286cb54",
     "96c263ed02d640d26c59ba1f30ed0dcf641eb7d6dd0f3297e1d06f2c4a2dcdab",
-    "7c4bf6237cc7be2a22ff57e51c3d021cb52eb1e90cb30bf975bfa4546a557789",
+    "2e1af20dce64a7235d15d2caf85ca8eb410532fbea0cfc880eef0d66198dee6f",
     "bc0a42a06e7b0e9ee66e5d7bc33eff051370eccda6d07bb99b4047c4b9c7c148"
   ],
-  "fingerprint": "b7cdc6d22afdbb394741431ab9733a5ced83214c6438ad75a78f7a50f769e9f0",
+  "fingerprint": "c31817f770cade26ac49e9c71ebeb3dadbd146fad2a1aec2978e776339027b3d",
   "fingerprint_alg": "tree-json-v1"
 }

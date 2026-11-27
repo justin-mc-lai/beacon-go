@@ -26,11 +26,11 @@ func newPlanCmd() *cobra.Command {
 }
 
 func newPlanTreeCmd() *cobra.Command {
-	return newTreeReadCmd("tree", "plan tree", "Render the intent tree index (read-only)")
+	return newTreeReadCmd("tree", "plan tree", "Read the intent tree; serve opens the local binding workspace")
 }
 
 func newTruthTreeCmd() *cobra.Command {
-	return newTreeReadCmd("tree", "truth tree", "Render the requirement tree index (read-only)")
+	return newTreeReadCmd("tree", "truth tree", "Read the requirement tree; serve opens the local binding workspace")
 }
 
 func newTreeReadCmd(use, op, short string) *cobra.Command {
@@ -123,39 +123,13 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 				return nil
 			}
 			if format == "html" {
-				bodies := map[string]intenttree.Node{}
-				for _, e := range idx.Nodes {
-					n, nerr := intenttree.ReadNode(dir, e.ID)
-					if nerr != nil {
-						return nerr
-					}
-					bodies[e.ID] = n
-				}
-				truth := map[string]intenttree.TruthLinkStatus{}
-				for _, e := range idx.Nodes {
-					n := bodies[e.ID]
-					if n.EffectiveTruthPath() == "" {
-						continue
-					}
-					st := readTruthStatus(projRoot, n)
-					st.NodeStatus = ""
-					truth[e.ID] = intenttree.TruthLinkStatus{
-						Path: st.TruthPath, PackageStatus: st.PackageStatus,
-						PackageSlug: st.PackageSlug, SlugOK: st.SlugOK,
-						Match: st.Match, Error: st.Error,
-					}
-				}
-				gateVerdicts, gerr := treeGateVerdicts(projRoot, idx.Version, idx, bodies)
-				if gerr != nil {
-					return gerr
-				}
-				rt := buildversion.Runtime()
-				data := intenttree.RenderHTMLTreeWithContext(idx, bodies, truth, intenttree.RenderContext{
-					RuntimeVersion: rt.Version, RuntimeCommit: rt.Commit, BinarySHA: rt.BinarySHA,
+				data, err := renderCurrentTree(dir, projRoot, idx, intenttree.RenderContext{
 					RequirementVersion: idx.Version, History: treeHistoryLinks(dir, true),
 					Changes: treeChangeLinks(dir), NodeHistory: treeNodeHistory(dir, true),
-					GateVerdicts: gateVerdicts,
 				})
+				if err != nil {
+					return err
+				}
 				def := filepath.Join(projRoot, ".beacon", "artifacts", "tree", idx.Version, "index.html")
 				p, werr := writeTreeRender(outPath, "", def, data)
 				if werr != nil {
@@ -191,7 +165,35 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 	c.Flags().StringVar(&nodeID, "node", "", "print a single node body (canonical JSON)")
 	c.Flags().StringVar(&snapshot, "snapshot", "", "read an immutable snapshot (id or latest)")
 	c.Flags().BoolVar(&asJSON, "json", false, "print JSON (default)")
+	c.AddCommand(newTreeServeCmd())
 	return c
+}
+
+func renderCurrentTree(dir, project string, idx intenttree.Index, rc intenttree.RenderContext) ([]byte, error) {
+	bodies := map[string]intenttree.Node{}
+	truth := map[string]intenttree.TruthLinkStatus{}
+	for _, entry := range idx.Nodes {
+		node, err := intenttree.ReadNode(dir, entry.ID)
+		if err != nil {
+			return nil, err
+		}
+		bodies[entry.ID] = node
+		if node.EffectiveTruthPath() != "" {
+			status := readTruthStatus(project, node)
+			truth[entry.ID] = intenttree.TruthLinkStatus{
+				Path: status.TruthPath, PackageStatus: status.PackageStatus,
+				PackageSlug: status.PackageSlug, SlugOK: status.SlugOK, Match: status.Match, Error: status.Error,
+			}
+		}
+	}
+	verdicts, err := treeGateVerdicts(project, idx.Version, idx, bodies)
+	if err != nil {
+		return nil, err
+	}
+	runtime := buildversion.Runtime()
+	rc.RuntimeVersion, rc.RuntimeCommit, rc.BinarySHA = runtime.Version, runtime.Commit, runtime.BinarySHA
+	rc.GateVerdicts = verdicts
+	return intenttree.RenderHTMLTreeWithContext(idx, bodies, truth, rc), nil
 }
 
 func resolveTree(st *store.Store, project, version string) (string, string, intenttree.Index, error) {

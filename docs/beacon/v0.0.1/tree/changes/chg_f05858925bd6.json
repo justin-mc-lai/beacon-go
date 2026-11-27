@@ -1,0 +1,11 @@
+{
+  "id": "chg_f05858925bd6",
+  "node_id": "n_d8063fefcf41",
+  "summary": "用户已批准：仅同步 CLI package 实际 test_files 清单，保留 AC、argv 与 required_tests。",
+  "by": "codex-approved-test-files-20261127",
+  "base_fingerprint": "90482b8b34cb7d597629966898723a71ccf256f192f0500b7a2446a97c9401a4",
+  "affected": [
+    "n_d8063fefcf41"
+  ],
+  "created_at": "2026-11-27T13:37:41.948873Z"
+}

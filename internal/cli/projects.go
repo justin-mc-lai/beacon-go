@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -313,26 +312,8 @@ func newProjectsBumpCmd() *cobra.Command {
 			if base == "" {
 				base = "v0.0.0"
 			}
-			if _, statErr := os.Stat(versionmanifest.Path(root, base)); statErr == nil {
-				m, err := orchestrator.NewEngine(st).OpenVersion(root, base, level)
-				if err != nil {
-					return err
-				}
-				view, err := buildProjectView(st, p)
-				if err != nil {
-					return err
-				}
-				if asJSON {
-					return printJSON(cmd, map[string]any{"from": base, "version": m.Version, "project": view, "manifest": versionmanifest.Path(root, m.Version)})
-				}
-				fmt.Fprintf(cmd.OutOrStdout(), "bumped %s -> %s (current, manifest)\n", base, m.Version)
-				return nil
-			}
-			next, err := orchestrator.BumpDocsVersion(base, level)
+			m, err := orchestrator.NewEngine(st).BumpProjectVersion(root, base, level)
 			if err != nil {
-				return err
-			}
-			if err := ensureVersion(st, p, next, ""); err != nil {
 				return err
 			}
 			view, err := buildProjectView(st, p)
@@ -340,9 +321,9 @@ func newProjectsBumpCmd() *cobra.Command {
 				return err
 			}
 			if asJSON {
-				return printJSON(cmd, map[string]any{"from": base, "version": next, "project": view})
+				return printJSON(cmd, map[string]any{"from": base, "version": m.Version, "project": view, "manifest": versionmanifest.Path(root, m.Version)})
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "bumped %s -> %s (current)\n", base, next)
+			fmt.Fprintf(cmd.OutOrStdout(), "bumped %s -> %s (current, manifest)\n", base, m.Version)
 			return nil
 		},
 	}

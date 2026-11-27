@@ -1,0 +1,30 @@
+{
+  "id": "n_9e4515fdf99c",
+  "kind": "feature",
+  "title": "strict delivery contract",
+  "intent": "六点严格交付协议横切七能力：分清宿主软约束、可执行检查、需求冻结与交付验收。",
+  "doc": "# 严格交付合同\n\n## 问题\n只有提示词与手写成功文本不能证明交付，计划、测试、审查和账本缺少一致的可核查合同。\n\n## 目标用户\n使用 Beacon 七能力进行需求交付的宿主 agent、审查者和需求负责人。\n\n## 场景\n宿主先计划与原子拆解，确认后执行 Red/Green，提交独立盲审与真实验证证据，按既有任务事实逐项核销。\n\n## 范围\n六个叶子分别定义 Plan-First、Red/Green 与断言保护、独立盲审、证据门禁、外部账本、确定性工具。implement/verify/goal 承担执行、验收、编排；其他能力执行适用部分。每条约束标记可执行检查或 advisory，不用文本检查冒充行为验收。需求权威是 canonical JSON，正文与证据分层；任务定义与执行事实不新建第二账本。\n\n## 非目标\n不新增第八能力或 design 阶段；不承诺宿主写工具已被权限隔离，不认证 reviewer 身份，不替代人工发布确认。\n\n## 验收标准\n六个子叶子各有 AC、计划状态 TC 与可执行验证规格；完整协议随 skill 安装可达。运行时成功与拒绝必须有实际输出，未执行写未验证。需求冻结不代表实现或验收通过。",
+  "parent_id": "n_3c1f1d8ec396",
+  "path": "root/acceptance-binding/strict-delivery-contract",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "六点均映射独立叶子及七能力适用责任，软约束与硬检查的覆盖边界显式声明。"
+    },
+    {
+      "id": "AC-002",
+      "text": "冻结、实现、hash verified、tree verified、gate pass 与发布就绪分别表达，不跨层声称完成。"
+    }
+  ],
+  "child_fingerprints": [
+    "14d002db76b99e6f32fdd30c78f5d71573d9058ae4db2db67fd95191784d9ca7",
+    "0496aa2272bf7c03926b8aa62cf195b862d769045e9b6874249cf483a31f82d8",
+    "63a6a3e4843a6ab0d6a03f2c7080a92b43051f0688a5ee0fab7d70ebc1c70213",
+    "eee43ad903e64569a4b6faaad297a5bbffb9b7abdeb8481f57dbcba4ce66c931",
+    "5c3607ae9c0b084f5ae7dce14c3d57e8c30ede048361e422ffedf49cf2adee12",
+    "96295e585d32f03c44a14c6c820d62e5b57a7a3b871d7085b0caaea4702c3c30"
+  ],
+  "fingerprint": "4096f1097cc407140c98a2557cad5dc8c93d3e9f9d75b4e15b34d5f3f2e8c320",
+  "fingerprint_alg": "tree-json-v1"
+}

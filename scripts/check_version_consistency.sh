@@ -7,6 +7,54 @@
 
 set -euo pipefail
 
+candidate_tag=""
+release_notes=""
+tag_set=0
+notes_set=0
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --tag|--release-notes)
+      option="$1"
+      if [ "$#" -lt 2 ] || [[ "$2" == --* ]]; then
+        echo "version-consistency: $option requires a value" >&2
+        exit 1
+      fi
+      if [ "$option" = --tag ]; then
+        if [ "$tag_set" -eq 1 ]; then
+          echo "version-consistency: duplicate option $option" >&2
+          exit 1
+        fi
+        candidate_tag="$2"
+        tag_set=1
+      else
+        if [ "$notes_set" -eq 1 ]; then
+          echo "version-consistency: duplicate option $option" >&2
+          exit 1
+        fi
+        release_notes="$2"
+        notes_set=1
+      fi
+      shift 2
+      ;;
+    --help|-h)
+      echo 'Usage: check_version_consistency.sh [--tag vX.Y.Z --release-notes PATH]'
+      echo 'Default: source/docs checks only; no implicit Git tag selection.'
+      echo 'Candidate: also check exact tag, CHANGELOG entry and release notes heading/body.'
+      echo 'PATH is absolute or relative to CHECK_VERSION_ROOT (default: repository root).'
+      echo 'Notes title: # [Release |Beacon Go ]vX.Y.Z; this checks content, not publication.'
+      exit 0
+      ;;
+    *)
+      echo "version-consistency: unknown option $1" >&2
+      exit 1
+      ;;
+  esac
+done
+if [ "$tag_set" -ne "$notes_set" ]; then
+  echo 'version-consistency: candidate scope requires both --tag and --release-notes' >&2
+  exit 1
+fi
+
 ROOT="${CHECK_VERSION_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 go_version="$ROOT/internal/version/version.go"
 readme="$ROOT/README.md"
@@ -56,6 +104,78 @@ if [ -f "$agents" ]; then
   fi
   if grep -nE '当前[[:space:]]*`v2\.0\.0-go\.[0-9]+`' "$agents" >&2; then
     echo "version-consistency: AGENTS.md hard-codes a current version; point to 'beacon --version' instead" >&2
+    fail=1
+  fi
+fi
+
+if [ "$tag_set" -eq 1 ]; then
+  if ! python3 - "$ROOT" "$ver" "$candidate_tag" "$release_notes" <<'PY'
+import pathlib
+import re
+import sys
+
+root, version, tag, notes_path = sys.argv[1:]
+
+def reject(message):
+    sys.exit("version-consistency: " + message)
+
+if not re.fullmatch(r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)", version):
+    reject("candidate tag requires a plain SemVer source version")
+if tag != "v" + version:
+    reject("candidate tag %r does not match version.go (v%s)" % (tag, version))
+
+def read(path, label):
+    try:
+        return path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError, ValueError) as exc:
+        reject("%s cannot be read: %s" % (label, exc))
+
+def markdown_lines(text):
+    lines = []
+    fence = None
+    for line in re.sub(r"<!--.*?-->", "", text, flags=re.S).splitlines():
+        marker = re.match(r"^\s{0,3}(`{3,}|~{3,})", line)
+        if marker:
+            token = marker[1]
+            if fence is None:
+                fence = token
+            elif token[0] == fence[0] and len(token) >= len(fence):
+                fence = None
+            continue
+        if fence is None:
+            lines.append(line)
+    return lines
+
+def require_body(lines, label):
+    body = "\n".join(line for line in lines if not re.match(r"^\s*#", line))
+    body = re.sub(r"[\s*`_>#|\-]+", "", body)
+    if not body or re.fullmatch(r"(?i:TODO|TBD|placeholder|generatedstub)|待补充|待填写", body):
+        reject(label + " body is empty or a generated stub")
+
+changelog = markdown_lines(read(pathlib.Path(root) / "CHANGELOG.md", "CHANGELOG"))
+entries = [index for index, line in enumerate(changelog)
+           if re.match(r"^## \[" + re.escape(version) + r"\](?:\s.*)?$", line)]
+if len(entries) != 1:
+    reject("CHANGELOG entry [%s] must occur exactly once (found %d)" % (version, len(entries)))
+start = entries[0] + 1
+end = next((index for index in range(start, len(changelog))
+            if re.match(r"^#{1,2}\s", changelog[index])), len(changelog))
+require_body(changelog[start:end], "CHANGELOG")
+
+if not notes_path.strip():
+    reject("release notes path is empty")
+notes_file = pathlib.Path(notes_path)
+if not notes_file.is_absolute():
+    notes_file = pathlib.Path(root) / notes_file
+notes = markdown_lines(read(notes_file, "release notes"))
+headings = [line for line in notes if re.match(r"^#\s", line)]
+title = r"# (?:Release |Beacon Go )?v?" + re.escape(version) + r"(?:\s+[—–-]\s+.+)?"
+if len(headings) != 1 or not re.fullmatch(title, headings[0]):
+    reject("release notes heading must identify only v%s exactly once" % version)
+require_body(notes[notes.index(headings[0]) + 1:], "release notes")
+print("version-consistency: candidate ok (%s, CHANGELOG, %s)" % (tag, notes_file))
+PY
+  then
     fail=1
   fi
 fi

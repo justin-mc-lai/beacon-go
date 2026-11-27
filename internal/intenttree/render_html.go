@@ -2,7 +2,6 @@ package intenttree
 
 import (
 	"beacon-go/internal/core"
-	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -30,6 +29,8 @@ type RenderContext struct {
 	NodeHistory        map[string][]NodeRevision
 	GateVerdicts       map[string][]GateVerdictStatus
 	BackURL            string
+	BindingURL         string
+	BindingToken       string
 }
 
 // GateVerdictStatus is the read-only gate result shown in a node's
@@ -193,10 +194,9 @@ table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px}th,td{text
 .bind-ac-row:hover td{background:#f1f8f4}
 .bind-ac-row.selected td{background:#e8f0eb;color:#17412c;font-weight:600}
 .bind-ac-form{margin:10px 0 4px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fcfbf8;font-size:12px}
-.bind-ac-form .bind-ac-state{display:inline-block;margin-right:12px;color:#374151}
-.bind-ac-form code{color:#17412c}
+.bind-ac-form label{display:block;margin-top:8px}
+.bind-ac-form select,.bind-ac-form button{display:block;max-width:100%;min-height:48px;padding:8px;font:inherit;font-size:1rem}
 .bind-ac-hint{margin:4px 0;color:var(--muted)}
-pre.bind-ac-command,pre.bind-ac-patch{white-space:pre-wrap;word-break:break-word;margin:6px 0;background:#fff;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
 .hidden{display:none!important}
 .empty{color:var(--muted);font-size:12px}
 @media (max-width:1100px){.app{grid-template-columns:240px 1fr 360px}}
@@ -227,7 +227,11 @@ func writeTreePane(b *strings.Builder, idx Index, children map[string][]IndexEnt
 	if commit != "" {
 		commit = " · " + shortHash(commit)
 	}
-	fmt.Fprintf(b, `<div class="source-note"><b>权威源</b> tree/index.json · %s<br><b>需求线</b> %s · <b>快照</b> %s<br><b>运行时</b> %s%s<br>HTML 派生只读</div>`, esc(shortHash(SourceHash(idx))), esc(requirement), esc(snapshot), esc(runtime), esc(commit))
+	mode := "HTML 派生只读"
+	if rc.BindingURL != "" && rc.BindingToken != "" && rc.SnapshotID == "" {
+		mode = "本地工作台 · 绑定写回 canonical；冻结节点只读"
+	}
+	fmt.Fprintf(b, `<div class="source-note"><b>权威源</b> tree/index.json · %s<br><b>需求线</b> %s · <b>快照</b> %s<br><b>运行时</b> %s%s<br>%s</div>`, esc(shortHash(SourceHash(idx))), esc(requirement), esc(snapshot), esc(runtime), esc(commit), mode)
 	if rc.BackURL != "" || len(rc.History) > 0 {
 		b.WriteString(`<details class="history"><summary>版本历史`)
 		if len(rc.History) > 0 {
@@ -451,23 +455,26 @@ func writeNodePanel(b *strings.Builder, n Node, rootID string, truth map[string]
 				if text == "" {
 					text = tc.ACID
 				}
-				fmt.Fprintf(b, `<tr class="bind-ac-row" data-bind-ac="%s" data-bind-node="%s" data-bind-testcase="%s" data-bind-ref="%s" data-bind-kind="%s" data-bind-status="%s" tabindex="0" role="button" title="点击确认该用例绑定到 AC"><td>%s</td><td class="ref">%s</td><td><span class="badge">%s</span></td></tr>`,
+				fmt.Fprintf(b, `<tr class="bind-ac-row" data-bind-ac="%s" data-bind-node="%s" data-bind-testcase="%s" data-bind-ref="%s" data-bind-kind="%s" data-bind-status="%s"><td>%s</td><td class="ref">%s</td><td><span class="badge">%s</span></td></tr>`,
 					esc(tc.ACID), esc(n.ID), esc(tc.ID), esc(tc.Ref), esc(tc.Kind), esc(tc.Status), esc(text), esc(tc.Ref), esc(testStatusLabel(tc.Status)))
 			}
 			b.WriteString(`</table>`)
-			patchJSON, _ := json.MarshalIndent(struct {
-				TestCases []TestCase `json:"test_cases"`
-			}{TestCases: n.TestCases}, "", "  ")
-			patchFile := "/tmp/beacon-bind-" + n.ID + ".json"
-			b.WriteString(`<form class="bind-ac-form" data-bind-form="` + esc(n.ID) + `">`)
-			fmt.Fprintf(b, `<div class="bind-ac-state" data-bind-ac-value>未选择 AC</div><div class="bind-ac-state" data-bind-testcase-value>未选择用例</div><div class="bind-ac-state" data-bind-ref-value>未选择引用</div><input type="hidden" name="binding" data-bind-state value="">`)
-			fmt.Fprintf(b, `<div class="bind-ac-hint">点击用例行确认 AC 绑定；先把下方 JSON 保存为 <code>%s</code>，再执行写回命令。</div>`, esc(patchFile))
-			if n.Status == StatusFrozen {
-				fmt.Fprintf(b, `<pre class="bind-ac-command">beacon change request --project . --node %s --summary "bind test case to AC" --by html --base-fingerprint %s</pre>`, esc(n.ID), esc(n.Fingerprint))
+			if n.Status != StatusDraft && n.Status != StatusChangePending {
+				b.WriteString(`<p class="bind-ac-hint">冻结合同只读；须先经授权变更流程后才能修改绑定。</p>`)
+			} else if rc.BindingURL == "" || rc.BindingToken == "" || rc.SnapshotID != "" {
+				b.WriteString(`<p class="bind-ac-hint">静态导出与历史快照只读；绑定操作请在本地工作台进行。</p>`)
+			} else {
+				fmt.Fprintf(b, `<form class="bind-ac-form" data-bind-form="%s" action="%s" method="post" aria-label="AC 与用例绑定"><input type="hidden" name="node" value="%s"><input type="hidden" name="base_fingerprint" value="%s"><input type="hidden" name="csrf_token" value="%s">`, esc(n.ID), esc(rc.BindingURL), esc(n.ID), esc(n.Fingerprint), esc(rc.BindingToken))
+				fmt.Fprintf(b, `<label for="bind-tc-%s">选择用例</label><select id="bind-tc-%s" name="test_case_id" required><option value="">请选择用例</option>`, esc(n.ID), esc(n.ID))
+				for _, tc := range n.TestCases {
+					fmt.Fprintf(b, `<option value="%s">%s · %s</option>`, esc(tc.ID), esc(tc.ID), esc(tc.Ref))
+				}
+				fmt.Fprintf(b, `</select><label for="bind-ac-%s">绑定到验收标准</label><select id="bind-ac-%s" name="ac_id" required><option value="">请选择 AC</option>`, esc(n.ID), esc(n.ID))
+				for _, ac := range n.ACs {
+					fmt.Fprintf(b, `<option value="%s">%s · %s</option>`, esc(ac.ID), esc(ac.ID), esc(ac.Text))
+				}
+				b.WriteString(`</select><button type="submit">保存绑定</button><p role="status" aria-live="polite" data-bind-result></p></form>`)
 			}
-			fmt.Fprintf(b, `<pre class="bind-ac-command">beacon truth node update --project . --node %s --file %s</pre>`, esc(n.ID), esc(patchFile))
-			fmt.Fprintf(b, `<pre class="bind-ac-patch">%s</pre>`, esc(string(patchJSON)))
-			b.WriteString(`</form>`)
 		}
 		b.WriteString(`</details>`)
 	}
@@ -535,20 +542,27 @@ function select(id){
 buttons.forEach(b=>b.addEventListener('click',()=>select(b.dataset.node)));
 document.querySelectorAll('[data-select]').forEach(b=>b.addEventListener('click',()=>select(b.dataset.select)));
 document.querySelectorAll('.fsm-toggle').forEach(b=>b.addEventListener('click',()=>{const slot=b.closest('.fsm-slot');slot.classList.toggle('show-exceptions');b.textContent=slot.classList.contains('show-exceptions')?'隐藏异常转移':'显示异常转移';}));
-const bindRows=[...document.querySelectorAll('.bind-ac-row')];
 const bindForms=[...document.querySelectorAll('[data-bind-form]')];
-bindForms.forEach(f=>f.addEventListener('submit',e=>e.preventDefault()));
-function showBinding(row){
- const form=row.closest('[data-panel]')?.querySelector('[data-bind-form]');
- if(!form)return;
- const state={node:form.dataset.bindForm,ac_id:row.dataset.bindAc,test_case_id:row.dataset.bindTestcase,ref:row.dataset.bindRef};
- const hidden=form.querySelector('[data-bind-state]'); if(hidden)hidden.value=JSON.stringify(state);
- const ac=form.querySelector('[data-bind-ac-value]'); if(ac)ac.textContent=row.dataset.bindAc||'未选择 AC';
- const tc=form.querySelector('[data-bind-testcase-value]'); if(tc)tc.textContent=row.dataset.bindTestcase||'未选择用例';
- const ref=form.querySelector('[data-bind-ref-value]'); if(ref)ref.textContent=row.dataset.bindRef||'未选择引用';
- const rows=row.closest('.bind-ac-table')?.querySelectorAll('.bind-ac-row')||[]; rows.forEach(r=>r.classList.toggle('selected',r===row));
-}
-bindRows.forEach(row=>{row.addEventListener('click',()=>showBinding(row));row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showBinding(row);}});});
+bindForms.forEach(form=>{
+ const cases=form.elements.namedItem('test_case_id'), ac=form.elements.namedItem('ac_id');
+ const panel=form.closest('[data-panel]');
+ cases.addEventListener('change',()=>{const row=[...panel.querySelectorAll('.bind-ac-row')].find(row=>row.dataset.bindTestcase===cases.value);ac.value=row?.dataset.bindAc||'';});
+ form.addEventListener('submit',async event=>{
+  event.preventDefault();
+  if(form.dataset.saving==='1'||!form.reportValidity())return;
+  const button=form.querySelector('button[type="submit"]'), result=form.querySelector('[data-bind-result]');
+  form.dataset.saving='1';button.disabled=true;result.textContent='正在保存并回读…';
+  try{
+   const response=await fetch(form.action,{method:'POST',headers:{'Accept':'application/json'},body:new URLSearchParams(new FormData(form)),credentials:'same-origin'});
+   if(!response.ok)throw new Error(await response.text());
+   const node=await response.json();
+   form.elements.namedItem('base_fingerprint').value=node.fingerprint;
+   node.test_cases.forEach(tc=>{const row=[...panel.querySelectorAll('.bind-ac-row')].find(row=>row.dataset.bindTestcase===tc.id);if(row){row.dataset.bindAc=tc.ac_id;row.cells[0].textContent=node.acs.find(item=>item.id===tc.ac_id)?.text||tc.ac_id;}});
+   result.textContent='已保存绑定，并从 canonical 回读确认。';
+  }catch(error){result.textContent='保存未确认：'+error.message+'；请刷新后核对。';}
+  finally{form.dataset.saving='0';button.disabled=false;}
+ });
+});
 const filter=document.getElementById('filter');
 let activeStatus='';
 const statusButtons=[...document.querySelectorAll('[data-status-filter]')];

@@ -51,6 +51,10 @@ func snapshotsDir(dir string) string { return filepath.Join(dir, "snapshots") }
 // CreateSnapshot writes one immutable snapshot. Unchanged nodes point at
 // the previous snapshot's body instead of storing a second copy.
 func CreateSnapshot(dir, version string) (Snapshot, string, error) {
+	return createSnapshot(dir, version, "")
+}
+
+func createSnapshot(dir, version, snapshotID string) (Snapshot, string, error) {
 	idx, err := ReadIndex(dir)
 	if err != nil {
 		return Snapshot{}, "", err
@@ -71,6 +75,9 @@ func CreateSnapshot(dir, version string) (Snapshot, string, error) {
 	}
 	stamp := time.Now().UTC()
 	snapID := fmt.Sprintf("%s-%s", version, stamp.Format("20060102T150405.000000000Z"))
+	if snapshotID != "" {
+		snapID = snapshotID
+	}
 	snapDir := filepath.Join(snapshotsDir(dir), snapID)
 	if err := os.MkdirAll(filepath.Join(snapDir, "nodes"), 0o755); err != nil {
 		return Snapshot{}, "", err

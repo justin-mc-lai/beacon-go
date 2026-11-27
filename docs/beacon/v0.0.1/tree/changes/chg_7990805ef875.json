@@ -1,0 +1,13 @@
+{
+  "id": "chg_7990805ef875",
+  "node_id": "n_ca6fe1322405",
+  "summary": "用户批准：九条完整 canonical 规范字段与公开 CLI 验证合同",
+  "by": "codex-user-approved-20261127",
+  "base_fingerprint": "388edc4c09896b9dd1f6c7f1e4aa458fe36562d11fa0f9f4bf5990046d923807",
+  "before_snapshot_id": "v0.0.1-20261127T152226.593148000Z",
+  "affected": [
+    "n_86e6a7a520c7",
+    "n_ca6fe1322405"
+  ],
+  "created_at": "2026-11-27T15:22:26.58837Z"
+}

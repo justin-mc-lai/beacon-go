@@ -1,0 +1,52 @@
+{
+  "id": "n_6ee4eee57ba1",
+  "kind": "touchpoint",
+  "title": "evidence gate",
+  "intent": "以真实退出码、候选绑定和共享校验决定迁移，不以自报成功取代证据。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/evidence-gate",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "静态/类型检查、构建、测试及适用 E2E 按项目规定执行，必需检查非零、未执行、超时或取消阻塞完成声明。"
+    },
+    {
+      "id": "AC-002",
+      "text": "登记和状态迁移共享规范化校验；日志/回执缺失、越界、hash 不符、需求/候选绑定错误拒绝，拒绝不推进成功状态。"
+    },
+    {
+      "id": "AC-003",
+      "text": "新增 diff 扫描真实占位实现与调试残留，语法合法用法及夹具误报按位置与依据记录；hash、tree、gate、version 的结论分层表达。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "TestDeliveryReceiptCLIRefusals/green_failed",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "TestDeliveryReceiptStaleBlocksRollupAndDelivery",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./internal/cli\",\"-run\",\"^TestCapture\"],\"test_files\":[\"internal/cli/artifact_ignore_test.go\",\"internal/cli/artifact_scope_test.go\",\"internal/cli/capture_binary_e2e_test.go\",\"internal/cli/capture_custom_test.go\",\"internal/cli/capture_delivery_fixture_test.go\",\"internal/cli/capture_delivery_test.go\",\"internal/cli/capture_goal_chain_test.go\",\"internal/cli/capture_preflight_test.go\",\"internal/cli/capture_replay_test.go\",\"internal/cli/capture_test.go\",\"internal/cli/change_concurrency_test.go\",\"internal/cli/cli_test.go\",\"internal/cli/delivery_paradigm_cli_test.go\",\"internal/cli/delivery_paradigm_r1_cli_test.go\",\"internal/cli/delivery_receipt_test.go\",\"internal/cli/drift_exit_test.go\",\"internal/cli/fsm_test.go\",\"internal/cli/gate_strict_test.go\",\"internal/cli/gate_test.go\",\"internal/cli/goal_artifacts_test.go\",\"internal/cli/goal_module_test.go\",\"internal/cli/goal_p2b_test.go\",\"internal/cli/goal_p2c_test.go\",\"internal/cli/goal_p2d_test.go\",\"internal/cli/goal_release_shadow_test.go\",\"internal/cli/goal_test.go\",\"internal/cli/goal_topology_test.go\",\"internal/cli/implement_tasks_test.go\",\"internal/cli/intent_contract_seed_test.go\",\"internal/cli/intent_test.go\",\"internal/cli/kernel_qa_evidence_cli_test.go\",\"internal/cli/kernel_traceability_cli_test.go\",\"internal/cli/migrate_test.go\",\"internal/cli/migration_read_store_test.go\",\"internal/cli/p4a_test.go\",\"internal/cli/plan_drift_test.go\",\"internal/cli/projects_bump_test.go\",\"internal/cli/qa_score_test.go\",\"internal/cli/r2b_test.go\",\"internal/cli/r2c_test.go\",\"internal/cli/r2d_test.go\",\"internal/cli/skills_install_test.go\",\"internal/cli/skills_verify_test.go\",\"internal/cli/stdflow_s1_test.go\",\"internal/cli/stdflow_s2_test.go\",\"internal/cli/surface_qa_test.go\",\"internal/cli/surface_test.go\",\"internal/cli/tree_binding_atomic_test.go\",\"internal/cli/tree_binding_recovery_test.go\",\"internal/cli/tree_binding_test.go\",\"internal/cli/tree_freeze_test.go\",\"internal/cli/tree_gate_panel_test.go\",\"internal/cli/tree_implement_artifact_test.go\",\"internal/cli/tree_link_test.go\",\"internal/cli/tree_node_generate_test.go\",\"internal/cli/tree_node_truth_test.go\",\"internal/cli/tree_portable_test.go\",\"internal/cli/tree_reopen_test.go\",\"internal/cli/tree_test.go\",\"internal/cli/truth_fsm_test.go\",\"internal/cli/truth_migrate_test.go\"],\"required_tests\":[\"TestCaptureBinaryE2ESuccessAndRefusal\",\"TestCaptureCustomProtocolRedGreenAndRejections\",\"TestCaptureRejectsHandwrittenDelivery\",\"TestCaptureRejectsPublicRefreshOfReservedResult\",\"TestCaptureMakerVerifyHasNoRegistrationSideEffect\",\"TestCaptureRollupRefusalHasNoPartialWrites\",\"TestCaptureDeliveryRefusesCandidateAndReferenceForgery\",\"TestCaptureGoalFullSuccessChain\",\"TestCaptureGoalSDDConnectedLedger\",\"TestCapturePreflightProcessFacts\",\"TestCaptureRealProcessAndTestHash\",\"TestCaptureRejectsUnboundCommand\",\"TestCaptureExplicitRedPair\",\"TestCapturePreflightFailureRetainsEvidence\",\"TestCaptureConcurrentProcessesUseBarrier\",\"TestCaptureRejectsDuplicateAliasAndEmptyTests\",\"TestCaptureRejectsZeroSkipAndEnvironmentFailure\",\"TestCapturePairRejectsChangedTestsAndStaleLogs\",\"TestCaptureTimeoutCancellationAndMutation\"]}"
+  },
+  "fingerprint": "63a6a3e4843a6ab0d6a03f2c7080a92b43051f0688a5ee0fab7d70ebc1c70213",
+  "fingerprint_alg": "tree-json-v1"
+}

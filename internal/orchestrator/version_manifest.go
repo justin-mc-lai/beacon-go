@@ -9,6 +9,7 @@ package orchestrator
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"sort"
@@ -73,28 +74,65 @@ func (e *Engine) BaselineVersion(root, version string) (versionmanifest.Manifest
 // and seas by reference. It registers the version in the store and
 // makes it current; no package files are copied.
 func (e *Engine) OpenVersion(root, from, level string) (versionmanifest.Manifest, error) {
+	return e.openVersion(root, from, level, false)
+}
+
+func (e *Engine) BumpProjectVersion(root, from, level string) (versionmanifest.Manifest, error) {
+	return e.openVersion(root, from, level, true)
+}
+
+func (e *Engine) openVersion(root, from, level string, allowInitial bool) (versionmanifest.Manifest, error) {
 	root = store.ResolveRootPath(root)
+	project, err := e.store.Projects().GetByRootPath(root)
+	if err != nil {
+		return versionmanifest.Manifest{}, err
+	}
+	versions, err := e.store.Projects().ListVersions(project.ID)
+	if err != nil {
+		return versionmanifest.Manifest{}, err
+	}
+	registered := allowInitial && len(versions) == 0 && from == "v0.0.0"
+	for _, version := range versions {
+		if version.Version == from {
+			registered = true
+		}
+	}
+	if !registered {
+		return versionmanifest.Manifest{}, core.NewError("version_not_registered", "version.Open", "parent version "+from+" is not registered under "+root)
+	}
 	parent, err := versionmanifest.LoadVersion(root, from)
 	if err != nil {
-		return versionmanifest.Manifest{}, core.NewError("manifest_missing", "version.Open",
-			"no manifest for "+from+" under "+root+"; run `beacon version baseline --version "+from+"` first")
+		_, statErr := os.Lstat(versionmanifest.Path(root, from))
+		if !allowInitial || !errors.Is(err, os.ErrNotExist) || !errors.Is(statErr, os.ErrNotExist) {
+			return versionmanifest.Manifest{}, core.NewError("manifest_missing", "version.Open",
+				"cannot load manifest for "+from+" under "+root+": "+err.Error())
+		}
+	} else {
+		if err := versionmanifest.Validate(parent); err != nil {
+			return versionmanifest.Manifest{}, err
+		}
+		if parent.Version != from {
+			return versionmanifest.Manifest{}, core.NewError("manifest_version_mismatch", "version.Open", "parent manifest version does not match "+from)
+		}
 	}
 	next, err := BumpDocsVersion(from, level)
 	if err != nil {
 		return versionmanifest.Manifest{}, err
 	}
-	if _, err := os.Stat(versionmanifest.Path(root, next)); err == nil {
+	if _, err := os.Lstat(versionmanifest.Path(root, next)); err == nil {
 		return versionmanifest.Manifest{}, core.NewError("version_exists", "version.Open",
 			"manifest for "+next+" already exists")
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return versionmanifest.Manifest{}, err
 	}
 	child := versionmanifest.Inherit(parent, next)
 	// Realign Runtime with the current binary: a parent line may carry a
 	// stale value, and the docs version axis evolves independently.
 	child.Runtime = buildversion.Version
-	if err := e.ensureStoreVersion(root, next); err != nil {
+	if err := versionmanifest.Save(versionmanifest.Path(root, next), child); err != nil {
 		return versionmanifest.Manifest{}, err
 	}
-	if err := versionmanifest.Save(versionmanifest.Path(root, next), child); err != nil {
+	if err := e.ensureStoreVersion(root, next); err != nil {
 		return versionmanifest.Manifest{}, err
 	}
 	return child, nil
@@ -191,6 +229,7 @@ func (e *Engine) ReleaseVersion(root, version string) (versionmanifest.Manifest,
 				"lake "+l.Slug+" has no passing release gate")
 		}
 	}
+	m.Runtime = buildversion.Version
 	m.Status = versionmanifest.StatusReleased
 	m.ReleasedAt = time.Now().UTC().Format(time.RFC3339)
 	if err := versionmanifest.Save(versionmanifest.Path(root, version), m); err != nil {

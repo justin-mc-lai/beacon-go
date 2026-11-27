@@ -9,13 +9,29 @@
   "acs": [
     {
       "id": "AC-001",
-      "text": "治理规则变更不进入需求漂移报告；仅规范正文变化被列出"
+      "text": "治理规则变更不进入需求漂移报告；仅规范正文变化被列出；九条完整 canonical 规范字段与 AGENTS.md 初始逐项对齐，治理追加不改变报告；真实第二条规范反转须只定位第二项 changed。验收通过公开 CLI，生产构建失败必须作为前置阻断，不得冒充行为 Red。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "TestPortableAgentsMDGovernance",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-001",
+      "kind": "e2e",
+      "ref": "TestPortableAgentsMDReverse",
+      "status": "planned"
     }
   ],
   "verification": {
     "type": "test",
-    "spec": "【待实现】验收命令 beacon plan drift --agents-md 尚未落地（plan 无 drift 子命令）；目标态：只报需求级 changed 项，治理规则字段不出现在列表"
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./e2e/driftcontract\",\"-run\",\"^TestPortableAgentsMD\"],\"test_files\":[\"e2e/driftcontract/portable_drift_test.go\"],\"required_tests\":[\"TestPortableAgentsMDGovernance\",\"TestPortableAgentsMDReverse\"]}"
   },
-  "fingerprint": "c52323b3b7d01e311fd401b3f88b49b7e8a8f36bf353dcd118095529264e94bc",
+  "fingerprint": "891c280bb9f3322cf51fb458f3fc67abf85d6e0f781c4b6fc19abb1af33eb9d0",
   "fingerprint_alg": "tree-json-v1"
 }

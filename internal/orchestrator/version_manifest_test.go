@@ -26,6 +26,55 @@ func writeVersionFixture(t *testing.T, root string) {
 	}
 }
 
+func TestVersionCreationRefusesUnregisteredScope(t *testing.T) {
+	for _, method := range []string{"open", "bump"} {
+		for _, probe := range []string{"unregistered-project", "unregistered-version", "closed-store"} {
+			t.Run(method+"/"+probe, func(t *testing.T) {
+				env := newTestEnv(t, "draft")
+				root, from := env.root, "v2.0.0"
+				if probe == "unregistered-project" {
+					root = t.TempDir()
+				}
+				if probe == "unregistered-version" {
+					from = "v9.0.0"
+				}
+				parent := versionmanifest.Manifest{Schema: versionmanifest.Schema, Version: from, Status: versionmanifest.StatusDraft}
+				path := versionmanifest.Path(root, from)
+				if err := versionmanifest.Save(path, parent); err != nil {
+					t.Fatal(err)
+				}
+				before, err := os.ReadFile(path)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if probe == "closed-store" {
+					if err := env.st.Close(); err != nil {
+						t.Fatal(err)
+					}
+				}
+				create := env.eng.OpenVersion
+				if method == "bump" {
+					create = env.eng.BumpProjectVersion
+				}
+				if _, err := create(root, from, "patch"); err == nil {
+					t.Fatal("accepted an unavailable project/version scope")
+				}
+				next, err := BumpDocsVersion(from, "patch")
+				if err != nil {
+					t.Fatal(err)
+				}
+				if _, err := os.Lstat(versionmanifest.Path(root, next)); !os.IsNotExist(err) {
+					t.Fatalf("refusal left a next manifest: %v", err)
+				}
+				after, err := os.ReadFile(path)
+				if err != nil || string(before) != string(after) {
+					t.Fatalf("refusal changed parent: %v", err)
+				}
+			})
+		}
+	}
+}
+
 func TestBaselineAndOpenVersion(t *testing.T) {
 	env := newTestEnv(t, "frozen")
 	writeVersionFixture(t, env.root)
@@ -318,5 +367,77 @@ func TestVersionManifestRuntimeMatchesBuildVersion(t *testing.T) {
 	}
 	if child2.Runtime != buildversion.Version || child2.Version != "v2.1.0" {
 		t.Fatalf("open manifest = %+v, want runtime=%q docs version=v2.1.0", child2, buildversion.Version)
+	}
+}
+
+func TestReleaseVersionAlignsRuntimeOnlyAfterExistingChecks(t *testing.T) {
+	for _, probe := range []struct {
+		name, status, runtime string
+		changed, gatePass     bool
+		wantError             bool
+	}{
+		{name: "stale-runtime", status: versionmanifest.StatusFrozen, runtime: "9.9.9"},
+		{name: "missing-runtime", status: versionmanifest.StatusFrozen},
+		{name: "blank-runtime", status: versionmanifest.StatusFrozen, runtime: " "},
+		{name: "already-aligned", status: versionmanifest.StatusFrozen, runtime: buildversion.Version},
+		{name: "changed-with-release-gate", status: versionmanifest.StatusFrozen, changed: true, gatePass: true},
+		{name: "draft", status: versionmanifest.StatusDraft, runtime: "9.9.9", wantError: true},
+		{name: "baseline", status: versionmanifest.StatusBaseline, runtime: "9.9.9", wantError: true},
+		{name: "released", status: versionmanifest.StatusReleased, runtime: "9.9.9", wantError: true},
+		{name: "changed-without-release-gate", status: versionmanifest.StatusFrozen, changed: true, wantError: true},
+		{name: "changed-with-failed-release-gate", status: versionmanifest.StatusFrozen, changed: true, wantError: true},
+	} {
+		t.Run(probe.name, func(t *testing.T) {
+			env := newTestEnv(t, "frozen")
+			m := versionmanifest.Manifest{
+				Schema: versionmanifest.Schema, Version: "v2.0.0", Parent: "v1.0.0",
+				Runtime: probe.runtime, Status: probe.status,
+				FrozenAt: "2026-01-01T00:00:00Z",
+			}
+			if probe.changed {
+				m.Lakes = []versionmanifest.Lake{{Slug: env.feature.Slug, Package: "contract-hash", Status: versionmanifest.LakeChanged}}
+			}
+			if probe.gatePass || probe.name == "changed-with-failed-release-gate" {
+				verdict := "fail"
+				if probe.gatePass {
+					verdict = "pass"
+				}
+				if _, err := env.st.Gates().Record(store.GateResult{FeatureID: env.feature.ID, GateType: "release", Verdict: verdict}); err != nil {
+					t.Fatal(err)
+				}
+			}
+			path := versionmanifest.Path(env.root, m.Version)
+			if err := versionmanifest.Save(path, m); err != nil {
+				t.Fatal(err)
+			}
+			before, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got, err := env.eng.ReleaseVersion(env.root, m.Version)
+			if (err != nil) != probe.wantError {
+				t.Fatalf("ReleaseVersion error = %v, want error=%v", err, probe.wantError)
+			}
+			after, readErr := os.ReadFile(path)
+			if readErr != nil {
+				t.Fatal(readErr)
+			}
+			if probe.wantError {
+				if string(before) != string(after) {
+					t.Fatal("refused release changed manifest bytes")
+				}
+				return
+			}
+			saved, err := versionmanifest.LoadVersion(env.root, m.Version)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got.Runtime != buildversion.Version || saved.Runtime != buildversion.Version || saved.Status != versionmanifest.StatusReleased || saved.ReleasedAt == "" {
+				t.Fatalf("release did not persist runtime identity: returned=%+v saved=%+v", got, saved)
+			}
+			if saved.Version != m.Version || saved.Parent != m.Parent || saved.FrozenAt != m.FrozenAt || len(saved.Lakes) != len(m.Lakes) {
+				t.Fatalf("runtime alignment changed docs contract: %+v", saved)
+			}
+		})
 	}
 }

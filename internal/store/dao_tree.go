@@ -172,9 +172,42 @@ func (s *Store) UpdateTreeNodeStatus(id, status, fingerprint, updatedAt string) 
 	if err := s.checkWritable(); err != nil {
 		return err
 	}
-	_, err := s.db.Exec(`UPDATE tree_nodes SET status = ?, fingerprint = ?, updated_at = ? WHERE id = ?`,
-		status, fingerprint, updatedAt, id)
-	return err
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	if _, err := tx.Exec(`UPDATE tree_nodes SET status = ?, fingerprint = ?, updated_at = ? WHERE id = ?`,
+		status, fingerprint, updatedAt, id); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+func (s *Store) UpdateTreeNodeProjection(node TreeNode) error {
+	if err := s.checkWritable(); err != nil {
+		return err
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	result, err := tx.Exec(`UPDATE tree_nodes SET parent_id = ?, kind = ?, path = ?, status = ?, title = ?,
+		fingerprint = ?, fingerprint_alg = ?, doc_path = ?, updated_at = ? WHERE id = ? AND project_version_id = ?`,
+		nullIfEmpty(node.ParentID), node.Kind, node.Path, node.Status, node.Title, node.Fingerprint,
+		node.FingerprintAlg, node.DocPath, node.UpdatedAt, node.ID, node.ProjectVersionID)
+	if err != nil {
+		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count != 1 {
+		return sql.ErrNoRows
+	}
+	return tx.Commit()
 }
 
 // DeleteTree removes the cache rows for one version (rollback = rerun

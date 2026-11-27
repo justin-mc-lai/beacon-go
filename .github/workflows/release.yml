@@ -1,8 +1,5 @@
 name: release
 
-# Distribution closure: the kernel stays one binary per platform; the
-# desktop workspace is an optional companion built for macOS/Linux where
-# the Wails toolchain is available. Every artifact ships with a SHA-256.
 on:
   push:
     tags: ["v*"]
@@ -11,7 +8,26 @@ permissions:
   contents: write
 
 jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check release candidate
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          notes="docs/beacon/${RELEASE_TAG}/release/${RELEASE_TAG}.md"
+          bash scripts/check_version_consistency.sh --tag "$RELEASE_TAG" --release-notes "$notes"
+          mkdir -p release-candidate
+          cp "$notes" release-candidate/release-notes.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-candidate
+          path: release-candidate/release-notes.md
+          if-no-files-found: error
+
   cli:
+    needs: preflight
     strategy:
       fail-fast: false
       matrix:
@@ -44,29 +60,8 @@ jobs:
           name: beacon-${{ matrix.goos }}-${{ matrix.goarch }}
           path: beacon-*
 
-  desktop:
-    # Wails needs a platform webview toolchain; macOS is the supported
-    # delivery target and is built on a macOS runner.
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          cache: true
-      - run: go test ./desktop -count=1
-      - name: build desktop
-        run: |
-          out="beacon-desktop-${GITHUB_REF_NAME}-darwin-arm64"
-          go build -trimpath -ldflags="-s -w" -o "$out" ./desktop
-          shasum -a 256 "$out" > "$out.sha256"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: beacon-desktop-darwin-arm64
-          path: beacon-desktop-*
-
   publish:
-    needs: [cli, desktop]
+    needs: [preflight, cli]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -74,9 +69,10 @@ jobs:
           path: dist
           merge-multiple: true
       - name: checksums
-        run: cd dist && sha256sum * > SHA256SUMS.txt || true
+        run: cd dist && sha256sum * > SHA256SUMS.txt
       - uses: softprops/action-gh-release@v2
         with:
+          body_path: dist/release-notes.md
           files: |
             dist/beacon-*
             dist/SHA256SUMS.txt

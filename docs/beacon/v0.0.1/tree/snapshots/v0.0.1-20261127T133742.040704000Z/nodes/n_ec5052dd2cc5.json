@@ -1,0 +1,52 @@
+{
+  "id": "n_ec5052dd2cc5",
+  "kind": "touchpoint",
+  "title": "blind review",
+  "intent": "宿主以全新只读上下文组织独立审查，系统校验绑定回执。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/blind-review",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "reviewer 输入原始需求、固定候选 diff 与运行日志，不接收实现者推理或自评；可只读检查源码并复跑验证。"
+    },
+    {
+      "id": "AC-002",
+      "text": "回执绑定节点、需求指纹、最终候选与 capture refs，review 在 Green 后、无未关闭问题；缺回执、自审或错误绑定拒绝。"
+    },
+    {
+      "id": "AC-003",
+      "text": "宿主不支持独立 reviewer 时记录阻塞，不以自审冒充；身份字符串检查不宣称真实身份认证或已证明上下文隔离。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "TestDeliveryReceiptCLIRefusals/missing_review and self_review",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "TestStrictDeliveryReferencesSurviveInstall",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./internal/cli\",\"-run\",\"^TestCaptureDeliveryRefusesCandidateAndReferenceForgery$\"],\"test_files\":[\"internal/cli/artifact_ignore_test.go\",\"internal/cli/artifact_scope_test.go\",\"internal/cli/capture_binary_e2e_test.go\",\"internal/cli/capture_custom_test.go\",\"internal/cli/capture_delivery_fixture_test.go\",\"internal/cli/capture_delivery_test.go\",\"internal/cli/capture_goal_chain_test.go\",\"internal/cli/capture_preflight_test.go\",\"internal/cli/capture_replay_test.go\",\"internal/cli/capture_test.go\",\"internal/cli/change_concurrency_test.go\",\"internal/cli/cli_test.go\",\"internal/cli/delivery_paradigm_cli_test.go\",\"internal/cli/delivery_paradigm_r1_cli_test.go\",\"internal/cli/delivery_receipt_test.go\",\"internal/cli/drift_exit_test.go\",\"internal/cli/fsm_test.go\",\"internal/cli/gate_strict_test.go\",\"internal/cli/gate_test.go\",\"internal/cli/goal_artifacts_test.go\",\"internal/cli/goal_module_test.go\",\"internal/cli/goal_p2b_test.go\",\"internal/cli/goal_p2c_test.go\",\"internal/cli/goal_p2d_test.go\",\"internal/cli/goal_release_shadow_test.go\",\"internal/cli/goal_test.go\",\"internal/cli/goal_topology_test.go\",\"internal/cli/implement_tasks_test.go\",\"internal/cli/intent_contract_seed_test.go\",\"internal/cli/intent_test.go\",\"internal/cli/kernel_qa_evidence_cli_test.go\",\"internal/cli/kernel_traceability_cli_test.go\",\"internal/cli/migrate_test.go\",\"internal/cli/migration_read_store_test.go\",\"internal/cli/p4a_test.go\",\"internal/cli/plan_drift_test.go\",\"internal/cli/projects_bump_test.go\",\"internal/cli/qa_score_test.go\",\"internal/cli/r2b_test.go\",\"internal/cli/r2c_test.go\",\"internal/cli/r2d_test.go\",\"internal/cli/skills_install_test.go\",\"internal/cli/skills_verify_test.go\",\"internal/cli/stdflow_s1_test.go\",\"internal/cli/stdflow_s2_test.go\",\"internal/cli/surface_qa_test.go\",\"internal/cli/surface_test.go\",\"internal/cli/tree_binding_atomic_test.go\",\"internal/cli/tree_binding_recovery_test.go\",\"internal/cli/tree_binding_test.go\",\"internal/cli/tree_freeze_test.go\",\"internal/cli/tree_gate_panel_test.go\",\"internal/cli/tree_implement_artifact_test.go\",\"internal/cli/tree_link_test.go\",\"internal/cli/tree_node_generate_test.go\",\"internal/cli/tree_node_truth_test.go\",\"internal/cli/tree_portable_test.go\",\"internal/cli/tree_reopen_test.go\",\"internal/cli/tree_test.go\",\"internal/cli/truth_fsm_test.go\",\"internal/cli/truth_migrate_test.go\"],\"required_tests\":[\"TestCaptureDeliveryRefusesCandidateAndReferenceForgery\"]}"
+  },
+  "fingerprint": "14d002db76b99e6f32fdd30c78f5d71573d9058ae4db2db67fd95191784d9ca7",
+  "fingerprint_alg": "tree-json-v1"
+}

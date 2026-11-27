@@ -1,0 +1,53 @@
+{
+  "id": "n_ca6fe1322405",
+  "kind": "feature",
+  "title": "AGENTS.md sync guard",
+  "intent": "检测 AGENTS.md 中声明的 SDD 规范与意图树之间的漂移，只报不改；治理规则变更不得被误判为需求漂移。",
+  "doc": "## 问题\nAGENTS.md 中用自然语言声明了一组 SDD 规范正文，意图树节点也承载需求，两处内容可能各自演进而产生漂移。治理规则（协作流程、写入口约定等过程性约定）的变化属于治理范畴，不应被当作需求漂移上报。当前缺少只针对规范正文、且能区分治理规则的漂移检测定义。\n\n## 目标用户\n维护 AGENTS.md 与意图树的规范负责人、在提交前核对规范与树是否一致的 beacon 使用者。\n\n## 场景\n当有人改动 AGENTS.md 的规范正文或治理规则后，运行漂移检查：规范正文的变化应作为需求级 changed 项列出，治理规则字段的变化不得出现在需求漂移报告中。检查过程只读，不回写 AGENTS.md 或意图树。\n\n## 范围\n本包交付一个只读、只报不改的漂移检测需求定义：比较 AGENTS.md 声明的 SDD 规范正文与意图树节点，只输出需求级 changed 项并排除治理规则。现有落点 scripts/check_version_consistency.sh 只校验 AGENTS.md 的版本号硬编码，与规范正文漂移无关。规范正文与意图树的漂移检测逻辑当前未实现，本包冻结的是需求定义，不是实现状态。\n\n## 非目标\n不自动修改 AGENTS.md 或意图树，检测只报不改；不把治理规则变更计入需求漂移。不做版本号唯一源校验，那属于 runtime-version-source；不做节点级 added/changed/removed 通用漂移报告，那属于 requirement-level-drift。\n\n## 验收标准\n治理规则字段变更后报告不含任何需求漂移项，只有规范正文变化被列为 changed 项。验收命令为 `beacon plan drift --agents-md --json 输出仅含需求级 changed 项，治理规则字段不在列表中`，该命令当前尚不存在（现有 plan 命令组只有 init/tree/expand/apply），属待实现能力。\n\n## 九项规范的 canonical 对应字段\n本 feature 的 NORM-001 至 NORM-009 分别承载 AGENTS.md 唯一真源节的九条完整编号规范。映射只保存编号与 canonical 字段选择器，不保存另一份规范正文或基线哈希。AGENTS.md 按仓库权威顺序用于冲突裁决；需求侧合同字段须经 change/refreeze 维护。本字段对应只用于逐条正文一致性检查，不代表九项产品行为已全部验收。治理规则变化排除于需求漂移报告。原文中的命令不存在说明为历史背景，当前目标入口固定为 beacon plan drift --agents-md --json。",
+  "parent_id": "n_56360bc665a3",
+  "path": "root/truth-binding/agents-md-sync-guard",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "NORM-001",
+      "text": "**需求树（intent tree）是唯一需求真相**。canonical JSON 为权威源，SQLite 只是可重建索引；叶子带可执行验证，冻结指纹只覆盖合同面。"
+    },
+    {
+      "id": "NORM-002",
+      "text": "**七能力/命令组**：`plan | truth | change | implement | verify | release | goal`。唯一一等能力集合，由 `internal/harness/harness.go` 的 `Abilities` 单点定义，CLI 从该表装配，回归测试锁死集合与顺序。旧六能力（loop/design/qa 为一等）及改名均为历史。"
+    },
+    {
+      "id": "NORM-003",
+      "text": "**worktree 是核心能力**，用于并行 worktree 交付；在 `implement` 组可见，admission 硬门禁，不得按\"移出核心\"处理。"
+    },
+    {
+      "id": "NORM-004",
+      "text": "**change 只有一个入口**：顶层 `change`（`request`/`list` 操作需求树；`legacy` 承载旧 feature-package 变更）。`truth change` 不再是独立命令。"
+    },
+    {
+      "id": "NORM-005",
+      "text": "**design 已从系统彻底移除**——不是能力、不是 goal 阶段、不是 gate 类型、不是 CLI flag、不是 admission 检查。产品基因：**复杂应该留给我们系统，不要留给用户，用户体验至高无上。** 任何让调用者手动声明\"这是 UX 工作\"、手动绑定设计原语、或暴露 design 阶段/命令/gate 的实现，都是违背这条基因的漂移。"
+    },
+    {
+      "id": "NORM-006",
+      "text": "**版本号是纯 `x.y.z`**，演进迭代；唯一源 `internal/version/version.go`，规则见 `docs/version-scheme.md`。当前版本以 `beacon --version` 为准，本文不写死。版本轴从 `0.0.1` 重新开始（首个正式版），历史版本线随旧工件一起清除。"
+    },
+    {
+      "id": "NORM-007",
+      "text": "**需求交付验证**分层：intent leaf/rollup → verify 证据登记 → harness 只读 hash 校验 → gate/release 评估；不混同 \"hash verified / gate pass / tree verified / version ready\"。"
+    },
+    {
+      "id": "NORM-008",
+      "text": "**内核不调 LLM、不跑 agent**；执行归宿主 agent，用 `goal tick --by` 记录。"
+    },
+    {
+      "id": "NORM-009",
+      "text": "**边界权威顺序**：本节 \u003e spec #15 \u003e `docs/adr/ADR-0002-intent-tree-truth-model.md` \u003e 其余文档（历史范围文档冲突段已作废）；术语见 `GLOSSARY.md`。"
+    }
+  ],
+  "child_fingerprints": [
+    "891c280bb9f3322cf51fb458f3fc67abf85d6e0f781c4b6fc19abb1af33eb9d0"
+  ],
+  "fingerprint": "5e7e5cca7015c4c60b42aa07026d8191195f327491ca4a3ac415bfa89f2e1686",
+  "fingerprint_alg": "tree-json-v1"
+}

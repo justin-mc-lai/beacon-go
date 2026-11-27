@@ -15,9 +15,10 @@ fail=0
 
 expect_fail() {
   local name="$1" dir="$2" pattern="$3"
+  shift 3
   set +e
   local out
-  out="$(CHECK_VERSION_ROOT="$dir" bash "$SCRIPT" 2>&1)"
+  out="$(CHECK_VERSION_ROOT="$dir" bash "$SCRIPT" "$@" 2>&1)"
   local rc=$?
   set -e
   if [ "$rc" -eq 0 ]; then
@@ -38,9 +39,10 @@ expect_fail() {
 
 expect_ok() {
   local name="$1" dir="$2"
+  shift 2
   set +e
   local out
-  out="$(CHECK_VERSION_ROOT="$dir" bash "$SCRIPT" 2>&1)"
+  out="$(CHECK_VERSION_ROOT="$dir" bash "$SCRIPT" "$@" 2>&1)"
   local rc=$?
   set -e
   if [ "$rc" -ne 0 ]; then
@@ -109,6 +111,66 @@ const Version = "2.0.0"
 const OldVersion = "1.2.3"
 EOF
 expect_fail "second-version-literal" "$case4" "exactly one const Version literal"
+
+release="$TMP/release"
+mkbase "$release"
+cat > "$release/CHANGELOG.md" <<'EOF'
+# Changelog
+## [Unreleased]
+- Work in progress.
+## [2.0.0] — baseline
+- Shipped the kernel.
+## [1.0.0]
+- Previous release.
+EOF
+cat > "$release/notes.md" <<'EOF'
+# Release v2.0.0
+- Shipped the kernel; upgrades from v1.0.0 are supported.
+EOF
+expect_ok "explicit-candidate" "$release" --tag v2.0.0 --release-notes notes.md
+expect_ok "absolute-notes-alias" "$release" --tag v2.0.0 --release-notes "$release/./notes.md"
+expect_fail "historical-tag-is-not-candidate" "$release" "candidate tag" --tag v3.0.2 --release-notes notes.md
+expect_fail "tag-needs-prefix" "$release" "candidate tag" --tag 2.0.0 --release-notes notes.md
+expect_fail "blank-tag" "$release" "candidate tag" --tag ' ' --release-notes notes.md
+expect_fail "empty-tag" "$release" "candidate tag" --tag '' --release-notes notes.md
+expect_fail "missing-tag-scope" "$release" "requires both" --release-notes notes.md
+expect_fail "missing-notes-scope" "$release" "requires both" --tag v2.0.0
+expect_fail "empty-notes-path" "$release" "release notes" --tag v2.0.0 --release-notes ''
+expect_fail "missing-notes-file" "$release" "release notes" --tag v2.0.0 --release-notes absent.md
+expect_fail "duplicate-tag-argument" "$release" "duplicate option" --tag v2.0.0 --tag v2.0.0 --release-notes notes.md
+expect_fail "duplicate-notes-alias" "$release" "duplicate option" --tag v2.0.0 --release-notes notes.md --release-notes "$release/notes.md"
+expect_fail "unknown-argument" "$release" "unknown option" --latest
+expect_fail "missing-argument-value" "$release" "requires a value" --tag
+
+printf '# Release v9.9.9\n\nThe prose mentions v2.0.0, but this is another release.\n' > "$release/notes.md"
+expect_fail "reverse-notes-description" "$release" "release notes heading" --tag v2.0.0 --release-notes notes.md
+printf '# Release v2.0.0\n\n' > "$release/notes.md"
+expect_fail "empty-notes-body" "$release" "release notes body" --tag v2.0.0 --release-notes notes.md
+printf '# Release v2.0.0\n\nTODO\n' > "$release/notes.md"
+expect_fail "stub-notes-body" "$release" "release notes body" --tag v2.0.0 --release-notes notes.md
+printf '# Release v2.0.0\n- Shipped.\n# Release v2.0.0\n- Duplicate.\n' > "$release/notes.md"
+expect_fail "duplicate-notes-heading" "$release" "release notes heading" --tag v2.0.0 --release-notes notes.md
+printf '<!-- # Release v2.0.0 -->\nThis is only a comment.\n' > "$release/notes.md"
+expect_fail "comment-is-not-title" "$release" "release notes heading" --tag v2.0.0 --release-notes notes.md
+printf '```markdown\n# Release v2.0.0\n```\nThis is only an example.\n' > "$release/notes.md"
+expect_fail "example-is-not-title" "$release" "release notes heading" --tag v2.0.0 --release-notes notes.md
+printf '# Release v2.0.0\n<!-- TODO: add actual release notes -->\n' > "$release/notes.md"
+expect_fail "comment-is-not-body" "$release" "release notes body" --tag v2.0.0 --release-notes notes.md
+printf '# Release v2.0.0\n- Shipped.\n' > "$release/notes.md"
+printf '## [9.9.9]\n- Mentions 2.0.0 in prose only.\n' > "$release/CHANGELOG.md"
+expect_fail "reverse-changelog-description" "$release" "CHANGELOG entry" --tag v2.0.0 --release-notes notes.md
+printf '## [2.0.0]\n## [1.0.0]\n- Old entry.\n' > "$release/CHANGELOG.md"
+expect_fail "empty-changelog-entry" "$release" "CHANGELOG body" --tag v2.0.0 --release-notes notes.md
+printf '## [2.0.0]\n- First.\n## [2.0.0]\n- Duplicate.\n' > "$release/CHANGELOG.md"
+expect_fail "duplicate-changelog-entry" "$release" "CHANGELOG entry" --tag v2.0.0 --release-notes notes.md
+rm "$release/CHANGELOG.md"
+expect_fail "missing-changelog" "$release" "CHANGELOG" --tag v2.0.0 --release-notes notes.md
+
+git -C "$base" init -q
+empty_tree="$(git -C "$base" mktree </dev/null)"
+historical_commit="$(printf 'Historical fixture\n' | git -C "$base" -c user.name=Probe -c user.email=probe@example.invalid -c commit.gpgsign=false commit-tree "$empty_tree")"
+git -C "$base" update-ref refs/tags/v3.0.2 "$historical_commit"
+expect_ok "daily-check-ignores-historical-tags" "$base"
 
 echo "version-consistency-probe: $pass passed, $fail failed"
 [ "$fail" -eq 0 ]
