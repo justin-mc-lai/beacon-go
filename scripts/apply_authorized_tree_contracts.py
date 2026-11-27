@@ -94,14 +94,15 @@ def refresh_proposal():
             "required_tests": [BEHAVIOR[node_id].strip("^$")],
         }
         patch = {"verification": {"type": "test", "spec": json.dumps(spec, ensure_ascii=False, separators=(",", ":"))}}
-        if not node.get("test_cases"):
+        if BEHAVIOR[node_id] != "^TestPortableStrictDeliveryContract$" or not node.get("test_cases"):
+            test_name = BEHAVIOR[node_id].strip("^$")
             cases = []
             for index, ac in enumerate(node.get("acs", [])):
                 cases.append({
                     "id": f"TC-PORTABLE-{index + 1:03d}",
                     "ac_id": ac["id"],
                     "kind": "e2e",
-                    "ref": TEST_REL,
+                    "ref": f"{test_name} → {TEST_REL}",
                     "status": "existing",
                 })
             if cases:
