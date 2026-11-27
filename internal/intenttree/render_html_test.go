@@ -29,6 +29,41 @@ func TestRenderHTMLTreeShowsRequirementBodies(t *testing.T) {
 	}
 }
 
+func TestRenderHTMLTreeBindsTestCaseRowsToAC(t *testing.T) {
+	idx := Index{Schema: Schema, Version: "v0.1.0", RootID: "r", Nodes: []IndexEntry{
+		{ID: "r", Kind: KindIntent, Status: StatusFrozen, Title: "root", Path: "root", Fingerprint: "aa"},
+		{ID: "n_bind", ParentID: "r", Kind: KindTouchpoint, Status: StatusFrozen, Title: "bind", Path: "root/bind", Fingerprint: "bb"},
+	}}
+	body := Node{ID: "n_bind", Kind: KindTouchpoint, Status: StatusFrozen, Title: "bind", Path: "root/bind", Fingerprint: "bb",
+		ACs: []AC{{ID: "AC-001", Text: "点击即绑定"}, {ID: "AC-002", Text: "另一条绑定"}},
+		TestCases: []TestCase{
+			{ID: "tc-1", ACID: "AC-001", Kind: "unit", Ref: "go test ./internal/intenttree -run TestOne", Status: "planned"},
+			{ID: "tc-2", ACID: "AC-002", Kind: "manual", Ref: "manual bind check", Status: "existing"},
+		},
+		Verification: &Verification{Type: "test", Spec: "点击行生成写回命令"}}
+	out := string(RenderHTMLTree(idx, map[string]Node{"r": {ID: "r", Kind: KindIntent, Title: "root"}, "n_bind": body}))
+	for _, want := range []string{
+		`data-bind-ac="AC-001"`,
+		`data-bind-ac="AC-002"`,
+		`data-bind-testcase="tc-1"`,
+		`data-bind-ref="go test ./internal/intenttree -run TestOne"`,
+		`data-bind-form="n_bind"`,
+		`data-bind-state`,
+		`beacon change request --project . --node n_bind`,
+		`beacon truth node update --project . --node n_bind --file /tmp/beacon-bind-n_bind.json`,
+		`test_cases`,
+		`addEventListener('click'`,
+		`data-panel="n_bind"`,
+	} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("html missing %q", want)
+		}
+	}
+	if got := strings.Count(out, `class="bind-ac-row"`); got != 2 {
+		t.Fatalf("bindable test case rows = %d, want 2", got)
+	}
+}
+
 func TestRenderHTMLTreeShowsTruthLinkMismatch(t *testing.T) {
 	idx := Index{Schema: Schema, Version: "v0.1.0", RootID: "r", Nodes: []IndexEntry{
 		{ID: "r", Kind: KindIntent, Status: StatusFrozen, Title: "root", Path: "root", Fingerprint: "aa"},
