@@ -7,6 +7,12 @@ The version axis was reset to `0.0.1` when the product was redesigned from
 scratch under the AGENTS.md "唯一真源" contract. Earlier version lines and
 frozen artifacts were removed.
 
+## [Unreleased]
+
+- `plan tree` and `truth tree` can read repository intent trees without a local
+  SQLite ledger. Without a registered current version, a sole tree is selected
+  automatically and multiple trees require an explicit `--version`.
+
 ## [0.0.1] — redesigned kernel baseline
 
 ### Added

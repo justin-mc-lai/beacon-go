@@ -41,15 +41,7 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 		Short: short,
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			st, exists, err := openReadStore()
-			if err != nil {
-				return err
-			}
-			if !exists {
-				return fail("store_not_found", op, "global store not found; run migrate tree first")
-			}
-			defer st.Close()
-			dir, projRoot, idx, err := resolveTree(st, project, version)
+			dir, projRoot, idx, err := resolveTreeRead(project, version, op)
 			if err != nil {
 				return err
 			}
@@ -214,15 +206,20 @@ func resolveTree(st *store.Store, project, version string) (string, string, inte
 	idx, err := intenttree.ReadIndex(dir)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) || strings.Contains(err.Error(), "no such file") {
-			msg := "tree is not materialized for version " + ver.Version + "; run: beacon migrate tree --project " + root + " --version " + ver.Version
-			if !ver.IsCurrent {
-				msg = "tree only covers materialized versions; version " + ver.Version + " has no tree. Old versions are not materialized by default; run: beacon migrate tree --project " + root + " --version " + ver.Version + " to create it"
-			}
-			return "", "", intenttree.Index{}, core.NewError("tree_version_not_materialized", "resolveTree", msg)
+			return "", "", intenttree.Index{}, missingRegisteredTree("resolveTree", root, ver)
 		}
 		return "", "", intenttree.Index{}, err
 	}
 	return dir, proj.RootPath, idx, nil
+}
+
+func missingRegisteredTree(op, root string, ver store.ProjectVersion) error {
+	command := "beacon migrate tree --project " + root + " --version " + ver.Version
+	msg := "tree is not materialized for version " + ver.Version + "; run: " + command
+	if !ver.IsCurrent {
+		msg = "tree only covers materialized versions; version " + ver.Version + " has no tree. Old versions are not materialized by default; run: " + command + " to create it"
+	}
+	return fail("tree_version_not_materialized", op, msg)
 }
 
 func resolveProjectVersion(st *store.Store, projectID, version string) (store.ProjectVersion, error) {
