@@ -97,6 +97,10 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 	// 1. truth frozen (the shared FrozenFact determination, via
 	// buildExitInput — no second derivation lives here). Module-run
 	// admission consumes the same item before any run is created.
+	in, err := e.buildExitInput(run, m)
+	if err != nil {
+		return AdmissionResult{}, err
+	}
 	truth := truthFrozenAdmissionItem(in)
 	if truth.OK {
 		ok(truth)
