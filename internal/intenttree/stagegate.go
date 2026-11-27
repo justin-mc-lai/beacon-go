@@ -89,13 +89,15 @@ func featureEntry(dir string, idx Index, slug string) (IndexEntry, bool) {
 			continue
 		}
 		truthPath := n.TruthPath
-		if truthPath == "" {
-			if body, err := ReadNode(dir, n.ID); err == nil {
-				truthPath = body.EffectiveTruthPath()
+		if body, err := ReadNode(dir, n.ID); err == nil {
+			if effective := body.EffectiveTruthPath(); effective != "" {
+				truthPath = effective
 			}
 		}
-		if n.Title == slug || filepath.Base(n.Path) == slug || TruthPathSlug(truthPath) == slug {
-			return n, true
+		for _, candidate := range FeaturePackageSlugs(idx, n.ID, truthPath) {
+			if candidate == slug {
+				return n, true
+			}
 		}
 	}
 	return IndexEntry{}, false

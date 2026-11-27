@@ -42,14 +42,21 @@ const (
 	ReasonMainImplementExcAllowed    = "main_implement_exception_allowed"
 )
 
+// ---- Module scheduler family (goal module runs) ----
+
+const (
+	ReasonModuleRunPending    = "module_run_pending"
+	ReasonModuleStageNotFound = "tree_stage_not_found"
+)
+
 // ReasonCatalog maps the stage-exit / admission family to the
 // user-facing descriptions of goal_reason_codes.REASON_CATALOG.
 var ReasonCatalog = map[string]string{
-	ReasonStageExitOK:                 "Stage exit verifier passed",
-	ReasonStageExitPlanIncomplete:     "Plan/journey incomplete; cannot leave plan",
-	ReasonStageExitTruthNotFrozen:     "Feature truth exists but status is not frozen",
-	ReasonStageExitTruthMissing:       "Feature truth package missing; fill then freeze",
-	ReasonIntentMissing:               "Kernel-driven run needs a confirmed intent recorded in the feature package",
+	ReasonStageExitOK:             "Stage exit verifier passed",
+	ReasonStageExitPlanIncomplete: "Plan/journey incomplete; cannot leave plan",
+	ReasonStageExitTruthNotFrozen: "Feature truth exists but status is not frozen",
+	ReasonStageExitTruthMissing:   "Feature truth package missing; fill then freeze",
+	ReasonIntentMissing:           "Kernel-driven run needs a confirmed intent recorded in the feature package",
 
 	ReasonStageExitImplementBlock:     "Implement admission failed",
 	ReasonStageExitQAEvidenceMiss:     "QA lacks scorecard/evidence artifact",
@@ -75,6 +82,8 @@ var ReasonCatalog = map[string]string{
 	ReasonACNotTraceableToRestatement: "An acceptance criterion names no restatement section, or one that does not exist",
 	ReasonMainImplementForbidden:      "Business path commit on main/master forbidden",
 	ReasonMainDocsPolicyForbidden:     "Docs path outside allowed main docs policy",
+	ReasonModuleRunPending:            "Module run is pending until its predecessor leaves the plan stage",
+	ReasonGateNoResult:                "Gate has no evaluation result",
 }
 
 // HumanGateReasonCodes is the closed set of blocker reason codes whose
@@ -185,8 +194,6 @@ const (
 	ReasonSatelliteTruthWrite   = "satellite_truth_write_forbidden"
 )
 
-
-
 // ---- Self-heal family (plan_goal_self_heal steps) ----
 
 const (
@@ -296,17 +303,18 @@ const (
 // evidence) — one vocabulary, no re-spelling.
 
 const (
-	ReasonGateEvaluatorRequired    = "gate_evaluator_required"
-	ReasonGateTypeUnknown          = "gate_type_unknown"
-	ReasonGateRunRequired          = "gate_run_required"
-	ReasonGateRunMismatch          = "gate_run_feature_mismatch"
-	ReasonGateNotEvaluated         = "gate_not_evaluated"
-	ReasonGatePrereqNotPassed      = "gate_prerequisite_not_passed"
+	ReasonGateEvaluatorRequired = "gate_evaluator_required"
+	ReasonGateTypeUnknown       = "gate_type_unknown"
+	ReasonGateRunRequired       = "gate_run_required"
+	ReasonGateRunMismatch       = "gate_run_feature_mismatch"
+	ReasonGateNotEvaluated      = "gate_not_evaluated"
+	ReasonGatePrereqNotPassed   = "gate_prerequisite_not_passed"
+	ReasonGateNoResult          = "gate_no_result"
 
-	ReasonTruthChangePending       = "truth_change_pending"
-	ReasonQAStageNotExecuted       = "qa_stage_not_executed"
-	ReasonQAArtifactStale          = "qa_artifact_stale"
-	ReasonReleaseAwaitingComplete  = "release_awaiting_complete"
+	ReasonTruthChangePending      = "truth_change_pending"
+	ReasonQAStageNotExecuted      = "qa_stage_not_executed"
+	ReasonQAArtifactStale         = "qa_artifact_stale"
+	ReasonReleaseAwaitingComplete = "release_awaiting_complete"
 	// qa-surface-e2e: the requirement-truth surface declaration and
 	// the qa gate's two fail-closed evidence doors.
 	ReasonTruthSurfaceRequired      = "truth_surface_required"
@@ -367,7 +375,6 @@ const (
 	ReasonIntegrityEvidenceMissing   = "truth_integrity_evidence_artifact_missing"
 	ReasonIntegritySlugMismatch      = "truth_integrity_slug_mismatch"
 	ReasonIntegrityAuditOnly         = "truth_integrity_audit_only"
-
 )
 
 // ---- Conformance traceability family (kernel-truth-traceability

@@ -145,11 +145,16 @@ func newTreeReadCmd(use, op, short string) *cobra.Command {
 						Match: st.Match, Error: st.Error,
 					}
 				}
+				gateVerdicts, gerr := treeGateVerdicts(projRoot, idx.Version, idx, bodies)
+				if gerr != nil {
+					return gerr
+				}
 				rt := buildversion.Runtime()
 				data := intenttree.RenderHTMLTreeWithContext(idx, bodies, truth, intenttree.RenderContext{
 					RuntimeVersion: rt.Version, RuntimeCommit: rt.Commit, BinarySHA: rt.BinarySHA,
 					RequirementVersion: idx.Version, History: treeHistoryLinks(dir, true),
 					Changes: treeChangeLinks(dir), NodeHistory: treeNodeHistory(dir, true),
+					GateVerdicts: gateVerdicts,
 				})
 				def := filepath.Join(projRoot, ".beacon", "artifacts", "tree", idx.Version, "index.html")
 				p, werr := writeTreeRender(outPath, "", def, data)
@@ -406,6 +411,67 @@ func snapshotRenderInput(dir string, snap intenttree.Snapshot) (intenttree.Index
 		bodies[e.ID] = n
 	}
 	return idx, bodies, nil
+}
+
+// treeGateVerdicts attaches the latest formal gate results to the tree
+// nodes they govern. A touchpoint inherits its nearest feature's gates;
+// the store decides the verdicts and this helper only projects them.
+func treeGateVerdicts(projRoot, version string, idx intenttree.Index, bodies map[string]intenttree.Node) (map[string][]intenttree.GateVerdictStatus, error) {
+	out := map[string][]intenttree.GateVerdictStatus{}
+	st, exists, err := openReadStore()
+	if err != nil || !exists {
+		return out, err
+	}
+	defer st.Close()
+	contexts, err := st.ListFeatureContexts(projRoot)
+	if err != nil {
+		return nil, err
+	}
+	bySlug := map[string][]intenttree.GateVerdictStatus{}
+	for _, ctx := range contexts {
+		if ctx.Version.Version != version {
+			continue
+		}
+		results, err := st.Gates().LatestByType(ctx.Feature.ID)
+		if err != nil {
+			return nil, err
+		}
+		verdicts := make([]intenttree.GateVerdictStatus, 0, len(results))
+		for _, g := range results {
+			verdicts = append(verdicts, intenttree.GateVerdictStatus{
+				GateType: g.GateType, Verdict: g.Verdict,
+				ReasonCodes: g.ReasonCodes, EvaluatedAt: g.EvaluatedAt,
+			})
+		}
+		if len(verdicts) > 0 {
+			bySlug[ctx.Feature.Slug] = verdicts
+		}
+	}
+	byID := map[string]intenttree.IndexEntry{}
+	for _, e := range idx.Nodes {
+		byID[e.ID] = e
+	}
+	for _, e := range idx.Nodes {
+		id := e.ID
+		var verdicts []intenttree.GateVerdictStatus
+		for id != "" {
+			n := bodies[id]
+			if n.Kind == intenttree.KindFeature {
+				for _, slug := range intenttree.FeaturePackageSlugs(idx, id, n.EffectiveTruthPath()) {
+					if got, ok := bySlug[slug]; ok {
+						verdicts = got
+						break
+					}
+				}
+				break
+			}
+			id = byID[id].ParentID
+		}
+		if verdicts != nil {
+			out[e.ID] = verdicts
+		}
+	}
+	return out, nil
 }
 
 func unlinkedFeatureSlugs(dir string, idx intenttree.Index) ([]string, error) {

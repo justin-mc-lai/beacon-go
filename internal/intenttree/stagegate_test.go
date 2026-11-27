@@ -75,7 +75,9 @@ func TestStageGateMatchesLegacyNodeTruthPath(t *testing.T) {
 	if err := WriteIndex(dir, idx); err != nil {
 		t.Fatal(err)
 	}
-	if ok, reason, err := StageGate(dir, "implement", "dispatch-thread-reuse"); err != nil || !ok {
-		t.Fatalf("legacy truth path must match: ok=%v reason=%q err=%v", ok, reason, err)
+	for _, slug := range []string{"dispatch-thread-reuse", "m-dispatch-thread-reuse"} {
+		if ok, reason, err := StageGate(dir, "implement", slug); err != nil || !ok {
+			t.Fatalf("legacy truth path %q must match: ok=%v reason=%q err=%v", slug, ok, reason, err)
+		}
 	}
 }

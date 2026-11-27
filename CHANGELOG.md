@@ -13,6 +13,8 @@ frozen artifacts were removed.
   SQLite ledger. Without a registered current version, a sole tree is selected
   automatically and multiple trees require an explicit `--version`.
 - `plan drift --node <id> --json` reports added/changed/removed requirement-level drift against one immutable snapshot. Status, grouping, fingerprints and evidence changes alone are not reported as requirement drift; `--snapshot <id>` selects the explicit baseline (`latest` is an accepted key).
+- Tree HTML renders each node's latest formal gate verdicts and reason codes in a `gate-panel`, sourced from registered gate results; verified snapshot rendering stays immutable.
+- `beacon goal module run --node <module-id> --json` expands a module's feature children into ordered goal runs. Later runs stay pending at plan until the predecessor leaves that stage; each run records the module's pool plan with one satellite per module.
 
 ## [0.0.1] — redesigned kernel baseline
 

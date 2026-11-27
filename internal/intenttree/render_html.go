@@ -1,6 +1,7 @@
 package intenttree
 
 import (
+	"beacon-go/internal/core"
 	"fmt"
 	"sort"
 	"strings"
@@ -26,7 +27,17 @@ type RenderContext struct {
 	History            []HistoryLink
 	Changes            []HistoryLink
 	NodeHistory        map[string][]NodeRevision
+	GateVerdicts       map[string][]GateVerdictStatus
 	BackURL            string
+}
+
+// GateVerdictStatus is the read-only gate result shown in a node's
+// verdict panel. The kernel decides the verdict; rendering only shows it.
+type GateVerdictStatus struct {
+	GateType    string   `json:"gate_type"`
+	Verdict     string   `json:"verdict"`
+	ReasonCodes []string `json:"reason_codes,omitempty"`
+	EvaluatedAt string   `json:"evaluated_at,omitempty"`
 }
 
 type NodeRevision struct {
@@ -399,6 +410,15 @@ func writeNodePanel(b *strings.Builder, n Node, rootID string, truth map[string]
 		}
 		b.WriteString(`</div>`)
 	}
+	b.WriteString(`<section class="gate-panel"><h2>Gate 判定</h2><table><tr><th>Gate</th><th>判定</th><th>reason code</th></tr>`)
+	verdicts := rc.GateVerdicts[n.ID]
+	if len(verdicts) == 0 {
+		fmt.Fprintf(b, `<tr><td>gate</td><td>未评估</td><td>%s</td></tr>`, core.ReasonGateNoResult)
+	}
+	for _, v := range verdicts {
+		fmt.Fprintf(b, `<tr><td>%s</td><td>%s</td><td>%s</td></tr>`, esc(v.GateType), esc(v.Verdict), esc(strings.Join(v.ReasonCodes, ", ")))
+	}
+	b.WriteString(`</table></section>`)
 	if len(n.ACs) > 0 {
 		b.WriteString(`<h2>验收标准</h2><ul class="acs">`)
 		for _, ac := range n.ACs {

@@ -246,20 +246,20 @@
       "id": "n_5a4abb5210d0",
       "parent_id": "n_47544230bf1e",
       "kind": "feature",
-      "status": "frozen",
+      "status": "verified",
       "title": "gate verdict panel",
       "path": "root/tree-visual/gate-verdict-panel",
-      "fingerprint": "4b85645a588c7458b30573b7108cc7bd7cd4f5cea1d18f79c6cfe1507cfec9b3",
+      "fingerprint": "1329fceea614dda3f3fc4f13074ce9c2e8bf228f5120cf217bbff0a84895e88b",
       "fingerprint_alg": "tree-json-v1"
     },
     {
       "id": "n_17162700446e",
       "parent_id": "n_5a4abb5210d0",
       "kind": "touchpoint",
-      "status": "frozen",
+      "status": "verified",
       "title": "gate panel",
       "path": "root/tree-visual/gate-verdict-panel/gate-panel",
-      "fingerprint": "1112cc831cd9b5acb45832b688b37de3474242718c33f8d35e52dff1e88251c3",
+      "fingerprint": "0e544600c630a7714e0b128c91b804c4be69ab8a3cefc9ab5d073614d2d80fdc",
       "fingerprint_alg": "tree-json-v1"
     },
     {

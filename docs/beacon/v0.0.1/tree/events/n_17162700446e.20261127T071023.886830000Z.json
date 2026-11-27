@@ -1,0 +1,10 @@
+{
+  "artifact": ".beacon/artifacts/priority3/gate-panel-evidence.txt",
+  "artifact_hash": "ec593f18e34c3e194f7eee6e8b7c07514ab6ce240d572e95251da378e20ee32e",
+  "at": "2026-11-27T07:10:23.88683Z",
+  "by": "implement-host",
+  "node_id": "n_17162700446e",
+  "outcome": "done",
+  "reason_code": "",
+  "type": "implementation_done"
+}
