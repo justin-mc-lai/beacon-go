@@ -51,6 +51,9 @@ Worked routes (open the file before acting; examples are not requirement authori
 
 ## HARD GATE
 
+- 严格交付（变更）：完整读取 `../beacon-go-verify/references/strict-delivery.md`，
+  记录受影响的任务、测试和证据；修改合同后重新确认，旧证据不得冒充新验收。
+
 - Never edit a frozen contract in place: `change request` (or `change legacy`)
   first, then edit, then refreeze.
 - Never treat a legacy package as a second truth authority; the tree wins.

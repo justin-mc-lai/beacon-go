@@ -1,0 +1,52 @@
+{
+  "id": "n_a3b9d2c7f296",
+  "kind": "touchpoint",
+  "title": "external ledger",
+  "intent": "任务定义和执行事实外部化，逐项核销且不产生双账本。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/external-ledger",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "tasks.md/DAG 是任务定义，已有运行回执是执行事实；展示清单声明派生来源，不创建独立权威 progress 账本。"
+    },
+    {
+      "id": "AC-002",
+      "text": "当前合同的必需集合决定核销范围；空集合、漏项、重复/未知 key、pending/failed、缺证据或候选过期均阻塞。"
+    },
+    {
+      "id": "AC-003",
+      "text": "恢复先读取显式作用域账本与候选；通过运行入口记录任务结果，手动勾选不等于通过；未核销可报告进度但不可宣称全部完成。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "TestDeliveryReceiptCLIRefusals/open_task and empty_ledger and duplicate_ac",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "TaskStatus freshness regression tests",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli ./internal/orchestrator ./skills -run 'TestDeliveryReceipt|TestTaskRunner|TestStrictDelivery' -count=1 -v；核对 TaskStatus 与显式 run/node 的派生关系。"
+  },
+  "fingerprint": "b3bfe9af409ac7f0de93d2c011e7f0f5591d365479159f5530a52d1c87523192",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -174,6 +174,11 @@ func (e *Engine) EvaluateGate(ctx store.FeatureContext, gateType, runID, evaluat
 	var boundRun string
 	var err error
 	extra := map[string]any{}
+	if gateType == string(gate.GateQA) || gateType == string(gate.GateRelease) {
+		if err := e.validateTreeDelivery(ctx); err != nil {
+			return gate.Evaluation{}, err
+		}
+	}
 	switch gate.GateType(gateType) {
 	case gate.GateTruthFreeze:
 		ev, err = e.evalTruthFreeze(ctx, evaluator)
@@ -195,6 +200,9 @@ func (e *Engine) EvaluateGate(ctx store.FeatureContext, gateType, runID, evaluat
 		}
 		if has {
 			boundRun = run.ID
+			if err := e.validateDeliveryTasks(run); err != nil {
+				return gate.Evaluation{}, err
+			}
 			fp, qerr := e.currentQAEligibility(run, m, true)
 			ev = e.qaEvaluation(evaluator, fp, qerr)
 			extra["qa_fingerprint"] = fp
@@ -202,13 +210,35 @@ func (e *Engine) EvaluateGate(ctx store.FeatureContext, gateType, runID, evaluat
 			ev = e.qaEvaluation(evaluator, "", qaError("qa_candidate_missing", "no goal run"))
 		}
 	case gate.GateRelease:
-		if runID != "" {
-			if _, _, _, verr := e.latestGoalRun(ctx, runID); verr != nil {
-				return gate.Evaluation{}, verr
-			}
-			boundRun = runID
+		run, m, has, rerr := e.latestGoalRun(ctx, runID)
+		if rerr != nil {
+			return gate.Evaluation{}, rerr
 		}
-		ev, err = e.evalRelease(ctx, evaluator)
+		if has {
+			boundRun = run.ID
+			if err := e.validateDeliveryTasks(run); err != nil {
+				return gate.Evaluation{}, err
+			}
+		}
+		facts, ferr := e.releaseFacts(ctx)
+		if ferr != nil {
+			return gate.Evaluation{}, ferr
+		}
+		// Explicit run selection must never borrow a sibling run's approval.
+		if has {
+			facts.HumanConfirmed = m.ReleaseHumanConfirmed
+			facts.HumanConfirmedBy = m.HumanConfirmedBy
+			events, eventErr := e.store.ListEventsByRun(run.ID)
+			if eventErr != nil {
+				return gate.Evaluation{}, eventErr
+			}
+			for _, event := range events {
+				if event.EventType == "release_confirmed" {
+					facts.HumanConfirmed = true
+				}
+			}
+		}
+		ev = gate.EvaluateRelease(facts, evaluator)
 	}
 	if err != nil {
 		return gate.Evaluation{}, err

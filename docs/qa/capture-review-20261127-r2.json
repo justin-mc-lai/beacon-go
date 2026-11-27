@@ -1,0 +1,24 @@
+{
+  "schema":"beacon-code-review.v1",
+  "reviewer":"capture-reviewer-20261127",
+  "execution_mode":"sequential",
+  "source_commit":"496a79655db635d2e9a9cdc240f22b5662dd7a7a",
+  "candidate":"HEAD plus current working tree; no source commit or release approval created",
+  "verdict":"pass",
+  "scope":"F1–F5 remediation review only; not full feature acceptance",
+  "source":"Independent read-only Task session ses_de3972ba5ffeZDJoPUOGcrOGRO, second round; condensed receipt",
+  "items":[
+    {"id":"F-1","status":"resolved","evidence":"Public registry checks canonical target of existing capture_result before DAO upsert; TestCaptureRejectsPublicRefreshOfReservedResult passed."},
+    {"id":"F-2","status":"resolved","evidence":"Shared ValidateVerifier runs before ingestion/registration and in MarkVerified; no-registration-side-effect probe passed."},
+    {"id":"F-3","status":"resolved","evidence":"Rollup plans complete postorder updates before writes; TestCaptureRollupRefusalHasNoPartialWrites passed."},
+    {"id":"F-4","status":"resolved","evidence":"release evaluate validates selected run ledger and consumes only selected run confirmation metadata/events; source review and release regression passed."},
+    {"id":"F-5","status":"resolved","evidence":"TestCaptureBinaryE2ESuccessAndRefusal builds real binary, captures Red/Green, verifies/rolls up/delivers and refuses stale candidate; passed twice."}
+  ],
+  "findings":[],
+  "tests":[
+    {"command":"go test ./internal/cli -run '^(TestCaptureRejectsPublicRefreshOfReservedResult|TestCaptureMakerVerifyHasNoRegistrationSideEffect|TestCaptureRollupRefusalHasNoPartialWrites|TestCaptureBinaryE2ESuccessAndRefusal)$' -count=1 -v","exit_code":0,"output":"ok beacon-go/internal/cli 6.403s; all four tests executed"},
+    {"command":"go test ./internal/orchestrator ./internal/cli -run 'TestReleaseGateComposition|TestGoalReleaseShadowCLI|TestReleaseShadow|TestCapture|TestDeliveryReceipt' -count=1 -v","exit_code":0,"output":"ok beacon-go/internal/orchestrator 1.429s; ok beacon-go/internal/cli 20.953s; no zero-test packages"},
+    {"command":"git diff --check","exit_code":0}
+  ],
+  "limitations":["Not a gate evaluation or release approval", "No full suite executed by reviewer", "Symlink alias handling and multi-run confirmation isolation source-reviewed, no dedicated dynamic probe", "Binary E2E reviewer document is synthetic and does not exercise goal tick/complete or direct verify/release evaluate", "Crash/concurrent IO atomicity unverified"]
+}

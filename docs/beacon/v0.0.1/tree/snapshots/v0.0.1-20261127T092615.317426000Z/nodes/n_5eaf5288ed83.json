@@ -1,0 +1,74 @@
+{
+  "id": "n_5eaf5288ed83",
+  "kind": "touchpoint",
+  "title": "capture process",
+  "intent": "确定性进程采集读取真实测试输入和运行结果。",
+  "parent_id": "n_4bdf0311e438",
+  "path": "root/acceptance-binding/red-green-capture/capture-process",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "implement 组采集入口显式绑定项目、版本、叶子、AC、阶段与当前确认测试调用；Go 服务直接启动进程，不调 LLM/agent，不隐式拼 shell。"
+    },
+    {
+      "id": "AC-002",
+      "text": "命令从当前确认测试定义或合同绑定配置解析，拒绝随意 true/false 冒充行为测试。"
+    },
+    {
+      "id": "AC-003",
+      "text": "服务读取实际测试文件集合计算 hash，采集规范 cwd、argv、时钟、真实退出码、stdout/stderr，调用者不能覆盖采集字段。"
+    },
+    {
+      "id": "AC-004",
+      "text": "运行前后核对合同及测试输入；超时、取消、启动失败、运行中输入改变保存失败证据并非零退出。"
+    },
+    {
+      "id": "AC-005",
+      "text": "Go 测试解析机器事件，拒绝零测试、全部 skip、无关编译或环境失败冒充 Red；自定义测试需明确机器结果协议，普通非零不证明 Red。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "planned TestCaptureProcessBinding",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "planned TestCaptureRejectsUnboundCommand",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "planned TestCaptureRealProcessAndTestHash",
+      "status": "planned"
+    },
+    {
+      "id": "TC-004",
+      "ac_id": "AC-004",
+      "kind": "unit",
+      "ref": "planned TestCaptureTimeoutCancellationAndMutation",
+      "status": "planned"
+    },
+    {
+      "id": "TC-005",
+      "ac_id": "AC-005",
+      "kind": "unit",
+      "ref": "planned TestCaptureRejectsZeroSkipAndEnvironmentFailure",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli ./internal/intenttree -run '^TestCapture' -count=1 -v；验收必须有每个计划用例的执行事件，不接受 no tests to run；新测试尚未实现，不宣称已通过。"
+  },
+  "fingerprint": "c63a54cb4cb8b4efead3e59176960b3a1bfb79b576e85e62238dd7e81a24bbd9",
+  "fingerprint_alg": "tree-json-v1"
+}

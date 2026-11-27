@@ -1,6 +1,6 @@
 ---
 name: beacon-go-goal
-description: Long-run delivery for one feature. Use when the user says goal, 长跑, 全流程, deliver this feature, or drive it to release; it turns one utterance into a staged run (plan → truth → design? → implement → verify → release), survives interruption, and never completes without an independent verifier and a human-confirmed release.
+description: Long-run delivery for one feature. Use when the user says goal, 长跑, 全流程, deliver this feature, or drive it to release; it turns one utterance into a staged run (plan → truth → implement → verify → release), survives interruption, and never completes without an independent verifier and a human-confirmed release.
 ---
 
 # beacon-goal
@@ -8,6 +8,9 @@ description: Long-run delivery for one feature. Use when the user says goal, 长
 Use `goal` when the work will outlive one turn.
 
 ## HARD GATE
+
+- 严格交付（编排）：先完整读取 `../beacon-go-verify/references/strict-delivery.md`；
+  以六点协议核对阶段证据和账本，再记录推进；未验证不记为完成。
 
 - Orchestrate only: never write product code, never judge your own work, never release.
 - Goal never expands the tree. Route to `beacon-go-plan` (pln-tree): the host
@@ -23,7 +26,7 @@ Use `goal` when the work will outlive one turn.
 ## Workflow
 
 1. `beacon goal run "<utterance>" --project . --feature <slug> --executor-id <id>`
-   creates the run and its stage plan (design is inserted only when UX is required).
+   creates the run and its stage plan (plan → truth → implement → verify → release).
 2. The host does the stage work; `beacon goal tick --run-id <id> --by <identity>`
    records it and advances one stage. The tree stage gate blocks on draft or
    unverified nodes.
@@ -44,7 +47,7 @@ Every turn ends with:
 - `mode_id`: `loop-goal`
 - `run_id` and the stage you actually advanced (or `blocked` + reason code)
 - `evidence_refs`: commands run, files read, artifacts registered
-- `next`: one of `goal|plan|truth|design|implement|qa|release|stop`
+- `next`: one of `goal|plan|truth|implement|verify|release|stop`
 - `plain_summary`: one sentence a non-engineer understands
 
 ## Refuse (no fake delivery)

@@ -1,0 +1,52 @@
+{
+  "id": "n_a11841bbc44c",
+  "kind": "touchpoint",
+  "title": "plan first",
+  "intent": "先确认计划与微步任务再实施产品代码；工具权限覆盖如实声明。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/plan-first",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "计划包含完成定义、输入输出、边界、AC、任务依赖及适用检查；确认前只读调查与计划材料允许，产品写入不允许。"
+    },
+    {
+      "id": "AC-002",
+      "text": "每次推进一个原子任务，通常一两个函数；扩大范围先拆解或说明必要跨文件原因；原子任务不授权自动提交。"
+    },
+    {
+      "id": "AC-003",
+      "text": "宿主文本合同与工具权限拦截分别声明；未实现工具拦截不得声称已硬阻断写入。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "TestStrictDeliveryReferencesSurviveInstall",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./skills -run '^TestStrictDelivery' -count=1 -v；必须有测试执行事件，人工核对协议区分 advisory 与权限检查，不把文本 PASS 当成工具阻断。"
+  },
+  "fingerprint": "17c06885f94fc5e7ba5d09ce5b18961b7ffd88a891c0137b369ed34415e99403",
+  "fingerprint_alg": "tree-json-v1"
+}

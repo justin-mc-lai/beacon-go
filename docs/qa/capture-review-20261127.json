@@ -1,0 +1,22 @@
+{
+  "schema": "beacon-code-review.v1",
+  "reviewer": "capture-reviewer-20261127",
+  "execution_mode": "sequential",
+  "source_commit": "496a79655db635d2e9a9cdc240f22b5662dd7a7a",
+  "candidate": "HEAD plus working tree, including untracked capture implementations and tests",
+  "verdict": "block",
+  "source": "Independent read-only Task session ses_de3972ba5ffeZDJoPUOGcrOGRO; condensed findings, not a passing delivery receipt",
+  "findings": [
+    {"id":"F-1","severity":"blocker","file":"internal/orchestrator/artifacts.go","line":257,"ac":"pair-and-register/AC-004","summary":"Public allowed-kind registration can refresh an existing capture_result path/hash while preserving its reserved kind and ID.","evidence":"registerArtifactScopedCaptured checks requested kind, but DAO upsert uses run_id+abs_path and retains original kind; ReadCaptureEvidence trusts the refreshed hash. Source-traced; attack not dynamically reproduced by reviewer."},
+    {"id":"F-2","severity":"major","file":"internal/cli/tree_verify.go","line":341,"ac":"transition-integration/AC-003","summary":"Maker-as-verifier rejection occurs after successful evidence registration.","evidence":"RegisterScopedArtifact precedes MarkVerified identity validation. Source-traced."},
+    {"id":"F-3","severity":"major","file":"internal/intenttree/verify.go","line":219,"ac":"transition-integration/AC-003","summary":"Rollup mutates earlier branches before later branch rejection, leaving nodes and index inconsistent.","evidence":"WriteNode/store update inside recursive walk, WriteIndex only after entire walk. Source-traced."},
+    {"id":"F-4","severity":"major","file":"internal/orchestrator/gates_eval.go","line":212,"ac":"transition-integration/AC-001,AC-002","summary":"Direct release evaluation omits task ledger validation and can read another run's human confirmation.","evidence":"Release path calls evalRelease/releaseFacts; releaseFacts uses latestGoalRun(ctx, empty) and feature-wide release_confirmed events. Source-traced."},
+    {"id":"F-5","severity":"major","file":"internal/cli/capture_delivery_test.go","line":44,"ac":"transition-integration/AC-004","summary":"New binary CLI E2E success/refusal evidence is missing; in-process CLI tests and legacy E2E do not satisfy it.","evidence":"No capture chain in e2e scripts; fixture tests use runCLI and synthetic reviewer JSON."}
+  ],
+  "verification": [
+    {"command":"go test ./internal/cli ./internal/intenttree ./internal/orchestrator -run 'TestCapture|TestDeliveryReceipt|TestVerifyLeafAndParentRollup|TestTruthNodeDeliverRequiresVerifiedChildren|TestTruthNodeReopenWithdrawsClaims' -count=1 -v","exit_code":0,"result":"14 matching CLI top-level tests passed; intenttree/orchestrator had no matching tests, not counted as verified"},
+    {"command":"go test ./internal/store -run '^TestAdd(UpsertsByPath|KeepsIdentity)$' -count=1 -v","exit_code":0,"result":"Both tests executed and passed"},
+    {"command":"git diff --check","exit_code":0}
+  ],
+  "limitations": ["Review is not gate evaluation or release approval", "No new attack probes were written in the read-only review", "No full build/test/vet or new capture E2E run by reviewer", "Concurrency/crash atomicity and reviewer identity authenticity not verified"]
+}

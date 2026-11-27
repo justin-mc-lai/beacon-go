@@ -1,0 +1,18 @@
+{
+  "provenance": {"by":"host-agent:user-confirmed-2026-11-27","skill":"beacon-intent-tree","sources":["docs/plan/strict-delivery-runtime-proposal.md","user confirmation: acceptance binding subtree change and refreeze"]},
+  "children": [
+    {
+      "kind":"feature","title":"strict delivery contract","slug":"strict-delivery-contract",
+      "intent":"六点严格交付协议横切七能力：分清宿主软约束、可执行检查、需求冻结与交付验收。",
+      "doc":"# 严格交付合同\n\n## 问题\n只有提示词与手写成功文本不能证明交付，计划、测试、审查和账本缺少一致的可核查合同。\n\n## 目标用户\n使用 Beacon 七能力进行需求交付的宿主 agent、审查者和需求负责人。\n\n## 场景\n宿主先计划与原子拆解，确认后执行 Red/Green，提交独立盲审与真实验证证据，按既有任务事实逐项核销。\n\n## 范围\n六个叶子分别定义 Plan-First、Red/Green 与断言保护、独立盲审、证据门禁、外部账本、确定性工具。implement/verify/goal 承担执行、验收、编排；其他能力执行适用部分。每条约束标记可执行检查或 advisory，不用文本检查冒充行为验收。需求权威是 canonical JSON，正文与证据分层；任务定义与执行事实不新建第二账本。\n\n## 非目标\n不新增第八能力或 design 阶段；不承诺宿主写工具已被权限隔离，不认证 reviewer 身份，不替代人工发布确认。\n\n## 验收标准\n六个子叶子各有 AC、计划状态 TC 与可执行验证规格；完整协议随 skill 安装可达。运行时成功与拒绝必须有实际输出，未执行写未验证。需求冻结不代表实现或验收通过。",
+      "acs":[{"id":"AC-001","text":"六点均映射独立叶子及七能力适用责任，软约束与硬检查的覆盖边界显式声明。"},{"id":"AC-002","text":"冻结、实现、hash verified、tree verified、gate pass 与发布就绪分别表达，不跨层声称完成。"}]
+    },
+    {
+      "kind":"feature","title":"red green capture","slug":"red-green-capture",
+      "intent":"由确定性执行器启动真实测试、读取测试输入、登记不可覆盖的采集结果，并在共享状态迁移入口消费显式 Red/Green 配对。",
+      "doc":"# Red/Green 确定性采集\n\n## 问题\n现有 v1 交付回执与 test_sha256 可由调用者手填；hash 一致不证明测试运行。需要系统直接采集，防止把自洽 JSON 当作真实执行。\n\n## 目标用户\n宿主 implementer、独立 reviewer 和 Beacon 验收服务。\n\n## 场景\n宿主在 implement 组显式选择项目、版本、叶子、AC 和测试定义；先采集 Red，修改实现后显式引用 Red ID 采集 Green，再取得最终候选的独立审查，最后核销与验证。\n\n## 范围\n三个叶子定义进程采集、配对登记和状态迁移集成。命令来自当前确认的测试定义或合同绑定配置；服务直接启动进程、不调 LLM/agent、不隐式拼 shell。采集系统时钟、真实退出码、stdout/stderr，读取实际测试文件集合计算 hash，前后核对合同输入。每次尝试唯一目录，失败历史追加保留，复用现有 scoped artifact 登记。Green 引用明确 Red capture ID，不用 latest。最终候选需真实源码 commit/input hash，独立回执绑定 Green 与 capture refs。\n\n## 非目标\n不认证外部 reviewer 的真实身份，不防御可任意改写源码/二进制/账本的恶意本机用户。无树 legacy 范围显式标记，不宣称全覆盖。非 TDD 自动豁免未定义前保持阻塞。\n\n## 验收标准\n有效行为 Red→Green→独立审查→核销可进入 verified；缺采集、零测试、全部 skip、环境/编译失败、取消、超时、输入改变、自审、篡改或账本未核销必须非零退出且不推进状态。所有直接 CLI 与共享服务使用同一校验。fixture/E2E 同批更新；legacy E2E 不代替新增采集链验收。",
+      "acs":[{"id":"AC-001","text":"采集、配对登记与状态迁移集成均由子叶子定义，可追溯到真实运行证据。"},{"id":"AC-002","text":"未采集→Red→Green→独立审查→可核销按序推进，跳步、过期与失败阻塞且保留历史。"}],
+      "domain_fsm":{"states":["not_captured","red_captured","green_captured","reviewed","settled"],"transitions":[{"from":"not_captured","to":"red_captured","event":"capture_expected_failure"},{"from":"red_captured","to":"green_captured","event":"capture_passing_same_tests"},{"from":"green_captured","to":"reviewed","event":"independent_review_pass"},{"from":"reviewed","to":"settled","event":"all_tasks_closed"}],"illegal":[{"from":"not_captured","to":"green_captured"},{"from":"red_captured","to":"settled"},{"from":"green_captured","to":"settled"}]}
+    }
+  ]
+}

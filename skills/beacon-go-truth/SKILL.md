@@ -81,6 +81,9 @@ requirement authority — the frozen body is):
 
 ## HARD GATE
 
+- 严格交付（合同）：完整读取 `../beacon-go-verify/references/strict-delivery.md`，
+  将适用的六点要求绑定 AC/TC 与任务定义；不把需求冻结当作实现或验证完成。
+
 - Never freeze while an intent question is open or an AC has no intent source.
 - Never edit a frozen body in place: `truth change` first, then edit, then `refreeze`.
 - Never move requirement text into the database; the Markdown package is the only authority.
@@ -97,7 +100,7 @@ from this summary alone.
 - `mode_id`: one of `tr-ask|tr-sign|tr-freeze|tr-change|tr-drift`
 - `package_path` and the fingerprint or change id you produced
 - `evidence_refs`: commands run and their output
-- `next`: one of `truth|design|implement|qa|stop`
+- `next`: one of `truth|implement|verify|stop`
 - `plain_summary`: one sentence a non-engineer understands
 
 ## Refuse (no fake delivery)
@@ -112,4 +115,3 @@ Stop and say so — do not proceed — when any of these is true:
 6. You would edit the frozen body directly to make a gate pass.
 7. You are re-asking a question the intent snapshot already records.
 8. You would report a drift or integrity result you did not evaluate.
-

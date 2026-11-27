@@ -437,6 +437,7 @@ func bytesReplace(b, old, new []byte) []byte {
 func TestVerifyLeafAndParentRollup(t *testing.T) {
 	proj := treeTestEnv(t)
 	seedFreezeTree(t, proj, false)
+	prepareCaptureTree(t, proj)
 	for _, id := range []string{"t1", "t2", "f", "m", "root"} {
 		if _, err := freeze(t, proj, id); err != nil {
 			t.Fatal(err)
@@ -447,7 +448,7 @@ func TestVerifyLeafAndParentRollup(t *testing.T) {
 			"--artifact", writeEvidence(t, proj, id), "--json")
 	}
 	out := mustRun(t, "verify", "leaf", "--project", proj, "--node", "t1",
-		"--artifact", writeEvidence(t, proj, "t1"), "--by", "qa", "--json")
+		"--artifact", writeCapturedEvidence(t, proj, "t1"), "--by", "qa", "--json")
 	doc := parseDoc(t, out)
 	if doc["verify"].(map[string]any)["status"] != "verified" {
 		t.Fatalf("verify leaf: %v", doc)
@@ -456,7 +457,7 @@ func TestVerifyLeafAndParentRollup(t *testing.T) {
 		t.Fatalf("rollup before all leaves: %v", err)
 	}
 	mustRun(t, "verify", "leaf", "--project", proj, "--node", "t2",
-		"--artifact", writeEvidence(t, proj, "t2"), "--by", "qa", "--json")
+		"--artifact", writeCapturedEvidence(t, proj, "t2"), "--by", "qa", "--json")
 	for _, id := range []string{"f", "m", "root"} {
 		out := mustRun(t, "verify", "rollup", "--project", proj, "--node", id, "--json")
 		if parseDoc(t, out)["status"] != "verified" {
@@ -465,7 +466,7 @@ func TestVerifyLeafAndParentRollup(t *testing.T) {
 	}
 	// Evidence is registered under the node scope.
 	list := parseDoc(t, mustRun(t, "goal", "artifacts", "list", "--scope-kind", "node", "--scope-id", "t1", "--json"))
-	if len(list["artifact_refs"].([]any)) != 1 {
+	if len(list["artifact_refs"].([]any)) != 7 {
 		t.Fatalf("node evidence: %v", list)
 	}
 }

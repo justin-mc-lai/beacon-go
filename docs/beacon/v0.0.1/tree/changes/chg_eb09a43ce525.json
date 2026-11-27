@@ -1,0 +1,18 @@
+{
+  "id": "chg_eb09a43ce525",
+  "node_id": "n_3c1f1d8ec396",
+  "summary": "用户确认：acceptance binding 新增 strict-delivery-contract 六点合同与 red-green-capture 确定性采集需求，原有正文不变，自底向上 refreeze；需求冻结不代表实现验收",
+  "by": "user-confirmed-host",
+  "base_fingerprint": "68a8a97ff590beac9e72a46629f9529071dea7bda211453bb1de0db63f15e687",
+  "before_snapshot_id": "v0.0.1-20261127T092554.245331000Z",
+  "affected": [
+    "n_12c7f50ea594",
+    "n_1ebfb857b26f",
+    "n_2b2a883e7f64",
+    "n_3c1f1d8ec396",
+    "n_673d03783f60",
+    "n_799afe679d02",
+    "n_dbab29f9640e"
+  ],
+  "created_at": "2026-11-27T09:25:54.23953Z"
+}

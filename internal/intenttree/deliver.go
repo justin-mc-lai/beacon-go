@@ -42,6 +42,28 @@ func MarkDelivered(st *store.Store, dir, nodeID, by string) (Node, error) {
 	if err != nil {
 		return Node{}, err
 	}
+	var validate func(Node) error
+	validate = func(current Node) error {
+		if current.Kind == KindTouchpoint {
+			return ValidateVerifiedDelivery(st, dir, current)
+		}
+		for _, child := range idx.Nodes {
+			if child.ParentID != current.ID {
+				continue
+			}
+			next, err := ReadNode(dir, child.ID)
+			if err != nil {
+				return err
+			}
+			if err := validate(next); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	if err := validate(n); err != nil {
+		return Node{}, err
+	}
 	n.Status = StatusDelivered
 	n, err = Stamp(n)
 	if err != nil {

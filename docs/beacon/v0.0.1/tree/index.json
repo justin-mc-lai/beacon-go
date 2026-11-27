@@ -9,7 +9,7 @@
       "status": "frozen",
       "title": "需求树驱动的 SDD 产品",
       "path": "root",
-      "fingerprint": "0c1bb92a3053d1db613f058ef79cd3faf956546e7fba445fb623afd40a0e5e44",
+      "fingerprint": "05d5ed836042810cb9bc73ac58cfe59bd05897359f4ad716cf1501637725cec5",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -19,7 +19,7 @@
       "status": "frozen",
       "title": "acceptance binding",
       "path": "root/acceptance-binding",
-      "fingerprint": "68a8a97ff590beac9e72a46629f9529071dea7bda211453bb1de0db63f15e687",
+      "fingerprint": "a94c450bf6528b215a1c4160124dc2e1f99e141960713357db5961d794a63f79",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -50,6 +50,116 @@
       "title": "illegal slot negative tc",
       "path": "root/acceptance-binding/fsm-illegal-coverage/illegal-slot-negative-tc",
       "fingerprint": "695606134ff3542b29505ed0ebff5e0e27ed184676cf929854b32c9120c44d20",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_4bdf0311e438",
+      "parent_id": "n_3c1f1d8ec396",
+      "kind": "feature",
+      "status": "frozen",
+      "title": "red green capture",
+      "path": "root/acceptance-binding/red-green-capture",
+      "fingerprint": "7b7681753a0407917f02c3aff1b299f575526f61e9107d6a9b01fb0b42bd81a3",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_5eaf5288ed83",
+      "parent_id": "n_4bdf0311e438",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "capture process",
+      "path": "root/acceptance-binding/red-green-capture/capture-process",
+      "fingerprint": "3af11842488f9930856659b654452fb3e479009bfb7d7a6dde7ce81f9e1d29de",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_d8063fefcf41",
+      "parent_id": "n_4bdf0311e438",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "pair and register",
+      "path": "root/acceptance-binding/red-green-capture/pair-and-register",
+      "fingerprint": "f905c395d2bcc120885cb9393bb905dc3ffa1852d8cd655d04d32a31b1ffab8b",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_54606a05e1b6",
+      "parent_id": "n_4bdf0311e438",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "transition integration",
+      "path": "root/acceptance-binding/red-green-capture/transition-integration",
+      "fingerprint": "54fb9419407fb1851feaf64e7ccca92eff9c81242633fb6d7a9010bcb5ea17ea",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_9e4515fdf99c",
+      "parent_id": "n_3c1f1d8ec396",
+      "kind": "feature",
+      "status": "frozen",
+      "title": "strict delivery contract",
+      "path": "root/acceptance-binding/strict-delivery-contract",
+      "fingerprint": "b2557191d18aecab76874f4529ec757d27e748d74e86f425e1b5294c8113b970",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_ec5052dd2cc5",
+      "parent_id": "n_9e4515fdf99c",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "blind review",
+      "path": "root/acceptance-binding/strict-delivery-contract/blind-review",
+      "fingerprint": "68b4b231575d8b70e0eab1bb64137457949fa10917f83c53ff480033047427c0",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_ea9234b5e82c",
+      "parent_id": "n_9e4515fdf99c",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "deterministic tools",
+      "path": "root/acceptance-binding/strict-delivery-contract/deterministic-tools",
+      "fingerprint": "0496aa2272bf7c03926b8aa62cf195b862d769045e9b6874249cf483a31f82d8",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_6ee4eee57ba1",
+      "parent_id": "n_9e4515fdf99c",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "evidence gate",
+      "path": "root/acceptance-binding/strict-delivery-contract/evidence-gate",
+      "fingerprint": "1a9b430d2e0cadb455a531e78158f58c5468d62901506a77d7b39bee8368c460",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_a3b9d2c7f296",
+      "parent_id": "n_9e4515fdf99c",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "external ledger",
+      "path": "root/acceptance-binding/strict-delivery-contract/external-ledger",
+      "fingerprint": "ae7fdf8982099f5c86c659513cd1d0959337f117015bfb3c0234c5f5d6254e89",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_a11841bbc44c",
+      "parent_id": "n_9e4515fdf99c",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "plan first",
+      "path": "root/acceptance-binding/strict-delivery-contract/plan-first",
+      "fingerprint": "5c3607ae9c0b084f5ae7dce14c3d57e8c30ede048361e422ffedf49cf2adee12",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_a78ea52722a0",
+      "parent_id": "n_9e4515fdf99c",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "red green",
+      "path": "root/acceptance-binding/strict-delivery-contract/red-green",
+      "fingerprint": "7d958847f8a3e2ae0df2cadd2767aba4c0bd61c5573f8e9092b08bd65bd30c14",
       "fingerprint_alg": "tree-json-v1"
     },
     {

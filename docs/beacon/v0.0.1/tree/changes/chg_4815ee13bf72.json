@@ -1,0 +1,14 @@
+{
+  "id": "chg_4815ee13bf72",
+  "node_id": "n_4bdf0311e438",
+  "summary": "用户授权：文字验证规格绑定当前可执行采集配置；AC和实现状态不变，不补造历史Red",
+  "by": "user-authorized-host",
+  "base_fingerprint": "5c385801c3cf0a696e80634bd79961fefe6722c2f4f85756f38a1ef4fd3eb7a5",
+  "affected": [
+    "n_4bdf0311e438",
+    "n_54606a05e1b6",
+    "n_5eaf5288ed83",
+    "n_d8063fefcf41"
+  ],
+  "created_at": "2026-11-27T10:57:38.201756Z"
+}

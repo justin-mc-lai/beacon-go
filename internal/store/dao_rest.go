@@ -147,7 +147,7 @@ func (d *ArtifactDao) Add(a ArtifactRef) (ArtifactRef, error) {
 	a.ScopeKind, a.ScopeID = scopeKind, scopeID
 	// One statement, one dbtx handle: the upsert and the read-back
 	// below must see the same transaction when called inside WithTx.
-	res, err := d.q.Exec(`UPDATE artifact_refs SET content_hash = ?, size_bytes = ?, created_at = ? WHERE run_id = ? AND abs_path = ?`,
+	res, err := d.q.Exec(`UPDATE artifact_refs SET content_hash = ?, size_bytes = ?, created_at = ? WHERE run_id = ? AND abs_path = ? AND kind != 'capture_result'`,
 		a.ContentHash, a.SizeBytes, a.CreatedAt, a.RunID, a.AbsPath)
 	if err != nil {
 		return ArtifactRef{}, err
@@ -162,6 +162,15 @@ func (d *ArtifactDao) Add(a ArtifactRef) (ArtifactRef, error) {
 		// duplicate rows of the same key are refreshed along with it.
 		return scanArtifact(d.q.QueryRow(`SELECT `+artifactCols+` FROM artifact_refs WHERE run_id = ? AND abs_path = ? ORDER BY created_at DESC, rowid DESC LIMIT 1`,
 			a.RunID, a.AbsPath))
+	}
+	// The UPDATE predicate, not only a pre-read, protects reserved evidence
+	// against another writer racing a refresh between validation and persistence.
+	var reserved int
+	if err := d.q.QueryRow(`SELECT COUNT(*) FROM artifact_refs WHERE run_id = ? AND abs_path = ? AND kind = 'capture_result'`, a.RunID, a.AbsPath).Scan(&reserved); err != nil {
+		return ArtifactRef{}, err
+	}
+	if reserved > 0 {
+		return ArtifactRef{}, core.NewError("artifact_capture_immutable", "ArtifactDao.Add", "captured result is append-only")
 	}
 	if a.ID == "" {
 		a.ID = newID("art_")

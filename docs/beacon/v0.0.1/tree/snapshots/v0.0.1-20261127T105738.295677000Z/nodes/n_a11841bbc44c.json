@@ -1,0 +1,52 @@
+{
+  "id": "n_a11841bbc44c",
+  "kind": "touchpoint",
+  "title": "plan first",
+  "intent": "先确认计划与微步任务再实施产品代码；工具权限覆盖如实声明。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/plan-first",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "计划包含完成定义、输入输出、边界、AC、任务依赖及适用检查；确认前只读调查与计划材料允许，产品写入不允许。"
+    },
+    {
+      "id": "AC-002",
+      "text": "每次推进一个原子任务，通常一两个函数；扩大范围先拆解或说明必要跨文件原因；原子任务不授权自动提交。"
+    },
+    {
+      "id": "AC-003",
+      "text": "宿主文本合同与工具权限拦截分别声明；未实现工具拦截不得声称已硬阻断写入。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "TestStrictDeliveryReferencesSurviveInstall",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./skills\",\"-run\",\"^TestStrictDelivery\"],\"test_files\":[\"skills/contract_test.go\",\"skills/hosts_test.go\",\"skills/router_test.go\",\"skills/skills_test.go\",\"skills/strict_delivery_test.go\",\"skills/verify_test.go\",\"skills/version_flow_test.go\"],\"required_tests\":[\"TestStrictDeliveryReferencesSurviveInstall\",\"TestStrictDeliverySixControls\"]}"
+  },
+  "fingerprint": "5c3607ae9c0b084f5ae7dce14c3d57e8c30ede048361e422ffedf49cf2adee12",
+  "fingerprint_alg": "tree-json-v1"
+}

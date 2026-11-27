@@ -15,15 +15,24 @@ description: Implementation lanes behind one admission check and one harvest rul
 
 Rules: no admission, no implement; no evidence, no completion claim.
 
+Go 测试真实采集：`beacon implement capture --project . --version <v> --node <leaf>
+--ac <AC> --phase red|green --by <maker>`。Green 必须带 `--red <artifact-id>`；
+命令取自冻结节点的 `beacon-capture-command.v1` 验证规格，不接收手填退出码。
+捕获 accepted 仅表示本次阶段有效，不等于 verified；接口与限制见仓内 `docs/capture-runtime.md`。
+
 ## Route examples
 
 Three worked routes; open the file before acting (examples are not
 requirement authority):
 
-- `examples/admission-blocked.md` — chain `honest-block`: an unfrozen package or unbound design blocks before code is written.
+- `examples/admission-blocked.md` — chain `honest-block`: an unfrozen package or missing admission blocks before code is written.
 - `examples/parallel-worktrees.md` — chain `full-delivery`: parallel lakes stay in separate worktrees; satellites merge into the main star.
 
 ## HARD GATE
+
+- 严格交付（执行）：先完整读取 `../beacon-go-verify/references/strict-delivery.md`；
+  按六点协议执行确认计划、原子任务、Red/Green、断言保护、证据与账本核销。
+  缺检查或独立审查回执时，只报告“未验证”及阻塞。
 
 - No admission, no write. A blocked admission stops every lane, not just one.
 - Satellites merge into the main star only; protected paths (`.env`, keys, auth,
@@ -58,4 +67,3 @@ Stop and say so — do not proceed — when any of these is true:
 6. You are re-planning instead of writing the code the plan already names.
 7. You are blocked by a dependency but have not recorded it.
 8. You would attach a verifier to your own work.
-

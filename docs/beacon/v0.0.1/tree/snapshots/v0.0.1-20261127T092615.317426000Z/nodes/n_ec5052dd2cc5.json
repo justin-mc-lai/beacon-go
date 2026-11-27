@@ -1,0 +1,52 @@
+{
+  "id": "n_ec5052dd2cc5",
+  "kind": "touchpoint",
+  "title": "blind review",
+  "intent": "宿主以全新只读上下文组织独立审查，系统校验绑定回执。",
+  "parent_id": "n_9e4515fdf99c",
+  "path": "root/acceptance-binding/strict-delivery-contract/blind-review",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "reviewer 输入原始需求、固定候选 diff 与运行日志，不接收实现者推理或自评；可只读检查源码并复跑验证。"
+    },
+    {
+      "id": "AC-002",
+      "text": "回执绑定节点、需求指纹、最终候选与 capture refs，review 在 Green 后、无未关闭问题；缺回执、自审或错误绑定拒绝。"
+    },
+    {
+      "id": "AC-003",
+      "text": "宿主不支持独立 reviewer 时记录阻塞，不以自审冒充；身份字符串检查不宣称真实身份认证或已证明上下文隔离。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "TestStrictDeliverySixControls",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "TestDeliveryReceiptCLIRefusals/missing_review and self_review",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "TestStrictDeliveryReferencesSurviveInstall",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./skills ./internal/cli -run 'TestStrictDelivery|TestDeliveryReceiptCLIRefusals' -count=1 -v；独立宿主会话回执另行实跑，文本检查不证明盲审发生。"
+  },
+  "fingerprint": "6f2e422384d819305da3b6cae9a7d30e6ce972ec397b58eef70bc2d573aa73e4",
+  "fingerprint_alg": "tree-json-v1"
+}

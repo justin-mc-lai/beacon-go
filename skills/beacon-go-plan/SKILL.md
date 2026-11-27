@@ -78,6 +78,9 @@ requirement authority — the frozen package is):
 
 ## HARD GATE
 
+- 严格交付（规划）：完整读取 `../beacon-go-verify/references/strict-delivery.md`，
+  输出完成定义、原子任务、依赖与验证策略；记录不适用项和待确认事实。
+
 - Any request that involves workflow, state transition, dispatch, lifecycle, approval, or order flow MUST trigger `pln-fsm`: decompose Entity Precedence, Aggregate FSM, and Illegal Transition Slots before routing to truth freeze.
 - Planning ends at a signed intent and a reviewed plan. Never at code, never at a
   frozen package, never at a QA or release verdict.
@@ -115,4 +118,3 @@ Stop and say so — do not proceed — when any of these is true:
 6. You are re-planning work that is already planned instead of executing it.
 7. You are waiting for a decision but have not asked for it in one clear question.
 8. You would drift into implementing or freezing because planning feels slow.
-

@@ -11,6 +11,7 @@ import (
 func TestTruthNodeReopenWithdrawsClaims(t *testing.T) {
 	proj := treeTestEnv(t)
 	seedFreezeTree(t, proj, false)
+	prepareCaptureTree(t, proj)
 	for _, id := range []string{"t1", "t2", "f", "m", "root"} {
 		if _, err := freeze(t, proj, id); err != nil {
 			t.Fatalf("freeze %s: %v", id, err)
@@ -20,7 +21,7 @@ func TestTruthNodeReopenWithdrawsClaims(t *testing.T) {
 		mustRun(t, "implement", "report", "--project", proj, "--node", id, "--by", "dev",
 			"--artifact", writeEvidence(t, proj, id), "--json")
 		mustRun(t, "verify", "leaf", "--project", proj, "--node", id, "--by", "qa",
-			"--artifact", writeEvidence(t, proj, id), "--json")
+			"--artifact", writeCapturedEvidence(t, proj, id), "--json")
 	}
 	mustRun(t, "verify", "rollup", "--project", proj, "--node", "f", "--json")
 

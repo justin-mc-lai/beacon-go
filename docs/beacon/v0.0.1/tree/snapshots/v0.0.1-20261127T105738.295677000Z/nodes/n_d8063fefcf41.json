@@ -1,0 +1,74 @@
+{
+  "id": "n_d8063fefcf41",
+  "kind": "touchpoint",
+  "title": "pair and register",
+  "intent": "显式 Red ID 配对 Green，唯一采集结果登记复用既有 artifact 权威。",
+  "parent_id": "n_4bdf0311e438",
+  "path": "root/acceptance-binding/red-green-capture/pair-and-register",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "Green 显式引用 Red capture ID，不查隐式 latest；节点、AC、合同、命令、测试集合、maker 一致才配对。"
+    },
+    {
+      "id": "AC-002",
+      "text": "Red 必须预期行为失败且 Green 通过才能核销；Green 绑定实现后源码 commit/input hash，不借用 Red 旧候选。"
+    },
+    {
+      "id": "AC-003",
+      "text": "每次采集唯一目录与不可覆盖结果日志，通过既有 scoped artifact 入口登记；重试追加历史，不覆盖前次。"
+    },
+    {
+      "id": "AC-004",
+      "text": "校验器读取已登记 capture 并重算引用 hash 与测试/候选；手填 v1 JSON、借用节点、缺登记、篡改、重复 ID 和路径别名绕过拒绝。"
+    },
+    {
+      "id": "AC-005",
+      "text": "一个采集事实只有一个写入口，派生 envelope 引用 capture ID/hash，不另维护第二任务状态。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "planned TestCaptureExplicitRedPair",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "planned TestCapturePairCandidateBinding",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "planned TestCaptureImmutableAttempts",
+      "status": "planned"
+    },
+    {
+      "id": "TC-004",
+      "ac_id": "AC-004",
+      "kind": "unit",
+      "ref": "planned TestCaptureRejectsForgedUnregisteredAndAliasedEvidence",
+      "status": "planned"
+    },
+    {
+      "id": "TC-005",
+      "ac_id": "AC-005",
+      "kind": "unit",
+      "ref": "planned TestCaptureCanonicalRegistration",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "{\"schema\":\"beacon-capture-command.v1\",\"argv\":[\"go\",\"test\",\"./internal/cli\",\"-run\",\"^TestCapture\"],\"test_files\":[\"internal/cli/artifact_ignore_test.go\",\"internal/cli/artifact_scope_test.go\",\"internal/cli/capture_binary_e2e_test.go\",\"internal/cli/capture_custom_test.go\",\"internal/cli/capture_delivery_fixture_test.go\",\"internal/cli/capture_delivery_test.go\",\"internal/cli/capture_goal_chain_test.go\",\"internal/cli/capture_preflight_test.go\",\"internal/cli/capture_test.go\",\"internal/cli/change_concurrency_test.go\",\"internal/cli/cli_test.go\",\"internal/cli/delivery_paradigm_cli_test.go\",\"internal/cli/delivery_paradigm_r1_cli_test.go\",\"internal/cli/delivery_receipt_test.go\",\"internal/cli/drift_exit_test.go\",\"internal/cli/fsm_test.go\",\"internal/cli/gate_strict_test.go\",\"internal/cli/gate_test.go\",\"internal/cli/goal_artifacts_test.go\",\"internal/cli/goal_module_test.go\",\"internal/cli/goal_p2b_test.go\",\"internal/cli/goal_p2c_test.go\",\"internal/cli/goal_p2d_test.go\",\"internal/cli/goal_release_shadow_test.go\",\"internal/cli/goal_test.go\",\"internal/cli/goal_topology_test.go\",\"internal/cli/implement_tasks_test.go\",\"internal/cli/intent_contract_seed_test.go\",\"internal/cli/intent_test.go\",\"internal/cli/kernel_qa_evidence_cli_test.go\",\"internal/cli/kernel_traceability_cli_test.go\",\"internal/cli/migrate_test.go\",\"internal/cli/migration_read_store_test.go\",\"internal/cli/p4a_test.go\",\"internal/cli/plan_drift_test.go\",\"internal/cli/projects_bump_test.go\",\"internal/cli/qa_score_test.go\",\"internal/cli/r2b_test.go\",\"internal/cli/r2c_test.go\",\"internal/cli/r2d_test.go\",\"internal/cli/skills_install_test.go\",\"internal/cli/skills_verify_test.go\",\"internal/cli/stdflow_s1_test.go\",\"internal/cli/stdflow_s2_test.go\",\"internal/cli/surface_qa_test.go\",\"internal/cli/surface_test.go\",\"internal/cli/tree_freeze_test.go\",\"internal/cli/tree_gate_panel_test.go\",\"internal/cli/tree_link_test.go\",\"internal/cli/tree_node_generate_test.go\",\"internal/cli/tree_node_truth_test.go\",\"internal/cli/tree_portable_test.go\",\"internal/cli/tree_reopen_test.go\",\"internal/cli/tree_test.go\",\"internal/cli/truth_fsm_test.go\",\"internal/cli/truth_migrate_test.go\"],\"required_tests\":[\"TestCaptureBinaryE2ESuccessAndRefusal\",\"TestCaptureCustomProtocolRedGreenAndRejections\",\"TestCaptureRejectsHandwrittenDelivery\",\"TestCaptureRejectsPublicRefreshOfReservedResult\",\"TestCaptureMakerVerifyHasNoRegistrationSideEffect\",\"TestCaptureRollupRefusalHasNoPartialWrites\",\"TestCaptureDeliveryRefusesCandidateAndReferenceForgery\",\"TestCaptureGoalFullSuccessChain\",\"TestCaptureGoalSDDConnectedLedger\",\"TestCapturePreflightProcessFacts\",\"TestCaptureRealProcessAndTestHash\",\"TestCaptureRejectsUnboundCommand\",\"TestCaptureExplicitRedPair\",\"TestCapturePreflightFailureRetainsEvidence\",\"TestCaptureConcurrentProcessesUseBarrier\",\"TestCaptureRejectsDuplicateAliasAndEmptyTests\",\"TestCaptureRejectsZeroSkipAndEnvironmentFailure\",\"TestCapturePairRejectsChangedTestsAndStaleLogs\",\"TestCaptureTimeoutCancellationAndMutation\"]}"
+  },
+  "fingerprint": "f905c395d2bcc120885cb9393bb905dc3ffa1852d8cd655d04d32a31b1ffab8b",
+  "fingerprint_alg": "tree-json-v1"
+}

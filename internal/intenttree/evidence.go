@@ -166,5 +166,8 @@ func ValidateEvidenceFile(projRoot, nodeID string, n Node, absPath string) (Evid
 		return meta, core.NewError(ReasonEvidenceFingerprint, "intenttree.ValidateEvidenceFile",
 			"requirement_fingerprint does not match the current contract for "+nodeID+"; regenerate the evidence")
 	}
+	if err := ValidateDeliveryReceipt(n, meta, abs, raw); err != nil {
+		return meta, err
+	}
 	return meta, nil
 }

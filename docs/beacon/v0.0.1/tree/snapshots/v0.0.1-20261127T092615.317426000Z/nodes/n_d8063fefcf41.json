@@ -1,0 +1,74 @@
+{
+  "id": "n_d8063fefcf41",
+  "kind": "touchpoint",
+  "title": "pair and register",
+  "intent": "显式 Red ID 配对 Green，唯一采集结果登记复用既有 artifact 权威。",
+  "parent_id": "n_4bdf0311e438",
+  "path": "root/acceptance-binding/red-green-capture/pair-and-register",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "Green 显式引用 Red capture ID，不查隐式 latest；节点、AC、合同、命令、测试集合、maker 一致才配对。"
+    },
+    {
+      "id": "AC-002",
+      "text": "Red 必须预期行为失败且 Green 通过才能核销；Green 绑定实现后源码 commit/input hash，不借用 Red 旧候选。"
+    },
+    {
+      "id": "AC-003",
+      "text": "每次采集唯一目录与不可覆盖结果日志，通过既有 scoped artifact 入口登记；重试追加历史，不覆盖前次。"
+    },
+    {
+      "id": "AC-004",
+      "text": "校验器读取已登记 capture 并重算引用 hash 与测试/候选；手填 v1 JSON、借用节点、缺登记、篡改、重复 ID 和路径别名绕过拒绝。"
+    },
+    {
+      "id": "AC-005",
+      "text": "一个采集事实只有一个写入口，派生 envelope 引用 capture ID/hash，不另维护第二任务状态。"
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "ac_id": "AC-001",
+      "kind": "unit",
+      "ref": "planned TestCaptureExplicitRedPair",
+      "status": "planned"
+    },
+    {
+      "id": "TC-002",
+      "ac_id": "AC-002",
+      "kind": "unit",
+      "ref": "planned TestCapturePairCandidateBinding",
+      "status": "planned"
+    },
+    {
+      "id": "TC-003",
+      "ac_id": "AC-003",
+      "kind": "unit",
+      "ref": "planned TestCaptureImmutableAttempts",
+      "status": "planned"
+    },
+    {
+      "id": "TC-004",
+      "ac_id": "AC-004",
+      "kind": "unit",
+      "ref": "planned TestCaptureRejectsForgedUnregisteredAndAliasedEvidence",
+      "status": "planned"
+    },
+    {
+      "id": "TC-005",
+      "ac_id": "AC-005",
+      "kind": "unit",
+      "ref": "planned TestCaptureCanonicalRegistration",
+      "status": "planned"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli ./internal/intenttree -run '^TestCapture' -count=1 -v；实际覆盖成功配对及各拒绝，必须检查用例确实执行，planned 不代表已通过。"
+  },
+  "fingerprint": "91d6adfdf73e5ea9f1349446b33f085ae083ff72655384123e8cea2d25367f23",
+  "fingerprint_alg": "tree-json-v1"
+}

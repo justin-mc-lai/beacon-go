@@ -168,6 +168,8 @@ func auditVerifiedEvidence(st *store.Store, projRoot, dir string, idx intenttree
 		}
 		if _, err := intenttree.ValidateEvidenceFile(projRoot, e.ID, n, found.AbsPath); err != nil {
 			out = append(out, err.Error())
+		} else if err := intenttree.ValidateCaptureDelivery(st, projRoot, n, found.AbsPath); err != nil {
+			out = append(out, err.Error())
 		}
 	}
 	return out
@@ -322,11 +324,20 @@ func newVerifyLeafCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if node.Status != intenttree.StatusImplemented {
+				return fail("tree_node_not_implemented", "verify leaf", "implement before verification")
+			}
+			if err := intenttree.ValidateVerifier(node, by); err != nil {
+				return err
+			}
 			artifact, err = ingestEvidence(projRoot, dir, node, artifact, by)
 			if err != nil {
 				return err
 			}
 			if _, err := intenttree.ValidateEvidenceFile(projRoot, nodeID, node, artifact); err != nil {
+				return err
+			}
+			if err := intenttree.ValidateCaptureDelivery(st, projRoot, node, artifact); err != nil {
 				return err
 			}
 			eng := orchestrator.NewEngine(st)

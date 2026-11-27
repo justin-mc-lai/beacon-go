@@ -55,6 +55,39 @@ func writeEvidence(t *testing.T, proj, nodeID string) string {
 	body := "source_commit: " + strings.Repeat("a", 40) + "\n" +
 		"binary_sha256: " + strings.Repeat("b", 64) + "\n" +
 		"requirement_fingerprint: " + fp + "\n\nproof\n"
+	zero, one := 0, 1
+	log := []byte("actual fixture output\n")
+	sum := sha256.Sum256(log)
+	hash := fmt.Sprintf("%x", sum)
+	logPath := nodeID + "-run.log"
+	if err := os.WriteFile(filepath.Join(filepath.Dir(p), logPath), log, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	r := intenttree.DeliveryReceipt{Schema: "beacon-delivery.v1", NodeID: nodeID, RequirementFingerprint: fp,
+		SourceCommit: strings.Repeat("a", 40), BinarySHA256: strings.Repeat("b", 64), Maker: "dev",
+		Review: &intenttree.DeliveryReview{Reviewer: "qa", Verdict: "pass", ReceiptPath: logPath, ReceiptSHA256: hash}}
+	review := intenttree.IndependentReview{NodeID: nodeID, RequirementFingerprint: fp, SourceCommit: r.SourceCommit, BinarySHA256: r.BinarySHA256, Reviewer: "qa", Verdict: "pass", Findings: []string{}, ReviewedAt: "2020-01-01T00:00:04Z"}
+	reviewRaw, err := json.Marshal(review)
+	if err != nil {
+		t.Fatal(err)
+	}
+	reviewPath := nodeID + "-review.json"
+	if err := os.WriteFile(filepath.Join(filepath.Dir(p), reviewPath), reviewRaw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	reviewHash := sha256.Sum256(reviewRaw)
+	r.Review.ReceiptPath = reviewPath
+	r.Review.ReceiptSHA256 = fmt.Sprintf("%x", reviewHash)
+	for _, ac := range n.ACs {
+		r.Tasks = append(r.Tasks, intenttree.DeliveryTask{ACID: ac.ID, Status: "done",
+			Red:   &intenttree.DeliveryRun{Command: []string{"fixture-test"}, ExitCode: &one, StartedAt: "2020-01-01T00:00:00Z", FinishedAt: "2020-01-01T00:00:01Z", TestSHA256: hash, LogPath: logPath, LogSHA256: hash},
+			Green: &intenttree.DeliveryRun{Command: []string{"fixture-test"}, ExitCode: &zero, StartedAt: "2020-01-01T00:00:02Z", FinishedAt: "2020-01-01T00:00:03Z", TestSHA256: hash, LogPath: logPath, LogSHA256: hash}})
+	}
+	encoded, err := json.Marshal(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	body += "delivery_receipt: " + string(encoded) + "\n"
 	if err := os.WriteFile(p, []byte(body), 0o644); err != nil {
 		t.Fatal(err)
 	}

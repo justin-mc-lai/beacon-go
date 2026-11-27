@@ -194,12 +194,16 @@ func (e *Engine) RegisterFeatureArtifact(fc store.FeatureContext, kind, path, by
 // declaration, hash the file, upsert the pointer under scopeRunID and
 // return the event payload the caller's scope writes.
 func (e *Engine) registerArtifactScoped(scopeRunID, kind, path, by string) (ArtifactRegistration, map[string]any, error) {
+	return e.registerArtifactScopedCaptured(scopeRunID, kind, path, by, false)
+}
+
+func (e *Engine) registerArtifactScopedCaptured(scopeRunID, kind, path, by string, captured bool) (ArtifactRegistration, map[string]any, error) {
 	if strings.TrimSpace(by) == "" {
 		return ArtifactRegistration{}, nil, core.NewError(ReasonArtifactRegistrarRequired,
 			"goal.RegisterArtifact", "a registrant identity (--by) is required")
 	}
 	kind = strings.ToLower(strings.TrimSpace(kind))
-	if !ValidRegisterKind(kind) {
+	if !ValidRegisterKind(kind) && !(captured && kind == "capture_result") {
 		return ArtifactRegistration{}, nil, core.NewError(ReasonArtifactKindNotAllowed,
 			"goal.RegisterArtifact", "kind "+kind+" is not in the registration vocabulary "+
 				"(qa, qa_*, scorecard, test_result, test_results, evidence, implement_artifact, report, log, artifact, a11y_tree, browser_trace, e2e_report)")
@@ -241,6 +245,17 @@ func (e *Engine) registerArtifactScoped(scopeRunID, kind, path, by string) (Arti
 	}
 	var previous, previousHash string
 	for _, a := range existing {
+		original := a.AbsPath
+		candidate := abs
+		if real, err := filepath.EvalSymlinks(candidate); err == nil {
+			candidate = real
+		}
+		if real, err := filepath.EvalSymlinks(original); err == nil {
+			original = real
+		}
+		if original == candidate && a.Kind == "capture_result" {
+			return ArtifactRegistration{}, nil, core.NewError("artifact_capture_immutable", "artifact.register", "captured results cannot be re-registered or refreshed")
+		}
 		if a.Kind != kind || a.AbsPath != abs {
 			continue
 		}

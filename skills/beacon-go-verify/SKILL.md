@@ -47,6 +47,9 @@ requirement authority):
 
 ## HARD GATE
 
+- 严格交付（验收）：先完整读取 `references/strict-delivery.md`；
+  核对六点协议的真实执行证据，宿主启动全新上下文只读盲审；缺证据不判通过。
+
 - Only registered artifacts count. A file on disk that was never registered is
   not evidence; a gate re-hashes what is registered and marks the rest stale.
 - Scores never pass or block a gate, and never edit a skill.
@@ -82,4 +85,3 @@ Stop and say so — do not proceed — when any of these is true:
 6. You are the maker of the code you are judging.
 7. You are waiting for evidence that nobody produced, and have not said so.
 8. You would score a skill and treat the score as a verdict.
-

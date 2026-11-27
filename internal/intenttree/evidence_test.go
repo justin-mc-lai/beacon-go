@@ -56,8 +56,8 @@ func TestValidateEvidenceFileContract(t *testing.T) {
 		}
 		return p
 	}
-	if _, err := ValidateEvidenceFile(root, "n1", n, write("docs/beacon/v0.1.0/evidence/n1.txt", good)); err != nil {
-		t.Fatalf("good evidence refused: %v", err)
+	if _, err := ValidateEvidenceFile(root, "n1", n, write("docs/beacon/v0.1.0/evidence/n1.txt", good)); err == nil || !strings.Contains(err.Error(), "delivery_receipt_missing") {
+		t.Fatalf("metadata alone must not verify delivery: %v", err)
 	}
 	if _, err := ValidateEvidenceFile(root, "n1", n, write(".beacon/artifacts/n1.txt", good)); err == nil {
 		t.Fatal("gitignored runtime evidence must be refused")

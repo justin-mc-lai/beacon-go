@@ -6,7 +6,7 @@ description: Final go/no-go release gate. Use for 发布, release, 上线, or �
 # beacon-release
 
 1. `beacon release evaluate --run-id <id> --evaluator <id>` computes the gate.
-2. Fix the named blocks (truth, design, implement, qa) — do not lower the bar.
+2. Fix the named blocks (truth, implement, verification) — do not lower the bar.
 3. `beacon release complete --run-id <id> --human-confirmed...` completes only at the
    release gate, with a verifier attached and the human confirmation recorded.
 
@@ -31,6 +31,9 @@ requirement authority):
 - `examples/hotfix-fast-lane.md` — chain `human-gate`: a hotfix plan states the fix version and rollback before release review.
 
 ## HARD GATE
+
+- 严格交付（发布）：完整读取 `../beacon-go-verify/references/strict-delivery.md`，
+  核对适用检查、剩余任务和独立审查证据；未验证项如实列为阻塞，人工确认仍必需。
 
 - All gates green + an explicit human confirmation, or it stays blocked with the
   named reasons. There is no "close enough".
@@ -64,4 +67,3 @@ Stop and say so — do not proceed — when any of these is true:
 6. You are treating your own approval as the human confirmation.
 7. The human has not actually answered, and you would proceed anyway.
 8. You would complete a run whose verifier is the maker.
-

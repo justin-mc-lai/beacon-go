@@ -36,6 +36,7 @@ func newImplementCmd() *cobra.Command {
 			"under one admission rule.",
 	}
 	c.AddCommand(
+		newImplementCaptureCmd(),
 		newGoalImplementPlanCmd(), newGoalAdmitCmd(),
 		newGoalReceiveResultCmd(), newGoalWorktreeCmd(),
 		newImplementTasksCmd(), newImplementReportCmd(),
