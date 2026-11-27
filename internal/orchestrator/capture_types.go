@@ -15,6 +15,7 @@ type CaptureCommand struct {
 
 type CaptureRequest struct {
 	Root, TreeDir, NodeID, ACID, Phase, By, RedID string
+	Baseline                                      string
 	Timeout                                       time.Duration
 }
 

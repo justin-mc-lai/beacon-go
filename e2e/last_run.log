@@ -1,25 +1,25 @@
 ==================================================================
 Beacon Go P6 E2E — full chain
-started: 2026-11-26 18:12:43 CST
+started: 2026-11-27 19:38:05 CST
 beacon:  /Users/hainagou-laikunqi/Developer/personal/beacon-go/e2e/../bin/beacon
 Beacon CLI v0.0.1
-workspace:        /tmp/beacon-e2e.HsFY8U1L
-BEACON_STORE_PATH=/tmp/beacon-e2e.HsFY8U1L/beacon.db (isolated temp store)
-project:          /tmp/beacon-e2e.HsFY8U1L/proj
+workspace:        /tmp/beacon-e2e.3HggzGPd
+BEACON_STORE_PATH=/tmp/beacon-e2e.3HggzGPd/beacon.db (isolated temp store)
+project:          /tmp/beacon-e2e.3HggzGPd/proj
 
 ===== STEP 1: 1 projects register (temp git project) =====
-368da50 initial commit (README)
+5a2e977 initial commit (README)
 {
-  "id": "proj_a188f4d2da10bf35cd639187",
-  "project_key": "proj--534a929597",
-  "root_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj",
+  "id": "proj_07a57706f5c31fed901bd538",
+  "project_key": "proj--392982d88f",
+  "root_path": "/private/tmp/beacon-e2e.3HggzGPd/proj",
   "name": "proj",
-  "registered_at": "2026-11-26T10:12:43.991881000Z",
+  "registered_at": "2026-11-27T11:38:05.690257000Z",
   "current_version": "v1.0.0",
   "versions": [
     {
-      "id": "ver_7525a6d759dda87a3d5f3a5d",
-      "project_id": "proj_a188f4d2da10bf35cd639187",
+      "id": "ver_6caf80cf157ee4d1183c9811",
+      "project_id": "proj_07a57706f5c31fed901bd538",
       "version": "v1.0.0",
       "docs_root": "docs/beacon/v1.0.0",
       "is_current": true
@@ -30,8 +30,8 @@ project:          /tmp/beacon-e2e.HsFY8U1L/proj
 ===== STEP 2: 2 truth create =====
 {
   "slug": "e2e-login-2fa",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
-  "project_root": "/private/tmp/beacon-e2e.HsFY8U1L/proj",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
+  "project_root": "/private/tmp/beacon-e2e.3HggzGPd/proj",
   "version": "v1.0.0",
   "status": "draft",
   "frozen": false,
@@ -52,7 +52,7 @@ project:          /tmp/beacon-e2e.HsFY8U1L/proj
     "AC-001": []
   }
 }
-package dir verified: /tmp/beacon-e2e.HsFY8U1L/proj/docs/beacon/v1.0.0/features/e2e-login-2fa (four-piece skeleton present)
+package dir verified: /tmp/beacon-e2e.3HggzGPd/proj/docs/beacon/v1.0.0/features/e2e-login-2fa (four-piece skeleton present)
 
 ===== STEP 3: 3 fill four-piece package =====
 filled truth.md / tests.md / tasks.md (evidence.md keeps bare-name index per skeleton boundary)
@@ -302,9 +302,9 @@ intent signed: snapshot + closed questions + per-AC coverage verified
   "version": "v1.0.0",
   "run_id": "",
   "intent_path": "docs/beacon/v1.0.0/features/e2e-login-2fa/intent.json",
-  "intent_sha256": "92714bbe3ea1a92667e00490f83ce0ca2a61f768e423d27a87f4262a1ef0cbf8",
+  "intent_sha256": "78f6e89f2b8bf69938b397002f533907c526686cf5babc3e98736f02be082fd0",
   "confirmed": true,
-  "recorded_at": "2026-11-26T10:12:44Z",
+  "recorded_at": "2026-11-27T11:38:05Z",
   "event_appended": false
 }
 intent.json recorded and confirmed (kernel-driven run may start)
@@ -312,8 +312,8 @@ intent.json recorded and confirmed (kernel-driven run may start)
 ===== STEP 4: 4 truth freeze =====
 {
   "slug": "e2e-login-2fa",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
-  "project_root": "/private/tmp/beacon-e2e.HsFY8U1L/proj",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
+  "project_root": "/private/tmp/beacon-e2e.3HggzGPd/proj",
   "version": "v1.0.0",
   "status": "frozen",
   "frozen": true,
@@ -357,8 +357,8 @@ baseline_status=uncommitted after freeze verified (AC-139)
 ===== STEP 4b: 4b commit frozen package + truth baseline (S1, AC-139) =====
 {
   "slug": "e2e-login-2fa",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
-  "project_root": "/private/tmp/beacon-e2e.HsFY8U1L/proj",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
+  "project_root": "/private/tmp/beacon-e2e.3HggzGPd/proj",
   "version": "v1.0.0",
   "status": "frozen",
   "frozen": true,
@@ -374,7 +374,7 @@ baseline_status=uncommitted after freeze verified (AC-139)
   "current_branch": "main",
   "canonical_branch": "main",
   "baseline_status": "committed",
-  "baseline_commit": "6c7a186ac31c066e8ed5457b697551347829ff42",
+  "baseline_commit": "efc15d271cf1e920e5a9b19f0b6ca6be18424651",
   "baseline_recorded": true,
   "surfaces": [
     "cli"
@@ -448,10 +448,10 @@ baseline committed + recorded verified (AC-139)
     }
   ],
   "evaluator": "e2e-evaluator",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
-  "gate_result_id": "gate_87b047ca216183f6da5a64ff",
-  "evaluated_at": "2026-11-26T10:12:44.578605000Z"
+  "gate_result_id": "gate_81507102cdff343f10ba09b5",
+  "evaluated_at": "2026-11-27T11:38:06.277883000Z"
 }
 truth_freeze verdict=pass verified
 
@@ -462,27 +462,27 @@ truth_freeze verdict=pass verified
   "scopes": [
     {
       "scope_id": "primary",
-      "git_root": "/tmp/beacon-e2e.HsFY8U1L/proj",
-      "worktree_path": "/tmp/beacon-e2e.HsFY8U1L/proj",
+      "git_root": "/tmp/beacon-e2e.3HggzGPd/proj",
+      "worktree_path": "/tmp/beacon-e2e.3HggzGPd/proj",
       "role": "primary",
       "writable": true,
       "dirty_policy": "fail_closed"
     }
   ],
   "topology_gate_status": "pass",
-  "topology_gate_ref": "bc_9b7986919933fd0f",
-  "graph_hash": "9b7986919933fd0f4286f120148243f9f85256f42516c33f10af254a22f5cb68",
+  "topology_gate_ref": "bc_36a103f8e682ba26",
+  "graph_hash": "36a103f8e682ba262bf1ebbdc7cb8537d1cc571e60bb73613424b5817c1c7030",
   "source": "file",
   "confirmed": true,
-  "projected_at": "2026-11-26T10:12:44.605286Z"
+  "projected_at": "2026-11-27T11:38:06.30536Z"
 }
-topology projected: ref=bc_9b7986919933fd0f gate=pass (AC-171); step 7 admission will consume it (AC-173)
+topology projected: ref=bc_36a103f8e682ba26 gate=pass (AC-171); step 7 admission will consume it (AC-173)
 
 ===== STEP 6: 6 goal run (manual lane; host agent does the work) =====
-agent script: /tmp/beacon-e2e.HsFY8U1L/bin/agent.sh
+agent script: /tmp/beacon-e2e.3HggzGPd/bin/agent.sh
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "status": "running",
   "run_status": "Running",
@@ -555,26 +555,26 @@ agent script: /tmp/beacon-e2e.HsFY8U1L/bin/agent.sh
   },
   "release_human_confirmed": false,
   "executor_mode": "manual",
-  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_fd9993ea0dd7eaeb0c24cb2a --by \u003cidentity\u003e`",
+  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_d092ee4cefc287a812916e4a --by \u003cidentity\u003e`",
   "release_policy": "human",
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
-  "started_at": "2026-11-26T10:12:44.691058000Z",
+  "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
+  "started_at": "2026-11-27T11:38:06.390413000Z",
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_9b7986919933fd0f",
+    "topology_gate_ref": "bc_36a103f8e682ba26",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
   }
 }
-run_id=run_fd9993ea0dd7eaeb0c24cb2a
+run_id=run_d092ee4cefc287a812916e4a
 stage plan has no design stage verified
 
 ===== STEP 7: 7 goal admit =====
 {
   "schema": "goal-implement-admission.v1",
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+  "run_id": "run_d092ee4cefc287a812916e4a",
   "feature_slug": "e2e-login-2fa",
   "allow_implement": true,
   "status": "pass",
@@ -609,7 +609,7 @@ stage plan has no design stage verified
       "check": "baseline_merged",
       "ok": true,
       "applicable": true,
-      "detail": "worktree HEAD 6c7a186ac31c contains truth_baseline_commit 6c7a186ac31c"
+      "detail": "worktree HEAD efc15d271cf1 contains truth_baseline_commit efc15d271cf1"
     },
     {
       "check": "dirty_policy",
@@ -621,7 +621,7 @@ stage plan has no design stage verified
       "check": "topology_gate",
       "ok": true,
       "applicable": true,
-      "detail": "topology gate pass over bc_9b7986919933fd0f (single_repo, 1 scope(s))"
+      "detail": "topology gate pass over bc_36a103f8e682ba26 (single_repo, 1 scope(s))"
     },
     {
       "check": "review_decision",
@@ -634,12 +634,12 @@ stage plan has no design stage verified
   "worktree_ref": "."
 }
 admit allow_implement=true verified
-admission topology_gate item present and passing (AC-173, ref bc_9b7986919933fd0f)
+admission topology_gate item present and passing (AC-173, ref bc_36a103f8e682ba26)
 
 ===== STEP 7b: 7b goal worktree status (worktree is a core ability) =====
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "project_root": "/private/tmp/beacon-e2e.HsFY8U1L/proj",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "project_root": "/private/tmp/beacon-e2e.3HggzGPd/proj",
   "records": [],
   "quarantines": []
 }
@@ -647,8 +647,8 @@ worktree status core surface reachable and well-formed (AC-140/AC-173)
 
 ===== STEP 8: 8 execute plan/truth/implement before independent QA =====
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "status": "running",
   "run_status": "Running",
@@ -721,22 +721,22 @@ worktree status core surface reachable and well-formed (AC-140/AC-173)
   },
   "release_human_confirmed": false,
   "executor_mode": "manual",
-  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_fd9993ea0dd7eaeb0c24cb2a --by \u003cidentity\u003e`",
+  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_d092ee4cefc287a812916e4a --by \u003cidentity\u003e`",
   "release_policy": "human",
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
-  "started_at": "2026-11-26T10:12:44.691058000Z",
+  "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
+  "started_at": "2026-11-27T11:38:06.390413000Z",
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_9b7986919933fd0f",
+    "topology_gate_ref": "bc_36a103f8e682ba26",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
   }
 }
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "status": "running",
   "run_status": "Running",
@@ -809,22 +809,22 @@ worktree status core surface reachable and well-formed (AC-140/AC-173)
   },
   "release_human_confirmed": false,
   "executor_mode": "manual",
-  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_fd9993ea0dd7eaeb0c24cb2a --by \u003cidentity\u003e`",
+  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_d092ee4cefc287a812916e4a --by \u003cidentity\u003e`",
   "release_policy": "human",
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
-  "started_at": "2026-11-26T10:12:44.691058000Z",
+  "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
+  "started_at": "2026-11-27T11:38:06.390413000Z",
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_9b7986919933fd0f",
+    "topology_gate_ref": "bc_36a103f8e682ba26",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
   }
 }
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "status": "running",
   "run_status": "Running",
@@ -897,105 +897,105 @@ worktree status core surface reachable and well-formed (AC-140/AC-173)
   },
   "release_human_confirmed": false,
   "executor_mode": "manual",
-  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_fd9993ea0dd7eaeb0c24cb2a --by \u003cidentity\u003e`",
+  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_d092ee4cefc287a812916e4a --by \u003cidentity\u003e`",
   "release_policy": "human",
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
-  "started_at": "2026-11-26T10:12:44.691058000Z",
+  "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
+  "started_at": "2026-11-27T11:38:06.390413000Z",
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_9b7986919933fd0f",
+    "topology_gate_ref": "bc_36a103f8e682ba26",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
   }
 }
-total 20
-drwxr-xr-x 7 hainagou-laikunqi wheel 224 Nov 26 18:12 .
-drwxr-xr-x 6 hainagou-laikunqi wheel 192 Nov 26 18:12 ..
--rw-r--r-- 1 hainagou-laikunqi wheel  95 Nov 26 18:12 implementation.py
--rw-r--r-- 1 hainagou-laikunqi wheel  60 Nov 26 18:12 implementation.txt
--rw-r--r-- 1 hainagou-laikunqi wheel 495 Nov 26 18:12 machine-proof.py
--rwxr-xr-x 1 hainagou-laikunqi wheel 214 Nov 26 18:12 tc-ac001.sh
--rwxr-xr-x 1 hainagou-laikunqi wheel 214 Nov 26 18:12 tc-ac002.sh
+total 40
+drwxr-xr-x@ 7 hainagou-laikunqi  wheel  224 Nov 27 19:38 .
+drwxr-xr-x@ 6 hainagou-laikunqi  wheel  192 Nov 27 19:38 ..
+-rw-r--r--@ 1 hainagou-laikunqi  wheel   95 Nov 27 19:38 implementation.py
+-rw-r--r--@ 1 hainagou-laikunqi  wheel   60 Nov 27 19:38 implementation.txt
+-rw-r--r--@ 1 hainagou-laikunqi  wheel  495 Nov 27 19:38 machine-proof.py
+-rwxr-xr-x@ 1 hainagou-laikunqi  wheel  214 Nov 27 19:38 tc-ac001.sh
+-rwxr-xr-x@ 1 hainagou-laikunqi  wheel  214 Nov 27 19:38 tc-ac002.sh
 agent implementation and kernel stage captures verified
 
 ===== STEP 8b: 8b goal artifacts register current source candidate =====
 {
   "artifact": {
-    "id": "art_c81e93880f8bb0ce4924d213",
-    "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+    "id": "art_fc92387c1f32a420d9b29a8c",
+    "run_id": "run_d092ee4cefc287a812916e4a",
     "kind": "qa_candidate",
-    "abs_path": "/tmp/beacon-e2e.HsFY8U1L/proj/candidate.json",
-    "content_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
+    "abs_path": "/tmp/beacon-e2e.3HggzGPd/proj/candidate.json",
+    "content_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
     "size_bytes": 726,
-    "created_at": "2026-11-26T10:12:45.454956000Z",
+    "created_at": "2026-11-27T11:38:07.191453000Z",
     "scope_kind": "feature",
-    "scope_id": "feat_bb62e231afb77c79ab63096c"
+    "scope_id": "feat_847ae3eb496f7a1f1843f1ee"
   },
   "already_registered": false
 }
-candidate registered as artifact art_c81e93880f8bb0ce4924d213
+candidate registered as artifact art_fc92387c1f32a420d9b29a8c
 {
   "artifact_refs": [
     {
-      "id": "art_c81e93880f8bb0ce4924d213",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_fc92387c1f32a420d9b29a8c",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "qa_candidate",
-      "abs_path": "/tmp/beacon-e2e.HsFY8U1L/proj/candidate.json",
-      "content_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
+      "abs_path": "/tmp/beacon-e2e.3HggzGPd/proj/candidate.json",
+      "content_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
       "size_bytes": 726,
-      "created_at": "2026-11-26T10:12:45.454956000Z",
+      "created_at": "2026-11-27T11:38:07.191453000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     }
   ],
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a"
+  "run_id": "run_d092ee4cefc287a812916e4a"
 }
 
 ===== STEP 8c: 8c qa autotest (real TC commands -> autotest evidence) =====
 {
-  "candidate_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
+  "candidate_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
   "raw_files": [
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/custom_result.json",
-      "sha256": "cf0192c6ae45160f59dacd24f75061a204b5d6511379f1f46b6a01a99c0e6ec8"
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/custom_result.json",
+      "sha256": "5b55803b59c90f6d47a74053047ee42f998d9161a1206119bd952748e35d8d93"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/result.json",
-      "sha256": "d18adf8bd31efd0e2cf7897cab859e20b8891e6f5158f00c86b6f54b2f562b21"
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/result.json",
+      "sha256": "c1571c6808920b924ac96d53d879b865048b7b0a5dd280e82e1d366cacc06efb"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/stderr.log",
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/stderr.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/stdout.log",
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/stdout.log",
       "sha256": "9b1d72a1ea8a12651cc16293dd9e5995a8d620a0574ad7ab1f1026aa0160dbd6"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/custom_result.json",
-      "sha256": "1981fe95136b5fb974aaab9789fb1da82a9294d9e67b6ac7ff89e47129106173"
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/custom_result.json",
+      "sha256": "d598286927d52e95f3044c575821fc12b197f569b6c2d24653005346e33f01a5"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/result.json",
-      "sha256": "caa446574b0bc322f067ca85cd23fa93ce3461694c2a97f6c9a8d51dec9659fc"
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/result.json",
+      "sha256": "c535b7bade701f9127003f7ef7b7663f827a14ac556394799cf4a0268aeb768d"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/stderr.log",
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/stderr.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/stdout.log",
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/stdout.log",
       "sha256": "13da2c33d5421c3dbd16add396ea8c85e09a22f022fa9fecf9a321c6f4dab155"
     }
   ],
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+  "run_id": "run_d092ee4cefc287a812916e4a",
   "feature_slug": "e2e-login-2fa",
-  "project_root": "/private/tmp/beacon-e2e.HsFY8U1L/proj",
-  "started_at": "2026-11-26T10:12:45Z",
-  "finished_at": "2026-11-26T10:12:45Z",
+  "project_root": "/private/tmp/beacon-e2e.3HggzGPd/proj",
+  "started_at": "2026-11-27T11:38:07Z",
+  "finished_at": "2026-11-27T11:38:07Z",
   "total": 2,
   "passed": 2,
   "failed": 0,
@@ -1008,7 +1008,7 @@ candidate registered as artifact art_c81e93880f8bb0ce4924d213
       "status": "passed",
       "detail": "custom: 1 case(s) executed",
       "exit_code": 0,
-      "duration_ms": 27,
+      "duration_ms": 23,
       "test_count": 1,
       "execution_adapter": "custom",
       "cases": [
@@ -1018,9 +1018,9 @@ candidate registered as artifact art_c81e93880f8bb0ce4924d213
           "assertions": 1
         }
       ],
-      "candidate_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
-      "result_path": ".beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/result.json",
-      "artifact_id": "art_80b3dcbc48c3ab0d76392023"
+      "candidate_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
+      "result_path": ".beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/result.json",
+      "artifact_id": "art_1882c913f220ae928af516df"
     },
     {
       "tc": "TC-002",
@@ -1029,7 +1029,7 @@ candidate registered as artifact art_c81e93880f8bb0ce4924d213
       "status": "passed",
       "detail": "custom: 1 case(s) executed",
       "exit_code": 0,
-      "duration_ms": 26,
+      "duration_ms": 23,
       "test_count": 1,
       "execution_adapter": "custom",
       "cases": [
@@ -1039,49 +1039,49 @@ candidate registered as artifact art_c81e93880f8bb0ce4924d213
           "assertions": 1
         }
       ],
-      "candidate_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
-      "result_path": ".beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/result.json",
-      "artifact_id": "art_6c291c09ebe7e80391624bda"
+      "candidate_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
+      "result_path": ".beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/result.json",
+      "artifact_id": "art_ed393702fe56993fe41f2ba5"
     }
   ],
-  "report_path": ".beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/report.json",
-  "report_artifact_id": "art_f5093e9e67358e97dda699e9"
+  "report_path": ".beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/report.json",
+  "report_artifact_id": "art_61b3c400aabe159a52d6c173"
 }
-autotest executed the fixture TCs for real; evidence at .beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a
+autotest executed the fixture TCs for real; evidence at .beacon/autotest/run_d092ee4cefc287a812916e4a
 
 ===== STEP 8d: 8d surface evidence: CLI e2e report =====
 {
   "artifact": {
-    "id": "art_6333b003382f42e5b881f132",
-    "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+    "id": "art_ee35531b245f3e641d5a8b5d",
+    "run_id": "run_d092ee4cefc287a812916e4a",
     "kind": "e2e_report",
-    "abs_path": "/tmp/beacon-e2e.HsFY8U1L/e2e-report.md",
-    "content_hash": "f784b9bcc366a8e82994f8b12af9d45420c154cc6e9ee0c232dc6838b3385efc",
+    "abs_path": "/tmp/beacon-e2e.3HggzGPd/e2e-report.md",
+    "content_hash": "d844a13271876f86e805c1866230885c3d7a1ec539f1ebf33a78142e1410973f",
     "size_bytes": 354,
-    "created_at": "2026-11-26T10:12:45.795041000Z",
+    "created_at": "2026-11-27T11:38:07.523860000Z",
     "scope_kind": "feature",
-    "scope_id": "feat_bb62e231afb77c79ab63096c"
+    "scope_id": "feat_847ae3eb496f7a1f1843f1ee"
   },
   "already_registered": false
 }
 CLI surface evidence registered
 {
   "artifact": {
-    "id": "art_5570cecca0f620901696e1e8",
-    "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+    "id": "art_f255b9e2fe929021314adf80",
+    "run_id": "run_d092ee4cefc287a812916e4a",
     "kind": "qa_report",
-    "abs_path": "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json",
-    "content_hash": "89aca438613dc1b253c4a3bdceb9838dbb32b6c75090b9b299cc8d19a404c761",
+    "abs_path": "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json",
+    "content_hash": "ce8fcfa95638985c6893b9f15477de9b928267d76460d84eca0e192da19fb25c",
     "size_bytes": 347,
-    "created_at": "2026-11-26T10:12:45.843694000Z",
+    "created_at": "2026-11-27T11:38:07.573255000Z",
     "scope_kind": "feature",
-    "scope_id": "feat_bb62e231afb77c79ab63096c"
+    "scope_id": "feat_847ae3eb496f7a1f1843f1ee"
   },
   "already_registered": false
 }
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "status": "running",
   "run_status": "Running",
@@ -1152,23 +1152,23 @@ CLI surface evidence registered
     "required_for_complete": true,
     "present": true,
     "refs": [
-      "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json"
+      "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json"
     ],
     "source": "e2e-checker"
   },
   "release_human_confirmed": false,
   "executor_mode": "manual",
-  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_fd9993ea0dd7eaeb0c24cb2a --by \u003cidentity\u003e`",
+  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_d092ee4cefc287a812916e4a --by \u003cidentity\u003e`",
   "release_policy": "human",
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
-  "started_at": "2026-11-26T10:12:44.691058000Z",
+  "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
+  "started_at": "2026-11-27T11:38:06.390413000Z",
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_9b7986919933fd0f",
+    "topology_gate_ref": "bc_36a103f8e682ba26",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
   }
 }
 {
@@ -1183,15 +1183,15 @@ CLI surface evidence registered
     }
   ],
   "evaluator": "e2e-checker",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "gate_result_id": "gate_4827ae47f6af5bf61af3fb39",
-  "evaluated_at": "2026-11-26T10:12:46.000704000Z"
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "gate_result_id": "gate_b188d31592a93f7380239989",
+  "evaluated_at": "2026-11-27T11:38:07.725541000Z"
 }
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "status": "running",
   "run_status": "Running",
@@ -1262,23 +1262,23 @@ CLI surface evidence registered
     "required_for_complete": true,
     "present": true,
     "refs": [
-      "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json"
+      "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json"
     ],
     "source": "e2e-checker"
   },
   "release_human_confirmed": false,
   "executor_mode": "manual",
-  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_fd9993ea0dd7eaeb0c24cb2a --by \u003cidentity\u003e`",
+  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_d092ee4cefc287a812916e4a --by \u003cidentity\u003e`",
   "release_policy": "human",
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
-  "started_at": "2026-11-26T10:12:44.691058000Z",
+  "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
+  "started_at": "2026-11-27T11:38:06.390413000Z",
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_9b7986919933fd0f",
+    "topology_gate_ref": "bc_36a103f8e682ba26",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
   }
 }
 
@@ -1316,7 +1316,7 @@ CLI surface evidence registered
       "check": "baseline_merged",
       "ok": true,
       "applicable": true,
-      "detail": "worktree HEAD 0698de781f7f contains truth_baseline_commit 6c7a186ac31c"
+      "detail": "worktree HEAD 3b0a7dccbdb7 contains truth_baseline_commit efc15d271cf1"
     },
     {
       "check": "dirty_policy",
@@ -1328,7 +1328,7 @@ CLI surface evidence registered
       "check": "topology_gate",
       "ok": true,
       "applicable": true,
-      "detail": "topology gate pass over bc_9b7986919933fd0f (single_repo, 1 scope(s))"
+      "detail": "topology gate pass over bc_36a103f8e682ba26 (single_repo, 1 scope(s))"
     },
     {
       "check": "review_decision",
@@ -1344,11 +1344,11 @@ CLI surface evidence registered
     }
   ],
   "evaluator": "e2e-evaluator",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "gate_result_id": "gate_dd0cada80158f130b543a38d",
-  "evaluated_at": "2026-11-26T10:12:46.306395000Z"
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "gate_result_id": "gate_7a252ac59e8d55bf8e397106",
+  "evaluated_at": "2026-11-27T11:38:08.034639000Z"
 }
 gate implement cli_rc=0
 gate implement verdict=pass
@@ -1365,11 +1365,11 @@ gate implement verdict=pass
     }
   ],
   "evaluator": "e2e-evaluator",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "gate_result_id": "gate_55dd0077a8d127c67e107a8b",
-  "evaluated_at": "2026-11-26T10:12:46.351275000Z"
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "gate_result_id": "gate_839b9a0affce92901e833ec2",
+  "evaluated_at": "2026-11-27T11:38:08.080530000Z"
 }
 gate qa cli_rc=0
 gate qa verdict=pass
@@ -1414,17 +1414,17 @@ gate qa verdict=pass
     }
   ],
   "evaluator": "e2e-evaluator",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "gate_result_id": "gate_dde2178c0565574a31bd9a83",
-  "evaluated_at": "2026-11-26T10:12:46.359034000Z"
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "gate_result_id": "gate_fbe0cd81f41f2cbaa1658be3",
+  "evaluated_at": "2026-11-27T11:38:08.090498000Z"
 }
 Error: gate evaluate: gate release blocked for feature e2e-login-2fa (release_requires_human_confirmation)
 gate release cli_rc=1
 gate release verdict=blocked
 {
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "gates": [
     {
@@ -1434,7 +1434,7 @@ gate release verdict=blocked
       "reason_codes": [
         "stage_exit_ok"
       ],
-      "evaluated_at": "2026-11-26T10:12:44.946214000Z"
+      "evaluated_at": "2026-11-27T11:38:06.660427000Z"
     },
     {
       "gate_type": "truth_freeze",
@@ -1443,19 +1443,19 @@ gate release verdict=blocked
       "reason_codes": [
         "stage_exit_ok"
       ],
-      "evaluated_at": "2026-11-26T10:12:44.986715000Z"
+      "evaluated_at": "2026-11-27T11:38:06.703174000Z"
     },
     {
       "gate_type": "implement",
       "evaluated": true,
       "verdict": "pass",
-      "evaluated_at": "2026-11-26T10:12:46.306395000Z"
+      "evaluated_at": "2026-11-27T11:38:08.034639000Z"
     },
     {
       "gate_type": "qa",
       "evaluated": true,
       "verdict": "pass",
-      "evaluated_at": "2026-11-26T10:12:46.351275000Z"
+      "evaluated_at": "2026-11-27T11:38:08.080530000Z"
     },
     {
       "gate_type": "release",
@@ -1464,13 +1464,13 @@ gate release verdict=blocked
       "reason_codes": [
         "release_requires_human_confirmation"
       ],
-      "evaluated_at": "2026-11-26T10:12:46.359034000Z"
+      "evaluated_at": "2026-11-27T11:38:08.090498000Z"
     },
     {
       "gate_type": "truth_integrity",
       "evaluated": true,
       "verdict": "pass",
-      "evaluated_at": "2026-11-26T10:12:44.230057000Z"
+      "evaluated_at": "2026-11-27T11:38:05.950001000Z"
     }
   ],
   "version": "v1.0.0",
@@ -1479,8 +1479,8 @@ gate release verdict=blocked
 
 ===== STEP 10: 10 attach-verifier + complete =====
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "status": "running",
   "run_status": "Running",
@@ -1551,29 +1551,29 @@ gate release verdict=blocked
     "required_for_complete": true,
     "present": true,
     "refs": [
-      "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json"
+      "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json"
     ],
     "source": "e2e-checker"
   },
   "release_human_confirmed": false,
   "executor_mode": "manual",
-  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_fd9993ea0dd7eaeb0c24cb2a --by \u003cidentity\u003e`",
+  "tick_hint": "not auto-driven: record each stage with `beacon goal tick --run-id run_d092ee4cefc287a812916e4a --by \u003cidentity\u003e`",
   "release_policy": "human",
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
-  "started_at": "2026-11-26T10:12:44.691058000Z",
+  "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
+  "started_at": "2026-11-27T11:38:06.390413000Z",
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_9b7986919933fd0f",
+    "topology_gate_ref": "bc_36a103f8e682ba26",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
   }
 }
 verifier attached (source=e2e-checker != maker=e2e-maker)
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "status": "completed",
   "run_status": "Succeeded",
@@ -1644,7 +1644,7 @@ verifier attached (source=e2e-checker != maker=e2e-maker)
     "required_for_complete": true,
     "present": true,
     "refs": [
-      "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json"
+      "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json"
     ],
     "source": "e2e-checker"
   },
@@ -1653,13 +1653,13 @@ verifier attached (source=e2e-checker != maker=e2e-maker)
   "release_policy": "human",
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
-  "started_at": "2026-11-26T10:12:44.691058000Z",
+  "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
+  "started_at": "2026-11-27T11:38:06.390413000Z",
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_9b7986919933fd0f",
+    "topology_gate_ref": "bc_36a103f8e682ba26",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
   }
 }
 complete cli_rc=0
@@ -1667,11 +1667,11 @@ run completed (loop_stage=done)
 
 ===== STEP 11: 11 spine + trace read-back =====
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "project_key": "proj--534a929597",
-  "project_root": "/private/tmp/beacon-e2e.HsFY8U1L/proj",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "project_key": "proj--392982d88f",
+  "project_root": "/private/tmp/beacon-e2e.3HggzGPd/proj",
   "version": "v1.0.0",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "slug": "e2e-login-2fa",
   "lifecycle_stage": "Release",
@@ -1691,16 +1691,16 @@ run completed (loop_stage=done)
   "run_status": "Succeeded",
   "iteration": 0,
   "blocking_reason_codes": [],
-  "updated_at": "2026-11-26T10:12:46.519326000Z",
+  "updated_at": "2026-11-27T11:38:08.249694000Z",
   "run_count": 1,
   "latest_run": {
-    "id": "run_fd9993ea0dd7eaeb0c24cb2a",
-    "feature_id": "feat_bb62e231afb77c79ab63096c",
+    "id": "run_d092ee4cefc287a812916e4a",
+    "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
     "run_kind": "goal",
     "status": "Succeeded",
     "iteration": 0,
-    "started_at": "2026-11-26T10:12:44.691058000Z",
-    "ended_at": "2026-11-26T10:12:46.519279Z",
+    "started_at": "2026-11-27T11:38:06.390413000Z",
+    "ended_at": "2026-11-27T11:38:08.249631Z",
     "metadata_json": {
       "utterance": "给登录加 TOTP 二次验证",
       "loop_stage": "done",
@@ -1779,7 +1779,7 @@ run completed (loop_stage=done)
         "required_for_complete": true,
         "present": true,
         "refs": [
-          "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json"
+          "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json"
         ],
         "source": "e2e-checker"
       },
@@ -1789,13 +1789,13 @@ run completed (loop_stage=done)
       "blocked": false,
       "blocked_streak": 0,
       "repair_loop_count": 0,
-      "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
+      "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
       "stride_turns": [
         {
-          "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:plan:f0c7afb4feca",
+          "turn_id": "run_d092ee4cefc287a812916e4a:stage:plan:9951d3458a06",
           "records": [
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:plan:f0c7afb4feca",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:plan:9951d3458a06",
               "layer": "effect",
               "boundary": "stage_exit:plan",
               "stop_reason": "semantic_closeout",
@@ -1803,7 +1803,7 @@ run completed (loop_stage=done)
               "outcome": "complete"
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:plan:f0c7afb4feca",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:plan:9951d3458a06",
               "layer": "delivery",
               "boundary": "settlement:stage_exit:plan",
               "stop_reason": "semantic_closeout",
@@ -1811,7 +1811,7 @@ run completed (loop_stage=done)
               "outcome": "complete"
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:plan:f0c7afb4feca",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:plan:9951d3458a06",
               "layer": "authority",
               "boundary": "authority:unchanged",
               "stop_reason": "semantic_closeout",
@@ -1819,15 +1819,15 @@ run completed (loop_stage=done)
               "outcome": "complete"
             }
           ],
-          "settlement": "stage_exit:plan:run_fd9993ea0dd7eaeb0c24cb2a",
+          "settlement": "stage_exit:plan:run_d092ee4cefc287a812916e4a",
           "progress": 1,
           "complete": true
         },
         {
-          "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:truth:ee98648ed3bb",
+          "turn_id": "run_d092ee4cefc287a812916e4a:stage:truth:5efab7230f4f",
           "records": [
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:truth:ee98648ed3bb",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:truth:5efab7230f4f",
               "layer": "effect",
               "boundary": "stage_exit:truth_freeze",
               "stop_reason": "semantic_closeout",
@@ -1835,7 +1835,7 @@ run completed (loop_stage=done)
               "outcome": "complete"
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:truth:ee98648ed3bb",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:truth:5efab7230f4f",
               "layer": "delivery",
               "boundary": "settlement:stage_exit:truth",
               "stop_reason": "semantic_closeout",
@@ -1843,7 +1843,7 @@ run completed (loop_stage=done)
               "outcome": "complete"
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:truth:ee98648ed3bb",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:truth:5efab7230f4f",
               "layer": "authority",
               "boundary": "authority:unchanged",
               "stop_reason": "semantic_closeout",
@@ -1851,15 +1851,15 @@ run completed (loop_stage=done)
               "outcome": "complete"
             }
           ],
-          "settlement": "stage_exit:truth:run_fd9993ea0dd7eaeb0c24cb2a",
+          "settlement": "stage_exit:truth:run_d092ee4cefc287a812916e4a",
           "progress": 1,
           "complete": true
         },
         {
-          "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:implement:cdc53686d51e",
+          "turn_id": "run_d092ee4cefc287a812916e4a:stage:implement:a9eeb922b379",
           "records": [
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:implement:cdc53686d51e",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:implement:a9eeb922b379",
               "layer": "effect",
               "boundary": "stage_exit:implement",
               "stop_reason": "semantic_closeout",
@@ -1867,7 +1867,7 @@ run completed (loop_stage=done)
               "outcome": "complete"
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:implement:cdc53686d51e",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:implement:a9eeb922b379",
               "layer": "delivery",
               "boundary": "settlement:stage_exit:implement",
               "stop_reason": "semantic_closeout",
@@ -1875,7 +1875,7 @@ run completed (loop_stage=done)
               "outcome": "complete"
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:implement:cdc53686d51e",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:implement:a9eeb922b379",
               "layer": "authority",
               "boundary": "authority:unchanged",
               "stop_reason": "semantic_closeout",
@@ -1883,15 +1883,15 @@ run completed (loop_stage=done)
               "outcome": "complete"
             }
           ],
-          "settlement": "stage_exit:implement:run_fd9993ea0dd7eaeb0c24cb2a",
+          "settlement": "stage_exit:implement:run_d092ee4cefc287a812916e4a",
           "progress": 1,
           "complete": true
         },
         {
-          "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:qa:0bc28e1197c3",
+          "turn_id": "run_d092ee4cefc287a812916e4a:stage:qa:571e25bfb5e5",
           "records": [
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:qa:0bc28e1197c3",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:qa:571e25bfb5e5",
               "layer": "effect",
               "boundary": "stage_exit:qa",
               "stop_reason": "semantic_closeout",
@@ -1899,7 +1899,7 @@ run completed (loop_stage=done)
               "outcome": "complete"
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:qa:0bc28e1197c3",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:qa:571e25bfb5e5",
               "layer": "delivery",
               "boundary": "settlement:stage_exit:qa",
               "stop_reason": "semantic_closeout",
@@ -1907,7 +1907,7 @@ run completed (loop_stage=done)
               "outcome": "complete"
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:qa:0bc28e1197c3",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:qa:571e25bfb5e5",
               "layer": "authority",
               "boundary": "authority:unchanged",
               "stop_reason": "semantic_closeout",
@@ -1915,14 +1915,14 @@ run completed (loop_stage=done)
               "outcome": "complete"
             }
           ],
-          "settlement": "stage_exit:qa:run_fd9993ea0dd7eaeb0c24cb2a",
+          "settlement": "stage_exit:qa:run_d092ee4cefc287a812916e4a",
           "progress": 1,
           "complete": true
         }
       ],
       "interrupt_pending": false,
       "interrupt_count": 0,
-      "last_tick_key": "run_fd9993ea0dd7eaeb0c24cb2a|qa_routing|qa|3|admission_bundle=pass@2026-11-26T10:12:45.344096000Z|implement=pass@2026-11-26T10:12:45.375560000Z|plan=pass@2026-11-26T10:12:44.946214000Z|qa=pass@2026-11-26T10:12:46.000704000Z|truth_freeze=pass@2026-11-26T10:12:44.986715000Z|truth_integrity=pass@2026-11-26T10:12:44.230057000Z|by=e2e-evaluator",
+      "last_tick_key": "run_d092ee4cefc287a812916e4a|qa_routing|qa|3|admission_bundle=pass@2026-11-27T11:38:07.079187000Z|implement=pass@2026-11-27T11:38:07.110967000Z|plan=pass@2026-11-27T11:38:06.660427000Z|qa=pass@2026-11-27T11:38:07.725541000Z|truth_freeze=pass@2026-11-27T11:38:06.703174000Z|truth_integrity=pass@2026-11-27T11:38:05.950001000Z|by=e2e-evaluator",
       "stall_count": 0,
       "todo_seq": 0,
       "implement": {
@@ -1930,215 +1930,215 @@ run completed (loop_stage=done)
       },
       "topology": {
         "status": "pass",
-        "topology_gate_ref": "bc_9b7986919933fd0f",
+        "topology_gate_ref": "bc_36a103f8e682ba26",
         "topology_kind": "single_repo",
-        "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+        "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
       }
     }
   },
   "gate_results": [
     {
-      "id": "gate_6ae61dd2715a4499caa774fc",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "gate_1c785589911cfca7adb2a4a4",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "gate_type": "admission_bundle",
       "verdict": "pass",
-      "evaluated_at": "2026-11-26T10:12:45.344096000Z"
+      "evaluated_at": "2026-11-27T11:38:07.079187000Z"
     },
     {
-      "id": "gate_dd0cada80158f130b543a38d",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "gate_7a252ac59e8d55bf8e397106",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "gate_type": "implement",
       "verdict": "pass",
-      "evaluated_at": "2026-11-26T10:12:46.306395000Z"
+      "evaluated_at": "2026-11-27T11:38:08.034639000Z"
     },
     {
-      "id": "gate_f74dd1a2289de687e1294a22",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "gate_b6bd8b9d969a0471337b7b97",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "gate_type": "plan",
       "verdict": "pass",
       "reason_codes": [
         "stage_exit_ok"
       ],
-      "evaluated_at": "2026-11-26T10:12:44.946214000Z"
+      "evaluated_at": "2026-11-27T11:38:06.660427000Z"
     },
     {
-      "id": "gate_55dd0077a8d127c67e107a8b",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "gate_839b9a0affce92901e833ec2",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "gate_type": "qa",
       "verdict": "pass",
-      "evaluated_at": "2026-11-26T10:12:46.351275000Z"
+      "evaluated_at": "2026-11-27T11:38:08.080530000Z"
     },
     {
-      "id": "gate_dde2178c0565574a31bd9a83",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "gate_fbe0cd81f41f2cbaa1658be3",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "gate_type": "release",
       "verdict": "blocked",
       "reason_codes": [
         "release_requires_human_confirmation"
       ],
-      "evaluated_at": "2026-11-26T10:12:46.359034000Z"
+      "evaluated_at": "2026-11-27T11:38:08.090498000Z"
     },
     {
-      "id": "gate_d5129524d6e4205014c0341f",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "gate_fa5975c95a1b72a95b96b9ef",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "gate_type": "truth_freeze",
       "verdict": "pass",
       "reason_codes": [
         "stage_exit_ok"
       ],
-      "evaluated_at": "2026-11-26T10:12:44.986715000Z"
+      "evaluated_at": "2026-11-27T11:38:06.703174000Z"
     },
     {
-      "id": "gate_7b5d5e974660a9715847b29e",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "gate_dc142a8b0117bbab3a512823",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "gate_type": "truth_integrity",
       "verdict": "pass",
-      "evaluated_at": "2026-11-26T10:12:44.230057000Z"
+      "evaluated_at": "2026-11-27T11:38:05.950001000Z"
     }
   ],
   "artifact_refs": [
     {
-      "id": "art_c81e93880f8bb0ce4924d213",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_fc92387c1f32a420d9b29a8c",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "qa_candidate",
-      "abs_path": "/tmp/beacon-e2e.HsFY8U1L/proj/candidate.json",
-      "content_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
+      "abs_path": "/tmp/beacon-e2e.3HggzGPd/proj/candidate.json",
+      "content_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
       "size_bytes": 726,
-      "created_at": "2026-11-26T10:12:45.454956000Z",
+      "created_at": "2026-11-27T11:38:07.191453000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_80b3dcbc48c3ab0d76392023",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_1882c913f220ae928af516df",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "test_result",
-      "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/result.json",
-      "content_hash": "d18adf8bd31efd0e2cf7897cab859e20b8891e6f5158f00c86b6f54b2f562b21",
+      "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/result.json",
+      "content_hash": "c1571c6808920b924ac96d53d879b865048b7b0a5dd280e82e1d366cacc06efb",
       "size_bytes": 545,
-      "created_at": "2026-11-26T10:12:45.603787000Z",
+      "created_at": "2026-11-27T11:38:07.335468000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_6c291c09ebe7e80391624bda",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_ed393702fe56993fe41f2ba5",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "test_result",
-      "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/result.json",
-      "content_hash": "caa446574b0bc322f067ca85cd23fa93ce3461694c2a97f6c9a8d51dec9659fc",
+      "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/result.json",
+      "content_hash": "c535b7bade701f9127003f7ef7b7663f827a14ac556394799cf4a0268aeb768d",
       "size_bytes": 545,
-      "created_at": "2026-11-26T10:12:45.698988000Z",
+      "created_at": "2026-11-27T11:38:07.424403000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_e922c4b9bd9aecc565c7152e",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_9cbcfaee03993cd9ac3d1778",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "log",
-      "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/custom_result.json",
-      "content_hash": "cf0192c6ae45160f59dacd24f75061a204b5d6511379f1f46b6a01a99c0e6ec8",
+      "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/custom_result.json",
+      "content_hash": "5b55803b59c90f6d47a74053047ee42f998d9161a1206119bd952748e35d8d93",
       "size_bytes": 265,
-      "created_at": "2026-11-26T10:12:45.766880000Z",
+      "created_at": "2026-11-27T11:38:07.489867000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_ddf4e2df0939348181df4440",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_77ab4b4e19d212523d82adf3",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "log",
-      "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/stderr.log",
+      "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/stderr.log",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size_bytes": 0,
-      "created_at": "2026-11-26T10:12:45.767167000Z",
+      "created_at": "2026-11-27T11:38:07.490081000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_68b5d6eeb4938748c81f59cb",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_3df23706b8d574f87d98ddb1",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "log",
-      "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/stdout.log",
+      "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/stdout.log",
       "content_hash": "9b1d72a1ea8a12651cc16293dd9e5995a8d620a0574ad7ab1f1026aa0160dbd6",
       "size_bytes": 30,
-      "created_at": "2026-11-26T10:12:45.767333000Z",
+      "created_at": "2026-11-27T11:38:07.492457000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_2e24b6e108a8d9c42d6aa571",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_6ff8f677fff9156d34a1c5e2",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "log",
-      "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/custom_result.json",
-      "content_hash": "1981fe95136b5fb974aaab9789fb1da82a9294d9e67b6ac7ff89e47129106173",
+      "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/custom_result.json",
+      "content_hash": "d598286927d52e95f3044c575821fc12b197f569b6c2d24653005346e33f01a5",
       "size_bytes": 265,
-      "created_at": "2026-11-26T10:12:45.767769000Z",
+      "created_at": "2026-11-27T11:38:07.492899000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_fa66fa0e488d5be357d1ba42",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_74983bda67d2c032ca2e6cd6",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "log",
-      "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/stderr.log",
+      "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/stderr.log",
       "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size_bytes": 0,
-      "created_at": "2026-11-26T10:12:45.768139000Z",
+      "created_at": "2026-11-27T11:38:07.493089000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_7ef3eef518f1d0ca34c8fcbe",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_d1634d4c4828470281444050",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "log",
-      "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/stdout.log",
+      "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/stdout.log",
       "content_hash": "13da2c33d5421c3dbd16add396ea8c85e09a22f022fa9fecf9a321c6f4dab155",
       "size_bytes": 30,
-      "created_at": "2026-11-26T10:12:45.768314000Z",
+      "created_at": "2026-11-27T11:38:07.493242000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_f5093e9e67358e97dda699e9",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_61b3c400aabe159a52d6c173",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "test_results",
-      "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/report.json",
-      "content_hash": "e8599473efbd6f9f16d7b013cea239f9054e03fd11cb0a6f4086e361b60eed0d",
+      "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/report.json",
+      "content_hash": "4eb6d59327e06db59d80a4c358bc57c3a101c0971668ca12b7059f95767c4c2e",
       "size_bytes": 3783,
-      "created_at": "2026-11-26T10:12:45.768740000Z",
+      "created_at": "2026-11-27T11:38:07.493489000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_6333b003382f42e5b881f132",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_ee35531b245f3e641d5a8b5d",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "e2e_report",
-      "abs_path": "/tmp/beacon-e2e.HsFY8U1L/e2e-report.md",
-      "content_hash": "f784b9bcc366a8e82994f8b12af9d45420c154cc6e9ee0c232dc6838b3385efc",
+      "abs_path": "/tmp/beacon-e2e.3HggzGPd/e2e-report.md",
+      "content_hash": "d844a13271876f86e805c1866230885c3d7a1ec539f1ebf33a78142e1410973f",
       "size_bytes": 354,
-      "created_at": "2026-11-26T10:12:45.795041000Z",
+      "created_at": "2026-11-27T11:38:07.523860000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     },
     {
-      "id": "art_5570cecca0f620901696e1e8",
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+      "id": "art_f255b9e2fe929021314adf80",
+      "run_id": "run_d092ee4cefc287a812916e4a",
       "kind": "qa_report",
-      "abs_path": "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json",
-      "content_hash": "89aca438613dc1b253c4a3bdceb9838dbb32b6c75090b9b299cc8d19a404c761",
+      "abs_path": "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json",
+      "content_hash": "ce8fcfa95638985c6893b9f15477de9b928267d76460d84eca0e192da19fb25c",
       "size_bytes": 347,
-      "created_at": "2026-11-26T10:12:45.843694000Z",
+      "created_at": "2026-11-27T11:38:07.573255000Z",
       "scope_kind": "feature",
-      "scope_id": "feat_bb62e231afb77c79ab63096c",
+      "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
       "stale": false
     }
   ],
@@ -2147,11 +2147,11 @@ run completed (loop_stage=done)
 {
   "snapshots": [
     {
-      "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-      "project_key": "proj--534a929597",
-      "project_root": "/private/tmp/beacon-e2e.HsFY8U1L/proj",
+      "run_id": "run_d092ee4cefc287a812916e4a",
+      "project_key": "proj--392982d88f",
+      "project_root": "/private/tmp/beacon-e2e.3HggzGPd/proj",
       "version": "v1.0.0",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "feature_slug": "e2e-login-2fa",
       "slug": "e2e-login-2fa",
       "lifecycle_stage": "Release",
@@ -2171,16 +2171,16 @@ run completed (loop_stage=done)
       "run_status": "Succeeded",
       "iteration": 0,
       "blocking_reason_codes": [],
-      "updated_at": "2026-11-26T10:12:46.519326000Z",
+      "updated_at": "2026-11-27T11:38:08.249694000Z",
       "run_count": 1,
       "latest_run": {
-        "id": "run_fd9993ea0dd7eaeb0c24cb2a",
-        "feature_id": "feat_bb62e231afb77c79ab63096c",
+        "id": "run_d092ee4cefc287a812916e4a",
+        "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
         "run_kind": "goal",
         "status": "Succeeded",
         "iteration": 0,
-        "started_at": "2026-11-26T10:12:44.691058000Z",
-        "ended_at": "2026-11-26T10:12:46.519279Z",
+        "started_at": "2026-11-27T11:38:06.390413000Z",
+        "ended_at": "2026-11-27T11:38:08.249631Z",
         "metadata_json": {
           "utterance": "给登录加 TOTP 二次验证",
           "loop_stage": "done",
@@ -2259,7 +2259,7 @@ run completed (loop_stage=done)
             "required_for_complete": true,
             "present": true,
             "refs": [
-              "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json"
+              "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json"
             ],
             "source": "e2e-checker"
           },
@@ -2269,13 +2269,13 @@ run completed (loop_stage=done)
           "blocked": false,
           "blocked_streak": 0,
           "repair_loop_count": 0,
-          "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
+          "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
           "stride_turns": [
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:plan:f0c7afb4feca",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:plan:9951d3458a06",
               "records": [
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:plan:f0c7afb4feca",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:plan:9951d3458a06",
                   "layer": "effect",
                   "boundary": "stage_exit:plan",
                   "stop_reason": "semantic_closeout",
@@ -2283,7 +2283,7 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 },
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:plan:f0c7afb4feca",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:plan:9951d3458a06",
                   "layer": "delivery",
                   "boundary": "settlement:stage_exit:plan",
                   "stop_reason": "semantic_closeout",
@@ -2291,7 +2291,7 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 },
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:plan:f0c7afb4feca",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:plan:9951d3458a06",
                   "layer": "authority",
                   "boundary": "authority:unchanged",
                   "stop_reason": "semantic_closeout",
@@ -2299,15 +2299,15 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 }
               ],
-              "settlement": "stage_exit:plan:run_fd9993ea0dd7eaeb0c24cb2a",
+              "settlement": "stage_exit:plan:run_d092ee4cefc287a812916e4a",
               "progress": 1,
               "complete": true
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:truth:ee98648ed3bb",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:truth:5efab7230f4f",
               "records": [
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:truth:ee98648ed3bb",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:truth:5efab7230f4f",
                   "layer": "effect",
                   "boundary": "stage_exit:truth_freeze",
                   "stop_reason": "semantic_closeout",
@@ -2315,7 +2315,7 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 },
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:truth:ee98648ed3bb",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:truth:5efab7230f4f",
                   "layer": "delivery",
                   "boundary": "settlement:stage_exit:truth",
                   "stop_reason": "semantic_closeout",
@@ -2323,7 +2323,7 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 },
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:truth:ee98648ed3bb",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:truth:5efab7230f4f",
                   "layer": "authority",
                   "boundary": "authority:unchanged",
                   "stop_reason": "semantic_closeout",
@@ -2331,15 +2331,15 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 }
               ],
-              "settlement": "stage_exit:truth:run_fd9993ea0dd7eaeb0c24cb2a",
+              "settlement": "stage_exit:truth:run_d092ee4cefc287a812916e4a",
               "progress": 1,
               "complete": true
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:implement:cdc53686d51e",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:implement:a9eeb922b379",
               "records": [
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:implement:cdc53686d51e",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:implement:a9eeb922b379",
                   "layer": "effect",
                   "boundary": "stage_exit:implement",
                   "stop_reason": "semantic_closeout",
@@ -2347,7 +2347,7 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 },
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:implement:cdc53686d51e",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:implement:a9eeb922b379",
                   "layer": "delivery",
                   "boundary": "settlement:stage_exit:implement",
                   "stop_reason": "semantic_closeout",
@@ -2355,7 +2355,7 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 },
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:implement:cdc53686d51e",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:implement:a9eeb922b379",
                   "layer": "authority",
                   "boundary": "authority:unchanged",
                   "stop_reason": "semantic_closeout",
@@ -2363,15 +2363,15 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 }
               ],
-              "settlement": "stage_exit:implement:run_fd9993ea0dd7eaeb0c24cb2a",
+              "settlement": "stage_exit:implement:run_d092ee4cefc287a812916e4a",
               "progress": 1,
               "complete": true
             },
             {
-              "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:qa:0bc28e1197c3",
+              "turn_id": "run_d092ee4cefc287a812916e4a:stage:qa:571e25bfb5e5",
               "records": [
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:qa:0bc28e1197c3",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:qa:571e25bfb5e5",
                   "layer": "effect",
                   "boundary": "stage_exit:qa",
                   "stop_reason": "semantic_closeout",
@@ -2379,7 +2379,7 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 },
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:qa:0bc28e1197c3",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:qa:571e25bfb5e5",
                   "layer": "delivery",
                   "boundary": "settlement:stage_exit:qa",
                   "stop_reason": "semantic_closeout",
@@ -2387,7 +2387,7 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 },
                 {
-                  "turn_id": "run_fd9993ea0dd7eaeb0c24cb2a:stage:qa:0bc28e1197c3",
+                  "turn_id": "run_d092ee4cefc287a812916e4a:stage:qa:571e25bfb5e5",
                   "layer": "authority",
                   "boundary": "authority:unchanged",
                   "stop_reason": "semantic_closeout",
@@ -2395,14 +2395,14 @@ run completed (loop_stage=done)
                   "outcome": "complete"
                 }
               ],
-              "settlement": "stage_exit:qa:run_fd9993ea0dd7eaeb0c24cb2a",
+              "settlement": "stage_exit:qa:run_d092ee4cefc287a812916e4a",
               "progress": 1,
               "complete": true
             }
           ],
           "interrupt_pending": false,
           "interrupt_count": 0,
-          "last_tick_key": "run_fd9993ea0dd7eaeb0c24cb2a|qa_routing|qa|3|admission_bundle=pass@2026-11-26T10:12:45.344096000Z|implement=pass@2026-11-26T10:12:45.375560000Z|plan=pass@2026-11-26T10:12:44.946214000Z|qa=pass@2026-11-26T10:12:46.000704000Z|truth_freeze=pass@2026-11-26T10:12:44.986715000Z|truth_integrity=pass@2026-11-26T10:12:44.230057000Z|by=e2e-evaluator",
+          "last_tick_key": "run_d092ee4cefc287a812916e4a|qa_routing|qa|3|admission_bundle=pass@2026-11-27T11:38:07.079187000Z|implement=pass@2026-11-27T11:38:07.110967000Z|plan=pass@2026-11-27T11:38:06.660427000Z|qa=pass@2026-11-27T11:38:07.725541000Z|truth_freeze=pass@2026-11-27T11:38:06.703174000Z|truth_integrity=pass@2026-11-27T11:38:05.950001000Z|by=e2e-evaluator",
           "stall_count": 0,
           "todo_seq": 0,
           "implement": {
@@ -2410,215 +2410,215 @@ run completed (loop_stage=done)
           },
           "topology": {
             "status": "pass",
-            "topology_gate_ref": "bc_9b7986919933fd0f",
+            "topology_gate_ref": "bc_36a103f8e682ba26",
             "topology_kind": "single_repo",
-            "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+            "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
           }
         }
       },
       "gate_results": [
         {
-          "id": "gate_6ae61dd2715a4499caa774fc",
-          "feature_id": "feat_bb62e231afb77c79ab63096c",
+          "id": "gate_1c785589911cfca7adb2a4a4",
+          "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
           "gate_type": "admission_bundle",
           "verdict": "pass",
-          "evaluated_at": "2026-11-26T10:12:45.344096000Z"
+          "evaluated_at": "2026-11-27T11:38:07.079187000Z"
         },
         {
-          "id": "gate_dd0cada80158f130b543a38d",
-          "feature_id": "feat_bb62e231afb77c79ab63096c",
+          "id": "gate_7a252ac59e8d55bf8e397106",
+          "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
           "gate_type": "implement",
           "verdict": "pass",
-          "evaluated_at": "2026-11-26T10:12:46.306395000Z"
+          "evaluated_at": "2026-11-27T11:38:08.034639000Z"
         },
         {
-          "id": "gate_f74dd1a2289de687e1294a22",
-          "feature_id": "feat_bb62e231afb77c79ab63096c",
+          "id": "gate_b6bd8b9d969a0471337b7b97",
+          "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
           "gate_type": "plan",
           "verdict": "pass",
           "reason_codes": [
             "stage_exit_ok"
           ],
-          "evaluated_at": "2026-11-26T10:12:44.946214000Z"
+          "evaluated_at": "2026-11-27T11:38:06.660427000Z"
         },
         {
-          "id": "gate_55dd0077a8d127c67e107a8b",
-          "feature_id": "feat_bb62e231afb77c79ab63096c",
+          "id": "gate_839b9a0affce92901e833ec2",
+          "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
           "gate_type": "qa",
           "verdict": "pass",
-          "evaluated_at": "2026-11-26T10:12:46.351275000Z"
+          "evaluated_at": "2026-11-27T11:38:08.080530000Z"
         },
         {
-          "id": "gate_dde2178c0565574a31bd9a83",
-          "feature_id": "feat_bb62e231afb77c79ab63096c",
+          "id": "gate_fbe0cd81f41f2cbaa1658be3",
+          "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
           "gate_type": "release",
           "verdict": "blocked",
           "reason_codes": [
             "release_requires_human_confirmation"
           ],
-          "evaluated_at": "2026-11-26T10:12:46.359034000Z"
+          "evaluated_at": "2026-11-27T11:38:08.090498000Z"
         },
         {
-          "id": "gate_d5129524d6e4205014c0341f",
-          "feature_id": "feat_bb62e231afb77c79ab63096c",
+          "id": "gate_fa5975c95a1b72a95b96b9ef",
+          "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
           "gate_type": "truth_freeze",
           "verdict": "pass",
           "reason_codes": [
             "stage_exit_ok"
           ],
-          "evaluated_at": "2026-11-26T10:12:44.986715000Z"
+          "evaluated_at": "2026-11-27T11:38:06.703174000Z"
         },
         {
-          "id": "gate_7b5d5e974660a9715847b29e",
-          "feature_id": "feat_bb62e231afb77c79ab63096c",
+          "id": "gate_dc142a8b0117bbab3a512823",
+          "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
           "gate_type": "truth_integrity",
           "verdict": "pass",
-          "evaluated_at": "2026-11-26T10:12:44.230057000Z"
+          "evaluated_at": "2026-11-27T11:38:05.950001000Z"
         }
       ],
       "artifact_refs": [
         {
-          "id": "art_c81e93880f8bb0ce4924d213",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_fc92387c1f32a420d9b29a8c",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "qa_candidate",
-          "abs_path": "/tmp/beacon-e2e.HsFY8U1L/proj/candidate.json",
-          "content_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
+          "abs_path": "/tmp/beacon-e2e.3HggzGPd/proj/candidate.json",
+          "content_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
           "size_bytes": 726,
-          "created_at": "2026-11-26T10:12:45.454956000Z",
+          "created_at": "2026-11-27T11:38:07.191453000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_80b3dcbc48c3ab0d76392023",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_1882c913f220ae928af516df",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "test_result",
-          "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/result.json",
-          "content_hash": "d18adf8bd31efd0e2cf7897cab859e20b8891e6f5158f00c86b6f54b2f562b21",
+          "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/result.json",
+          "content_hash": "c1571c6808920b924ac96d53d879b865048b7b0a5dd280e82e1d366cacc06efb",
           "size_bytes": 545,
-          "created_at": "2026-11-26T10:12:45.603787000Z",
+          "created_at": "2026-11-27T11:38:07.335468000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_6c291c09ebe7e80391624bda",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_ed393702fe56993fe41f2ba5",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "test_result",
-          "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/result.json",
-          "content_hash": "caa446574b0bc322f067ca85cd23fa93ce3461694c2a97f6c9a8d51dec9659fc",
+          "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/result.json",
+          "content_hash": "c535b7bade701f9127003f7ef7b7663f827a14ac556394799cf4a0268aeb768d",
           "size_bytes": 545,
-          "created_at": "2026-11-26T10:12:45.698988000Z",
+          "created_at": "2026-11-27T11:38:07.424403000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_e922c4b9bd9aecc565c7152e",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_9cbcfaee03993cd9ac3d1778",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "log",
-          "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/custom_result.json",
-          "content_hash": "cf0192c6ae45160f59dacd24f75061a204b5d6511379f1f46b6a01a99c0e6ec8",
+          "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/custom_result.json",
+          "content_hash": "5b55803b59c90f6d47a74053047ee42f998d9161a1206119bd952748e35d8d93",
           "size_bytes": 265,
-          "created_at": "2026-11-26T10:12:45.766880000Z",
+          "created_at": "2026-11-27T11:38:07.489867000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_ddf4e2df0939348181df4440",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_77ab4b4e19d212523d82adf3",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "log",
-          "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/stderr.log",
+          "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/stderr.log",
           "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "size_bytes": 0,
-          "created_at": "2026-11-26T10:12:45.767167000Z",
+          "created_at": "2026-11-27T11:38:07.490081000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_68b5d6eeb4938748c81f59cb",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_3df23706b8d574f87d98ddb1",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "log",
-          "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/stdout.log",
+          "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/stdout.log",
           "content_hash": "9b1d72a1ea8a12651cc16293dd9e5995a8d620a0574ad7ab1f1026aa0160dbd6",
           "size_bytes": 30,
-          "created_at": "2026-11-26T10:12:45.767333000Z",
+          "created_at": "2026-11-27T11:38:07.492457000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_2e24b6e108a8d9c42d6aa571",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_6ff8f677fff9156d34a1c5e2",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "log",
-          "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/custom_result.json",
-          "content_hash": "1981fe95136b5fb974aaab9789fb1da82a9294d9e67b6ac7ff89e47129106173",
+          "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/custom_result.json",
+          "content_hash": "d598286927d52e95f3044c575821fc12b197f569b6c2d24653005346e33f01a5",
           "size_bytes": 265,
-          "created_at": "2026-11-26T10:12:45.767769000Z",
+          "created_at": "2026-11-27T11:38:07.492899000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_fa66fa0e488d5be357d1ba42",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_74983bda67d2c032ca2e6cd6",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "log",
-          "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/stderr.log",
+          "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/stderr.log",
           "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "size_bytes": 0,
-          "created_at": "2026-11-26T10:12:45.768139000Z",
+          "created_at": "2026-11-27T11:38:07.493089000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_7ef3eef518f1d0ca34c8fcbe",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_d1634d4c4828470281444050",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "log",
-          "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/stdout.log",
+          "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/stdout.log",
           "content_hash": "13da2c33d5421c3dbd16add396ea8c85e09a22f022fa9fecf9a321c6f4dab155",
           "size_bytes": 30,
-          "created_at": "2026-11-26T10:12:45.768314000Z",
+          "created_at": "2026-11-27T11:38:07.493242000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_f5093e9e67358e97dda699e9",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_61b3c400aabe159a52d6c173",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "test_results",
-          "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/report.json",
-          "content_hash": "e8599473efbd6f9f16d7b013cea239f9054e03fd11cb0a6f4086e361b60eed0d",
+          "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/report.json",
+          "content_hash": "4eb6d59327e06db59d80a4c358bc57c3a101c0971668ca12b7059f95767c4c2e",
           "size_bytes": 3783,
-          "created_at": "2026-11-26T10:12:45.768740000Z",
+          "created_at": "2026-11-27T11:38:07.493489000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_6333b003382f42e5b881f132",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_ee35531b245f3e641d5a8b5d",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "e2e_report",
-          "abs_path": "/tmp/beacon-e2e.HsFY8U1L/e2e-report.md",
-          "content_hash": "f784b9bcc366a8e82994f8b12af9d45420c154cc6e9ee0c232dc6838b3385efc",
+          "abs_path": "/tmp/beacon-e2e.3HggzGPd/e2e-report.md",
+          "content_hash": "d844a13271876f86e805c1866230885c3d7a1ec539f1ebf33a78142e1410973f",
           "size_bytes": 354,
-          "created_at": "2026-11-26T10:12:45.795041000Z",
+          "created_at": "2026-11-27T11:38:07.523860000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         },
         {
-          "id": "art_5570cecca0f620901696e1e8",
-          "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+          "id": "art_f255b9e2fe929021314adf80",
+          "run_id": "run_d092ee4cefc287a812916e4a",
           "kind": "qa_report",
-          "abs_path": "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json",
-          "content_hash": "89aca438613dc1b253c4a3bdceb9838dbb32b6c75090b9b299cc8d19a404c761",
+          "abs_path": "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json",
+          "content_hash": "ce8fcfa95638985c6893b9f15477de9b928267d76460d84eca0e192da19fb25c",
           "size_bytes": 347,
-          "created_at": "2026-11-26T10:12:45.843694000Z",
+          "created_at": "2026-11-27T11:38:07.573255000Z",
           "scope_kind": "feature",
-          "scope_id": "feat_bb62e231afb77c79ab63096c",
+          "scope_id": "feat_847ae3eb496f7a1f1843f1ee",
           "stale": false
         }
       ],
@@ -2627,8 +2627,8 @@ run completed (loop_stage=done)
   ]
 }
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "run_kind": "goal",
   "status": "completed",
@@ -2636,10 +2636,10 @@ run completed (loop_stage=done)
   "event_count": 37,
   "events": [
     {
-      "id": "evt_befa46e18b9aaa6b973fc51b",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_a2a580d469eaa0e1b728ed39",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "goal_run_created",
@@ -2655,13 +2655,13 @@ run completed (loop_stage=done)
         ],
         "utterance": "给登录加 TOTP 二次验证"
       },
-      "created_at": "2026-11-26T10:12:44.691130000Z"
+      "created_at": "2026-11-27T11:38:06.390479000Z"
     },
     {
-      "id": "evt_e2eae2a26adc9ac606199fa1",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_dffafbfa7b6180dfa070377d",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_executed",
@@ -2674,36 +2674,36 @@ run completed (loop_stage=done)
         "source": "external",
         "stage": "plan"
       },
-      "created_at": "2026-11-26T10:12:44.946187000Z"
+      "created_at": "2026-11-27T11:38:06.660398000Z"
     },
     {
-      "id": "evt_fa1c20c8dff95f2b976db5e4",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_f8eabf05a903a8147dec5241",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_exit_evaluated",
       "payload_json": {
         "completed_by": "e2e-maker",
         "derived": true,
-        "evaluated_at": "2026-11-26T10:12:44.946214000Z",
+        "evaluated_at": "2026-11-27T11:38:06.660427000Z",
         "evaluator": "e2e-maker",
         "executor": "manual",
         "formal_verdict": "",
         "frozen_source": "",
-        "gate_result_id": "gate_f74dd1a2289de687e1294a22",
+        "gate_result_id": "gate_b6bd8b9d969a0471337b7b97",
         "gate_type": "plan",
         "stage": "plan",
         "verdict": "pass"
       },
-      "created_at": "2026-11-26T10:12:44.946235000Z"
+      "created_at": "2026-11-27T11:38:06.660449000Z"
     },
     {
-      "id": "evt_8bcabdcb72ca284d0be4cd24",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_b48498c105b9ea88f7bf2117",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_advanced",
@@ -2712,13 +2712,13 @@ run completed (loop_stage=done)
         "loop_stage": "truth_routing",
         "to_stage": "truth"
       },
-      "created_at": "2026-11-26T10:12:44.946285000Z"
+      "created_at": "2026-11-27T11:38:06.660498000Z"
     },
     {
-      "id": "evt_c8b71ea1bf2d049980774267",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_7752790d04f40ba11ed62e62",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_executed",
@@ -2731,36 +2731,36 @@ run completed (loop_stage=done)
         "source": "external",
         "stage": "truth"
       },
-      "created_at": "2026-11-26T10:12:44.986689000Z"
+      "created_at": "2026-11-27T11:38:06.703150000Z"
     },
     {
-      "id": "evt_84d46f43a948f3fb33443cd3",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_c9c2d46761ab2823d81e16f0",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_exit_evaluated",
       "payload_json": {
         "completed_by": "e2e-maker",
         "derived": true,
-        "evaluated_at": "2026-11-26T10:12:44.986715000Z",
+        "evaluated_at": "2026-11-27T11:38:06.703174000Z",
         "evaluator": "e2e-maker",
         "executor": "manual",
         "formal_verdict": "pass",
         "frozen_source": "frontmatter",
-        "gate_result_id": "gate_d5129524d6e4205014c0341f",
+        "gate_result_id": "gate_fa5975c95a1b72a95b96b9ef",
         "gate_type": "truth_freeze",
         "stage": "truth",
         "verdict": "pass"
       },
-      "created_at": "2026-11-26T10:12:44.986738000Z"
+      "created_at": "2026-11-27T11:38:06.703205000Z"
     },
     {
-      "id": "evt_2f2859a78487f8a94668d47b",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_9d0cdc8be750a1a96f76351e",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_advanced",
@@ -2769,20 +2769,20 @@ run completed (loop_stage=done)
         "loop_stage": "implement_routing",
         "to_stage": "implement"
       },
-      "created_at": "2026-11-26T10:12:44.986777000Z"
+      "created_at": "2026-11-27T11:38:06.703251000Z"
     },
     {
-      "id": "evt_defc7df0d1b1863761795592",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_630e3bb2c9fe3d8257f22b23",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "admission_bundle_evaluated",
       "payload_json": {
-        "baseline_commit": "6c7a186ac31c066e8ed5457b697551347829ff42",
+        "baseline_commit": "efc15d271cf1e920e5a9b19f0b6ca6be18424651",
         "evaluator": "beacon-goal-admission",
-        "gate_result_id": "gate_6ae61dd2715a4499caa774fc",
+        "gate_result_id": "gate_1c785589911cfca7adb2a4a4",
         "gate_type": "admission_bundle",
         "items": [
           {
@@ -2825,15 +2825,15 @@ run completed (loop_stage=done)
         "schema": "admission-bundle.v1",
         "status": "pass",
         "verdict": "pass",
-        "worktree_dir": "/private/tmp/beacon-e2e.HsFY8U1L/proj"
+        "worktree_dir": "/private/tmp/beacon-e2e.3HggzGPd/proj"
       },
-      "created_at": "2026-11-26T10:12:45.344168000Z"
+      "created_at": "2026-11-27T11:38:07.079261000Z"
     },
     {
-      "id": "evt_16a53f847cff99eb074f41ef",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_c814d2c3b28041fdc53beaa3",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_executed",
@@ -2846,36 +2846,36 @@ run completed (loop_stage=done)
         "source": "external",
         "stage": "implement"
       },
-      "created_at": "2026-11-26T10:12:45.375538000Z"
+      "created_at": "2026-11-27T11:38:07.110945000Z"
     },
     {
-      "id": "evt_9de3b89b8206468ffe96d442",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_d3320eaadb7f3dd37b525a65",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_exit_evaluated",
       "payload_json": {
         "completed_by": "e2e-maker",
         "derived": true,
-        "evaluated_at": "2026-11-26T10:12:45.375560000Z",
+        "evaluated_at": "2026-11-27T11:38:07.110967000Z",
         "evaluator": "e2e-maker",
         "executor": "manual",
         "formal_verdict": "",
         "frozen_source": "",
-        "gate_result_id": "gate_3d0e74a3716d2d3b89b758ec",
+        "gate_result_id": "gate_8f20ffcc91995b15473f154f",
         "gate_type": "implement",
         "stage": "implement",
         "verdict": "pass"
       },
-      "created_at": "2026-11-26T10:12:45.375575000Z"
+      "created_at": "2026-11-27T11:38:07.110986000Z"
     },
     {
-      "id": "evt_ba00043f28738c80b12fb4ad",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_38de01fd6f1ec6ce45047ba6",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_advanced",
@@ -2884,228 +2884,228 @@ run completed (loop_stage=done)
         "loop_stage": "qa_routing",
         "to_stage": "qa"
       },
-      "created_at": "2026-11-26T10:12:45.375613000Z"
+      "created_at": "2026-11-27T11:38:07.111025000Z"
     },
     {
-      "id": "evt_3c4c7ed5ed6c654c9d83a64d",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_5246292a4c96f8dc4ed6576b",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/tmp/beacon-e2e.HsFY8U1L/proj/candidate.json",
-        "artifact_id": "art_c81e93880f8bb0ce4924d213",
-        "content_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
+        "abs_path": "/tmp/beacon-e2e.3HggzGPd/proj/candidate.json",
+        "artifact_id": "art_fc92387c1f32a420d9b29a8c",
+        "content_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
         "kind": "qa_candidate",
         "registered_by": "e2e-maker",
         "size_bytes": 726
       },
-      "created_at": "2026-11-26T10:12:45.455172000Z"
+      "created_at": "2026-11-27T11:38:07.191681000Z"
     },
     {
-      "id": "evt_5da54e05035a980f9fd67108",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_e30ab9802727743ebbb58422",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "autotest_executed",
       "payload_json": {
-        "candidate_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
+        "candidate_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
         "outcome": "started",
-        "report_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/report.json"
+        "report_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/report.json"
       },
-      "created_at": "2026-11-26T10:12:45.541233000Z"
+      "created_at": "2026-11-27T11:38:07.278458000Z"
     },
     {
-      "id": "evt_87126f5c7b671b2ee59512b5",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_79c47f22f301a33eb40722ce",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/result.json",
-        "artifact_id": "art_80b3dcbc48c3ab0d76392023",
-        "content_hash": "d18adf8bd31efd0e2cf7897cab859e20b8891e6f5158f00c86b6f54b2f562b21",
+        "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/result.json",
+        "artifact_id": "art_1882c913f220ae928af516df",
+        "content_hash": "c1571c6808920b924ac96d53d879b865048b7b0a5dd280e82e1d366cacc06efb",
         "kind": "test_result",
         "registered_by": "e2e-evaluator",
         "size_bytes": 545
       },
-      "created_at": "2026-11-26T10:12:45.603894000Z"
+      "created_at": "2026-11-27T11:38:07.335568000Z"
     },
     {
-      "id": "evt_c973895648df5409d7b34293",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_f9ecf966fa248a10aa99a082",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/result.json",
-        "artifact_id": "art_6c291c09ebe7e80391624bda",
-        "content_hash": "caa446574b0bc322f067ca85cd23fa93ce3461694c2a97f6c9a8d51dec9659fc",
+        "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/result.json",
+        "artifact_id": "art_ed393702fe56993fe41f2ba5",
+        "content_hash": "c535b7bade701f9127003f7ef7b7663f827a14ac556394799cf4a0268aeb768d",
         "kind": "test_result",
         "registered_by": "e2e-evaluator",
         "size_bytes": 545
       },
-      "created_at": "2026-11-26T10:12:45.699073000Z"
+      "created_at": "2026-11-27T11:38:07.424484000Z"
     },
     {
-      "id": "evt_ab2ea216c2e44fe558e4ec0d",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_6d8af962e01ab57bb7eedc2e",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/custom_result.json",
-        "artifact_id": "art_e922c4b9bd9aecc565c7152e",
-        "content_hash": "cf0192c6ae45160f59dacd24f75061a204b5d6511379f1f46b6a01a99c0e6ec8",
+        "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/custom_result.json",
+        "artifact_id": "art_9cbcfaee03993cd9ac3d1778",
+        "content_hash": "5b55803b59c90f6d47a74053047ee42f998d9161a1206119bd952748e35d8d93",
         "kind": "log",
         "registered_by": "e2e-evaluator",
         "size_bytes": 265
       },
-      "created_at": "2026-11-26T10:12:45.766994000Z"
+      "created_at": "2026-11-27T11:38:07.489958000Z"
     },
     {
-      "id": "evt_51361db076d93a599d54d5c8",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_6d81e2d6a102d27acc970d12",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/stderr.log",
-        "artifact_id": "art_ddf4e2df0939348181df4440",
+        "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/stderr.log",
+        "artifact_id": "art_77ab4b4e19d212523d82adf3",
         "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "kind": "log",
         "registered_by": "e2e-evaluator",
         "size_bytes": 0
       },
-      "created_at": "2026-11-26T10:12:45.767222000Z"
+      "created_at": "2026-11-27T11:38:07.490127000Z"
     },
     {
-      "id": "evt_5d37f4d1be1dba9071f53136",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_9235f56fb4279a27b4647e40",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-001/stdout.log",
-        "artifact_id": "art_68b5d6eeb4938748c81f59cb",
+        "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-001/stdout.log",
+        "artifact_id": "art_3df23706b8d574f87d98ddb1",
         "content_hash": "9b1d72a1ea8a12651cc16293dd9e5995a8d620a0574ad7ab1f1026aa0160dbd6",
         "kind": "log",
         "registered_by": "e2e-evaluator",
         "size_bytes": 30
       },
-      "created_at": "2026-11-26T10:12:45.767382000Z"
+      "created_at": "2026-11-27T11:38:07.492552000Z"
     },
     {
-      "id": "evt_c40bc5d448e06dc97e79d711",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_c4b321938b9ba430a362141a",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/custom_result.json",
-        "artifact_id": "art_2e24b6e108a8d9c42d6aa571",
-        "content_hash": "1981fe95136b5fb974aaab9789fb1da82a9294d9e67b6ac7ff89e47129106173",
+        "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/custom_result.json",
+        "artifact_id": "art_6ff8f677fff9156d34a1c5e2",
+        "content_hash": "d598286927d52e95f3044c575821fc12b197f569b6c2d24653005346e33f01a5",
         "kind": "log",
         "registered_by": "e2e-evaluator",
         "size_bytes": 265
       },
-      "created_at": "2026-11-26T10:12:45.767877000Z"
+      "created_at": "2026-11-27T11:38:07.492961000Z"
     },
     {
-      "id": "evt_2d0559284a9afa115f0d14d0",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_5c9fa94fe1f560ce50b39ff9",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/stderr.log",
-        "artifact_id": "art_fa66fa0e488d5be357d1ba42",
+        "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/stderr.log",
+        "artifact_id": "art_74983bda67d2c032ca2e6cd6",
         "content_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "kind": "log",
         "registered_by": "e2e-evaluator",
         "size_bytes": 0
       },
-      "created_at": "2026-11-26T10:12:45.768197000Z"
+      "created_at": "2026-11-27T11:38:07.493134000Z"
     },
     {
-      "id": "evt_18c5dcdf571a60482000e52c",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_2616a49a756bdb12243158b3",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/TC-002/stdout.log",
-        "artifact_id": "art_7ef3eef518f1d0ca34c8fcbe",
+        "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/TC-002/stdout.log",
+        "artifact_id": "art_d1634d4c4828470281444050",
         "content_hash": "13da2c33d5421c3dbd16add396ea8c85e09a22f022fa9fecf9a321c6f4dab155",
         "kind": "log",
         "registered_by": "e2e-evaluator",
         "size_bytes": 30
       },
-      "created_at": "2026-11-26T10:12:45.768359000Z"
+      "created_at": "2026-11-27T11:38:07.493286000Z"
     },
     {
-      "id": "evt_6e061d927650d39589d08a06",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_4c74439fdecb56e8a2f4c975",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/report.json",
-        "artifact_id": "art_f5093e9e67358e97dda699e9",
-        "content_hash": "e8599473efbd6f9f16d7b013cea239f9054e03fd11cb0a6f4086e361b60eed0d",
+        "abs_path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/report.json",
+        "artifact_id": "art_61b3c400aabe159a52d6c173",
+        "content_hash": "4eb6d59327e06db59d80a4c358bc57c3a101c0971668ca12b7059f95767c4c2e",
         "kind": "test_results",
         "registered_by": "e2e-evaluator",
         "size_bytes": 3783
       },
-      "created_at": "2026-11-26T10:12:45.768806000Z"
+      "created_at": "2026-11-27T11:38:07.493535000Z"
     },
     {
-      "id": "evt_f339a731c2929cbf94c6cd1d",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_32f4995e13dab9afad00260a",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "autotest_executed",
       "payload_json": {
         "blocked": 0,
         "by": "e2e-evaluator",
-        "candidate_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
+        "candidate_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
         "failed": 0,
         "passed": 2,
-        "report_hash": "e8599473efbd6f9f16d7b013cea239f9054e03fd11cb0a6f4086e361b60eed0d",
-        "report_path": ".beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3383802338/report.json",
+        "report_hash": "4eb6d59327e06db59d80a4c358bc57c3a101c0971668ca12b7059f95767c4c2e",
+        "report_path": ".beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2272121947/report.json",
         "total": 2
       },
-      "created_at": "2026-11-26T10:12:45.768863000Z"
+      "created_at": "2026-11-27T11:38:07.493585000Z"
     },
     {
-      "id": "evt_6bbec7997e7d2272733119e1",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_b7b1036c8f0a4584b1f3c858",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_executed",
@@ -3120,56 +3120,56 @@ run completed (loop_stage=done)
         "stage": "qa",
         "total": 2
       },
-      "created_at": "2026-11-26T10:12:45.768878000Z"
+      "created_at": "2026-11-27T11:38:07.493597000Z"
     },
     {
-      "id": "evt_ebe6f95ae5c6a0734335518b",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_ae084ae523cbf1da6a5a3df9",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/tmp/beacon-e2e.HsFY8U1L/e2e-report.md",
-        "artifact_id": "art_6333b003382f42e5b881f132",
-        "content_hash": "f784b9bcc366a8e82994f8b12af9d45420c154cc6e9ee0c232dc6838b3385efc",
+        "abs_path": "/tmp/beacon-e2e.3HggzGPd/e2e-report.md",
+        "artifact_id": "art_ee35531b245f3e641d5a8b5d",
+        "content_hash": "d844a13271876f86e805c1866230885c3d7a1ec539f1ebf33a78142e1410973f",
         "kind": "e2e_report",
         "registered_by": "e2e-evaluator",
         "size_bytes": 354
       },
-      "created_at": "2026-11-26T10:12:45.795225000Z"
+      "created_at": "2026-11-27T11:38:07.524027000Z"
     },
     {
-      "id": "evt_fa67451668c4ac08269cf44d",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_fe8bf8718c980ebfa596c342",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "artifact_registered",
       "payload_json": {
-        "abs_path": "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json",
-        "artifact_id": "art_5570cecca0f620901696e1e8",
-        "candidate_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
-        "content_hash": "89aca438613dc1b253c4a3bdceb9838dbb32b6c75090b9b299cc8d19a404c761",
+        "abs_path": "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json",
+        "artifact_id": "art_f255b9e2fe929021314adf80",
+        "candidate_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
+        "content_hash": "ce8fcfa95638985c6893b9f15477de9b928267d76460d84eca0e192da19fb25c",
         "evidence_files": [
           {
-            "path": "/tmp/beacon-e2e.HsFY8U1L/e2e-report.md",
-            "sha256": "f784b9bcc366a8e82994f8b12af9d45420c154cc6e9ee0c232dc6838b3385efc"
+            "path": "/tmp/beacon-e2e.3HggzGPd/e2e-report.md",
+            "sha256": "d844a13271876f86e805c1866230885c3d7a1ec539f1ebf33a78142e1410973f"
           }
         ],
         "kind": "qa_report",
         "registered_by": "e2e-checker",
         "size_bytes": 347
       },
-      "created_at": "2026-11-26T10:12:45.879086000Z"
+      "created_at": "2026-11-27T11:38:07.607772000Z"
     },
     {
-      "id": "evt_ed24de3291759181cc97726f",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_99fac123b2f64353140a8a98",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "verifier_attached",
@@ -3177,35 +3177,35 @@ run completed (loop_stage=done)
         "block_pending": false,
         "cleared_block": false,
         "refs": [
-          "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json"
+          "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json"
         ],
         "source": "e2e-checker"
       },
-      "created_at": "2026-11-26T10:12:45.956051000Z"
+      "created_at": "2026-11-27T11:38:07.682638000Z"
     },
     {
-      "id": "evt_eb2abe1738dc327a203e6183",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_d5ebe0d98c2fdfb0aaf7793a",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "gate_evaluated",
       "payload_json": {
         "evaluator": "e2e-checker",
-        "gate_result_id": "gate_4827ae47f6af5bf61af3fb39",
+        "gate_result_id": "gate_b188d31592a93f7380239989",
         "gate_type": "qa",
-        "qa_fingerprint": "9e72ea257bf260851730bdea898de3a445dbf22ac905eb9df89e1663f1599a2a",
+        "qa_fingerprint": "433ff26c96b866dbf2b0a00bf2a18898a340bd2e3e9963b260c5236359caaa58",
         "reason_codes": null,
         "verdict": "pass"
       },
-      "created_at": "2026-11-26T10:12:46.000741000Z"
+      "created_at": "2026-11-27T11:38:07.725577000Z"
     },
     {
-      "id": "evt_93855b65e1b44d412e17a688",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_64dce756ad6c9ca6fb49f789",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_executed",
@@ -3218,36 +3218,36 @@ run completed (loop_stage=done)
         "source": "external",
         "stage": "qa"
       },
-      "created_at": "2026-11-26T10:12:46.077630000Z"
+      "created_at": "2026-11-27T11:38:07.799542000Z"
     },
     {
-      "id": "evt_36e916a5af8ae5a665f1e100",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_c0d65edd3137002a2165571c",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_exit_evaluated",
       "payload_json": {
         "completed_by": "e2e-evaluator",
         "derived": false,
-        "evaluated_at": "2026-11-26T10:12:46.077660000Z",
+        "evaluated_at": "2026-11-27T11:38:07.799569000Z",
         "evaluator": "e2e-evaluator",
         "executor": "manual",
         "formal_verdict": "pass",
         "frozen_source": "",
-        "gate_result_id": "gate_04bab09ba5a4b492b3475475",
+        "gate_result_id": "gate_f1abfd553dfd8d2347ae108b",
         "gate_type": "qa",
         "stage": "qa",
         "verdict": "pass"
       },
-      "created_at": "2026-11-26T10:12:46.077677000Z"
+      "created_at": "2026-11-27T11:38:07.799586000Z"
     },
     {
-      "id": "evt_fdfb58ab6243c50cd73aa58f",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_3d60a9e67d3085182d8181a2",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "stage_advanced",
@@ -3256,67 +3256,67 @@ run completed (loop_stage=done)
         "loop_stage": "release_gate",
         "to_stage": "release"
       },
-      "created_at": "2026-11-26T10:12:46.077713000Z"
+      "created_at": "2026-11-27T11:38:07.799619000Z"
     },
     {
-      "id": "evt_55517b76571360a45f048312",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_10d760134f6df6d04c55a368",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "gate_evaluated",
       "payload_json": {
         "evaluator": "e2e-evaluator",
-        "gate_result_id": "gate_dd0cada80158f130b543a38d",
+        "gate_result_id": "gate_7a252ac59e8d55bf8e397106",
         "gate_type": "implement",
         "reason_codes": null,
         "verdict": "pass"
       },
-      "created_at": "2026-11-26T10:12:46.306445000Z"
+      "created_at": "2026-11-27T11:38:08.034686000Z"
     },
     {
-      "id": "evt_fa85093126da2909d9e2506e",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_115c4d0d427ae7336eb40d8f",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "gate_evaluated",
       "payload_json": {
         "evaluator": "e2e-evaluator",
-        "gate_result_id": "gate_55dd0077a8d127c67e107a8b",
+        "gate_result_id": "gate_839b9a0affce92901e833ec2",
         "gate_type": "qa",
-        "qa_fingerprint": "9e72ea257bf260851730bdea898de3a445dbf22ac905eb9df89e1663f1599a2a",
+        "qa_fingerprint": "433ff26c96b866dbf2b0a00bf2a18898a340bd2e3e9963b260c5236359caaa58",
         "reason_codes": null,
         "verdict": "pass"
       },
-      "created_at": "2026-11-26T10:12:46.351310000Z"
+      "created_at": "2026-11-27T11:38:08.080607000Z"
     },
     {
-      "id": "evt_c5869367d1748a71e03fed68",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_4f2a721d284e5ee532956fe3",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "gate_evaluated",
       "payload_json": {
         "evaluator": "e2e-evaluator",
-        "gate_result_id": "gate_dde2178c0565574a31bd9a83",
+        "gate_result_id": "gate_fbe0cd81f41f2cbaa1658be3",
         "gate_type": "release",
         "reason_codes": [
           "release_requires_human_confirmation"
         ],
         "verdict": "blocked"
       },
-      "created_at": "2026-11-26T10:12:46.359064000Z"
+      "created_at": "2026-11-27T11:38:08.090529000Z"
     },
     {
-      "id": "evt_19525f707500243ed45aef40",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_ba7cb7e647fadaba7ed7126e",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "verifier_attached",
@@ -3324,30 +3324,30 @@ run completed (loop_stage=done)
         "block_pending": false,
         "cleared_block": false,
         "refs": [
-          "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json"
+          "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json"
         ],
         "source": "e2e-checker"
       },
-      "created_at": "2026-11-26T10:12:46.475888000Z"
+      "created_at": "2026-11-27T11:38:08.206144000Z"
     },
     {
-      "id": "evt_a864af679eb5105efb649fff",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_dfcedd823af25247f9625bd5",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "release_confirmed",
       "payload_json": {
         "by": "lai"
       },
-      "created_at": "2026-11-26T10:12:46.483166000Z"
+      "created_at": "2026-11-27T11:38:08.214242000Z"
     },
     {
-      "id": "evt_c2b2502ee3cfc0473a7e168e",
-      "feature_id": "feat_bb62e231afb77c79ab63096c",
+      "id": "evt_900fece9aaa432b7fb38dab3",
+      "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
       "run_id": {
-        "String": "run_fd9993ea0dd7eaeb0c24cb2a",
+        "String": "run_d092ee4cefc287a812916e4a",
         "Valid": true
       },
       "event_type": "goal_completed",
@@ -3355,13 +3355,13 @@ run completed (loop_stage=done)
         "human_confirmed_by": "lai",
         "verifier_source": "e2e-checker"
       },
-      "created_at": "2026-11-26T10:12:46.519245000Z"
+      "created_at": "2026-11-27T11:38:08.249448000Z"
     }
   ]
 }
 {
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
   "status": "completed",
   "run_status": "Succeeded",
@@ -3432,7 +3432,7 @@ run completed (loop_stage=done)
     "required_for_complete": true,
     "present": true,
     "refs": [
-      "/tmp/beacon-e2e.HsFY8U1L/proj/product-qa.json"
+      "/tmp/beacon-e2e.3HggzGPd/proj/product-qa.json"
     ],
     "source": "e2e-checker"
   },
@@ -3443,54 +3443,54 @@ run completed (loop_stage=done)
     "gate_type": "release",
     "evaluated": true,
     "verdict": "blocked",
-    "evaluated_at": "2026-11-26T10:12:46.359064000Z",
+    "evaluated_at": "2026-11-27T11:38:08.090529000Z",
     "source": "formal_gate"
   },
   "release_policy": "human",
   "repair_loop_count": 0,
   "blocked_streak": 0,
-  "last_heartbeat_at": "2026-11-26T10:12:44.671801Z",
-  "started_at": "2026-11-26T10:12:44.691058000Z",
+  "last_heartbeat_at": "2026-11-27T11:38:06.372514Z",
+  "started_at": "2026-11-27T11:38:06.390413000Z",
   "topology": {
     "status": "pass",
-    "topology_gate_ref": "bc_9b7986919933fd0f",
+    "topology_gate_ref": "bc_36a103f8e682ba26",
     "topology_kind": "single_repo",
-    "detail": "live topology gate evaluation over the recorded BranchContext bc_9b7986919933fd0f"
+    "detail": "live topology gate evaluation over the recorded BranchContext bc_36a103f8e682ba26"
   }
 }
 {
-  "candidate_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
+  "candidate_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
   "raw_files": [
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3895023377/TC-001/result.json",
-      "sha256": "4cfeb059a3bd94aff0c2b463cec5945f28b13cd9aa58b342318bb7b3d98eda1c"
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2132184571/TC-001/result.json",
+      "sha256": "75d0c5c3f6fe4e6564be7121c199d66865f6adbde5e5b511dc5620869c494ddf"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3895023377/TC-001/stderr.log",
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2132184571/TC-001/stderr.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3895023377/TC-001/stdout.log",
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2132184571/TC-001/stdout.log",
       "sha256": "9b1d72a1ea8a12651cc16293dd9e5995a8d620a0574ad7ab1f1026aa0160dbd6"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3895023377/TC-002/result.json",
-      "sha256": "3d9b0ae77af4965cee251d72725f6375fd566b0ae7f3d4c7157abb22d60211c9"
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2132184571/TC-002/result.json",
+      "sha256": "c67632a86210cdb43a97b32bca75f956776fc99f0868f714c680cbe3b1370364"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3895023377/TC-002/stderr.log",
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2132184571/TC-002/stderr.log",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "/private/tmp/beacon-e2e.HsFY8U1L/proj/.beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3895023377/TC-002/stdout.log",
+      "path": "/private/tmp/beacon-e2e.3HggzGPd/proj/.beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2132184571/TC-002/stdout.log",
       "sha256": "13da2c33d5421c3dbd16add396ea8c85e09a22f022fa9fecf9a321c6f4dab155"
     }
   ],
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
+  "run_id": "run_d092ee4cefc287a812916e4a",
   "feature_slug": "e2e-login-2fa",
-  "project_root": "/private/tmp/beacon-e2e.HsFY8U1L/proj",
-  "started_at": "2026-11-26T10:12:46Z",
-  "finished_at": "2026-11-26T10:12:46Z",
+  "project_root": "/private/tmp/beacon-e2e.3HggzGPd/proj",
+  "started_at": "2026-11-27T11:38:08Z",
+  "finished_at": "2026-11-27T11:38:08Z",
   "total": 2,
   "passed": 0,
   "failed": 2,
@@ -3504,10 +3504,10 @@ run completed (loop_stage=done)
       "reason_code": "qa_execution_result_missing",
       "detail": "qa.evaluateQAExecution: command exited 0 but produced no Go -json/-v, JUnit, or BEACON_TEST_RESULT_PATH machine result (qa_execution_result_missing)",
       "exit_code": 0,
-      "duration_ms": 19,
-      "candidate_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
-      "result_path": ".beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3895023377/TC-001/result.json",
-      "artifact_id": "art_530ec38e9f2af6fdeb0e059d"
+      "duration_ms": 18,
+      "candidate_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
+      "result_path": ".beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2132184571/TC-001/result.json",
+      "artifact_id": "art_10207ccb226dec9075e5b933"
     },
     {
       "tc": "TC-002",
@@ -3517,14 +3517,14 @@ run completed (loop_stage=done)
       "reason_code": "qa_execution_result_missing",
       "detail": "qa.evaluateQAExecution: command exited 0 but produced no Go -json/-v, JUnit, or BEACON_TEST_RESULT_PATH machine result (qa_execution_result_missing)",
       "exit_code": 0,
-      "duration_ms": 20,
-      "candidate_hash": "3bac26c1ab703a4474e6880218a6b58387cb5203e581a0e15ae9e3a3c0902b62",
-      "result_path": ".beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3895023377/TC-002/result.json",
-      "artifact_id": "art_d8a4141747de26ad1ab38535"
+      "duration_ms": 18,
+      "candidate_hash": "966b382d7af732f7d40aa5f2d15a0cb77570c3dc74cdf4d2c41c94cf477945ee",
+      "result_path": ".beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2132184571/TC-002/result.json",
+      "artifact_id": "art_f6e42463cc2c2ae6702a6c24"
     }
   ],
-  "report_path": ".beacon/autotest/run_fd9993ea0dd7eaeb0c24cb2a/invocation-3895023377/report.json",
-  "report_artifact_id": "art_89c1b273e92095b2ee556dd3"
+  "report_path": ".beacon/autotest/run_d092ee4cefc287a812916e4a/invocation-2132184571/report.json",
+  "report_artifact_id": "art_95c9f0ae1a5fe49ee3729240"
 }
 Error: qa.RunAutoTest: auto-test finished with failures or blocked TCs (see report) (autotest_failed)
 {
@@ -3543,14 +3543,14 @@ Error: qa.RunAutoTest: auto-test finished with failures or blocked TCs (see repo
     }
   ],
   "evaluator": "e2e-checker",
-  "feature_id": "feat_bb62e231afb77c79ab63096c",
+  "feature_id": "feat_847ae3eb496f7a1f1843f1ee",
   "feature_slug": "e2e-login-2fa",
-  "run_id": "run_fd9993ea0dd7eaeb0c24cb2a",
-  "gate_result_id": "gate_24ca3aa1edff8db4bb663d43",
-  "evaluated_at": "2026-11-26T10:12:46.859340000Z"
+  "run_id": "run_d092ee4cefc287a812916e4a",
+  "gate_result_id": "gate_31e43225c6690c8e3442427f",
+  "evaluated_at": "2026-11-27T11:38:08.581152000Z"
 }
 Error: gate evaluate: gate qa blocked for feature e2e-login-2fa (qa_execution_invalid)
 ==================================================================
-E2E RESULT: PASS — full chain completed (run run_fd9993ea0dd7eaeb0c24cb2a done)
+E2E RESULT: PASS — full chain completed (run run_d092ee4cefc287a812916e4a done)
 elapsed: 3s
-workspace kept at: /tmp/beacon-e2e.HsFY8U1L
+workspace kept at: /tmp/beacon-e2e.3HggzGPd

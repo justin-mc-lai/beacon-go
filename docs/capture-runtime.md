@@ -50,6 +50,23 @@ package 预检、进程启动失败、取消或超时也保留 rejected 结果�
 
 ## 接入 verified
 
+### 历史 Red 重放
+
+对已经实现的工作，允许 `--phase red --baseline <完整40位祖先commit>`。
+仅支持 Go 适配器；系统通过 Git ls-tree/cat-file 读取原始 tree/blob 字节，
+不使用会受 export-ignore/export-subst 影响的 archive。在临时目录提取（拒绝特殊文件和符号链接），
+只覆盖冻结合同绑定的测试文件，保留旧业务源码。测试必须实际运行且按同一机器事件规则
+产生预期用例失败；缺接口导致的编译失败不算 Red。
+不会 checkout、修改或删除活动工作区的正确实现。
+
+结果额外记录 baseline_commit、replay_candidate、replay_target_sha256 和 execution_root。
+source_commit 指旧源码基线，source_sha256 指覆盖相同测试后的实际旧输入；
+replay_candidate/input hash 指计划配对的当前 Green。
+临时快照运行后清理，原始 stdout/stderr 和结果仍在本项目 captures 下登记。
+Green 必须引用此 Red，且当前 HEAD 与输入 hash 仍等于重放目标；verified 也复核此绑定。
+HEAD 本身、缩写、无效/非祖先 commit、Green 上携带 baseline 均拒绝。
+这是真实历史执行，不是把旧终端日志补写为 capture；不保证所有已实现功能均有可用旧基线。
+
 `verify leaf` 的每个 DeliveryRun 现在必须提供 `capture_id`；该 ID 必须指向当前节点
 账本中的保留种类 `capture_result`，不能由手动 `artifacts register` 生成。
 系统从采集结果读取真实命令、退出码、时间、测试 hash 和日志 hash，逐项与 envelope 比较。

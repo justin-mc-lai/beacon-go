@@ -40,6 +40,7 @@ func newImplementCaptureCmd() *cobra.Command {
 	c.Flags().StringVar(&req.Phase, "phase", "", "red or green")
 	c.Flags().StringVar(&req.By, "by", "", "maker identity")
 	c.Flags().StringVar(&req.RedID, "red", "", "explicit Red artifact ID for Green")
+	c.Flags().StringVar(&req.Baseline, "baseline", "", "Red only: exact ancestor commit for isolated historical replay")
 	c.Flags().IntVar(&seconds, "timeout-sec", 120, "process timeout, 1..3600 seconds")
 	for _, flag := range []string{"version", "node", "ac", "phase", "by"} {
 		_ = c.MarkFlagRequired(flag)

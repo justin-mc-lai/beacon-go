@@ -1,0 +1,12 @@
+{
+  "id": "chg_8614a7dca58d",
+  "node_id": "n_d8063fefcf41",
+  "summary": "用户确认历史基线重放协议：隔离祖先快照、同测试覆盖、目标Green候选绑定，禁止伪造Red",
+  "by": "user-confirmed-host",
+  "base_fingerprint": "f905c395d2bcc120885cb9393bb905dc3ffa1852d8cd655d04d32a31b1ffab8b",
+  "before_snapshot_id": "v0.0.1-20261127T112712.582240000Z",
+  "affected": [
+    "n_d8063fefcf41"
+  ],
+  "created_at": "2026-11-27T11:27:12.575363Z"
+}

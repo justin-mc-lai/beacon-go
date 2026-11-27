@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -17,35 +18,39 @@ import (
 
 // CaptureEvidence is the process-owned record shared by producer and consumers.
 type CaptureEvidence struct {
-	Schema       string            `json:"schema"`
-	NodeID       string            `json:"node_id"`
-	ACID         string            `json:"ac_id"`
-	Phase        string            `json:"phase"`
-	By           string            `json:"by"`
-	RedID        string            `json:"red_id,omitempty"`
-	Fingerprint  string            `json:"requirement_fingerprint"`
-	Command      []string          `json:"command"`
-	TestSHA256   string            `json:"test_sha256"`
-	SourceSHA256 string            `json:"source_sha256"`
-	SourceCommit string            `json:"source_commit,omitempty"`
-	BinarySHA256 string            `json:"binary_sha256"`
-	Workdir      string            `json:"workdir"`
-	TestFiles    []string          `json:"test_files"`
-	SourceAfter  string            `json:"source_after"`
-	StartedAt    string            `json:"started_at"`
-	FinishedAt   string            `json:"finished_at"`
-	ExitCode     int               `json:"exit_code"`
-	TimedOut     bool              `json:"timed_out"`
-	Cancelled    bool              `json:"cancelled"`
-	Status       string            `json:"status"`
-	Reason       string            `json:"reason,omitempty"`
-	ResultPath   string            `json:"result_path"`
-	StdoutPath   string            `json:"stdout_path"`
-	StderrPath   string            `json:"stderr_path"`
-	StdoutSHA256 string            `json:"stdout_sha256"`
-	StderrSHA256 string            `json:"stderr_sha256"`
-	ArtifactID   string            `json:"artifact_id,omitempty"`
-	Preflight    *CapturePreflight `json:"preflight,omitempty"`
+	BaselineCommit     string            `json:"baseline_commit,omitempty"`
+	ReplayCandidate    string            `json:"replay_candidate,omitempty"`
+	ReplayTargetSHA256 string            `json:"replay_target_sha256,omitempty"`
+	ExecutionRoot      string            `json:"execution_root,omitempty"`
+	Schema             string            `json:"schema"`
+	NodeID             string            `json:"node_id"`
+	ACID               string            `json:"ac_id"`
+	Phase              string            `json:"phase"`
+	By                 string            `json:"by"`
+	RedID              string            `json:"red_id,omitempty"`
+	Fingerprint        string            `json:"requirement_fingerprint"`
+	Command            []string          `json:"command"`
+	TestSHA256         string            `json:"test_sha256"`
+	SourceSHA256       string            `json:"source_sha256"`
+	SourceCommit       string            `json:"source_commit,omitempty"`
+	BinarySHA256       string            `json:"binary_sha256"`
+	Workdir            string            `json:"workdir"`
+	TestFiles          []string          `json:"test_files"`
+	SourceAfter        string            `json:"source_after"`
+	StartedAt          string            `json:"started_at"`
+	FinishedAt         string            `json:"finished_at"`
+	ExitCode           int               `json:"exit_code"`
+	TimedOut           bool              `json:"timed_out"`
+	Cancelled          bool              `json:"cancelled"`
+	Status             string            `json:"status"`
+	Reason             string            `json:"reason,omitempty"`
+	ResultPath         string            `json:"result_path"`
+	StdoutPath         string            `json:"stdout_path"`
+	StderrPath         string            `json:"stderr_path"`
+	StdoutSHA256       string            `json:"stdout_sha256"`
+	StderrSHA256       string            `json:"stderr_sha256"`
+	ArtifactID         string            `json:"artifact_id,omitempty"`
+	Preflight          *CapturePreflight `json:"preflight,omitempty"`
 }
 
 type CapturePreflight struct {
@@ -261,6 +266,15 @@ func ValidateCaptureDelivery(st *store.Store, root string, n Node, path string) 
 		}
 		if green.RedID != red.ArtifactID || red.TestSHA256 != green.TestSHA256 || testHash != green.TestSHA256 || !reflect.DeepEqual(red.Command, green.Command) || green.SourceSHA256 != currentSource || review.SourceSHA256 != currentSource || green.BinarySHA256 != receipt.BinarySHA256 || review.Captures[task.ACID] != green.ArtifactID || (green.SourceCommit != "" && green.SourceCommit != receipt.SourceCommit) {
 			return deliveryError("delivery_capture_stale", "pair, candidate, tests or review differs")
+		}
+		if red.BaselineCommit != "" && (red.SourceCommit != red.BaselineCommit || red.ReplayCandidate != green.SourceCommit || red.ReplayTargetSHA256 != green.SourceSHA256) {
+			return deliveryError("delivery_capture_stale", "historical Red targets a different Green candidate")
+		}
+		if red.BaselineCommit != "" {
+			head, e := exec.Command("git", "-C", canonicalRoot, "rev-parse", "HEAD").Output()
+			if e != nil || strings.TrimSpace(string(head)) != red.ReplayCandidate {
+				return deliveryError("delivery_capture_stale", "current HEAD differs from replay target")
+			}
 		}
 	}
 	return nil

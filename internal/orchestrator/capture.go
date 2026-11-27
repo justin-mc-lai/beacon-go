@@ -261,6 +261,9 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 	if req.Phase == "red" && req.RedID != "" {
 		return res, captureError("capture_request_invalid", "Red cannot reference Red")
 	}
+	if req.Baseline != "" && req.Phase != "red" {
+		return res, captureError("capture_baseline_invalid", "baseline only allowed for Red")
+	}
 	root, err := filepath.EvalSymlinks(req.Root)
 	if err != nil {
 		return res, err
@@ -324,6 +327,40 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 	if err != nil {
 		return res, err
 	}
+	liveRoot := root
+	liveSource, err := captureSourceHash(liveRoot)
+	if err != nil {
+		return res, err
+	}
+	replayCandidate := ""
+	if req.Baseline != "" {
+		if spec.Adapter == "custom-json" {
+			return res, captureError("capture_baseline_invalid", "historical replay currently requires Go tests")
+		}
+		var cleanup func()
+		root, replayCandidate, cleanup, err = prepareCaptureReplay(ctx, liveRoot, req.Baseline, spec.TestFiles)
+		if err != nil {
+			return res, err
+		}
+		defer cleanup()
+		// Resolve the same relative test set inside the historical snapshot.
+		var relative []string
+		for _, name := range spec.TestFiles {
+			p, e := captureFile(liveRoot, name)
+			if e != nil {
+				return res, e
+			}
+			rel, e := filepath.Rel(liveRoot, p)
+			if e != nil {
+				return res, e
+			}
+			relative = append(relative, rel)
+		}
+		spec.TestFiles = relative
+		if replayHash, e := captureTestHash(root, relative); e != nil || replayHash != testHash {
+			return res, captureError("capture_baseline_invalid", "overlay test hash differs")
+		}
+	}
 	if req.Phase == "green" {
 		red, err := e.ReadCapture(req.NodeID, req.RedID)
 		if err != nil {
@@ -334,12 +371,21 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 		if red.Phase != "red" || red.Status != "accepted" || red.ACID != req.ACID || red.By != req.By || red.Fingerprint != fp || red.TestSHA256 != testHash || string(a) != string(b) {
 			return res, captureError("capture_pair_invalid", "Red scope/contract/tests/command/maker differs")
 		}
+		if red.BaselineCommit != "" {
+			head, e := qaGit(liveRoot, "rev-parse", "HEAD")
+			if e != nil || strings.TrimSpace(head) != red.ReplayCandidate {
+				return res, captureError("capture_pair_invalid", "candidate commit differs from replay target")
+			}
+			if liveSource != red.ReplayTargetSHA256 {
+				return res, captureError("capture_pair_invalid", "live replay target inputs changed")
+			}
+		}
 	}
 	source, err := captureSourceHash(root)
 	if err != nil {
 		return res, err
 	}
-	base := filepath.Join(root, ".beacon", "captures")
+	base := filepath.Join(liveRoot, ".beacon", "captures")
 	if err := os.MkdirAll(base, 0700); err != nil {
 		return res, err
 	}
@@ -350,8 +396,15 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 	res = CaptureResult{Schema: "beacon-capture.v1", NodeID: n.ID, ACID: req.ACID, Phase: req.Phase, By: req.By, RedID: req.RedID, Fingerprint: fp, Command: argv, TestSHA256: testHash, SourceSHA256: source, StartedAt: time.Now().UTC().Format(time.RFC3339Nano), Status: "rejected", ResultPath: filepath.Join(dir, "result.json"), StdoutPath: filepath.Join(dir, "stdout.log"), StderrPath: filepath.Join(dir, "stderr.log")}
 	commit, _ := qaGit(root, "rev-parse", "HEAD")
 	res.SourceCommit = strings.TrimSpace(commit)
+	if req.Baseline != "" {
+		res.SourceCommit = req.Baseline
+		res.BaselineCommit = req.Baseline
+		res.ReplayCandidate = replayCandidate
+		res.ReplayTargetSHA256 = liveSource
+		res.ExecutionRoot = root
+	}
 	res.BinarySHA256 = version.Runtime().BinarySHA
-	res.Workdir = root
+	res.Workdir = liveRoot
 	res.TestFiles = append([]string{}, spec.TestFiles...)
 	var preflightErr error
 	if spec.Adapter == "custom-json" {
@@ -425,6 +478,12 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 		runErr = err
 	} else if res.SourceAfter != source {
 		runErr = captureError("capture_input_changed", "project inputs changed during execution")
+	}
+	if req.Baseline != "" {
+		after, e := captureSourceHash(liveRoot)
+		if e != nil || after != liveSource {
+			runErr = captureError("capture_input_changed", "live replay target changed during execution")
+		}
 	}
 	if runErr == nil {
 		res.Status = "accepted"
