@@ -19,12 +19,12 @@ PROPOSAL = pathlib.Path("/tmp/beacon-cl744/proposal/nodes.json")
 TEST_REL = "e2e/portableacceptance/portable_acceptance_test.go"
 
 BEHAVIOR = {
-    "n_a78ea52722a0": "^TestPortableCaptureLifecycle$",
+    "n_a78ea52722a0": "^TestPortableStrictDeliveryGuard$",
     "n_a3b9d2c7f296": "^TestPortableStrictDeliveryGuard$",
-    "n_5eaf5288ed83": "^TestPortableCaptureLifecycle$",
+    "n_5eaf5288ed83": "^TestPortableStrictDeliveryGuard$",
     "n_6ee4eee57ba1": "^TestPortableStrictDeliveryGuard$",
-    "n_54606a05e1b6": "^TestPortableCaptureLifecycle$",
-    "n_d8063fefcf41": "^TestPortableCaptureLifecycle$",
+    "n_54606a05e1b6": "^TestPortableStrictDeliveryGuard$",
+    "n_d8063fefcf41": "^TestPortableStrictDeliveryGuard$",
     "n_ec5052dd2cc5": "^TestPortableStrictDeliveryGuard$",
     "n_a11841bbc44c": "^TestPortableStrictDeliveryContract$",
     "n_ea9234b5e82c": "^TestPortableStrictDeliveryContract$",
@@ -94,6 +94,19 @@ def refresh_proposal():
             "required_tests": [BEHAVIOR[node_id].strip("^$")],
         }
         patch = {"verification": {"type": "test", "spec": json.dumps(spec, ensure_ascii=False, separators=(",", ":"))}}
+        if not node.get("test_cases"):
+            cases = []
+            for index, ac in enumerate(node.get("acs", [])):
+                cases.append({
+                    "id": f"TC-PORTABLE-{index + 1:03d}",
+                    "ac_id": ac["id"],
+                    "kind": "e2e",
+                    "ref": TEST_REL,
+                    "status": "existing",
+                })
+            if cases:
+                patch["test_cases"] = cases
+                change["note"] = (change.get("note", "") + " 补齐 portable 测试合同覆盖的用例映射。").strip()
         if node_id in NARROW_ACS:
             acs = []
             for ac in node["acs"]:
