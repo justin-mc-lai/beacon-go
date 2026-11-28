@@ -166,6 +166,60 @@ func TestTreeMigrateReadAuditAndIdempotency(t *testing.T) {
 	}
 }
 
+func TestVerifyAuditSkipsDeprecatedEmptyModules(t *testing.T) {
+	proj := treeTestEnv(t)
+	mustRun(t, "truth", "create", "--project", proj, "--slug", "demo", "--json")
+	mustRun(t, "migrate", "tree", "--project", proj, "--version", "v0.1.0", "--json")
+	dir := filepath.Join(proj, "docs", "beacon", "v0.1.0", "tree")
+	idx, err := intenttree.ReadIndex(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, spec := range []struct{ id, status string }{
+		{"m_deprecated", string(intenttree.StatusDeprecated)},
+		{"m_active", string(intenttree.StatusDraft)},
+		{"m_pending", string(intenttree.StatusChangePending)},
+	} {
+		n, err := intenttree.Stamp(intenttree.Node{ID: spec.id, Kind: intenttree.KindModule, ParentID: idx.RootID,
+			Path: "root/" + spec.id, Title: spec.id, Status: intenttree.Status(spec.status)})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := intenttree.WriteNode(dir, n); err != nil {
+			t.Fatal(err)
+		}
+		idx.Nodes = append(idx.Nodes, intenttree.IndexEntry{ID: n.ID, ParentID: n.ParentID, Kind: n.Kind,
+			Status: n.Status, Title: n.Title, Path: n.Path, Fingerprint: n.Fingerprint, FingerprintAlg: n.FingerprintAlg})
+	}
+	if err := intenttree.WriteIndex(dir, idx); err != nil {
+		t.Fatal(err)
+	}
+	out, _ := runCLI(t, "verify", "audit", "--project", proj, "--json")
+	audit := parseDoc(t, out)
+	var findings []string
+	for _, item := range audit["findings"].([]any) {
+		findings = append(findings, item.(string))
+	}
+	joined := strings.Join(findings, "\n")
+	if audit["ok"] != false {
+		t.Fatalf("audit should stay blocked by active empty modules: %v", audit)
+	}
+	for _, want := range []string{"tree_module_empty: m_active", "tree_module_empty: m_pending"} {
+		found := false
+		for _, item := range audit["findings"].([]any) {
+			if item.(string) == want {
+				found = true
+			}
+		}
+		if !found {
+			t.Fatalf("missing exact finding %q: %s", want, joined)
+		}
+	}
+	if strings.Contains(joined, "m_deprecated") {
+		t.Fatalf("deprecated empty module still audited as finding: %s", joined)
+	}
+}
+
 func TestTreeExpandSchemaDAG(t *testing.T) {
 	proj := treeTestEnv(t)
 	mustRun(t, "truth", "create", "--project", proj, "--slug", "demo", "--json")

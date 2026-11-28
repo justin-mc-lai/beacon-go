@@ -93,7 +93,7 @@ func newVerifyAuditCmd() *cobra.Command {
 				if n.Kind != intenttree.KindTouchpoint && n.Verification != nil {
 					findings = append(findings, "tree_verification_scope: "+n.ID)
 				}
-				if n.Kind == intenttree.KindModule && childCount[n.ID] == 0 {
+				if n.Kind == intenttree.KindModule && childCount[n.ID] == 0 && entry.Status != intenttree.StatusDeprecated {
 					findings = append(findings, intenttree.ReasonModuleEmpty+": "+n.ID)
 				}
 			}
