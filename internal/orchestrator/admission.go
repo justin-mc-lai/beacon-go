@@ -112,6 +112,19 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 	} else {
 		fail(truth)
 	}
+	// The whole delivery scope must be frozen, not just the run's wrapper
+	// feature package. A wrapper being frozen cannot consume draft children.
+	scopeFrozen, err := e.scopeFrozenAdmissionItem(run.ID)
+	if err != nil {
+		return AdmissionResult{}, err
+	}
+	if scopeFrozen.Applicable {
+		if scopeFrozen.OK {
+			ok(scopeFrozen)
+		} else {
+			fail(scopeFrozen)
+		}
+	}
 	if fc, fcErr := e.featureContext(run.FeatureID); fcErr != nil {
 		return AdmissionResult{}, fcErr
 	} else {

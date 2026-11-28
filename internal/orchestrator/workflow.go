@@ -8,6 +8,11 @@ import (
 )
 
 func validateWorkflow(c WorkflowContract, idx intenttree.Index, bodies map[string]intenttree.Node) error {
+	_, err := resolveWorkflowDelivery(c, idx, bodies)
+	return err
+}
+
+func validateWorkflowContract(c WorkflowContract, idx intenttree.Index, bodies map[string]intenttree.Node) error {
 	bad := func(s string) error { return qaError("workflow_contract_invalid", s) }
 	if c.Schema != "beacon-workflow.v1" || strings.TrimSpace(c.Goal) == "" || strings.TrimSpace(c.Scope) == "" || len(c.Modules) == 0 || len(c.Coverage) == 0 {
 		return bad("goal/scope/modules/coverage required")
@@ -101,10 +106,45 @@ func validateWorkflow(c WorkflowContract, idx intenttree.Index, bodies map[strin
 			}
 		}
 	}
+	// Acceptance nodes (including the run anchor) are integration contracts:
+	// they are not scheduled as delivery tasks, but their ACs are required.
+	acceptance := map[string]bool{}
+	if c.RunAnchor != "" {
+		acceptance[c.RunAnchor] = true
+	}
+	for _, id := range c.Acceptance {
+		if strings.TrimSpace(id) == "" || id != strings.TrimSpace(id) {
+			return bad("invalid acceptance node")
+		}
+		acceptance[id] = true
+	}
+	for id := range acceptance {
+		anchor, ok := bodies[id]
+		if !ok || anchor.Kind != intenttree.KindFeature || !scoped[id] {
+			return bad("invalid/out-of-scope acceptance node")
+		}
+		for _, leaf := range bodies {
+			if workflowDeprecated(leaf.ID, bodies) || leaf.ParentID != id || leaf.Kind != intenttree.KindTouchpoint {
+				continue
+			}
+			for _, ac := range leaf.ACs {
+				key := leaf.ID + "\x00" + ac.ID
+				if strings.TrimSpace(ac.ID) == "" || strings.TrimSpace(ac.Text) == "" {
+					return bad("blank acceptance AC")
+				}
+				if !required[key] {
+					required[key] = true
+				}
+			}
+		}
+	}
 	if len(required) == 0 {
 		return bad("zero active target ACs")
 	}
 	for id := range scoped {
+		if acceptance[id] {
+			continue
+		}
 		if bodies[id].Kind == intenttree.KindFeature && !features[id] {
 			return bad("scope feature has no owner")
 		}
@@ -288,6 +328,11 @@ func (e *Engine) workflowCheckStage(runID, stage string) (WorkflowView, error) {
 	if fileErr != nil || fileHash != bound.FileHash {
 		v.Missing = append(v.Missing, "workflow_contract_changed")
 		v.Next = "restore contract or explicitly rebind at plan/truth"
+		return v, nil
+	}
+	if reason, ok := e.workflowScopeReady(runID, bound); !ok {
+		v.Missing = append(v.Missing, reason)
+		v.Next = "repair scope and explicitly rebind at plan/truth"
 		return v, nil
 	}
 	if stage == StagePlan {

@@ -47,13 +47,22 @@ func (e *Engine) Heartbeat(runID, summary, substep string) (RunView, error) {
 // (checkpoint row, event, run state) commit as ONE transaction
 // (P6 write-path fix).
 func (e *Engine) Checkpoint(runID, nextAction, substep string) (store.Checkpoint, RunView, error) {
+	unlock, err := e.lockProgram(runID)
+	if err != nil {
+		return store.Checkpoint{}, RunView{}, err
+	}
+	defer unlock()
 	run, m, slug, err := e.loadRun(runID)
 	if err != nil {
 		return store.Checkpoint{}, RunView{}, err
 	}
 	var ckpt store.Checkpoint
+	scope, err := e.workflowCheckpointInput(runID)
+	if err != nil {
+		return store.Checkpoint{}, RunView{}, err
+	}
 	err = e.store.WithTx(func(tx *store.Tx) error {
-		c, err := e.checkpointOn(tx, run, m, nextAction, substep)
+		c, err := e.checkpointOn(tx, run, m, nextAction, substep, scope)
 		if err != nil {
 			return err
 		}
@@ -70,7 +79,7 @@ func (e *Engine) Checkpoint(runID, nextAction, substep string) (store.Checkpoint
 // write set, so DriverRunOnce can fold the turn-end checkpoint into
 // the turn's own batch. It mutates m (LastSubstep /
 // LastCheckpointAction) and persists it via the final saveRunOn.
-func (e *Engine) checkpointOn(w writeSet, run store.Run, m *runMeta, nextAction, substep string) (store.Checkpoint, error) {
+func (e *Engine) checkpointOn(w writeSet, run store.Run, m *runMeta, nextAction, substep string, scope workflowCheckpoint) (store.Checkpoint, error) {
 	iteration := 1
 	if latest, err := w.Runs().LatestCheckpoint(run.ID); err == nil {
 		iteration = latest.Iteration + 1
@@ -89,6 +98,7 @@ func (e *Engine) checkpointOn(w writeSet, run store.Run, m *runMeta, nextAction,
 		"run_id": run.ID, "loop_stage": m.LoopStage, "current_stage": m.currentStage(),
 		"next_action": nextAction, "last_substep": m.LastSubstep,
 		"open_blockers": openBlockers, "last_heartbeat_at": m.LastHeartbeatAt,
+		"workflow_binding_hash": scope.Binding, "workflow_scope_fingerprint": scope.Scope,
 	})
 	if err != nil {
 		return store.Checkpoint{}, err
@@ -219,9 +229,32 @@ func decideResume(runID string, m *runMeta) ResumeView {
 // exactly one goal_resumed event carrying the utterance (AC-003) —
 // a replayed interrupt also consumes its flag in the same write.
 func (e *Engine) Resume(runID, utterance string) (ResumeView, error) {
+	unlock, err := e.lockProgram(runID)
+	if err != nil {
+		return ResumeView{}, err
+	}
+	defer unlock()
 	run, m, _, err := e.loadRun(runID)
 	if err != nil {
 		return ResumeView{}, err
+	}
+	// Re-evaluate the bound commitment before clearing blockers or consuming an
+	// interrupt. A resume request cannot authorize a changed delivery contract.
+	workflow, err := e.workflowCheckStage(runID, m.currentStage())
+	if err != nil {
+		return ResumeView{}, err
+	}
+	if workflow.Mode == "stable" && !workflow.Ready {
+		return ResumeView{RunID: runID, Status: "blocked", ReasonCode: workflow.Missing[0], CurrentStage: m.currentStage(), LoopStage: m.LoopStage, NextAction: workflow.Next, ResumeAction: core.ResumeNone}, nil
+	}
+	if workflow.Mode == "stable" {
+		current, err := e.workflowCheckpointCurrent(runID)
+		if err != nil {
+			return ResumeView{}, err
+		}
+		if !current {
+			return ResumeView{RunID: runID, Status: "blocked", ReasonCode: "workflow_checkpoint_stale", CurrentStage: m.currentStage(), LoopStage: m.LoopStage, NextAction: "reconcile changed scope and record a new checkpoint", ResumeAction: core.ResumeNone}, nil
+		}
 	}
 	// A review-routed block (H5) is NOT a soft block: it clears only
 	// when a later review decision routes onward, never by resume.

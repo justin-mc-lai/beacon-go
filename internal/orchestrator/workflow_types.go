@@ -19,15 +19,18 @@ type WorkflowContract struct {
 	Scope       string             `json:"scope"`
 	ScopeNodes  []string           `json:"scope_nodes"`
 	SourceNodes []string           `json:"source_nodes"`
+	RunAnchor   string             `json:"run_anchor,omitempty"`
+	Acceptance  []string           `json:"acceptance_nodes,omitempty"`
 	Modules     []WorkflowModule   `json:"modules"`
 	Coverage    []WorkflowCoverage `json:"coverage"`
 }
 type workflowBinding struct {
-	Contract WorkflowContract `json:"contract"`
-	Hash     string           `json:"hash"`
-	By       string           `json:"by"`
-	Path     string           `json:"path"`
-	FileHash string           `json:"file_hash"`
+	Contract         WorkflowContract `json:"contract"`
+	Hash             string           `json:"hash"`
+	By               string           `json:"by"`
+	Path             string           `json:"path"`
+	FileHash         string           `json:"file_hash"`
+	ScopeFingerprint string           `json:"scope_fingerprint,omitempty"`
 }
 type workflowArtifacts struct {
 	PreparationID string `json:"preparation_id"`

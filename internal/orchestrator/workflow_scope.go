@@ -80,6 +80,9 @@ func validateWorkflowDraft(c WorkflowContract) error {
 		return qaError("workflow_contract_invalid", "schema, goal, scope and explicit scope_nodes required")
 	}
 	seen := map[string]bool{}
+	if c.RunAnchor != "" && c.RunAnchor != strings.TrimSpace(c.RunAnchor) {
+		return qaError("workflow_contract_invalid", "run_anchor must be a canonical node id")
+	}
 	for _, id := range c.ScopeNodes {
 		if strings.TrimSpace(id) == "" || id != strings.TrimSpace(id) || seen[id] {
 			return qaError("workflow_contract_invalid", "blank/duplicate scope node")
@@ -140,6 +143,38 @@ func (e *Engine) workflowRunFeature(runID string, c WorkflowContract, idx intent
 	fc, err := e.featureContext(run.FeatureID)
 	if err != nil {
 		return err
+	}
+	// An explicit run_anchor binds this run to one canonical node. It resolves
+	// legacy slug ambiguity without letting any run claim any scope: the anchor
+	// must exist, be a feature, sit in the declared scope (or be its ancestor),
+	// and actually carry this run's feature slug.
+	if c.RunAnchor != "" {
+		anchor, ok := bodies[c.RunAnchor]
+		if !ok || anchor.Kind != intenttree.KindFeature {
+			return qaError("workflow_anchor_invalid", "run_anchor must name a canonical feature")
+		}
+		scoped, err := workflowScope(c, idx, bodies)
+		if err != nil {
+			return err
+		}
+		inScope := scoped[c.RunAnchor]
+		if !inScope {
+			for id := c.RunAnchor; id != ""; id = bodies[id].ParentID {
+				if scoped[id] {
+					inScope = true
+					break
+				}
+			}
+		}
+		if !inScope {
+			return qaError("workflow_anchor_outside_scope", "run_anchor is outside the declared delivery scope")
+		}
+		for _, slug := range intenttree.FeaturePackageSlugs(idx, c.RunAnchor, anchor.EffectiveTruthPath()) {
+			if slug == fc.Feature.Slug {
+				return nil
+			}
+		}
+		return qaError("workflow_anchor_mismatch", "run feature does not resolve to the declared run_anchor")
 	}
 	var matches []string
 	for _, n := range bodies {

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"path/filepath"
 	"strings"
+
+	"beacon-go/internal/store"
 )
 
 func (e *Engine) BindWorkflow(runID, path, by string) (WorkflowView, error) {
@@ -39,7 +41,52 @@ func (e *Engine) BindWorkflow(runID, path, by string) (WorkflowView, error) {
 	payload := map[string]any{}
 	encoded, _ := json.Marshal(binding)
 	_ = json.Unmarshal(encoded, &payload)
-	if err := e.appendEvent(run, "workflow_contract_bound", payload); err != nil {
+	var delivery *WorkflowDelivery
+	// Plan accepts a draft contract before the tree exists. Once modules are
+	// declared, persist the deterministic plan with its binding in one write.
+	if len(c.Modules) > 0 {
+		_, _, idx, bodies, err := e.workflowInput(runID)
+		if err != nil {
+			return WorkflowView{}, err
+		}
+		d, err := resolveWorkflowDelivery(c, idx, bodies)
+		if err != nil {
+			return WorkflowView{}, err
+		}
+		fc, err := e.featureContext(run.FeatureID)
+		if err != nil {
+			return WorkflowView{}, err
+		}
+		d = namespaceWorkflowDelivery(d, fc.Project.ID, fc.Version.ID)
+		delivery = &d
+		binding.ScopeFingerprint = d.Fingerprint
+		payload["scope_fingerprint"] = d.Fingerprint
+	}
+	previous, _, err := e.workflowBinding(runID)
+	if err != nil {
+		return WorkflowView{}, err
+	}
+	if previous != nil && previous.Hash == binding.Hash && previous.FileHash == binding.FileHash && previous.Path == binding.Path && previous.ScopeFingerprint == binding.ScopeFingerprint {
+		return e.WorkflowCheck(runID)
+	}
+	if err := e.store.WithTx(func(tx *store.Tx) error {
+		if err := e.appendEventOn(tx, run, "workflow_contract_bound", payload); err != nil {
+			return err
+		}
+		if delivery != nil {
+			raw, err := json.Marshal(delivery)
+			if err != nil {
+				return err
+			}
+			var taskPayload map[string]any
+			if err := json.Unmarshal(raw, &taskPayload); err != nil {
+				return err
+			}
+			taskPayload["binding_hash"] = binding.Hash
+			return e.appendEventOn(tx, run, "workflow_tasks_planned", taskPayload)
+		}
+		return nil
+	}); err != nil {
 		return WorkflowView{}, err
 	}
 	return e.WorkflowCheck(runID)

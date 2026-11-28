@@ -324,6 +324,10 @@ func (e *Engine) DriverRunOnce(ctx context.Context, runID string) (DriverView, e
 		return driverViewOf(run, m, slug), nil
 	}
 	// Mark the turn active (renews the lease), then tick once.
+	checkpointScope, err := e.workflowCheckpointInput(run.ID)
+	if err != nil {
+		return DriverView{}, err
+	}
 	m.Driver.State = DriverTurnActive
 	m.Driver.LeaseExpiresAt = time.Now().Add(DefaultDriverLeaseTTL).UTC().Format(time.RFC3339Nano)
 	m.Driver.UpdatedAt = nowISO()
@@ -385,6 +389,23 @@ func (e *Engine) DriverRunOnce(ctx context.Context, runID string) (DriverView, e
 	// as ONE transaction (P6 write-path fix; this unit alone was 5
 	// commits before). The two trail events stay best-effort inside
 	// the batch, exactly as they were outside it.
+	unlockCheckpoint, err := e.lockProgram(run.ID)
+	if err != nil {
+		return DriverView{}, err
+	}
+	defer unlockCheckpoint()
+	currentScope, scopeErr := e.workflowCheckpointInput(run.ID)
+	if scopeErr == nil && currentScope == checkpointScope {
+		checkpointScope = currentScope
+	} else {
+		// The turn already happened: retain accounting and its original
+		// commitment rather than leaving an active turn without a closeout.
+		m.Blocked = true
+		m.LastBlockReason = "workflow_checkpoint_stale"
+		v.Blocked = true
+		v.ReasonCode = m.LastBlockReason
+		m.Driver.NextPrompt = "reconcile changed workflow before resuming"
+	}
 	err = e.store.WithTx(func(tx *store.Tx) error {
 		_ = e.appendEventOn(tx, run, "driver_turn_end", map[string]any{
 			"driver_id": m.Driver.DriverID, "turn_n": m.Driver.TurnN,
@@ -418,7 +439,7 @@ func (e *Engine) DriverRunOnce(ctx context.Context, runID string) (DriverView, e
 			return err
 		}
 		// Source parity: heartbeat + checkpoint close every driver turn.
-		_, err := e.checkpointOn(tx, run, m, m.Driver.NextPrompt, fmt.Sprintf("driver-turn-%d", m.Driver.TurnN))
+		_, err := e.checkpointOn(tx, run, m, m.Driver.NextPrompt, fmt.Sprintf("driver-turn-%d", m.Driver.TurnN), checkpointScope)
 		return err
 	})
 	if err != nil {

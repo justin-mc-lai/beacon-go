@@ -25,6 +25,22 @@ func goalWorkflowView(runID string) (*orchestrator.WorkflowView, error) {
 
 func newGoalWorkflowCmd() *cobra.Command {
 	root := &cobra.Command{Use: "workflow", Short: "Bind, prepare and inspect stable stage deliverables"}
+	var tasksRunID string
+	tasks := &cobra.Command{Use: "tasks", Short: "Read deterministic scope task plan (does not execute or approve)", Args: cobra.NoArgs, RunE: func(cmd *cobra.Command, args []string) error {
+		eng, closeFn, err := goalReadEngine()
+		if err != nil {
+			return err
+		}
+		defer closeFn()
+		view, err := eng.WorkflowTasks(tasksRunID)
+		if err != nil {
+			return err
+		}
+		return printJSON(cmd, view)
+	}}
+	tasks.Flags().StringVar(&tasksRunID, "run-id", "", "explicit run ID")
+	_ = tasks.MarkFlagRequired("run-id")
+	root.AddCommand(tasks)
 	for _, action := range []string{"bind", "prepare", "confirm", "check"} {
 		action := action
 		var runID, file, by, preparedHash string
