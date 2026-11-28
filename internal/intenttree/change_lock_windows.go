@@ -2,7 +2,6 @@ package intenttree
 
 import (
 	"os"
-	"path/filepath"
 
 	"golang.org/x/sys/windows"
 )

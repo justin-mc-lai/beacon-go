@@ -19,6 +19,7 @@ type IntegrityView struct {
 	Verdict      string         `json:"verdict"`
 	Mode         string         `json:"mode"`
 	ReasonCodes  []string       `json:"reason_codes,omitempty"`
+	ReasonCode   string         `json:"reason_code,omitempty"`
 	Findings     []gate.Finding `json:"findings,omitempty"`
 	Evaluator    string         `json:"evaluator"`
 	FeatureID    string         `json:"feature_id"`
@@ -153,9 +154,13 @@ func (e *Engine) EvaluateIntegrity(ctx store.FeatureContext, evaluator, mode str
 	if err != nil {
 		return IntegrityView{}, err
 	}
+	reasonCode := ""
+	if len(rep.ReasonCodes) > 0 {
+		reasonCode = rep.ReasonCodes[0]
+	}
 	return IntegrityView{
 		GateType: string(gate.GateTruthIntegrity), Verdict: string(rep.Verdict),
-		Mode: mode, ReasonCodes: rep.ReasonCodes, Findings: rep.Findings,
+		Mode: mode, ReasonCodes: rep.ReasonCodes, ReasonCode: reasonCode, Findings: rep.Findings,
 		Evaluator: evaluator, FeatureID: ctx.Feature.ID, FeatureSlug: ctx.Feature.Slug,
 		GateResultID: ev.GateResultID, EvaluatedAt: ev.EvaluatedAt,
 		RepairRoute: gate.DefaultRepairRoute,

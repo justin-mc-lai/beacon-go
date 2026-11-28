@@ -321,7 +321,14 @@ func (e *Engine) currentQAReview(run store.Run, m *runMeta, c qaCurrent) (qaProd
 
 // currentQAEligibility is the live predicate shared by formal QA and every
 // advancement path. Formal records are evidence bindings, never cached permission.
-func (e *Engine) currentQAEligibility(run store.Run, m *runMeta, requireVerifier bool) (string, error) {
+func (e *Engine) currentQAEligibility(run store.Run, m *runMeta, requireVerifier bool, tcChecks ...*[]gate.CheckItem) (fp string, eligibilityErr error) {
+	var checks []gate.CheckItem
+	defer func() {
+		checks = e.qaTCEligibilityChecks(run, checks, eligibilityErr)
+		for _, dst := range tcChecks {
+			*dst = checks
+		}
+	}()
 	c, err := e.currentQACandidate(run)
 	if err != nil {
 		return "", err
@@ -364,29 +371,12 @@ func (e *Engine) currentQAEligibility(run store.Run, m *runMeta, requireVerifier
 		return "", err
 	}
 	rows := gate.ParseCoverageRows(e.packageFiles(fc).Tests.Text)
-	if report.RunID != run.ID || report.CandidateHash != c.Hash || report.Failed != 0 || report.Blocked != 0 || len(rows) == 0 || report.Total != len(rows) || report.Passed != len(rows) || len(report.Results) != len(rows) || len(report.RawFiles) == 0 {
-		return "", qaError("qa_execution_invalid", "latest invocation did not pass the entire current TC contract")
+	checks, err = e.validateQATCResults(run, root, c.Hash, invocation.ReportPath, report, rows)
+	if err != nil {
+		return "", err
 	}
 	parts := []string{c.Hash, invocation.ReportHash}
-	for i, res := range report.Results {
-		row := rows[i]
-		if res.TC != row.TC || res.Status != AutoTestPassed || res.CandidateHash != c.Hash || res.TestCount == nil || *res.TestCount <= 0 || *res.TestCount != len(res.Cases) {
-			return "", qaError("qa_execution_invalid", "invalid TC result: "+row.TC)
-		}
-		if err := checkQACases(QAExecutionResult{Cases: res.Cases}, row.RequiredTests); err != nil {
-			return "", err
-		}
-		if _, err := e.qaRegisteredFile(run.ID, resolvePkgPath(root, res.ResultPath)); err != nil {
-			return "", err
-		}
-	}
 	for _, f := range report.RawFiles {
-		if err := qaFileMatches(root, f); err != nil {
-			return "", qaError("qa_execution_stale", err.Error())
-		}
-		if _, err := e.qaRegisteredFile(run.ID, resolvePkgPath(root, f.Path)); err != nil {
-			return "", err
-		}
 		parts = append(parts, f.SHA256)
 	}
 	r, p, err := e.currentQAReview(run, m, c)
@@ -473,7 +463,7 @@ func (e *Engine) requireCurrentFormalQA(run store.Run, m *runMeta) error {
 	return qaError(ReasonQAGateNotPassed, "current evidence requires a passing formal QA gate bound to this run")
 }
 
-func (e *Engine) qaEvaluation(evaluator, fp string, err error) gate.Evaluation {
+func (e *Engine) qaEvaluation(evaluator, fp string, err error, tcChecks ...[]gate.CheckItem) gate.Evaluation {
 	check := gate.CheckItem{Check: "current_product_qa", Applicable: true, OK: err == nil, Detail: "current candidate has executed tests, independent product review and live verifier"}
 	v := gate.Evaluation{GateType: gate.GateQA, Verdict: gate.VerdictPass, Evaluator: evaluator}
 	if err != nil {
@@ -486,5 +476,8 @@ func (e *Engine) qaEvaluation(evaluator, fp string, err error) gate.Evaluation {
 		v.ReasonCodes = []string{check.ReasonCode}
 	}
 	v.Checks = []gate.CheckItem{check}
+	for _, checks := range tcChecks {
+		v.Checks = append(v.Checks, checks...)
+	}
 	return v
 }

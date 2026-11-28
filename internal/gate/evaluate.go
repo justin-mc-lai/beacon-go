@@ -194,6 +194,14 @@ func EvaluateImplement(f ImplementFacts, evaluator string) Evaluation {
 
 // ---- qa ----
 
+// QATCCheck renders a verdict derived from the shared live QA eligibility check.
+func QATCCheck(tc, verdict, reason, detail string) CheckItem {
+	if verdict == "pass" {
+		return okItem(tc+":pass", detail)
+	}
+	return failItem(tc+":"+verdict, reason, detail)
+}
+
 // StaleRef is one QA artifact pointer whose blob no longer matches
 // (file missing / unreadable / hash mismatch — the spine staleness
 // vocabulary of AC-010/AC-019).

@@ -268,6 +268,9 @@ func autoLinkTruthNode(st *store.Store, projectRoot, version, slug, truthPath st
 // applyTruthStatus mirrors a package status into a feature node. It never
 // downgrades a node and refuses a parent whose children are not ready.
 func applyTruthStatus(st *store.Store, dir string, idx intenttree.Index, n intenttree.Node, status truthSyncStatus) (bool, error) {
+	if n.Status == intenttree.StatusDeprecated {
+		return false, nil
+	}
 	target := truthStatusTarget(status.PackageStatus)
 	if target == "" || !status.SlugOK {
 		return false, nil

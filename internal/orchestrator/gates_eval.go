@@ -203,8 +203,9 @@ func (e *Engine) EvaluateGate(ctx store.FeatureContext, gateType, runID, evaluat
 			if err := e.validateDeliveryTasks(run); err != nil {
 				return gate.Evaluation{}, err
 			}
-			fp, qerr := e.currentQAEligibility(run, m, true)
-			ev = e.qaEvaluation(evaluator, fp, qerr)
+			var tcChecks []gate.CheckItem
+			fp, qerr := e.currentQAEligibility(run, m, true, &tcChecks)
+			ev = e.qaEvaluation(evaluator, fp, qerr, tcChecks)
 			extra["qa_fingerprint"] = fp
 		} else {
 			ev = e.qaEvaluation(evaluator, "", qaError("qa_candidate_missing", "no goal run"))

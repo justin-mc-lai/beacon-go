@@ -372,7 +372,7 @@ func TestIntegrityDomainFSMGroup(t *testing.T) {
 	in.Pkg.Truth.Text = goodTruth + "\n## Illegal Transitions\n\n- illegal: a -> b\n"
 	rep := CheckIntegrity(in, IntegrityModeBlock)
 	kinds := findingKinds(rep.Findings)
-	for _, want := range []string{"domain_model_missing", "entity_precedence_missing", "domain_fsm_missing", "illegal_transition_slot_missing"} {
+	for _, want := range []string{"domain_model_missing", "entity_precedence_missing", "domain_fsm_missing", "illegal_transition_slot_uncovered"} {
 		if !kinds[want] {
 			t.Fatalf("missing domain finding %s in %v", want, kinds)
 		}
@@ -407,10 +407,10 @@ func TestIntegrityDomainFSMGroup(t *testing.T) {
 |-------|-----------|
 | AC-001 | order draft becomes placed when paid |
 `
-	in2.Pkg.Tests.Text = goodTests + "\nillegal transitions covered by TC-001.\n"
+	in2.Pkg.Tests.Text = "---\nslug: demo\n---\n" + negativeCoverageTests("| AC-001 | TC-001 | negative | go test ./x | rejected | | placed | draft |\n")
 	rep2 := CheckIntegrity(in2, IntegrityModeBlock)
 	for _, f := range rep2.Findings {
-		if strings.HasPrefix(f.Kind, "domain_") || f.Kind == "illegal_transition_slot_missing" ||
+		if strings.HasPrefix(f.Kind, "domain_") || f.Kind == "illegal_transition_slot_missing" || f.ReasonCode == "uncovered" ||
 			f.Kind == "entity_precedence_missing" || f.Kind == "orphan_ac_without_fsm_path" {
 			t.Fatalf("complete domain surface must not produce domain findings, got %+v", f)
 		}

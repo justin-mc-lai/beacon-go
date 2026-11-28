@@ -286,9 +286,19 @@ func ListChanges(dir string) ([]ChangeRecord, error) {
 // SetNodeStatus applies one explicit status transition to a node and its
 // cached index rows. The caller owns the transition's policy checks.
 func SetNodeStatus(st *store.Store, dir, id string, status Status) error {
+	if status == StatusDeprecated {
+		return core.NewError("tree_deprecate_invalid", "intenttree.SetNodeStatus", "use DeprecateDraft to create the required change record")
+	}
 	idx, err := ReadIndex(dir)
 	if err != nil {
 		return err
+	}
+	current, err := ReadNode(dir, id)
+	if err != nil {
+		return err
+	}
+	if current.Status == StatusDeprecated {
+		return core.NewError("tree_deprecate_invalid", "intenttree.SetNodeStatus", "deprecated node cannot be reactivated by status synchronization")
 	}
 	if err := setNodeStatus(st, dir, &idx, id, status); err != nil {
 		return err

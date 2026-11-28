@@ -54,6 +54,8 @@ type DomainIllegalSlot struct {
 	Description string `json:"description"`
 	Aggregate   string `json:"aggregate"`
 	Source      string `json:"source"`
+	From        string `json:"from,omitempty"`
+	To          string `json:"to,omitempty"`
 }
 
 // DomainAC is one acceptance row of the domain parse.
@@ -313,48 +315,6 @@ func parseDomainFSMTables(sections []mdSection) []DomainAggregate {
 	return aggregates
 }
 
-func parseDomainIllegalSlots(sections []mdSection) []DomainIllegalSlot {
-	var slots []DomainIllegalSlot
-	for _, sec := range sections {
-		if !headingMatchesAny(sec.Title, domainIllegalTitles) {
-			continue
-		}
-		for _, line := range strings.Split(sec.Body, "\n") {
-			stripped := strings.TrimSpace(line)
-			if stripped == "" {
-				continue
-			}
-			if !strings.HasPrefix(stripped, "-") && !strings.HasPrefix(stripped, "*") &&
-				!strings.HasPrefix(stripped, "•") && !strings.HasPrefix(stripped, "|") {
-				continue
-			}
-			text := strings.TrimSpace(strings.Trim(strings.TrimSpace(strings.TrimLeft(stripped, "-*• ")), "|"))
-			if text == "" || onlySepChars(text) {
-				continue
-			}
-			if strings.HasPrefix(strings.ToLower(text), "illegal") && len(strings.Fields(text)) <= 2 {
-				continue
-			}
-			aggregate := ""
-			if first := strings.Fields(text); len(first) > 0 && strings.Contains(first[0], ".") {
-				aggregate = strings.Trim(strings.SplitN(first[0], ".", 2)[0], "`")
-			}
-			slots = append(slots, DomainIllegalSlot{Description: text, Aggregate: aggregate, Source: "truth"})
-		}
-	}
-	seen := map[string]bool{}
-	var out []DomainIllegalSlot
-	for _, s := range slots {
-		key := strings.ToLower(s.Description)
-		if seen[key] {
-			continue
-		}
-		seen[key] = true
-		out = append(out, s)
-	}
-	return out
-}
-
 func parseDomainAcceptance(sections []mdSection, body string) []DomainAC {
 	var acs []DomainAC
 	for _, sec := range sections {
@@ -479,7 +439,7 @@ func ParseDomainFSM(truthMD string) DomainFSMProjection {
 	sections := extractMDSections(body)
 	entities := parseEntityPrecedence(sections)
 	aggregates := parseDomainFSMTables(sections)
-	illegal := parseDomainIllegalSlots(sections)
+	illegal := domainIllegalProjection(truthMD)
 	acceptance := parseDomainAcceptance(sections, body)
 
 	hasModel, hasFSM, hasIllegal := false, false, false
@@ -709,16 +669,6 @@ func EvaluateDomainFSM(truthMD, testsMD string) (required bool, findings []Domai
 		return false, nil
 	}
 	findings = validateDomainFSM(p)
-	// evaluate_domain_fsm_authority: tests.md should mention
-	// illegal when the domain authority applies.
-	if testsMD != "" {
-		low := strings.ToLower(testsMD)
-		if !strings.Contains(low, "illegal") && !strings.Contains(testsMD, "非法") {
-			findings = append(findings, DomainFSMFinding{
-				Kind: "illegal_transition_slot_missing", ReasonCode: "illegal_transition_slot_missing",
-				Text: "tests.md missing illegal-transition coverage reference",
-			})
-		}
-	}
+	findings = append(findings, uncoveredIllegalSlots(p, testsMD)...)
 	return true, findings
 }

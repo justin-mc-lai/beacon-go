@@ -181,6 +181,11 @@ type TCRow struct {
 	Layer         string
 	RequiredTests []string
 	Line          int
+	Aggregate     string
+	From          string
+	To            string
+	IllegalSlot   string
+	DuplicateTC   bool
 }
 
 var softCellValues = map[string]bool{
@@ -209,8 +214,22 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 	evidenceCol := -1
 	requiredCol := -1
 	layerCol := -1
+	var columns map[string]int
+	fence := ""
 	for i, line := range strings.Split(tests, "\n") {
 		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "```") || strings.HasPrefix(trimmed, "~~~") {
+			if fence == "" {
+				fence = trimmed[:3]
+			} else if fence == trimmed[:3] {
+				fence = ""
+			}
+			inMatrix = false
+			continue
+		}
+		if fence != "" {
+			continue
+		}
 		if !strings.HasPrefix(trimmed, "|") {
 			if trimmed != "" {
 				inMatrix = false
@@ -222,8 +241,19 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 		for j, c := range cells {
 			lowered[j] = strings.ToLower(c)
 		}
-		if containsCell(lowered, "ac id") {
-			inMatrix = containsCell(lowered, "tc id")
+		// Header events switch scope, including unsupported alias/index
+		// headers. They must not inherit the preceding matrix's columns.
+		isHeader := containsCell(lowered, "ac id") || containsCell(lowered, "tc id") ||
+			containsCell(lowered, "ac_id") || containsCell(lowered, "tc_id")
+		if isHeader {
+			inMatrix = containsCell(lowered, "ac id") && containsCell(lowered, "tc id")
+			columns = make(map[string]int, len(lowered))
+			for j, c := range lowered {
+				columns[c] = j
+			}
+			if len(columns) != len(lowered) {
+				inMatrix = false
+			}
 			if !inMatrix {
 				continue
 			}
@@ -252,6 +282,8 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 			continue
 		}
 		if !acRefRe.MatchString(cells[0]) || len(cells[0]) > 8 {
+			// Invalid data is skipped, not a structural boundary: subsequent
+			// valid rows remain required by execution and coverage consumers.
 			continue
 		}
 		row := TCRow{AC: cells[0], Line: i + 1}
@@ -279,7 +311,30 @@ func ParseCoverageMatrix(tests string) (rows []TCRow, hasEvidenceColumn bool, ok
 				}
 			}
 		}
+		cell := func(name string) string {
+			if col, exists := columns[name]; exists && col < len(cells) {
+				return slotToken(cells[col])
+			}
+			return ""
+		}
+		row.TC = slotToken(row.TC)
+		row.Layer = strings.ToLower(slotToken(row.Layer))
+		row.Aggregate, row.From, row.To, row.IllegalSlot = cell("aggregate"), cell("from"), cell("to"), cell("illegal slot")
+		if row.From == "" && row.To == "" {
+			if m := illegalExplicitRe.FindStringSubmatch(slotToken(row.Assertion)); m != nil {
+				if a := illegalArrowRe.FindStringSubmatch(m[1]); a != nil && strings.TrimSpace(m[1]) == a[0] {
+					row.From, row.To = a[1], a[2]
+				}
+			}
+		}
 		rows = append(rows, row)
+	}
+	counts := map[string]int{}
+	for _, row := range rows {
+		counts[row.TC]++
+	}
+	for i := range rows {
+		rows[i].DuplicateTC = counts[rows[i].TC] > 1
 	}
 	return rows, hasEvidenceColumn, ok
 }
@@ -407,8 +462,6 @@ var evidenceRefRe = regexp.MustCompile(`[^\s|]+/[^\s|]*`)
 
 // (The ux-section consistency check was removed with design; see AGENTS.md
 // truth source. No design/ux reason codes remain.)
-
-
 
 // EvidenceRefs extracts the artifact references of an evidence
 // document: path-like tokens (containing a slash, ending in a file
@@ -588,6 +641,13 @@ func CheckIntegrity(in IntegrityInput, mode string) IntegrityReport {
 					File: in.Pkg.Truth.Path, Detail: d.Text, RepairRoute: DefaultRepairRoute,
 				})
 			}
+		}
+	}
+	if in.Pkg.Truth.Present && sdd {
+		// SDD keeps its TC authority in truth.md, not legacy tests.md.
+		for _, d := range uncoveredIllegalSlots(ParseDomainFSM(in.Pkg.Truth.Text), in.Pkg.CoverageFile().Text) {
+			findings = append(findings, Finding{Kind: d.Kind, ReasonCode: d.ReasonCode,
+				File: in.Pkg.Truth.Path, Detail: d.Text, RepairRoute: DefaultRepairRoute})
 		}
 	}
 	findings = append(findings, scanExtensionFiles(in.Pkg)...)

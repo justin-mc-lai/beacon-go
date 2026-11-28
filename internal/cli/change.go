@@ -13,7 +13,7 @@ import (
 // so "change" has exactly one command group.
 func newChangeCmd() *cobra.Command {
 	c := &cobra.Command{Use: "change", Short: "Change frozen truth: invalidate a tree subtree or a legacy package"}
-	c.AddCommand(newChangeRequestCmd(), newChangeListCmd(), newTruthChangeCmd())
+	c.AddCommand(newChangeRequestCmd(), newChangeListCmd(), newTruthChangeCmd(), newChangeDeprecateCmd())
 	return c
 }
 

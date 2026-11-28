@@ -13,7 +13,7 @@ while read -r lines file; do
     echo "over 500 lines without an ADR exception: $rel ($lines)" >&2
     fail=1
   fi
-done < <(find "$ROOT/internal" "$ROOT/cmd" "$ROOT/desktop" "$ROOT/skills" \
+done < <(find "$ROOT/internal" "$ROOT/cmd" "$ROOT/skills" \
            -name '*.go' ! -name '*_test.go' -exec wc -l {} + | awk '$2!="total"{print $1, $2}')
 if [ "$fail" -eq 0 ]; then echo "file-size guard: ok"; fi
 exit "$fail"

@@ -153,7 +153,6 @@ func Drift(dir, nodeID, snapshotID string) (DriftReport, error) {
 	return rep, nil
 }
 
-
 func childrenByIndex(nodes []IndexEntry) map[string][]string {
 	out := map[string][]string{}
 	for _, e := range nodes {

@@ -12,6 +12,10 @@ bottom-up refreeze.
 
 ## The one entry
 
+Draft 无子节点废弃：`beacon change deprecate --project . --node <id>
+--base-fingerprint <hash> --summary <reason> --by <identity>`；保留正文并写 change record。
+非空父节点、根或冻结节点拒绝，不隐式级联。详见仓内 `docs/node-deprecate.md`。
+
 1. `beacon change request --project . --node <node-id> --summary "..." --by <id>`
    — invalidates one frozen subtree; its ancestors become `change_pending`.
    The frozen fingerprint covers the contract face only; evidence appended

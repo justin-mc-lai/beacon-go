@@ -83,4 +83,3 @@ func TestValidateTaskBindingKeepsExistingVerdicts(t *testing.T) {
 		t.Fatalf("fully bound ledger must not add findings, got %+v", fs)
 	}
 }
-

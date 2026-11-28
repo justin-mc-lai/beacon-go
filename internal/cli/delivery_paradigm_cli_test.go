@@ -273,4 +273,3 @@ func TestGoalConformanceAllPassAndFailure(t *testing.T) {
 		t.Fatalf("failure output must list the failed items:\n%s", failOut)
 	}
 }
-

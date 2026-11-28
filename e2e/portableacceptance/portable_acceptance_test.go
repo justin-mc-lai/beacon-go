@@ -174,9 +174,9 @@ func testFiles(t *testing.T, root, packageName string) []string {
 		t.Fatalf("go list %s: %v\n%s", packageName, err, output)
 	}
 	var info struct {
-		Dir           string
-		TestGoFiles   []string
-		XTestGoFiles  []string
+		Dir          string
+		TestGoFiles  []string
+		XTestGoFiles []string
 	}
 	if err := json.Unmarshal(output, &info); err != nil {
 		t.Fatal(err)
@@ -228,7 +228,7 @@ func TestPortableModuleRun(t *testing.T) {
 func TestPortableModuleAdmission(t *testing.T) {
 	project, ledger := treeFixture(t)
 	patchNode(t, project, ledger, "n_5d6dde8f4e1a", "portable admission fixture", map[string]any{
-		"acs": []map[string]any{{"id": "AC-001", "text": "draft gate fixture"}},
+		"acs":          []map[string]any{{"id": "AC-001", "text": "draft gate fixture"}},
 		"verification": changeSpec("./e2e/portableacceptance", "^TestPortableModuleAdmission$", testFiles(t, portableRoot, "./e2e/portableacceptance")),
 	})
 	output, err := run(t, project, ledger, "goal", "module", "run", "--project", project, "--node", "n_5f7fcbdf0840", "--json")
