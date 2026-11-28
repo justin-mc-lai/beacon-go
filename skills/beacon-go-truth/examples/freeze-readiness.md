@@ -1,15 +1,23 @@
-# 示例：冻前对齐
+# 冻前对齐（chain `full-delivery`）
 
-**用户说**：「这个需求可以冻了」
+前提：宿主已完成 plan 调查与本轮范围取舍。以下命令是可执行模板，
+变量由当前项目账本与 proposal 的实际回执填写；本示例未声称执行成功。
 
-**mode_id**：`tr-sign`
+```bash
+beacon plan expand --project "$PROJECT" --version "$VERSION" --node "$PARENT" --children "$PROPOSAL"
+beacon plan apply --project "$PROJECT" --version "$VERSION" --node "$PARENT" --proposal "$PROPOSAL"
+beacon truth tree --project "$PROJECT" --version "$VERSION" --format html
+```
 
-**做法**
-1. `beacon truth confirm --feature order-refund` → 有未答问题就拒绝
-2. 补答：`beacon truth answer --id Q1 --answer "..."`
-3. `beacon truth intent ...` 确认每个 AC 都有意图来源
-4. `beacon truth freeze --feature order-refund` → 打印指纹
+首次树不存在时先 `beacon plan init --project "$PROJECT" --title "$TITLE" --intent "$INTENT"`。
+CLI plan apply 是工具名；这里属于 truth 阶段。已有树修改先走 change。
+宿主核对输出真实 html_path/source_hash、当前节点和覆盖清单，交用户审阅批准。
+然后依照内核缺项从叶到父逐个调用：
 
-**产出**：冻结指纹 + 冻结事件
+```bash
+beacon truth node freeze --project "$PROJECT" --version "$VERSION" --node "$NODE" --json
+```
 
-**不要做**：跳过 confirm 直接 freeze；手动改 truth.md 里的 status
+成功产出：本轮树、HTML、批准记录、各节点真实冻结回执和指纹。
+拒绝：缺 HTML、哈希陈旧、未批准、零有效叶或验证规格缺失；保留 truth 和 next/missing。
+回执列 run_id/current_stage/existing_artifacts/next_action/owner，不将本模板视为执行证据。

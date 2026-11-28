@@ -46,6 +46,9 @@ func newSkillsVerifyCmd() *cobra.Command {
 					if len(v.Extra) > 0 {
 						fmt.Fprintf(out, "  extra:   %s\n", strings.Join(v.Extra, ", "))
 					}
+					if len(v.Stale) > 0 {
+						fmt.Fprintf(out, "  stale:   %s\n", strings.Join(v.Stale, ", "))
+					}
 				}
 			}
 			if strict {

@@ -58,7 +58,10 @@ func (e *Engine) ModuleRun(opts ModuleRunOptions) ([]ModuleRunView, error) {
 	if !ok {
 		return nil, core.NewError(intenttree.ReasonVersionNotFound, "goal.ModuleRun", "version not found: "+opts.Version)
 	}
-	dir := intenttree.TreeDir(proj.RootPath, ver.DocsRoot)
+	dir, err := intenttree.ResolveTreeLocation(proj.RootPath, ver.DocsRoot)
+	if err != nil {
+		return nil, err
+	}
 	idx, err := intenttree.ReadIndex(dir)
 	if err != nil {
 		return nil, err

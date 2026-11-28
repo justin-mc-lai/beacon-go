@@ -9,6 +9,11 @@ import (
 // the canonical tree? It is read-only and shares the same structural
 // rules the direct tree commands use.
 func StageGate(dir, stage, featureSlug string) (bool, string, error) {
+	var err error
+	dir, err = resolveTreePath(dir)
+	if err != nil {
+		return false, "", err
+	}
 	if !HasIndex(dir) {
 		return true, "", nil // legacy project: no tree, no extra gate
 	}
@@ -37,6 +42,9 @@ func StageGate(dir, stage, featureSlug string) (bool, string, error) {
 	var walk func(string)
 	walk = func(id string) {
 		for _, ch := range children[id] {
+			if ch.Status == StatusDeprecated {
+				continue
+			}
 			if ch.Kind == KindTouchpoint {
 				leaves = append(leaves, ch)
 			}

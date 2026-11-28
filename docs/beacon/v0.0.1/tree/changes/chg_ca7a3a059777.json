@@ -1,0 +1,19 @@
+{
+  "id": "chg_ca7a3a059777",
+  "node_id": "n_5e13a94c202d",
+  "summary": "用户确认稳定工作流内核：五项出口/快照/统一判断/归属合并预览/HTML补强，Portfolio迁移暂停",
+  "by": "user-confirmed-host",
+  "base_fingerprint": "89ab8c2da8060bc5fc27fd433470bb3ca53d743328f94053b331c13cc286cb54",
+  "before_snapshot_id": "v0.0.1-20261128T052201.436136000Z",
+  "affected": [
+    "n_1c00934a592b",
+    "n_41398c3173e0",
+    "n_5e13a94c202d",
+    "n_5e74132fe68f",
+    "n_657f878cb0ab",
+    "n_b935c7e6837a",
+    "n_e11ba0e98451",
+    "n_e203874ad8d4"
+  ],
+  "created_at": "2026-11-28T05:22:01.428938Z"
+}

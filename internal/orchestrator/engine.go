@@ -50,9 +50,10 @@ type StageExecutor interface {
 
 // Engine is the goal core engine over one store handle.
 type Engine struct {
-	store         *store.Store
-	executors     map[string]StageExecutor
-	laneExecutors map[string]StageExecutor
+	workflowConfirmCaptured func() // deterministic concurrency probe after capturing reviewed generation
+	store                   *store.Store
+	executors               map[string]StageExecutor
+	laneExecutors           map[string]StageExecutor
 
 	// implementWorkGate is the implement_work_gate config switch
 	// (implement-work-gate truth 配置项). "" and "on" both mean on
@@ -122,6 +123,7 @@ func (e *Engine) RegisterExecutorForAllStages(ex StageExecutor) {
 // RunView is the stable JSON surface of one goal run (AC-065 style:
 // snake_case, one document).
 type RunView struct {
+	Workflow              *WorkflowView    `json:"workflow,omitempty"`
 	RunID                 string           `json:"run_id"`
 	FeatureID             string           `json:"feature_id"`
 	FeatureSlug           string           `json:"feature_slug"`
@@ -339,6 +341,11 @@ func (e *Engine) Status(runID string) (RunView, error) {
 	if v.CurrentStage != "" {
 		v.StageGate = e.stageGateView(run.ID, v.CurrentStage)
 	}
+	w, err := e.WorkflowCheck(runID)
+	if err != nil {
+		return RunView{}, err
+	}
+	v.Workflow = &w
 	return v, nil
 }
 

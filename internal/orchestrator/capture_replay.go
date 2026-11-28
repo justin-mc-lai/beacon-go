@@ -43,6 +43,18 @@ func prepareCaptureReplay(ctx context.Context, root, baseline string, tests []st
 	}
 	cleanup := func() { _ = os.RemoveAll(dir) }
 	fail := func(err error) (string, string, func(), error) { cleanup(); return "", "", noop, err }
+	selected := map[string]bool{}
+	for _, name := range tests {
+		path, err := captureFile(root, name)
+		if err != nil {
+			return fail(err)
+		}
+		rel, err := filepath.Rel(root, path)
+		if err != nil {
+			return fail(err)
+		}
+		selected[rel] = true
+	}
 	for _, entry := range strings.Split(listing.Stdout, "\x00") {
 		if entry == "" {
 			continue
@@ -55,6 +67,10 @@ func prepareCaptureReplay(ctx context.Context, root, baseline string, tests []st
 		name = filepath.Clean(filepath.FromSlash(name))
 		if filepath.IsAbs(name) || name == ".." || strings.HasPrefix(name, ".."+string(filepath.Separator)) {
 			return fail(captureError("capture_baseline_invalid", "Git path escapes"))
+		}
+		// Refuse rather than silently execute historical tests outside the overlay.
+		if strings.HasSuffix(name, "_test.go") && !selected[name] {
+			return fail(captureError("capture_replay_test_set_unsupported", "baseline contains test outside current effective set: "+filepath.ToSlash(name)))
 		}
 		path := filepath.Join(dir, name)
 		blob := harness.RunCommand(ctx, []string{"git", "cat-file", "blob", fields[2]}, root, os.Environ(), 0)

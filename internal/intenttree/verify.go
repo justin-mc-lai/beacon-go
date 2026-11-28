@@ -145,6 +145,9 @@ func ValidateFeatureDelivery(st *store.Store, dir, slug string) error {
 			if entry.ParentID != id {
 				continue
 			}
+			if entry.Status == StatusDeprecated {
+				continue
+			}
 			if entry.Kind == KindTouchpoint {
 				n, err := ReadNode(dir, entry.ID)
 				if err != nil {
@@ -177,6 +180,9 @@ func RollupVerified(st *store.Store, dir, nodeID string) (VerifyReport, error) {
 	var updates []Node
 	var walk func(string) error
 	walk = func(id string) error {
+		if entry, ok := findEntry(idx, id); ok && entry.Status == StatusDeprecated {
+			return nil
+		}
 		for _, ch := range children[id] {
 			if err := walk(ch.ID); err != nil {
 				return err
@@ -197,8 +203,13 @@ func RollupVerified(st *store.Store, dir, nodeID string) (VerifyReport, error) {
 			return nil
 		}
 		all := true
+		active := 0
 		for _, ch := range children[id] {
 			e, _ := findEntry(idx, ch.ID)
+			if e.Status == StatusDeprecated {
+				continue
+			}
+			active++
 			if e.Status != StatusVerified {
 				all = false
 				break
@@ -207,6 +218,9 @@ func RollupVerified(st *store.Store, dir, nodeID string) (VerifyReport, error) {
 		if !all {
 			return core.NewError("tree_parent_not_verified", "intenttree.RollupVerified",
 				fmt.Sprintf("child of %s is not verified", id))
+		}
+		if active == 0 {
+			return core.NewError("tree_parent_not_verified", "intenttree.RollupVerified", "no active evaluated children")
 		}
 		if entry.Status == StatusVerified {
 			return nil

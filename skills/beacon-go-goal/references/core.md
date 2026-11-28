@@ -1,40 +1,28 @@
-<!-- Source: distilled from Python v1.6.19 skills/beacon/beacon-goal/
-     (SKILL.md hard gate + references/modes/loop-goal.md). Content is
-     re-expressed against the Go binary's surfaces; the Python mode
-     files remain the deeper reference. -->
-
 # beacon-goal — core reference
 
-## Hard gate (Python original)
+## 当前 run 与阶段
 
-Orchestrate the pipeline only. Complete needs verifier evidence.
-Release is always a human gate. Long-run and supervision live only
-on goal. Stage exits are hard (`goal_stage_exit_gates`); entering
-implement requires workspace admission + freeze ack — a filled form
-is not a pass.
+阶段固定为 `plan -> truth -> implement -> verify -> release`。
+plan 负责调查、头脑风暴和分析，可选候选树；truth 形成本轮唯一 canonical 树，
+必交 HTML 供审阅批准后冻结；后续节点变更统一交 change。
+实现归宿主并经 admission（包括 worktree）；验证使用独立 verifier；发布由人批准。
+内核不调 LLM、不跑 agent，`goal tick --by` 记录宿主真实执行。
 
-## The run's shape in the Go kernel
+## 推进与恢复
 
-- One utterance -> one run: `beacon goal run "<utterance>" --project . --feature <slug>`.
-- Stage plan: plan -> truth -> design (only when UX is required) ->
-  implement -> qa -> release. The 12-state loop machine is separate
-  from the stage plan; both must agree before anything advances.
-- Advance with `beacon goal tick` (idempotent) or let the driver
-  push: `beacon goal driver run-loop --run-id <id>` — it stops at
-  the release gate on its own; budgets and quota decide whether a
-  turn may run at all (waiting for a human/evidence/focus is a
-  requeue, not a failure).
-- Interruptions are normal: heartbeat + checkpoint, then
-  `beacon goal resume --run-id <id>` replays the interrupted
-  substep. The kill switch `.beacon/loop/pause-all` halts drivers.
-- Completion is a four-condition hard gate: at release_gate + human
-  confirmation on record + an independent verifier attached
-  (maker != checker) + latest qa verdict pass. `--force` never
-  bypasses any of the four.
+1. `goal run` 创建 run；恢复时读取明确 run_id，不能凭聊天或隐式 latest 选状态。
+2. `goal workflow check --run-id <id>` 返回 next/missing。宿主整理来源、准备材料、
+   完成必要绑定与执行；用户只决定目标、取舍、批准，不承担重复技术清单解释。
+3. 对照当前 run、阶段产物、指纹和命令回执完成动作，再 `goal tick --run-id <id> --by <identity>`。
+4. 输出 run_id/current_stage/existing_artifacts/next_action/owner；
+   不存在的 run、未运行的命令、旧 HTML 或文档 status 一律不能报成实际交付。
+5. 中断后用 `goal resume-pack --run-id <id>` 读取恢复包，再按缺项继续；
+   无执行者或证据就保留阻塞与责任人。
 
-## Shared preamble
+## 持续树与本轮完成
 
-1. Lake vs sea — boil lakes; split/defer seas.
-2. Search before invent — truth, source, evidence, memory first.
-3. User sovereignty on scope and freeze.
-4. No fake delivery (placeholder, docs-only, zero assertions).
+逻辑一棵树持续成长；版本保存不可变 baseline + 本轮 delta。
+future draft 可与本轮同时存在，范围和依赖闭包外的草稿不拖本轮发布。
+若实际内核尚未支持所需范围隔离，明确报告阻塞，不能靠文档改变 gate 事实。
+完成仍需 release_gate、人工批准、独立 verifier 与 verify pass 的真实记录。
+本轮完成、hash verified、gate pass、tree verified、version ready 分开报告。

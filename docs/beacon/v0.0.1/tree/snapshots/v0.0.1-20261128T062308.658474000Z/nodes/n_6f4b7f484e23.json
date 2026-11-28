@@ -1,0 +1,29 @@
+{
+  "id": "n_6f4b7f484e23",
+  "kind": "touchpoint",
+  "title": "continuous tree evolution",
+  "intent": "逻辑一棵canonical需求树经唯一change入口持续成长，注册版本持久引用不可变快照和本轮delta。",
+  "parent_id": "n_0386efdd0ffb",
+  "path": "root/self-drive/stable-workflow-kernel/continuous-tree-evolution",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "已有树的新增、修改、废弃（含draft调整）统一经顶层change grow/request/deprecate，按节点状态授权后由update/plan expand/apply落树；不得另建隐式变更入口或直接手改canonical JSON。冻结子树修改必须携带当前base fingerprint，变更后自底向上refreeze。"
+    },
+    {
+      "id": "AC-002",
+      "text": "版本必须已注册，以显式snapshot ID和baseline+delta lineage持久引用；各注册版本经同一规范化解析入口定位同一canonical树，validate/persist/query与admission一致，不借隐式latest，不复制成第二canonical。历史baseline、snapshot和既有版本引用不可变，未知版本、缺失/篡改snapshot、lineage环、相对/绝对别名冲突拒绝。"
+    },
+    {
+      "id": "AC-003",
+      "text": "在同一canonical上连续两轮完成需求变更到本轮范围交付；每轮scope及依赖闭包内的节点必须满足原有冻结/admission/verify/release要求，future draft在闭包外不拖本轮且不污染scoped合同hash，闭包内依赖不能改future标签绕过。deprecated按墓碑保留在合同指纹、HTML与历史中，从活跃执行/验证集合剔除，禁止物理删除历史；零活跃目标、缺失范围或依赖、墓碑篡改拒绝。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli ./internal/intenttree ./internal/orchestrator -run 'Test(Change|Tree|StableWorkflow|Lineage|Tombstone)' -count=1 -v；并实跑CLI连续两轮change→truth refreeze→范围实现/验证/发布评估（人工批准单列），核对注册版本显式snapshot lineage重启后解析同一canonical、历史hash不变、future隔离与deprecated墓碑；空集合/空白/重复key/相对绝对别名/未知版本/缺失篡改快照/lineage环/闭包内future/零评估必须拒绝。零测试不算验收，仅冻结不代表这些行为已通过。"
+  },
+  "fingerprint": "2a70430ff8ee0f5b4fd9fea2fb970f0bb8937af6b229ecd21c92762926a69995",
+  "fingerprint_alg": "tree-json-v1"
+}

@@ -93,6 +93,11 @@ func (e *Engine) checkAdmission(run store.Run, m *runMeta) (AdmissionResult, err
 		res.ReasonCodes = append(res.ReasonCodes, item.ReasonCode)
 	}
 	ok := func(item AdmissionItem) { res.Items = append(res.Items, item) }
+	if ready, reason, err := e.workflowStageFacts(run, StageImplement); err != nil {
+		return AdmissionResult{}, err
+	} else if !ready {
+		fail(AdmissionItem{Check: "workflow", Applicable: true, ReasonCode: reason, Detail: "current stable workflow contract/artifacts/scope must be ready"})
+	}
 
 	// 1. truth frozen (the shared FrozenFact determination, via
 	// buildExitInput — no second derivation lives here). Module-run

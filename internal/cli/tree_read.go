@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"beacon-go/internal/core"
 	"beacon-go/internal/intenttree"
 	"beacon-go/internal/orchestrator"
 	"beacon-go/internal/store"
@@ -48,11 +47,7 @@ func resolveTreeRead(project, version, op string) (string, string, intenttree.In
 			}
 			for _, v := range versions {
 				if (selected == "" && v.IsCurrent) || v.Version == selected {
-					readDir, projRoot, idx, err := readSelectedTree(root, intenttree.TreeDir(root, v.DocsRoot), v.Version, op)
-					if code, _ := core.ReasonCodeOf(err); code == "tree_version_not_materialized" {
-						return "", "", intenttree.Index{}, missingRegisteredTree(op, root, v)
-					}
-					return readDir, projRoot, idx, err
+					return resolveTree(st, root, v.Version)
 				}
 			}
 		}

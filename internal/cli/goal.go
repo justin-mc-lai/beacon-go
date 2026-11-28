@@ -31,6 +31,7 @@ func newGoalCmd() *cobra.Command {
 			"human confirmation, an attached verifier and a passing verify gate.",
 	}
 	c.AddCommand(
+		newGoalWorkflowCmd(),
 		newGoalRunCmd(), newGoalStatusCmd(), newGoalTickCmd(false), newGoalTickCmd(true),
 		newGoalBlockCmd(), newGoalRecoverCmd(), newGoalAttachVerifierCmd(), newGoalCompleteCmd(),
 		newGoalLegacyCloseCmd(),
@@ -83,7 +84,7 @@ func newGoalCmd() *cobra.Command {
 		// command.
 		newGoalReleaseShadowCmd(),
 	)
-	hideAllBut(c, "run", "status", "tick", "block", "recover", "attach-verifier", "complete", "resume", "module")
+	hideAllBut(c, "run", "status", "tick", "block", "recover", "attach-verifier", "complete", "resume", "module", "workflow")
 	return c
 }
 
@@ -180,6 +181,13 @@ func goalReadEngine() (*orchestrator.Engine, func(), error) {
 }
 
 func printGoalView(cmd *cobra.Command, v orchestrator.RunView, asJSON bool) error {
+	if v.Workflow == nil && v.RunID != "" {
+		workflow, err := goalWorkflowView(v.RunID)
+		if err != nil {
+			return err
+		}
+		v.Workflow = workflow
+	}
 	if asJSON {
 		return printJSON(cmd, v)
 	}
@@ -191,6 +199,9 @@ func printGoalView(cmd *cobra.Command, v orchestrator.RunView, asJSON bool) erro
 	}
 	if v.ExecutorMode != "" {
 		fmt.Fprintf(cmd.OutOrStdout(), "\nexecutor: %s", v.ExecutorMode)
+	}
+	if v.Workflow != nil {
+		fmt.Fprintf(cmd.OutOrStdout(), "\nworkflow: %s ready=%v next=%s", v.Workflow.Mode, v.Workflow.Ready, v.Workflow.Next)
 	}
 	if v.ReasonCode != "" {
 		fmt.Fprintf(cmd.OutOrStdout(), "\nreason: %s", v.ReasonCode)

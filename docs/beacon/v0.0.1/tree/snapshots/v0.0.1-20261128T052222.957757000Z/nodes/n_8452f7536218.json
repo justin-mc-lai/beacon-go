@@ -1,0 +1,21 @@
+{
+  "id": "n_8452f7536218",
+  "kind": "touchpoint",
+  "title": "brownfield ownership preview",
+  "intent": "存量来源唯一归属。",
+  "parent_id": "n_0386efdd0ffb",
+  "path": "root/self-drive/stable-workflow-kernel/ownership-preview",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "合同引用canonical IDs与源AC覆盖，重复调度归属、漏项、未知节点、依赖环拒绝；仅预览重组，不修改冻结树；语义取舍由宿主独立审查。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli ./internal/orchestrator -run TestStableWorkflow -count=1 -v；存量成功/重复/漏项拒绝。"
+  },
+  "fingerprint": "4c6c3fac0fb950c6cb3c05879af2e577d8b6ef7b964a75a8f258d95c7bb5788e",
+  "fingerprint_alg": "tree-json-v1"
+}

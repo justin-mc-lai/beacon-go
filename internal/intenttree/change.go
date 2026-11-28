@@ -16,6 +16,7 @@ import (
 
 // ChangeRecord is one subtree change request, stored under tree/changes/.
 type ChangeRecord struct {
+	Action          string   `json:"action"`
 	ID              string   `json:"id"`
 	NodeID          string   `json:"node_id"`
 	Summary         string   `json:"summary"`
@@ -24,13 +25,21 @@ type ChangeRecord struct {
 	BeforeSnapshot  string   `json:"before_snapshot_id,omitempty"`
 	Affected        []string `json:"affected"`
 	CreatedAt       string   `json:"created_at"`
+	Added           []string `json:"added"`
+	Modified        []string `json:"modified"`
+	Deprecated      []string `json:"deprecated"`
+	DependencyScope []string `json:"dependency_scope"`
+	SourceHash      string   `json:"source_hash,omitempty"`
+	SourceCommit    string   `json:"source_commit,omitempty"`
+	BinarySHA       string   `json:"binary_sha256,omitempty"`
 }
 
 type changeJournal struct {
-	TreeDir    string           `json:"tree_dir"`
-	Files      []changeFileCopy `json:"files"`
-	Cache      []store.TreeNode `json:"cache,omitempty"`
-	RemoveDirs []string         `json:"remove_dirs,omitempty"`
+	TreeDir        string           `json:"tree_dir"`
+	Files          []changeFileCopy `json:"files"`
+	Cache          []store.TreeNode `json:"cache,omitempty"`
+	RemoveDirs     []string         `json:"remove_dirs,omitempty"`
+	ReplaceVersion string           `json:"replace_version,omitempty"`
 }
 
 type changeFileCopy struct {
@@ -78,6 +87,14 @@ func recoverTreeChange(dir string, stores ...*store.Store) error {
 	}
 	for _, path := range j.RemoveDirs {
 		if err := os.RemoveAll(path); err != nil {
+			return err
+		}
+	}
+	if j.ReplaceVersion != "" {
+		if len(stores) != 1 || stores[0] == nil {
+			return core.NewError(ReasonStateConflict, "intenttree.recoverTreeChange", "cache recovery requires scoped store")
+		}
+		if err := stores[0].ReplaceTreeNodes(j.ReplaceVersion, j.Cache); err != nil {
 			return err
 		}
 	}
@@ -210,6 +227,7 @@ func RequestChange(st *store.Store, dir, versionID, nodeID, summary, by, base st
 		BaseFingerprint: fresh.Fingerprint, BeforeSnapshot: beforeSnapshot, Affected: affected,
 		CreatedAt: now.Format(time.RFC3339Nano),
 	}
+	bindChangeDelta(&rec, idx, "request", nil, append(append([]string{}, affected...), ancestors...), nil, ancestors)
 	raw, err := json.MarshalIndent(rec, "", "  ")
 	if err != nil {
 		return ChangeRecord{}, err

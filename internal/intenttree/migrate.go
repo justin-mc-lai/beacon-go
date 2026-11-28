@@ -51,7 +51,10 @@ func shortID(prefix string, parts ...string) string {
 // packages into the canonical tree. It is idempotent: a second call
 // returns the existing tree without writing anything.
 func Import(st *store.Store, in ImportInput) (ImportReport, error) {
-	dir := TreeDir(in.ProjectRoot, in.DocsRoot)
+	dir, resolveErr := ResolveTreeLocation(in.ProjectRoot, in.DocsRoot)
+	if resolveErr != nil {
+		return ImportReport{}, resolveErr
+	}
 	rep := ImportReport{Version: in.Version, VersionID: in.VersionID, TreeDir: dir, IndexPath: IndexPath(dir)}
 
 	if _, err := st.Tree().GetTreeMigration(in.VersionID); err == nil {

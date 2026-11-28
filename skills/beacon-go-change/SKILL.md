@@ -12,6 +12,13 @@ bottom-up refreeze.
 
 ## The one entry
 
+已有 canonical 树后，后续所有节点变更统一经 change 入口，包括新增、删除、
+重组与 draft 调整。宿主先读取状态：冻结子树用 change request；新增子节点用
+change grow（显式 version、proposal 与已审阅的父指纹）；无子 draft 废弃用
+change deprecate；可写 draft 使用 truth node update 完成已登记的变更意图。
+change 是统一工作流入口，不虚构每种 draft 操作都有新的 change 子命令。
+跨版本保留不可变 baseline 与本轮 delta，future draft 与本轮范围明确分开。
+
 Draft 无子节点废弃：`beacon change deprecate --project . --node <id>
 --base-fingerprint <hash> --summary <reason> --by <identity>`；保留正文并写 change record。
 非空父节点、根或冻结节点拒绝，不隐式级联。详见仓内 `docs/node-deprecate.md`。
@@ -20,13 +27,13 @@ Draft 无子节点废弃：`beacon change deprecate --project . --node <id>
    — invalidates one frozen subtree; its ancestors become `change_pending`.
    The frozen fingerprint covers the contract face only; evidence appended
    later does not move it.
-2. Edit the tree nodes/leaves that the change authorizes. Never edit a
+2. Use `truth node update` or `plan apply` for authorized writable nodes. Never edit a
    frozen contract in place without a request first.
-3. Refreeze bottom-up until the tree is consistent again. Use `truth refreeze`
+3. Refreeze bottom-up with `truth node freeze` until the scoped tree is consistent again. Use `truth refreeze`
    on any legacy package touched by the change.
 4. `beacon change list` — read the change records, newest first.
 
-`--base-fingerprint` is an optional optimistic-concurrency guard: pass the
+`--base-fingerprint` is the optimistic-concurrency guard: pass the
 fingerprint you reviewed so a concurrent change is refused instead of silently
 overwritten.
 
@@ -73,6 +80,7 @@ from this summary alone.
 
 - `mode_id`: one of `ch-request|ch-list|ch-legacy|ch-refreeze`
 - `change_id` and `node_id` (or legacy `feature` slug) you produced
+- `run_id`, `current_stage`, `existing_artifacts`, `next_action`, `owner`: current run receipt; absent data is unconfirmed
 - `evidence_refs`: commands run and their output
 - `next`: one of `implement|truth|stop`
 - `plain_summary`: one sentence a non-engineer understands

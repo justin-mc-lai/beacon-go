@@ -80,6 +80,7 @@ func normalizeCaptureCommand(spec CaptureCommand) ([]string, []string, error) {
 	}
 	args := []string{"go", "test", "-json", "-count=1"}
 	var packages []string
+	seenPackages := map[string]bool{}
 	for i := 2; i < len(spec.Argv); i++ {
 		a := spec.Argv[i]
 		if a == "-run" || a == "-timeout" {
@@ -96,6 +97,11 @@ func normalizeCaptureCommand(spec CaptureCommand) ([]string, []string, error) {
 		if strings.Contains(a, "..") || strings.ContainsAny(a, ";\n\r") {
 			return bad()
 		}
+		key := filepath.Clean(a)
+		if seenPackages[key] {
+			return bad()
+		}
+		seenPackages[key] = true
 		packages = append(packages, a)
 		args = append(args, a)
 	}
@@ -113,35 +119,13 @@ func normalizeCaptureCommand(spec CaptureCommand) ([]string, []string, error) {
 }
 
 func captureCheckPackages(ctx context.Context, root string, packages, files []string, timeout time.Duration, observed *intenttree.CapturePreflight) error {
-	argv := append([]string{"go", "list", "-e", "-json"}, packages...)
-	out := harness.RunCommand(ctx, argv, root, captureEnv(), timeout)
-	*observed = intenttree.CapturePreflight{Command: argv, ExitCode: out.ExitCode, Stdout: out.Stdout, Stderr: out.Stderr, TimedOut: out.TimedOut}
-	if out.Err != nil {
-		observed.Error = out.Err.Error()
+	discovered, err := discoverCaptureTests(ctx, root, packages, timeout, observed)
+	if err != nil {
+		return err
 	}
-	if out.Err != nil || out.ExitCode != 0 || out.TimedOut {
-		if out.TimedOut {
-			return capturePreflightTimeout{}
-		}
-		return captureError("capture_package_invalid", out.Stderr)
-	}
-	dec := json.NewDecoder(strings.NewReader(out.Stdout))
 	expected := map[string]bool{}
-	for dec.More() {
-		var p struct {
-			Dir                       string
-			TestGoFiles, XTestGoFiles []string
-		}
-		if err := dec.Decode(&p); err != nil {
-			return err
-		}
-		for _, file := range append(p.TestGoFiles, p.XTestGoFiles...) {
-			path, err := captureFile(root, filepath.Join(p.Dir, file))
-			if err != nil {
-				return err
-			}
-			expected[path] = true
-		}
+	for _, file := range discovered {
+		expected[filepath.Join(root, file)] = true
 	}
 	if len(expected) != len(files) {
 		return captureError("capture_test_files_invalid", "test_files must cover every selected package test file")
@@ -154,6 +138,7 @@ func captureCheckPackages(ctx context.Context, root string, packages, files []st
 		if !expected[p] {
 			return captureError("capture_test_files_invalid", file)
 		}
+		delete(expected, p)
 	}
 	return nil
 }
@@ -231,6 +216,45 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 	if err != nil {
 		return res, err
 	}
+	if spec.DiscoverTests {
+		if spec.Adapter == "custom-json" || len(spec.TestFiles) != 0 {
+			return res, captureError("capture_command_invalid", "discovery is Go-only and cannot also declare test_files")
+		}
+	}
+	// Allocate before discovery so even the first failed process has one receipt.
+	fp, err := intenttree.ContractFingerprint(n)
+	if err != nil {
+		return res, err
+	}
+	liveSource, err := captureSourceHash(root)
+	if err != nil {
+		return res, err
+	}
+	base := filepath.Join(root, ".beacon", "captures")
+	if err := os.MkdirAll(base, 0700); err != nil {
+		return res, err
+	}
+	dir, err := os.MkdirTemp(base, "attempt-")
+	if err != nil {
+		return res, err
+	}
+	res = CaptureResult{Schema: "beacon-capture.v1", NodeID: n.ID, ACID: req.ACID, Phase: req.Phase, By: req.By, RedID: req.RedID, Fingerprint: fp, Command: argv, StartedAt: time.Now().UTC().Format(time.RFC3339Nano), Status: "rejected", ResultPath: filepath.Join(dir, "result.json"), StdoutPath: filepath.Join(dir, "stdout.log"), StderrPath: filepath.Join(dir, "stderr.log"), Workdir: root, BinarySHA256: version.Runtime().BinarySHA}
+	if spec.Adapter != "custom-json" {
+		res.Preflight = &intenttree.CapturePreflight{}
+		if spec.DiscoverTests {
+			spec.TestFiles, err = discoverCaptureTests(ctx, root, packages, req.Timeout, res.Preflight)
+		} else {
+			err = captureCheckPackages(ctx, root, packages, spec.TestFiles, req.Timeout, res.Preflight)
+		}
+		if err != nil {
+			res.ExitCode = -1
+			res.TimedOut = res.Preflight.TimedOut
+			res.Cancelled = ctx.Err() != nil
+			res.Reason = err.Error()
+			res.FinishedAt = time.Now().UTC().Format(time.RFC3339Nano)
+			return e.persistCapture(res, res.Preflight.Stdout, res.Preflight.Stderr, err)
+		}
+	}
 	if spec.Adapter == "custom-json" {
 		p, e := filepath.Abs(filepath.Join(root, argv[0]))
 		if e != nil {
@@ -246,15 +270,7 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 	if err != nil {
 		return res, err
 	}
-	fp, err := intenttree.ContractFingerprint(n)
-	if err != nil {
-		return res, err
-	}
 	liveRoot := root
-	liveSource, err := captureSourceHash(liveRoot)
-	if err != nil {
-		return res, err
-	}
 	replayCandidate := ""
 	if req.Baseline != "" {
 		if spec.Adapter == "custom-json" {
@@ -263,7 +279,13 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 		var cleanup func()
 		root, replayCandidate, cleanup, err = prepareCaptureReplay(ctx, liveRoot, req.Baseline, spec.TestFiles)
 		if err != nil {
-			return res, err
+			res.ExitCode = -1
+			res.TestFiles = append([]string{}, spec.TestFiles...)
+			res.TestSHA256 = testHash
+			res.SourceSHA256 = liveSource
+			res.Reason = err.Error()
+			res.FinishedAt = time.Now().UTC().Format(time.RFC3339Nano)
+			return e.persistCapture(res, "", "", err)
 		}
 		defer cleanup()
 		// Resolve the same relative test set inside the historical snapshot.
@@ -308,15 +330,10 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 	if err != nil {
 		return res, err
 	}
-	base := filepath.Join(liveRoot, ".beacon", "captures")
-	if err := os.MkdirAll(base, 0700); err != nil {
-		return res, err
+	if req.Baseline == "" {
+		source = liveSource
 	}
-	dir, err := os.MkdirTemp(base, "attempt-")
-	if err != nil {
-		return res, err
-	}
-	res = CaptureResult{Schema: "beacon-capture.v1", NodeID: n.ID, ACID: req.ACID, Phase: req.Phase, By: req.By, RedID: req.RedID, Fingerprint: fp, Command: argv, TestSHA256: testHash, SourceSHA256: source, StartedAt: time.Now().UTC().Format(time.RFC3339Nano), Status: "rejected", ResultPath: filepath.Join(dir, "result.json"), StdoutPath: filepath.Join(dir, "stdout.log"), StderrPath: filepath.Join(dir, "stderr.log")}
+	res.Command, res.TestSHA256, res.SourceSHA256 = argv, testHash, source
 	commit, _ := qaGit(root, "rev-parse", "HEAD")
 	res.SourceCommit = strings.TrimSpace(commit)
 	if req.Baseline != "" {
@@ -324,6 +341,8 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 		res.BaselineCommit = req.Baseline
 		res.ReplayCandidate = replayCandidate
 		res.ReplayTargetSHA256 = liveSource
+		res.ReplayOverlay = append([]string{}, spec.TestFiles...)
+		res.ReplayDeleted = []string{}
 		res.ExecutionRoot = root
 	}
 	res.BinarySHA256 = version.Runtime().BinarySHA
@@ -347,9 +366,6 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 			argv = append([]string{executable}, argv[1:]...)
 			res.Command = argv
 		}
-	} else {
-		res.Preflight = &intenttree.CapturePreflight{}
-		preflightErr = captureCheckPackages(ctx, root, packages, spec.TestFiles, req.Timeout, res.Preflight)
 	}
 	out := harness.IterationOutput{ExitCode: -1}
 	if preflightErr == nil {
@@ -413,11 +429,15 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 	} else {
 		res.Reason = runErr.Error()
 	}
-	for path, body := range map[string]string{res.StdoutPath: out.Stdout, res.StderrPath: out.Stderr} {
+	return e.persistCapture(res, out.Stdout, out.Stderr, runErr)
+}
+
+func (e *Engine) persistCapture(res CaptureResult, stdout, stderr string, runErr error) (CaptureResult, error) {
+	for path, body := range map[string]string{res.StdoutPath: stdout, res.StderrPath: stderr} {
 		if err := os.WriteFile(path, []byte(body), 0600); err != nil {
 			return res, err
 		}
-		if _, err := e.RegisterScopedArtifact("node", n.ID, "log", path, req.By); err != nil {
+		if _, err := e.RegisterScopedArtifact("node", res.NodeID, "log", path, res.By); err != nil {
 			return res, err
 		}
 	}
@@ -430,7 +450,7 @@ func (e *Engine) CaptureTest(ctx context.Context, req CaptureRequest) (CaptureRe
 	if err := os.WriteFile(res.ResultPath, raw, 0600); err != nil {
 		return res, err
 	}
-	reg, _, err := e.registerArtifactScopedCaptured(storeScope(n.ID), "capture_result", res.ResultPath, req.By, true)
+	reg, _, err := e.registerArtifactScopedCaptured(storeScope(res.NodeID), "capture_result", res.ResultPath, res.By, true)
 	if err != nil {
 		return res, err
 	}

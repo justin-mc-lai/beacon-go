@@ -88,7 +88,7 @@ func FreezeNode(st *store.Store, dir, versionID, nodeID string) (FreezeReport, e
 	}
 	bound := make([]string, 0, len(children))
 	for _, ch := range children {
-		if ch.Status != StatusFrozen && ch.Status != StatusImplemented && ch.Status != StatusVerified && ch.Status != StatusDelivered {
+		if ch.Status != StatusFrozen && ch.Status != StatusImplemented && ch.Status != StatusVerified && ch.Status != StatusDelivered && ch.Status != StatusDeprecated {
 			return FreezeReport{}, core.NewError(ReasonParentNotFrozen, "intenttree.FreezeNode",
 				fmt.Sprintf("child %s is %s; freeze children first", ch.ID, ch.Status))
 		}
@@ -99,6 +99,9 @@ func FreezeNode(st *store.Store, dir, versionID, nodeID string) (FreezeReport, e
 		if body.Fingerprint != ch.Fingerprint {
 			return FreezeReport{}, core.NewError(ReasonInvalidIndex, "intenttree.FreezeNode",
 				"index fingerprint for child "+ch.ID+" does not match its body")
+		}
+		if valid, err := VerifyFingerprint(body); err != nil || !valid {
+			return FreezeReport{}, core.NewError(ReasonStateConflict, "intenttree.FreezeNode", "child fingerprint invalid")
 		}
 		bound = append(bound, ch.Fingerprint)
 	}

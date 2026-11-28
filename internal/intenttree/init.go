@@ -10,7 +10,10 @@ import (
 // InitTree creates the root intent node for a project version. It is the
 // greenfield entry; migrated projects use Import instead.
 func InitTree(st *store.Store, projectRoot, docsRoot, version, versionID, title, intent string) (Node, string, error) {
-	dir := TreeDir(projectRoot, docsRoot)
+	dir, resolveErr := ResolveTreeLocation(projectRoot, docsRoot)
+	if resolveErr != nil {
+		return Node{}, "", resolveErr
+	}
 	if HasIndex(dir) {
 		return Node{}, "", core.NewError(ReasonStateConflict, "intenttree.InitTree", "tree already exists")
 	}

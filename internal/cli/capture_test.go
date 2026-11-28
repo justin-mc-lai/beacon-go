@@ -274,7 +274,7 @@ func TestCaptureTimeoutCancellationAndMutation(t *testing.T) {
 			proj := captureFixture(t, []string{"go", "test", "."})
 			body := "package capturefixture\nimport (\"testing\";\"time\")\nfunc TestBehavior(t *testing.T){time.Sleep(10*time.Second);t.Fatal(\"missing\")}\n"
 			if mode == "mutation" {
-				body = "package capturefixture\nimport (\"testing\";\"os\")\nfunc TestBehavior(t *testing.T){os.WriteFile(\"behavior.go\",[]byte(\"package capturefixture\\nfunc Ready() bool{return true}\\n\"),0600);t.Fatal(\"missing\")}\n"
+				body = "package capturefixture\nimport (\"testing\";\"os\")\nfunc TestBehavior(t *testing.T){if err:=os.WriteFile(\"behavior.go\",[]byte(\"package capturefixture\\nfunc Ready() bool{return true}\\n\"),0600);err!=nil{t.Fatal(err)};t.Fatal(\"mutation executed\")}\n"
 			}
 			if err := os.WriteFile(filepath.Join(proj, "behavior_test.go"), []byte(body), 0600); err != nil {
 				t.Fatal(err)
@@ -286,17 +286,27 @@ func TestCaptureTimeoutCancellationAndMutation(t *testing.T) {
 			defer st.Close()
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			timeout := time.Second
+			// Mutation needs compilation/startup time; only timeout mode tests a short deadline.
+			timeout := 30 * time.Second
+			if mode == "timeout" {
+				timeout = time.Second
+			}
 			if mode == "cancel" {
-				timeout = 30 * time.Second
 				go func() { time.Sleep(500 * time.Millisecond); cancel() }()
 			}
 			r, err := orchestrator.NewEngine(st).CaptureTest(ctx, orchestrator.CaptureRequest{Root: proj, TreeDir: filepath.Join(proj, "docs/beacon/v0.1.0/tree"), NodeID: "t1", ACID: "t1-1", Phase: "red", By: "maker", Timeout: timeout})
 			if err == nil {
 				t.Fatal("invalid capture accepted")
 			}
-			if mode == "mutation" && (!strings.Contains(err.Error(), "capture_input_changed") || r.ArtifactID == "") {
-				t.Fatalf("mutation not retained: %+v %v", r, err)
+			if mode == "mutation" {
+				log, logErr := os.ReadFile(r.StdoutPath)
+				source, sourceErr := os.ReadFile(filepath.Join(proj, "behavior.go"))
+				if logErr != nil || sourceErr != nil || !strings.Contains(string(log), "mutation executed") || !strings.Contains(string(source), "return true") {
+					t.Fatalf("mutation process did not reach assertion: log=%s source=%s read errors=%v/%v capture=%+v err=%v", log, source, logErr, sourceErr, r, err)
+				}
+				if !strings.Contains(err.Error(), "capture_input_changed") || r.ArtifactID == "" || r.TimedOut || r.Cancelled {
+					t.Fatalf("mutation not retained: %+v %v", r, err)
+				}
 			}
 			if mode == "timeout" && r.ResultPath != "" && !r.TimedOut {
 				t.Fatalf("timeout not recorded: %+v", r)

@@ -1,0 +1,21 @@
+{
+  "id": "n_34b30e01b511",
+  "kind": "touchpoint",
+  "title": "automatic workflow workspace",
+  "intent": "显式准备生成HTML覆盖清单。",
+  "parent_id": "n_0386efdd0ffb",
+  "path": "root/self-drive/stable-workflow-kernel/auto-workspace",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "prepare用现有renderer自动生成HTML与派生覆盖清单，绑定当前canonical source hash；check/tick发现缺失/篡改/过期阻断；输出阶段产物与下一步，legacy单独标记。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli ./internal/orchestrator -run TestStableWorkflow -count=1 -v；实际HTML生成与陈旧拒绝。"
+  },
+  "fingerprint": "7142ff3bc6d8e0dfde9b8acc8d4d6577f275dbaa1cdffbb12e05003f0fc9a7df",
+  "fingerprint_alg": "tree-json-v1"
+}

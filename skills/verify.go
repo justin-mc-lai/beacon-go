@@ -4,7 +4,12 @@
 // never reported as extra, deleted, or overwritten.
 package skills
 
-import "sort"
+import (
+	"bytes"
+	"os"
+	"path/filepath"
+	"sort"
+)
 
 // HostVerification is one host's drift report.
 type HostVerification struct {
@@ -14,6 +19,7 @@ type HostVerification struct {
 	Missing []string `json:"missing,omitempty"`
 	Extra   []string `json:"extra,omitempty"`
 	OK      bool     `json:"ok"`
+	Stale   []string `json:"stale,omitempty"`
 }
 
 // ExpectedInstallNames is the router plus every 1+6 skill directory,
@@ -53,7 +59,30 @@ func VerifyHost(h Host) HostVerification {
 	}
 	sort.Strings(v.Missing)
 	sort.Strings(v.Extra)
-	v.OK = len(v.Missing) == 0 && len(v.Extra) == 0
+	for _, id := range order {
+		if !installed[InstallDirName(id)] {
+			continue
+		}
+		for _, rel := range packageFiles(id) {
+			want, err := readPackageFile(id, rel)
+			if err != nil {
+				v.Stale = append(v.Stale, InstallDirName(id)+"/"+rel)
+				continue
+			}
+			got, err := os.ReadFile(filepath.Join(h.Dir, InstallDirName(id), filepath.FromSlash(rel)))
+			if err != nil || !bytes.Equal(got, want) {
+				v.Stale = append(v.Stale, InstallDirName(id)+"/"+rel)
+			}
+		}
+	}
+	if installed[RouterSkillID] {
+		raw, err := os.ReadFile(filepath.Join(h.Dir, RouterSkillID, "SKILL.md"))
+		if err != nil || !bytes.Equal(raw, []byte(RouterSkillBody())) {
+			v.Stale = append(v.Stale, RouterSkillID+"/SKILL.md")
+		}
+	}
+	sort.Strings(v.Stale)
+	v.OK = len(v.Missing) == 0 && len(v.Extra) == 0 && len(v.Stale) == 0
 	return v
 }
 

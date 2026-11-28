@@ -21,6 +21,8 @@ type CaptureEvidence struct {
 	BaselineCommit     string            `json:"baseline_commit,omitempty"`
 	ReplayCandidate    string            `json:"replay_candidate,omitempty"`
 	ReplayTargetSHA256 string            `json:"replay_target_sha256,omitempty"`
+	ReplayOverlay      []string          `json:"replay_overlay,omitempty"`
+	ReplayDeleted      []string          `json:"replay_deleted"`
 	ExecutionRoot      string            `json:"execution_root,omitempty"`
 	Schema             string            `json:"schema"`
 	NodeID             string            `json:"node_id"`
@@ -271,6 +273,9 @@ func ValidateCaptureDelivery(st *store.Store, root string, n Node, path string) 
 			return deliveryError("delivery_capture_stale", "historical Red targets a different Green candidate")
 		}
 		if red.BaselineCommit != "" {
+			if !reflect.DeepEqual(red.ReplayOverlay, red.TestFiles) || len(red.ReplayDeleted) != 0 {
+				return deliveryError("delivery_capture_stale", "historical replay overlay differs from effective test set")
+			}
 			head, e := exec.Command("git", "-C", canonicalRoot, "rev-parse", "HEAD").Output()
 			if e != nil || strings.TrimSpace(string(head)) != red.ReplayCandidate {
 				return deliveryError("delivery_capture_stale", "current HEAD differs from replay target")

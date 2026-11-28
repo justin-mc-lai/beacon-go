@@ -1,0 +1,21 @@
+{
+  "id": "n_34b30e01b511",
+  "kind": "touchpoint",
+  "title": "automatic workflow workspace",
+  "intent": "显式准备生成HTML覆盖清单。",
+  "parent_id": "n_0386efdd0ffb",
+  "path": "root/self-drive/stable-workflow-kernel/auto-workspace",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "truth的prepare使用现有renderer生成本轮HTML与派生覆盖清单，绑定显式project/version/feature/run、本轮scope及依赖闭包与来源的scoped合同hash，保留deprecated墓碑；范围与依赖闭包外future draft不污染本轮合同。prepare不等于确认；confirm必须有明确身份和expected prepared hash，并共同绑定合同/source/HTML/manifest，同轮并发或重准备不得把A的批准套到B。check/status只读，tick复用同一事实；缺失、篡改、过期、未确认或合同变更未重新绑定确认均阻断truth出口，输出阶段产物/next/missing/owner，legacy单独标记。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli ./internal/orchestrator -run TestStableWorkflow -count=1 -v；真实HTML、scoped hash与明确confirm成功；缺HTML、陈旧/篡改、未确认、错误expected hash拒绝，两个执行者同步屏障证明A批准不套B，future范围隔离与墓碑保留；零测试不算验收。"
+  },
+  "fingerprint": "b349f364b0ab11e86661c14c8b5c86e163e5c9db801e06e08316ef07d1251a43",
+  "fingerprint_alg": "tree-json-v1"
+}

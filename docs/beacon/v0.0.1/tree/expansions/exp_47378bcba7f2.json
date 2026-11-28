@@ -1,0 +1,25 @@
+{
+  "at": "2026-11-28T05:22:01.478764Z",
+  "children": [
+    {
+      "id": "n_0386efdd0ffb",
+      "kind": "feature",
+      "title": "stable workflow kernel",
+      "intent": "让用户只决定目标/取舍/批准，系统承担阶段产物、覆盖、快照、推进判断和可视化。",
+      "doc": "## 问题\n当前plan默认放行且测试文件清单混入冻结合同，宿主依赖反复提示。\n## 目标用户\n其他项目的SDD需求负责人和宿主agent。\n## 场景\n新建/存量项目进入明确run，系统准备并检查模块树覆盖和HTML，恢复后给出缺项与下一步。\n## 范围\n五叶定义阶段出口、稳定验证选择、统一判定、来源合并预览与自动工作台；细则见docs/stable-workflow-spec.md，节点AC是合同。\n## 非目标\n不新增能力/不调LLM、不自动解释业务语义、不自动发布、不批量冻结Portfolio。\n## 验收标准\n显式稳定模式具备真实成功/拒绝/恢复测试，旧模式显式legacy，不混淆结构PASS和行为验收。",
+      "parent_id": "n_5e13a94c202d",
+      "path": "root/self-drive/stable-workflow-kernel",
+      "status": "draft",
+      "fingerprint": "947f426143b0b8eab084ff904e63e6fb6da3ca3b11189ee8076b58ec891cf383",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_5e13a94c202d",
+  "provenance": {
+    "skill": "beacon-go-plan",
+    "by": "user-confirmed-host",
+    "sources": [
+      "docs/stable-workflow-spec.md"
+    ]
+  }
+}

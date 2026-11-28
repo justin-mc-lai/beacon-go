@@ -1,0 +1,21 @@
+{
+  "id": "n_366977ee5808",
+  "kind": "touchpoint",
+  "title": "selector execution snapshot",
+  "intent": "测试文件由执行时发现。",
+  "parent_id": "n_0386efdd0ffb",
+  "path": "root/self-drive/stable-workflow-kernel/selector-snapshot",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "Go选择器绑定package/required_tests，实际test_files运行时发现记录；增加测试无需改Spec，同一配对与当前候选hash仍严格；v1显式清单兼容。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli -run TestCaptureSelector -count=1 -v；新增/变更/重复测试集拒绝探针。"
+  },
+  "fingerprint": "8920d4aec024ebf75bd05de93a05b79cc52dc2f348f22729f77f95586e79350f",
+  "fingerprint_alg": "tree-json-v1"
+}

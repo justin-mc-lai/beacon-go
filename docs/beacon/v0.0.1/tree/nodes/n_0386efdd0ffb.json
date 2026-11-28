@@ -1,0 +1,20 @@
+{
+  "id": "n_0386efdd0ffb",
+  "kind": "feature",
+  "title": "stable workflow kernel",
+  "intent": "让用户只决定目标/取舍/批准，系统承担阶段产物、覆盖、快照、推进判断和可视化。",
+  "doc": "## 问题\n旧冻结合同错误要求plan已有树和HTML，且缺少同一需求树持续版本演进合同。\n## 目标用户\n其他项目的SDD需求负责人和宿主agent。\n## 场景\nplan先调查目标、范围与决定；truth将本轮范围落为canonical树、覆盖清单及确认HTML并冻结；后续经admission、独立验证和人工发布批准持续交付。\n## 范围\n六叶定义阶段出口、稳定验证选择、统一判定、同文多来源归属合并、scoped合同hash与明确确认的自动工作台、一棵树的连续版本演进；canonical节点AC是合同，旧来源JSON提案保留为历史，不是第二权威。\n## 非目标\n不新增能力、不调LLM、不跑agent、不自动解释业务语义、不自动发布、不批量迁移或冻结Portfolio。\n## 验收标准\n显式稳定模式具备真实成功/拒绝/恢复测试；plan无需树/HTML，truth本轮树/覆盖/确认HTML/冻结才准入；注册版本通过持久lineage解析同一canonical且历史不改，连续两轮交付验证future隔离与墓碑。旧模式显式legacy，结构PASS与需求冻结不等于实现验收或发布。",
+  "parent_id": "n_5e13a94c202d",
+  "path": "root/self-drive/stable-workflow-kernel",
+  "status": "frozen",
+  "child_fingerprints": [
+    "b349f364b0ab11e86661c14c8b5c86e163e5c9db801e06e08316ef07d1251a43",
+    "2a70430ff8ee0f5b4fd9fea2fb970f0bb8937af6b229ecd21c92762926a69995",
+    "99c72fa76dc542757540630cd468e70c086bbd9ecf63fc91a89c15979f214d82",
+    "8920d4aec024ebf75bd05de93a05b79cc52dc2f348f22729f77f95586e79350f",
+    "9625256a1f9620441b320bdee742e78cd2c4428f8cf3cb53a7f3fa9247773e5e",
+    "c6a663a0295d4072a8a2a7935ee38fa48ae117c4f0943b626d087a447a31aca1"
+  ],
+  "fingerprint": "7786668ab9cf092165f527235ed3202f8f28f4c1843802267fc574f3a538d4f6",
+  "fingerprint_alg": "tree-json-v1"
+}

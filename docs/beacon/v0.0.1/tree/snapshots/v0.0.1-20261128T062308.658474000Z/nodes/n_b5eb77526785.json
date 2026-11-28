@@ -1,0 +1,21 @@
+{
+  "id": "n_b5eb77526785",
+  "kind": "touchpoint",
+  "title": "stage completion contract",
+  "intent": "阶段缺项阻断推进。",
+  "parent_id": "n_0386efdd0ffb",
+  "path": "root/self-drive/stable-workflow-kernel/stage-contract",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "显式project/version/feature/run绑定稳定合同。plan仅调查、头脑风暴和分析，澄清目标、范围选项、来源、未知项与取舍决定；不要求已有需求树、叶AC、覆盖清单或HTML。truth才将本轮范围形成唯一canonical树，明确模块、依赖、叶AC与可执行验证，完成来源覆盖，交付绑定本轮scoped合同hash的HTML并由用户明确确认，自底向上冻结后才准入implement；缺树、缺覆盖、缺确认、缺HTML或未冻结均拒绝。后续implement admission、verify真实证据与独立审查、release依赖闭包与人工批准保持，稳定检查不得替代既有门禁。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli ./internal/orchestrator -run TestStableWorkflow -count=1 -v；必须真实执行目标测试：无树/HTML的plan调查决定成功，truth缺树/覆盖/HTML/明确确认/冻结分别拒绝，完整truth才准入implement，后续既有门禁仍拒绝缺项；零测试不算验收。"
+  },
+  "fingerprint": "c6a663a0295d4072a8a2a7935ee38fa48ae117c4f0943b626d087a447a31aca1",
+  "fingerprint_alg": "tree-json-v1"
+}

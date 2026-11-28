@@ -32,10 +32,8 @@ func TestSkillsVerifyReportOnlyAndStrict(t *testing.T) {
 		t.Fatalf("reason = %q", rc)
 	}
 	// A complete install passes strict.
-	for _, name := range skills.ExpectedInstallNames() {
-		if err := os.MkdirAll(filepath.Join(dir, name), 0o755); err != nil {
-			t.Fatal(err)
-		}
+	if _, err := skills.Install(dir, true); err != nil {
+		t.Fatal(err)
 	}
 	if _, err := runCLI(t, "skills", "verify", "--home", home, "--strict"); err != nil {
 		t.Fatalf("complete install must pass strict: %v", err)

@@ -208,13 +208,21 @@ func resolveTree(st *store.Store, project, version string) (string, string, inte
 	if err != nil {
 		return "", "", intenttree.Index{}, err
 	}
-	dir := intenttree.TreeDir(proj.RootPath, ver.DocsRoot)
+	dir, err := intenttree.ResolveTreeLocation(proj.RootPath, ver.DocsRoot)
+	if err != nil {
+		return "", "", intenttree.Index{}, err
+	}
 	idx, err := intenttree.ReadIndex(dir)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) || strings.Contains(err.Error(), "no such file") {
 			return "", "", intenttree.Index{}, missingRegisteredTree("resolveTree", root, ver)
 		}
 		return "", "", intenttree.Index{}, err
+	}
+	if idx.Version != ver.Version {
+		if err := intenttree.ValidateDeliveryScope(dir, proj.ID, ver.ID, ver.Version); err != nil {
+			return "", "", intenttree.Index{}, err
+		}
 	}
 	return dir, proj.RootPath, idx, nil
 }
@@ -470,23 +478,6 @@ func treeGateVerdicts(projRoot, version string, idx intenttree.Index, bodies map
 		}
 		if verdicts != nil {
 			out[e.ID] = verdicts
-		}
-	}
-	return out, nil
-}
-
-func unlinkedFeatureSlugs(dir string, idx intenttree.Index) ([]string, error) {
-	out := []string{}
-	for _, e := range idx.Nodes {
-		if e.Kind != intenttree.KindFeature {
-			continue
-		}
-		n, err := intenttree.ReadNode(dir, e.ID)
-		if err != nil {
-			return nil, err
-		}
-		if n.EffectiveTruthPath() == "" {
-			out = append(out, filepath.Base(e.Path))
 		}
 	}
 	return out, nil

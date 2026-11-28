@@ -11,6 +11,7 @@ type CaptureCommand struct {
 	Argv          []string `json:"argv"`
 	TestFiles     []string `json:"test_files"`
 	RequiredTests []string `json:"required_tests"`
+	DiscoverTests bool     `json:"discover_tests,omitempty"`
 }
 
 type CaptureRequest struct {

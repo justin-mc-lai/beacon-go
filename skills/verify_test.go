@@ -117,3 +117,21 @@ func TestVerifyIgnoresV1Names(t *testing.T) {
 		t.Fatalf("v1 name counted as extra: %v", v.Extra)
 	}
 }
+
+func TestVerifyHostRejectsStaleContent(t *testing.T) {
+	home := t.TempDir()
+	dir := filepath.Join(home, ".claude", "skills")
+	if _, err := Install(dir, false); err != nil {
+		t.Fatal(err)
+	}
+	if v := VerifyHost(claudeHost(t, home)); !v.OK {
+		t.Fatalf("fresh install: %+v", v)
+	}
+	path := filepath.Join(dir, InstallDirName("plan"), "SKILL.md")
+	if err := os.WriteFile(path, []byte("stale plan"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if v := VerifyHost(claudeHost(t, home)); v.OK {
+		t.Fatal("directory exists but stale content accepted")
+	}
+}

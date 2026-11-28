@@ -50,11 +50,13 @@ func DeprecateDraft(st *store.Store, dir, versionID, id, summary, by, base strin
 	}
 	// Never alter a frozen ancestor through a draft-only operation.
 	seen := map[string]bool{id: true}
+	var ancestors []string
 	for parent := n.ParentID; parent != ""; {
 		if seen[parent] {
 			return bad("ancestor cycle")
 		}
 		seen[parent] = true
+		ancestors = append(ancestors, parent)
 		p, ok := findEntry(idx, parent)
 		if !ok {
 			return bad("missing ancestor")
@@ -76,6 +78,7 @@ func DeprecateDraft(st *store.Store, dir, versionID, id, summary, by, base strin
 	}
 	now := time.Now().UTC()
 	rec := ChangeRecord{ID: shortID("chg_", versionID, id, "deprecate", now.Format(time.RFC3339Nano)), NodeID: id, Summary: strings.TrimSpace(summary), By: strings.TrimSpace(by), BaseFingerprint: base, Affected: []string{id}, CreatedAt: now.Format(time.RFC3339Nano)}
+	bindChangeDelta(&rec, idx, "deprecate", nil, nil, []string{id}, ancestors)
 	path := filepath.Join(dir, "changes", rec.ID+".json")
 	n.Status = StatusDeprecated
 	n, err = Stamp(n)

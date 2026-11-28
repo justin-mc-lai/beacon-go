@@ -174,6 +174,26 @@ func (e *Engine) EvaluateGate(ctx store.FeatureContext, gateType, runID, evaluat
 	var boundRun string
 	var err error
 	extra := map[string]any{}
+	selected, _, hasSelected, selectErr := e.latestGoalRun(ctx, runID)
+	if selectErr != nil {
+		return gate.Evaluation{}, selectErr
+	}
+	if hasSelected {
+		binding, _, bindingErr := e.workflowBinding(selected.ID)
+		if bindingErr != nil {
+			return gate.Evaluation{}, bindingErr
+		}
+		if binding != nil && strings.TrimSpace(runID) == "" {
+			return gate.Evaluation{}, qaError("workflow_run_required", "stable workflow gate evaluation requires explicit run ID")
+		}
+		stage := map[string]string{"truth_freeze": StageTruth, "implement": StageImplement, "qa": StageQA, "release": StageRelease}[gateType]
+		if ready, reason, factErr := e.workflowStageFacts(selected, stage); factErr != nil {
+			return gate.Evaluation{}, factErr
+		} else if !ready {
+			ev := gate.Evaluation{GateType: gate.GateType(gateType), Verdict: gate.VerdictBlocked, Evaluator: evaluator, ReasonCodes: []string{reason}, Checks: []gate.CheckItem{{Check: "workflow", Applicable: true, OK: false, ReasonCode: reason}}}
+			return e.persistGateResult(ctx, ev, selected.ID, EventGateEvaluated, extra)
+		}
+	}
 	if gateType == string(gate.GateQA) || gateType == string(gate.GateRelease) {
 		if err := e.validateTreeDelivery(ctx); err != nil {
 			return gate.Evaluation{}, err

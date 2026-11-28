@@ -1,0 +1,21 @@
+{
+  "id": "n_b5eb77526785",
+  "kind": "touchpoint",
+  "title": "stage completion contract",
+  "intent": "阶段缺项阻断推进。",
+  "parent_id": "n_0386efdd0ffb",
+  "path": "root/self-drive/stable-workflow-kernel/stage-contract",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "显式run绑定稳定合同，plan缺目标/范围/模块/依赖/叶AC/验证/来源覆盖/有效HTML拒绝；稳定检查不替代freeze/admission/QA/人批准。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli ./internal/orchestrator -run TestStableWorkflow -count=1 -v；必须目标用例执行，零用例不算验收。"
+  },
+  "fingerprint": "4cd1443583b864aae02e0b17f09e1c7ae9ad2bd8e6e48fae47381b03adcce4e1",
+  "fingerprint_alg": "tree-json-v1"
+}

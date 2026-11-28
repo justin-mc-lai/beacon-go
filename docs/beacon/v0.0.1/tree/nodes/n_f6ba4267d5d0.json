@@ -1,0 +1,21 @@
+{
+  "id": "n_f6ba4267d5d0",
+  "kind": "touchpoint",
+  "title": "shared progression decision",
+  "intent": "状态/推进同一检查。",
+  "parent_id": "n_0386efdd0ffb",
+  "path": "root/self-drive/stable-workflow-kernel/shared-decision",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "AC-001",
+      "text": "显式run的只读check/status与tick共享阶段事实，输出current_stage/missing/next_action/责任人；查询不写账本或文件，恢复不跳步、不借latest。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/cli ./internal/orchestrator -run TestStableWorkflow -count=1 -v；比较只读前后及tick拒绝。"
+  },
+  "fingerprint": "9625256a1f9620441b320bdee742e78cd2c4428f8cf3cb53a7f3fa9247773e5e",
+  "fingerprint_alg": "tree-json-v1"
+}

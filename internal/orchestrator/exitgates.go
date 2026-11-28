@@ -422,6 +422,11 @@ func (e *Engine) ExitGate(runID string) (ExitVerdict, error) {
 	if err != nil {
 		return ExitVerdict{}, err
 	}
+	if ready, reason, err := e.workflowStageFacts(run, m.currentStage()); err != nil {
+		return ExitVerdict{}, err
+	} else if !ready {
+		return blockedVerdict(reason, "repair_workflow", "beacon-go-truth"), nil
+	}
 	in, err := e.buildExitInput(run, m)
 	if err != nil {
 		return ExitVerdict{}, err

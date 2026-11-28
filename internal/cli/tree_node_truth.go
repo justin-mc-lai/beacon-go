@@ -234,7 +234,10 @@ func autoLinkTruthNode(st *store.Store, projectRoot, version, slug, truthPath st
 	if err != nil {
 		return err
 	}
-	dir := intenttree.TreeDir(proj.RootPath, ver.DocsRoot)
+	dir, err := intenttree.ResolveTreeLocation(proj.RootPath, ver.DocsRoot)
+	if err != nil {
+		return err
+	}
 	idx, err := intenttree.ReadIndex(dir)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) || strings.Contains(err.Error(), "no such file") {

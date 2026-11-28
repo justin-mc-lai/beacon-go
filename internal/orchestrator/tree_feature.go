@@ -30,10 +30,16 @@ func (e *Engine) ensureTreeFeature(projectRoot, version, slug string) (store.Fea
 	if !ok {
 		return store.FeatureContext{}, false, nil
 	}
-	dir := intenttree.TreeDir(proj.RootPath, ver.DocsRoot)
+	dir, err := intenttree.ResolveTreeLocation(proj.RootPath, ver.DocsRoot)
+	if err != nil {
+		return store.FeatureContext{}, false, err
+	}
 	idx, err := intenttree.ReadIndex(dir)
 	if err != nil {
-		return store.FeatureContext{}, false, nil
+		if errors.Is(err, os.ErrNotExist) {
+			return store.FeatureContext{}, false, nil
+		}
+		return store.FeatureContext{}, false, err
 	}
 	features := make([]intenttree.IndexEntry, 0)
 	seen := map[string]bool{}
@@ -223,7 +229,10 @@ func (e *Engine) SyncDerivedFeature(projectRoot, version, nodeID string) (Derive
 		return DerivedFeatureSync{}, core.NewError(intenttree.ReasonVersionNotFound, "orchestrator.SyncDerivedFeature",
 			"version not found: "+version)
 	}
-	dir := intenttree.TreeDir(proj.RootPath, ver.DocsRoot)
+	dir, err := intenttree.ResolveTreeLocation(proj.RootPath, ver.DocsRoot)
+	if err != nil {
+		return DerivedFeatureSync{}, err
+	}
 	idx, err := intenttree.ReadIndex(dir)
 	if err != nil {
 		return DerivedFeatureSync{}, err

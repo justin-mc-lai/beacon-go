@@ -9,7 +9,7 @@
       "status": "frozen",
       "title": "需求树驱动的 SDD 产品",
       "path": "root",
-      "fingerprint": "356131d3ddebf8d4a3537ede19e5097c9ac1db6d338695b37ece956a733ee749",
+      "fingerprint": "4666231259ed86cd2c670b7288b31c3a4600a5786b2f3eab652d8db827784184",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -269,7 +269,7 @@
       "status": "frozen",
       "title": "self drive",
       "path": "root/self-drive",
-      "fingerprint": "89ab8c2da8060bc5fc27fd433470bb3ca53d743328f94053b331c13cc286cb54",
+      "fingerprint": "0ba2f06f4d30df6432deaeb5e56188e9a132f66a88920b38ccaf2f639a4d4236",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -340,6 +340,76 @@
       "title": "full test suite green",
       "path": "root/self-drive/self-tree-ci/self-test-suite",
       "fingerprint": "94fa34f4a93f040851f3fabb8d7f79a4dec464bd904d16b8c7efdd12228a1605",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_0386efdd0ffb",
+      "parent_id": "n_5e13a94c202d",
+      "kind": "feature",
+      "status": "frozen",
+      "title": "stable workflow kernel",
+      "path": "root/self-drive/stable-workflow-kernel",
+      "fingerprint": "7786668ab9cf092165f527235ed3202f8f28f4c1843802267fc574f3a538d4f6",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_34b30e01b511",
+      "parent_id": "n_0386efdd0ffb",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "automatic workflow workspace",
+      "path": "root/self-drive/stable-workflow-kernel/auto-workspace",
+      "fingerprint": "b349f364b0ab11e86661c14c8b5c86e163e5c9db801e06e08316ef07d1251a43",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_6f4b7f484e23",
+      "parent_id": "n_0386efdd0ffb",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "continuous tree evolution",
+      "path": "root/self-drive/stable-workflow-kernel/continuous-tree-evolution",
+      "fingerprint": "2a70430ff8ee0f5b4fd9fea2fb970f0bb8937af6b229ecd21c92762926a69995",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_8452f7536218",
+      "parent_id": "n_0386efdd0ffb",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "brownfield ownership preview",
+      "path": "root/self-drive/stable-workflow-kernel/ownership-preview",
+      "fingerprint": "99c72fa76dc542757540630cd468e70c086bbd9ecf63fc91a89c15979f214d82",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_366977ee5808",
+      "parent_id": "n_0386efdd0ffb",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "selector execution snapshot",
+      "path": "root/self-drive/stable-workflow-kernel/selector-snapshot",
+      "fingerprint": "8920d4aec024ebf75bd05de93a05b79cc52dc2f348f22729f77f95586e79350f",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_f6ba4267d5d0",
+      "parent_id": "n_0386efdd0ffb",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "shared progression decision",
+      "path": "root/self-drive/stable-workflow-kernel/shared-decision",
+      "fingerprint": "9625256a1f9620441b320bdee742e78cd2c4428f8cf3cb53a7f3fa9247773e5e",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_b5eb77526785",
+      "parent_id": "n_0386efdd0ffb",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "stage completion contract",
+      "path": "root/self-drive/stable-workflow-kernel/stage-contract",
+      "fingerprint": "c6a663a0295d4072a8a2a7935ee38fa48ae117c4f0943b626d087a447a31aca1",
       "fingerprint_alg": "tree-json-v1"
     },
     {

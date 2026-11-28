@@ -1,0 +1,118 @@
+{
+  "at": "2026-11-28T05:22:13.041395Z",
+  "children": [
+    {
+      "id": "n_b5eb77526785",
+      "kind": "touchpoint",
+      "title": "stage completion contract",
+      "intent": "阶段缺项阻断推进。",
+      "parent_id": "n_0386efdd0ffb",
+      "path": "root/self-drive/stable-workflow-kernel/stage-contract",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "显式run绑定稳定合同，plan缺目标/范围/模块/依赖/叶AC/验证/来源覆盖/有效HTML拒绝；稳定检查不替代freeze/admission/QA/人批准。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/cli ./internal/orchestrator -run TestStableWorkflow -count=1 -v；必须目标用例执行，零用例不算验收。"
+      },
+      "fingerprint": "f8b21edab8bfc5ace1666d26d5f7cd3a47b6d2a07b061c0bcb7b6e2c9a47258d",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_366977ee5808",
+      "kind": "touchpoint",
+      "title": "selector execution snapshot",
+      "intent": "测试文件由执行时发现。",
+      "parent_id": "n_0386efdd0ffb",
+      "path": "root/self-drive/stable-workflow-kernel/selector-snapshot",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "Go选择器绑定package/required_tests，实际test_files运行时发现记录；增加测试无需改Spec，同一配对与当前候选hash仍严格；v1显式清单兼容。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/cli -run TestCaptureSelector -count=1 -v；新增/变更/重复测试集拒绝探针。"
+      },
+      "fingerprint": "7d8472f702b580aa6f53b5945d511cc8fe943c77d7ace3dbad3845e19741a5d1",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_f6ba4267d5d0",
+      "kind": "touchpoint",
+      "title": "shared progression decision",
+      "intent": "状态/推进同一检查。",
+      "parent_id": "n_0386efdd0ffb",
+      "path": "root/self-drive/stable-workflow-kernel/shared-decision",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "显式run的只读check/status与tick共享阶段事实，输出current_stage/missing/next_action/责任人；查询不写账本或文件，恢复不跳步、不借latest。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/cli ./internal/orchestrator -run TestStableWorkflow -count=1 -v；比较只读前后及tick拒绝。"
+      },
+      "fingerprint": "436ef0bf68d7f15ffca3844493578d18c761f816e5095c29b2f4598325948dcd",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_8452f7536218",
+      "kind": "touchpoint",
+      "title": "brownfield ownership preview",
+      "intent": "存量来源唯一归属。",
+      "parent_id": "n_0386efdd0ffb",
+      "path": "root/self-drive/stable-workflow-kernel/ownership-preview",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "合同引用canonical IDs与源AC覆盖，重复调度归属、漏项、未知节点、依赖环拒绝；仅预览重组，不修改冻结树；语义取舍由宿主独立审查。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/cli ./internal/orchestrator -run TestStableWorkflow -count=1 -v；存量成功/重复/漏项拒绝。"
+      },
+      "fingerprint": "74bcd5c4d84b789238217cd35a157d403682385d1ebabf366b43ca1e88379237",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_34b30e01b511",
+      "kind": "touchpoint",
+      "title": "automatic workflow workspace",
+      "intent": "显式准备生成HTML覆盖清单。",
+      "parent_id": "n_0386efdd0ffb",
+      "path": "root/self-drive/stable-workflow-kernel/auto-workspace",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "AC-001",
+          "text": "prepare用现有renderer自动生成HTML与派生覆盖清单，绑定当前canonical source hash；check/tick发现缺失/篡改/过期阻断；输出阶段产物与下一步，legacy单独标记。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/cli ./internal/orchestrator -run TestStableWorkflow -count=1 -v；实际HTML生成与陈旧拒绝。"
+      },
+      "fingerprint": "237fa1f68bdb2df74bb20e9024f4e6859ae40970725c0e8cf0a9e1cfc0c3b42e",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_0386efdd0ffb",
+  "provenance": {
+    "skill": "beacon-go-plan",
+    "by": "user-confirmed-host",
+    "sources": [
+      "docs/stable-workflow-spec.md"
+    ]
+  }
+}
