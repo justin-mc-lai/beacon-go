@@ -1,0 +1,44 @@
+{
+  "schema": "beacon-closeout-observation.v1",
+  "source_commit": "78da930a632bb39517841bba80bec5207a99197c",
+  "binary_sha256": "c162fd235de6b93bd15e4006bc5f0aad3c697dd56e3d4400a0c2f0ea712bb311",
+  "node_id": "n_97cff751330d",
+  "node_fingerprint": "918edec60bd8c1064b7d64081c25f3d31fdff00537b58a5d3bf9f99ebb171f85",
+  "command": [
+    "go",
+    "test",
+    "./internal/cli",
+    "-run",
+    "TestNodeDeprecate|TestTreeBindingCacheFailureRollsBack|TestTreeBindingRollbackFailureRetainsRecoveryJournal",
+    "-count=1",
+    "-json"
+  ],
+  "started_at": "2026-11-28T04:14:42.051633+00:00",
+  "finished_at": "2026-11-28T04:14:42.749012+00:00",
+  "exit_code": 0,
+  "passed_cases": [
+    "TestNodeDeprecateRecordsChangeAndRetainsBody",
+    "TestNodeDeprecateRejectsCanonicalAncestorDrift",
+    "TestNodeDeprecateRefusals/frozen",
+    "TestNodeDeprecateRefusals/children",
+    "TestNodeDeprecateRefusals/blank-summary",
+    "TestNodeDeprecateRefusals/blank-by",
+    "TestNodeDeprecateRefusals/missing-base",
+    "TestNodeDeprecateRefusals/stale-base",
+    "TestNodeDeprecateRefusals",
+    "TestTreeBindingCacheFailureRollsBack",
+    "TestTreeBindingRollbackFailureRetainsRecoveryJournal"
+  ],
+  "failed_or_skipped_cases": [],
+  "stdout": {
+    "path": "n_97cff751330d.stdout.jsonl",
+    "sha256": "7d205c1db141522bbe7853300a2fcb1e4eb62e86775804421d92d187fa3d74cc"
+  },
+  "stderr": {
+    "path": "n_97cff751330d.stderr.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "scope": "Observed behavior regression, not a Red/Green delivery receipt or release approval",
+  "state_transition": "none",
+  "ci": "https://github.com/justin-mc-lai/beacon-go/actions/runs/46105800430"
+}

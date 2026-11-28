@@ -1,0 +1,84 @@
+{"Time":"2026-11-28T12:14:39.484487+08:00","Action":"start","Package":"beacon-go/internal/orchestrator"}
+{"Time":"2026-11-28T12:14:39.508155+08:00","Action":"start","Package":"beacon-go/internal/cli"}
+{"Time":"2026-11-28T12:14:39.917902+08:00","Action":"run","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport"}
+{"Time":"2026-11-28T12:14:39.917961+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport","Output":"=== RUN   TestPerTCVerdictRejectsMalformedReport\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:39.918001+08:00","Action":"run","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/missing"}
+{"Time":"2026-11-28T12:14:39.918003+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/missing","Output":"=== RUN   TestPerTCVerdictRejectsMalformedReport/missing\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.028344+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/missing","Output":"--- PASS: TestPerTCVerdictRejectsMalformedReport/missing (0.11s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.02837+08:00","Action":"pass","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/missing","Elapsed":0.11}
+{"Time":"2026-11-28T12:14:40.028386+08:00","Action":"run","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/duplicate"}
+{"Time":"2026-11-28T12:14:40.028396+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/duplicate","Output":"=== RUN   TestPerTCVerdictRejectsMalformedReport/duplicate\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.108209+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI"}
+{"Time":"2026-11-28T12:14:40.108239+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI","Output":"=== RUN   TestPerTCVerdictCLI\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.175382+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/duplicate","Output":"--- PASS: TestPerTCVerdictRejectsMalformedReport/duplicate (0.15s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.175396+08:00","Action":"pass","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/duplicate","Elapsed":0.15}
+{"Time":"2026-11-28T12:14:40.175405+08:00","Action":"run","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/reordered"}
+{"Time":"2026-11-28T12:14:40.175407+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/reordered","Output":"=== RUN   TestPerTCVerdictRejectsMalformedReport/reordered\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.323726+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/reordered","Output":"--- PASS: TestPerTCVerdictRejectsMalformedReport/reordered (0.15s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.323741+08:00","Action":"pass","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/reordered","Elapsed":0.15}
+{"Time":"2026-11-28T12:14:40.323744+08:00","Action":"run","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/zero-results"}
+{"Time":"2026-11-28T12:14:40.323745+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/zero-results","Output":"=== RUN   TestPerTCVerdictRejectsMalformedReport/zero-results\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.444499+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/zero-results","Output":"--- PASS: TestPerTCVerdictRejectsMalformedReport/zero-results (0.12s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.444513+08:00","Action":"pass","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/zero-results","Elapsed":0.12}
+{"Time":"2026-11-28T12:14:40.444517+08:00","Action":"run","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/zero-cases"}
+{"Time":"2026-11-28T12:14:40.444518+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/zero-cases","Output":"=== RUN   TestPerTCVerdictRejectsMalformedReport/zero-cases\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.575282+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/zero-cases","Output":"--- PASS: TestPerTCVerdictRejectsMalformedReport/zero-cases (0.13s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.575298+08:00","Action":"pass","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/zero-cases","Elapsed":0.13}
+{"Time":"2026-11-28T12:14:40.575303+08:00","Action":"run","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/blank-tc"}
+{"Time":"2026-11-28T12:14:40.575304+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/blank-tc","Output":"=== RUN   TestPerTCVerdictRejectsMalformedReport/blank-tc\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.575466+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/pass"}
+{"Time":"2026-11-28T12:14:40.575471+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/pass","Output":"=== RUN   TestPerTCVerdictCLI/pass\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.682662+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/blank-tc","Output":"--- PASS: TestPerTCVerdictRejectsMalformedReport/blank-tc (0.11s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.682674+08:00","Action":"pass","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/blank-tc","Elapsed":0.11}
+{"Time":"2026-11-28T12:14:40.682678+08:00","Action":"run","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/wrong-candidate"}
+{"Time":"2026-11-28T12:14:40.68268+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/wrong-candidate","Output":"=== RUN   TestPerTCVerdictRejectsMalformedReport/wrong-candidate\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.734085+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/pass","Output":"    per_tc_verdict_test.go:82: real CLI scenario=pass verdict=pass checks=[TC-002:pass TC-001:pass]\n"}
+{"Time":"2026-11-28T12:14:40.787684+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/wrong-candidate","Output":"--- PASS: TestPerTCVerdictRejectsMalformedReport/wrong-candidate (0.11s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.787696+08:00","Action":"pass","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport/wrong-candidate","Elapsed":0.11}
+{"Time":"2026-11-28T12:14:40.787699+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport","Output":"--- PASS: TestPerTCVerdictRejectsMalformedReport (0.87s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.7877+08:00","Action":"pass","Package":"beacon-go/internal/orchestrator","Test":"TestPerTCVerdictRejectsMalformedReport","Elapsed":0.87}
+{"Time":"2026-11-28T12:14:40.787702+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:40.788365+08:00","Action":"output","Package":"beacon-go/internal/orchestrator","Output":"ok  \tbeacon-go/internal/orchestrator\t1.304s\n"}
+{"Time":"2026-11-28T12:14:40.788386+08:00","Action":"pass","Package":"beacon-go/internal/orchestrator","Elapsed":1.304}
+{"Time":"2026-11-28T12:14:41.259403+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/pass","Output":"--- PASS: TestPerTCVerdictCLI/pass (0.68s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.259425+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/pass","Elapsed":0.68}
+{"Time":"2026-11-28T12:14:41.25959+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/missing"}
+{"Time":"2026-11-28T12:14:41.259605+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/missing","Output":"=== RUN   TestPerTCVerdictCLI/missing\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.313898+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/missing","Output":"    per_tc_verdict_test.go:82: real CLI scenario=missing verdict=blocked checks=[TC-002:blocked TC-001:blocked]\n"}
+{"Time":"2026-11-28T12:14:41.329889+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/missing","Output":"--- PASS: TestPerTCVerdictCLI/missing (0.07s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.329906+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/missing","Elapsed":0.07}
+{"Time":"2026-11-28T12:14:41.329911+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/failed"}
+{"Time":"2026-11-28T12:14:41.329912+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/failed","Output":"=== RUN   TestPerTCVerdictCLI/failed\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.439772+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/failed","Output":"    per_tc_verdict_test.go:82: real CLI scenario=failed verdict=blocked checks=[TC-002:fail TC-001:fail]\n"}
+{"Time":"2026-11-28T12:14:41.45673+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/failed","Output":"--- PASS: TestPerTCVerdictCLI/failed (0.13s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.456747+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/failed","Elapsed":0.13}
+{"Time":"2026-11-28T12:14:41.456751+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/blocked"}
+{"Time":"2026-11-28T12:14:41.456752+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/blocked","Output":"=== RUN   TestPerTCVerdictCLI/blocked\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.555206+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/blocked","Output":"    per_tc_verdict_test.go:82: real CLI scenario=blocked verdict=blocked checks=[TC-002:blocked TC-001:pass]\n"}
+{"Time":"2026-11-28T12:14:41.571667+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/blocked","Output":"--- PASS: TestPerTCVerdictCLI/blocked (0.11s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.571678+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/blocked","Elapsed":0.11}
+{"Time":"2026-11-28T12:14:41.571681+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/stale"}
+{"Time":"2026-11-28T12:14:41.571682+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/stale","Output":"=== RUN   TestPerTCVerdictCLI/stale\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.714585+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/stale","Output":"    per_tc_verdict_test.go:82: real CLI scenario=stale verdict=blocked checks=[TC-002:stale TC-001:stale]\n"}
+{"Time":"2026-11-28T12:14:41.730989+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/stale","Output":"--- PASS: TestPerTCVerdictCLI/stale (0.16s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.731+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/stale","Elapsed":0.16}
+{"Time":"2026-11-28T12:14:41.731004+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/raw-stale"}
+{"Time":"2026-11-28T12:14:41.731005+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/raw-stale","Output":"=== RUN   TestPerTCVerdictCLI/raw-stale\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.877602+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/raw-stale","Output":"    per_tc_verdict_test.go:82: real CLI scenario=raw-stale verdict=blocked checks=[TC-002:stale TC-001:stale]\n"}
+{"Time":"2026-11-28T12:14:41.894458+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/raw-stale","Output":"--- PASS: TestPerTCVerdictCLI/raw-stale (0.16s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.894469+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/raw-stale","Elapsed":0.16}
+{"Time":"2026-11-28T12:14:41.894473+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/duplicate-tc"}
+{"Time":"2026-11-28T12:14:41.894479+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/duplicate-tc","Output":"=== RUN   TestPerTCVerdictCLI/duplicate-tc\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.945763+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/duplicate-tc","Output":"    per_tc_verdict_test.go:82: real CLI scenario=duplicate-tc verdict=blocked checks=[TC-001:blocked TC-001:blocked]\n"}
+{"Time":"2026-11-28T12:14:41.961413+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/duplicate-tc","Output":"--- PASS: TestPerTCVerdictCLI/duplicate-tc (0.07s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:41.961425+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/duplicate-tc","Elapsed":0.07}
+{"Time":"2026-11-28T12:14:41.961429+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/zero"}
+{"Time":"2026-11-28T12:14:41.96143+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/zero","Output":"=== RUN   TestPerTCVerdictCLI/zero\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.006689+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/zero","Output":"    per_tc_verdict_test.go:82: real CLI scenario=zero verdict=blocked checks=[]\n"}
+{"Time":"2026-11-28T12:14:42.022554+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/zero","Output":"--- PASS: TestPerTCVerdictCLI/zero (0.06s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.022571+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI/zero","Elapsed":0.06}
+{"Time":"2026-11-28T12:14:42.023295+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI","Output":"--- PASS: TestPerTCVerdictCLI (1.92s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.0233+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestPerTCVerdictCLI","Elapsed":1.92}
+{"Time":"2026-11-28T12:14:42.023323+08:00","Action":"output","Package":"beacon-go/internal/cli","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.024164+08:00","Action":"output","Package":"beacon-go/internal/cli","Output":"ok  \tbeacon-go/internal/cli\t2.516s\n"}
+{"Time":"2026-11-28T12:14:42.02417+08:00","Action":"pass","Package":"beacon-go/internal/cli","Elapsed":2.516}

@@ -1,0 +1,48 @@
+{"Time":"2026-11-28T12:14:42.365463+08:00","Action":"start","Package":"beacon-go/internal/cli"}
+{"Time":"2026-11-28T12:14:42.638974+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRecordsChangeAndRetainsBody"}
+{"Time":"2026-11-28T12:14:42.639047+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRecordsChangeAndRetainsBody","Output":"=== RUN   TestNodeDeprecateRecordsChangeAndRetainsBody\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.655664+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRecordsChangeAndRetainsBody","Output":"--- PASS: TestNodeDeprecateRecordsChangeAndRetainsBody (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.655676+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRecordsChangeAndRetainsBody","Elapsed":0.02}
+{"Time":"2026-11-28T12:14:42.655695+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRejectsCanonicalAncestorDrift"}
+{"Time":"2026-11-28T12:14:42.655697+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRejectsCanonicalAncestorDrift","Output":"=== RUN   TestNodeDeprecateRejectsCanonicalAncestorDrift\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.663555+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRejectsCanonicalAncestorDrift","Output":"--- PASS: TestNodeDeprecateRejectsCanonicalAncestorDrift (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.663563+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRejectsCanonicalAncestorDrift","Elapsed":0.01}
+{"Time":"2026-11-28T12:14:42.663572+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals"}
+{"Time":"2026-11-28T12:14:42.663574+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals","Output":"=== RUN   TestNodeDeprecateRefusals\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.663592+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/frozen"}
+{"Time":"2026-11-28T12:14:42.663595+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/frozen","Output":"=== RUN   TestNodeDeprecateRefusals/frozen\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.67243+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/frozen","Output":"--- PASS: TestNodeDeprecateRefusals/frozen (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.672437+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/frozen","Elapsed":0.01}
+{"Time":"2026-11-28T12:14:42.672439+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/children"}
+{"Time":"2026-11-28T12:14:42.672441+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/children","Output":"=== RUN   TestNodeDeprecateRefusals/children\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.679181+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/children","Output":"--- PASS: TestNodeDeprecateRefusals/children (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.679185+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/children","Elapsed":0.01}
+{"Time":"2026-11-28T12:14:42.679187+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/blank-summary"}
+{"Time":"2026-11-28T12:14:42.679188+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/blank-summary","Output":"=== RUN   TestNodeDeprecateRefusals/blank-summary\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.686053+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/blank-summary","Output":"--- PASS: TestNodeDeprecateRefusals/blank-summary (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.686057+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/blank-summary","Elapsed":0.01}
+{"Time":"2026-11-28T12:14:42.686059+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/blank-by"}
+{"Time":"2026-11-28T12:14:42.68606+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/blank-by","Output":"=== RUN   TestNodeDeprecateRefusals/blank-by\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.692775+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/blank-by","Output":"--- PASS: TestNodeDeprecateRefusals/blank-by (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.692779+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/blank-by","Elapsed":0.01}
+{"Time":"2026-11-28T12:14:42.692789+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/missing-base"}
+{"Time":"2026-11-28T12:14:42.69279+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/missing-base","Output":"=== RUN   TestNodeDeprecateRefusals/missing-base\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.698996+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/missing-base","Output":"--- PASS: TestNodeDeprecateRefusals/missing-base (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.699+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/missing-base","Elapsed":0.01}
+{"Time":"2026-11-28T12:14:42.699001+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/stale-base"}
+{"Time":"2026-11-28T12:14:42.699002+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/stale-base","Output":"=== RUN   TestNodeDeprecateRefusals/stale-base\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.704599+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/stale-base","Output":"--- PASS: TestNodeDeprecateRefusals/stale-base (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.704602+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals/stale-base","Elapsed":0.01}
+{"Time":"2026-11-28T12:14:42.704603+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals","Output":"--- PASS: TestNodeDeprecateRefusals (0.04s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.704606+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestNodeDeprecateRefusals","Elapsed":0.04}
+{"Time":"2026-11-28T12:14:42.704746+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestTreeBindingCacheFailureRollsBack"}
+{"Time":"2026-11-28T12:14:42.70475+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestTreeBindingCacheFailureRollsBack","Output":"=== RUN   TestTreeBindingCacheFailureRollsBack\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.713971+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestTreeBindingCacheFailureRollsBack","Output":"--- PASS: TestTreeBindingCacheFailureRollsBack (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.713976+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestTreeBindingCacheFailureRollsBack","Elapsed":0.01}
+{"Time":"2026-11-28T12:14:42.713987+08:00","Action":"run","Package":"beacon-go/internal/cli","Test":"TestTreeBindingRollbackFailureRetainsRecoveryJournal"}
+{"Time":"2026-11-28T12:14:42.713988+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestTreeBindingRollbackFailureRetainsRecoveryJournal","Output":"=== RUN   TestTreeBindingRollbackFailureRetainsRecoveryJournal\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.723734+08:00","Action":"output","Package":"beacon-go/internal/cli","Test":"TestTreeBindingRollbackFailureRetainsRecoveryJournal","Output":"--- PASS: TestTreeBindingRollbackFailureRetainsRecoveryJournal (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.723742+08:00","Action":"pass","Package":"beacon-go/internal/cli","Test":"TestTreeBindingRollbackFailureRetainsRecoveryJournal","Elapsed":0.01}
+{"Time":"2026-11-28T12:14:42.723958+08:00","Action":"output","Package":"beacon-go/internal/cli","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-11-28T12:14:42.724662+08:00","Action":"output","Package":"beacon-go/internal/cli","Output":"ok  \tbeacon-go/internal/cli\t0.359s\n"}
+{"Time":"2026-11-28T12:14:42.724669+08:00","Action":"pass","Package":"beacon-go/internal/cli","Elapsed":0.359}
