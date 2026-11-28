@@ -1,0 +1,21 @@
+{
+  "id": "n_c085c6eac582",
+  "kind": "touchpoint",
+  "title": "scope binding",
+  "intent": "唯一范围规范化入口",
+  "parent_id": "n_d8566e18c1a1",
+  "path": "root/self-drive/scope-delivery-runtime/scope-binding",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "S1",
+      "text": "单feature和多模块交付均绑定明确项目版本、节点ID、依赖闭包及需求指纹，validate/persist/query共用结果；空白、重复、重叠、跨版本、未知/循环依赖、反向归属和零活跃目标拒绝，历史同名不靠slug决定证据归属。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；必须包含单feature、多模块成功及S1全部退化拒绝探针，不以零测试算通过。"
+  },
+  "fingerprint": "9479cc7133cb1585b5e2d43c4307b86de75b13fc713e8a90bdb2508f1296ee79",
+  "fingerprint_alg": "tree-json-v1"
+}

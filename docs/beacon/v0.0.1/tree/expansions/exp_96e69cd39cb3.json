@@ -1,0 +1,139 @@
+{
+  "at": "2026-11-28T08:44:00.211744Z",
+  "children": [
+    {
+      "id": "n_c085c6eac582",
+      "kind": "touchpoint",
+      "title": "scope binding",
+      "intent": "唯一范围规范化入口",
+      "parent_id": "n_d8566e18c1a1",
+      "path": "root/self-drive/scope-delivery-runtime/scope-binding",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "S1",
+          "text": "单feature和多模块交付均绑定明确项目版本、节点ID、依赖闭包及需求指纹，validate/persist/query共用结果；空白、重复、重叠、跨版本、未知/循环依赖、反向归属和零活跃目标拒绝，历史同名不靠slug决定证据归属。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；必须包含单feature、多模块成功及S1全部退化拒绝探针，不以零测试算通过。"
+      },
+      "fingerprint": "d4a205ed88f903aeff00c22b7e143994d5d0cd509980f6543cb76782bd7480ac",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_962d573b8698",
+      "kind": "touchpoint",
+      "title": "task expansion",
+      "intent": "稳定任务身份和幂等拆分",
+      "parent_id": "n_d8566e18c1a1",
+      "path": "root/self-drive/scope-delivery-runtime/task-expansion",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "S2",
+          "text": "从确认范围确定性生成依赖任务与稳定ID，重试与跨进程恢复不重复建任务或丢失失败历史；未知/循环依赖拒绝，真并发以双执行者同步屏障证明唯一写入口；内核不调用LLM/agent。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；S2覆盖重复调用、跨进程与同步屏障并发成功和依赖拒绝。"
+      },
+      "fingerprint": "30f1cd183b8f3e8ee30a8347b64ee26fdbde162acc992d6c9276b660a817bead",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_96952d72c093",
+      "kind": "touchpoint",
+      "title": "scope admission",
+      "intent": "全范围实施准入",
+      "parent_id": "n_d8566e18c1a1",
+      "path": "root/self-drive/scope-delivery-runtime/scope-admission",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "S3",
+          "text": "所有执行入口检查完整范围冻结、当前确认、committed baseline、worktree绑定、dirty policy与topology；包装层或单个feature冻结不能放行其余draft/change_pending节点，未准入不得写实施状态。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；S3逐项拒绝缺冻结、基线、绑定、拓扑与dirty违规，包含全范围成功。"
+      },
+      "fingerprint": "13cde976e19ff97c92d81dd3ebdcc8e731d9ce48a05d19d6818e414f20ad69e9",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_79a3d5d04b76",
+      "kind": "touchpoint",
+      "title": "evidence rollup",
+      "intent": "局部与整体验收并存",
+      "parent_id": "n_d8566e18c1a1",
+      "path": "root/self-drive/scope-delivery-runtime/evidence-rollup",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "S4",
+          "text": "候选与证据绑定范围指纹、源码候选和执行身份；局部通过但集成失败、任一必需任务未核销、零评估、缺失/篡改/过期/错范围/自审证据均阻塞整体；证据登记、hash校验、tree verified、gate pass分别表达。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；S4包含整体成功及局部PASS集成失败、旧候选、未核销和自审拒绝。"
+      },
+      "fingerprint": "fc92936f2f3558c150f4db15efc6cb8d6694ce7c9bd43aaec6f3d4ed3487d365",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_216428d61e27",
+      "kind": "touchpoint",
+      "title": "checkpoint recovery",
+      "intent": "恢复前重评事实",
+      "parent_id": "n_d8566e18c1a1",
+      "path": "root/self-drive/scope-delivery-runtime/checkpoint-recovery",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "S5",
+          "text": "检查点绑定范围合同、需求指纹、候选及任务引用；跨进程恢复保留有效结果与失败历史，对change影响重新计算并使过期批准证据失效；resume/recover不能清人工门禁或把中断当成功。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；S5覆盖中断恢复、范围与候选改变及人工门禁拒绝。"
+      },
+      "fingerprint": "ee33306750ae4632ef9ce943d8dd5e7e8e9bb74ab89187a870ac79d615b636ba",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_2d82e2f4a3e6",
+      "kind": "touchpoint",
+      "title": "entrypoint release",
+      "intent": "全入口同一事实",
+      "parent_id": "n_d8566e18c1a1",
+      "path": "root/self-drive/scope-delivery-runtime/entrypoint-release",
+      "status": "draft",
+      "acs": [
+        {
+          "id": "S6",
+          "text": "status/check/admit/tick/prepare/confirm/tasks/verifier/complete/release及旧program路径共用规范化范围和状态迁移规则；单feature兼容，整体必须全部必需任务及集成验证成功并有独立审查与人工批准；不能只放宽prepare旧校验。"
+        }
+      ],
+      "verification": {
+        "type": "test",
+        "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；bash e2e/run_e2e.sh；S6新增真实CLI单feature/多模块成功、拒绝、恢复链路，旧E2E不能代替。"
+      },
+      "fingerprint": "33a2381be1582df124c27b252526f100ff1d9714ba7ecd05e109baca205db1fd",
+      "fingerprint_alg": "tree-json-v1"
+    }
+  ],
+  "parent_id": "n_d8566e18c1a1",
+  "provenance": {
+    "skill": "beacon-intent-tree",
+    "by": "user-authorized-host",
+    "sources": [
+      "docs/plan/scope-delivery-chain-audit.md"
+    ]
+  }
+}

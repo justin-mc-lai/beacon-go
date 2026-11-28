@@ -1,0 +1,21 @@
+{
+  "id": "n_216428d61e27",
+  "kind": "touchpoint",
+  "title": "checkpoint recovery",
+  "intent": "恢复前重评事实",
+  "parent_id": "n_d8566e18c1a1",
+  "path": "root/self-drive/scope-delivery-runtime/checkpoint-recovery",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "S5",
+      "text": "检查点绑定范围合同、需求指纹、候选及任务引用；跨进程恢复保留有效结果与失败历史，对change影响重新计算并使过期批准证据失效；resume/recover不能清人工门禁或把中断当成功。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；S5覆盖中断恢复、范围与候选改变及人工门禁拒绝。"
+  },
+  "fingerprint": "6892436fc0e564aed9276412ec7695781af72a35ed3ca08a8abaee3359148aa8",
+  "fingerprint_alg": "tree-json-v1"
+}

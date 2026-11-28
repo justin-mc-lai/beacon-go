@@ -1,0 +1,30 @@
+{
+  "action": "grow",
+  "id": "chg_902b09cf3cb5",
+  "node_id": "n_5e13a94c202d",
+  "summary": "用户授权：范围交付全链路合同与需求基线",
+  "by": "user-authorized-host",
+  "base_fingerprint": "0ba2f06f4d30df6432deaeb5e56188e9a132f66a88920b38ccaf2f639a4d4236",
+  "before_snapshot_id": "v0.0.1-20261128T084353.826574000Z",
+  "affected": [
+    "n_5e13a94c202d",
+    "nroot_6b8991789867",
+    "n_d8566e18c1a1"
+  ],
+  "created_at": "2026-11-28T08:43:53.817657Z",
+  "added": [
+    "n_d8566e18c1a1"
+  ],
+  "modified": [
+    "n_5e13a94c202d",
+    "nroot_6b8991789867"
+  ],
+  "deprecated": [],
+  "dependency_scope": [
+    "n_5e13a94c202d",
+    "nroot_6b8991789867"
+  ],
+  "source_hash": "1ff8a3a2d19f77eb2703147b16c34ad98a733d91014db8f735f2c8a6153de822",
+  "source_commit": "62bfca1ca79970607e92636730123154034b9037",
+  "binary_sha256": "f53352f9fc25ead7289d3410c7d6a7f22d1d9d455ebf4d7a0944a2720006b2d5"
+}

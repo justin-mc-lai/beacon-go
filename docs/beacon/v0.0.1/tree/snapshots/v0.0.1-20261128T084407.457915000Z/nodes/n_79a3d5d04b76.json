@@ -1,0 +1,21 @@
+{
+  "id": "n_79a3d5d04b76",
+  "kind": "touchpoint",
+  "title": "evidence rollup",
+  "intent": "局部与整体验收并存",
+  "parent_id": "n_d8566e18c1a1",
+  "path": "root/self-drive/scope-delivery-runtime/evidence-rollup",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "S4",
+      "text": "候选与证据绑定范围指纹、源码候选和执行身份；局部通过但集成失败、任一必需任务未核销、零评估、缺失/篡改/过期/错范围/自审证据均阻塞整体；证据登记、hash校验、tree verified、gate pass分别表达。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；S4包含整体成功及局部PASS集成失败、旧候选、未核销和自审拒绝。"
+  },
+  "fingerprint": "70e7fe800a2f5fe3a4cdb8118d8b9bfa0c61b05557439c86ee85c0a6a615e889",
+  "fingerprint_alg": "tree-json-v1"
+}

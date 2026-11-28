@@ -9,7 +9,7 @@
       "status": "frozen",
       "title": "需求树驱动的 SDD 产品",
       "path": "root",
-      "fingerprint": "4666231259ed86cd2c670b7288b31c3a4600a5786b2f3eab652d8db827784184",
+      "fingerprint": "4354a5c4a01ea2541c70aa4f119cb2c3d925d3a9ba8387138c92734a562e4f7d",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -269,7 +269,7 @@
       "status": "frozen",
       "title": "self drive",
       "path": "root/self-drive",
-      "fingerprint": "0ba2f06f4d30df6432deaeb5e56188e9a132f66a88920b38ccaf2f639a4d4236",
+      "fingerprint": "767740f0e4c69430aa2fd846491f9aa0b11c58d287f90fb78a6a5e50c7e8a55e",
       "fingerprint_alg": "tree-json-v1"
     },
     {
@@ -290,6 +290,76 @@
       "title": "defect to change",
       "path": "root/self-drive/defect-feedback/defect-to-change",
       "fingerprint": "662f8e579f05600239ba1fcad1a805104f08b8dcd06c07b7c4d11cb4269d964c",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_d8566e18c1a1",
+      "parent_id": "n_5e13a94c202d",
+      "kind": "feature",
+      "status": "frozen",
+      "title": "scope delivery runtime",
+      "path": "root/self-drive/scope-delivery-runtime",
+      "fingerprint": "254c91ec8b0c13b2d033d19f875c585c554fabc972185148adeee83874d0d174",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_216428d61e27",
+      "parent_id": "n_d8566e18c1a1",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "checkpoint recovery",
+      "path": "root/self-drive/scope-delivery-runtime/checkpoint-recovery",
+      "fingerprint": "6892436fc0e564aed9276412ec7695781af72a35ed3ca08a8abaee3359148aa8",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_2d82e2f4a3e6",
+      "parent_id": "n_d8566e18c1a1",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "entrypoint release",
+      "path": "root/self-drive/scope-delivery-runtime/entrypoint-release",
+      "fingerprint": "86d5ad101dfeb4caa35e1074b60cd853843fd74af0b32f057cc5dcbcb3eec678",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_79a3d5d04b76",
+      "parent_id": "n_d8566e18c1a1",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "evidence rollup",
+      "path": "root/self-drive/scope-delivery-runtime/evidence-rollup",
+      "fingerprint": "70e7fe800a2f5fe3a4cdb8118d8b9bfa0c61b05557439c86ee85c0a6a615e889",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_96952d72c093",
+      "parent_id": "n_d8566e18c1a1",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "scope admission",
+      "path": "root/self-drive/scope-delivery-runtime/scope-admission",
+      "fingerprint": "495329d6bbfb7df2ed1a2e032f33c81267986dbc07f5248a871de3a71d097698",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_c085c6eac582",
+      "parent_id": "n_d8566e18c1a1",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "scope binding",
+      "path": "root/self-drive/scope-delivery-runtime/scope-binding",
+      "fingerprint": "9479cc7133cb1585b5e2d43c4307b86de75b13fc713e8a90bdb2508f1296ee79",
+      "fingerprint_alg": "tree-json-v1"
+    },
+    {
+      "id": "n_962d573b8698",
+      "parent_id": "n_d8566e18c1a1",
+      "kind": "touchpoint",
+      "status": "frozen",
+      "title": "task expansion",
+      "path": "root/self-drive/scope-delivery-runtime/task-expansion",
+      "fingerprint": "b0a13930e1077701253754c5713e84b53ed1a7d69fd9a53d2365b1e882b7daf2",
       "fingerprint_alg": "tree-json-v1"
     },
     {

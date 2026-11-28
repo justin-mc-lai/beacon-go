@@ -1,0 +1,4 @@
+{
+  "provenance": {"by":"user-authorized-host","skill":"beacon-intent-tree","sources":["docs/plan/scope-delivery-chain-audit.md"]},
+  "children": [{"kind":"feature","slug":"scope-delivery-runtime","title":"scope delivery runtime","intent":"一次交付绑定明确需求范围和指纹；系统确定性拆分任务、汇总局部与整体验收证据并在中断后重评恢复，统一全部入口且保留worktree、独立验收、人工发布门禁。","doc":"## 问题\n现有run与单feature耦合，包装层可能代替范围事实。\n## 目标用户\n多模块需求交付的用户与宿主agent。\n## 场景\n用户确认范围后，宿主利用内核确定性绑定、拆分、核销和恢复；内核不调用LLM或启动agent。\n## 范围\n范围规范化、幂等拆分、全范围准入、证据汇总、恢复与统一入口；具体AC以子叶为准，调用点见docs/plan/scope-delivery-chain-audit.md。\n## 非目标\n不自动发布、不新增能力组、不物理删除历史、不将旧Portfolio来源变成第二需求权威。\n## 验收标准\n单feature与多模块同一规范化路径；真实成功/拒绝/恢复/并发探针通过，必需检查和独立复核齐全。需求冻结不等于实现或发布。"}]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "n_2d82e2f4a3e6",
+  "kind": "touchpoint",
+  "title": "entrypoint release",
+  "intent": "全入口同一事实",
+  "parent_id": "n_d8566e18c1a1",
+  "path": "root/self-drive/scope-delivery-runtime/entrypoint-release",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "S6",
+      "text": "status/check/admit/tick/prepare/confirm/tasks/verifier/complete/release及旧program路径共用规范化范围和状态迁移规则；单feature兼容，整体必须全部必需任务及集成验证成功并有独立审查与人工批准；不能只放宽prepare旧校验。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；bash e2e/run_e2e.sh；S6新增真实CLI单feature/多模块成功、拒绝、恢复链路，旧E2E不能代替。"
+  },
+  "fingerprint": "86d5ad101dfeb4caa35e1074b60cd853843fd74af0b32f057cc5dcbcb3eec678",
+  "fingerprint_alg": "tree-json-v1"
+}

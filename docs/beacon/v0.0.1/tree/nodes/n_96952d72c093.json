@@ -1,0 +1,21 @@
+{
+  "id": "n_96952d72c093",
+  "kind": "touchpoint",
+  "title": "scope admission",
+  "intent": "全范围实施准入",
+  "parent_id": "n_d8566e18c1a1",
+  "path": "root/self-drive/scope-delivery-runtime/scope-admission",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "S3",
+      "text": "所有执行入口检查完整范围冻结、当前确认、committed baseline、worktree绑定、dirty policy与topology；包装层或单个feature冻结不能放行其余draft/change_pending节点，未准入不得写实施状态。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；S3逐项拒绝缺冻结、基线、绑定、拓扑与dirty违规，包含全范围成功。"
+  },
+  "fingerprint": "495329d6bbfb7df2ed1a2e032f33c81267986dbc07f5248a871de3a71d097698",
+  "fingerprint_alg": "tree-json-v1"
+}

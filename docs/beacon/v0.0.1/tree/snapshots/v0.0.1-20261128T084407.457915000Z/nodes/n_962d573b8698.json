@@ -1,0 +1,21 @@
+{
+  "id": "n_962d573b8698",
+  "kind": "touchpoint",
+  "title": "task expansion",
+  "intent": "稳定任务身份和幂等拆分",
+  "parent_id": "n_d8566e18c1a1",
+  "path": "root/self-drive/scope-delivery-runtime/task-expansion",
+  "status": "frozen",
+  "acs": [
+    {
+      "id": "S2",
+      "text": "从确认范围确定性生成依赖任务与稳定ID，重试与跨进程恢复不重复建任务或丢失失败历史；未知/循环依赖拒绝，真并发以双执行者同步屏障证明唯一写入口；内核不调用LLM/agent。"
+    }
+  ],
+  "verification": {
+    "type": "test",
+    "spec": "go test ./internal/orchestrator ./internal/cli -run TestScopeDelivery -count=1 -v；S2覆盖重复调用、跨进程与同步屏障并发成功和依赖拒绝。"
+  },
+  "fingerprint": "b0a13930e1077701253754c5713e84b53ed1a7d69fd9a53d2365b1e882b7daf2",
+  "fingerprint_alg": "tree-json-v1"
+}
